@@ -56,10 +56,6 @@
  *
  * Michael Borland
  */
-#if defined(LINUX)
-#include <sys/stat.h>
-#endif
-
 #include "rpn_internal.h"
 
 #ifdef VAX_VMS
@@ -72,6 +68,9 @@ int main(int argc, char **argv)
     char *ptr;
     static char *input;
     static char *rpn_defns;
+#if defined(LINUX)
+    struct stat sts;
+#endif
 
 #ifdef VAX_VMS
     /* initialize collection of computer usage statistics--required by

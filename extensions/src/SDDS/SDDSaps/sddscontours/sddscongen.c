@@ -45,11 +45,6 @@
  First test release of the SDDS1.5 package.
 
  */
-
-#if defined(LINUX)
-#include <sys/stat.h>
-#endif
-
 #include "mdb.h"
 #include "scan.h"
 #include "SDDS.h"
@@ -95,6 +90,10 @@ int main(int argc, char **argv)
     FILE *fp;
     unsigned long pipeFlags;
     char pfix[IFPF_BUF_SIZE], *ptr;
+    char * rpn_defns;
+#if defined(LINUX)
+    struct stat sts;
+#endif
 
     if (argc<2 || argc>(2+N_OPTIONS)) 
         bomb(NULL, USAGE);

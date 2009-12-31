@@ -91,10 +91,6 @@
 
  *
  */
-#if defined(LINUX)
-#include <sys/stat.h>
-#endif
-
 #include "mdb.h"
 #include "SDDS.h"
 #include "SDDSaps.h"
@@ -202,7 +198,10 @@ int main(int argc, char **argv)
   unsigned long simplexFlags = 0;
   char *ptr;
   char * rpn_defns;
-  
+#if defined(LINUX)
+    struct stat sts;
+#endif
+
   SDDS_RegisterProgramName(argv[0]);
   argc = scanargs(&s_arg, argc, argv);
 

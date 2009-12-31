@@ -204,11 +204,6 @@
    * First test release of SDDS1.5
    *
    */
-
-#if defined(LINUX)
-#include <sys/stat.h>
-#endif
-
 #include "mdb.h"
 #include "scan.h"
 #include "SDDS.h"
@@ -425,6 +420,11 @@ int main(int argc, char **argv)
     char **orig_array_name, **new_array_name;
     long *orig_array_flag;
     int32_t orig_array_names;
+#if defined(LINUX)
+    struct stat sts;
+#endif
+    char * rpn_defns;
+    
     SDDS_RegisterProgramName(argv[0]);
     
     argc = scanargs(&s_arg, argc, argv);

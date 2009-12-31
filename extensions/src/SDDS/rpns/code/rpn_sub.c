@@ -62,10 +62,6 @@
  *
  * Michael Borland
  */
-#if defined(LINUX)
-#include <sys/stat.h>
-#endif
-
 #include "rpn_internal.h"
 
 double rpn_internal(char *expression)
@@ -108,6 +104,9 @@ double rpn(char *expression)
     static char *ptr;
     static char *input, *rpn_defns;
     static long initial_call = 1;
+#if defined(LINUX)
+    struct stat sts;
+#endif
 
     if (initial_call) {
         initial_call = 0;
@@ -196,7 +195,7 @@ double rpn(char *expression)
 	    }
 	    if (rpn_defns) {
             /* check environment variable RPN_DEFNS for setup file */
-		//cp_str(&rpn_defns, getenv("RPN_DEFNS"));
+		/*cp_str(&rpn_defns, getenv("RPN_DEFNS"));*/
 		if (strlen(rpn_defns)) {
 		    input_stack[istackptr].fp = fopen_e(rpn_defns, "r", 0);
 		    input_stack[istackptr++].filemode = NO_ECHO;

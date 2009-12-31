@@ -224,10 +224,6 @@
  * First test release of the SDDS1.5 package.
  *
  */
-#if defined(LINUX)
-#include <sys/stat.h>
-#endif
-
 #include "mdb.h"
 #include "SDDS.h"
 #include "scan.h"
@@ -542,6 +538,11 @@ int main(int argc, char **argv)
 #endif
 #endif
 
+#if defined(LINUX)
+    struct stat sts;
+#endif
+    char * rpn_defns;
+    
   argc = scanargsg(&s_arg, argc, argv); 
   for (i_arg=1; i_arg<argc; i_arg++) {
     if (s_arg[i_arg].arg_type==OPTION) {

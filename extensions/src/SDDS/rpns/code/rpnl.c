@@ -29,11 +29,6 @@
  * First test release of the SDDS1.5 package.
  *
 */
-
-#if defined(LINUX)
-#include <sys/stat.h>
-#endif
-
 #include "mdb.h"
 #include "rpn_internal.h"
 
@@ -43,6 +38,9 @@ char **argv;
 {
     double rpn(), result=0;
     char *format, *defns;
+#if defined(LINUX)
+    struct stat sts;
+#endif
     
     defns=getenv("RPN_DEFNS");
     if(!defns) {

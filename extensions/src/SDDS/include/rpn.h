@@ -122,7 +122,10 @@ typedef unsigned __int32 uint32_t;
 #endif
 
 #if defined(LINUX)
-#define rpn_default = "/etc/sdds/defns.rpn"
+#include <sys/stat.h>
+#include <errno.h>
+
+static char * rpn_default = "/etc/sdds/defns.rpn";
 #endif
 
 #undef epicsShareFuncRPNLIB
