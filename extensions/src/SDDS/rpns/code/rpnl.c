@@ -30,6 +30,10 @@
  *
 */
 
+#if defined(LINUX)
+#include <sys/stat.h>
+#endif
+
 #include "mdb.h"
 #include "rpn_internal.h"
 
@@ -39,10 +43,20 @@ char **argv;
 {
     double rpn(), result=0;
     char *format, *defns;
+    
+    defns=getenv("RPN_DEFNS");
+    if(!defns) {
+#if defined(LINUX)
+	if (!(stat(rpn_default, &sts) == -1 && errno == ENOENT)) { /* check whether default file exists */
+	    defns = rpn_default;
+	}
+#endif
+    }
+    
+    rpn(defns);
 
-
-    rpn(defns=getenv("RPN_DEFNS"));
-
+    /* add default RPM_DEFNS setting, G. Shen Dec 31, 2009 */
+    /* rpn(defns=getenv("RPN_DEFNS")); */
     if (!(format=getenv("RPNL_FORMAT")))
         cp_str(&format, "%.15lg");
 

@@ -45,6 +45,11 @@
  First test release of the SDDS1.5 package.
 
  */
+
+#if defined(LINUX)
+#include <sys/stat.h>
+#endif
+
 #include "mdb.h"
 #include "scan.h"
 #include "SDDS.h"
@@ -210,7 +215,19 @@ int main(int argc, char **argv)
     if (z_equation==NULL)
         bomb("-zequation must be supplied", NULL);
 
-    rpn(rpn_defns_file?rpn_defns_file:getenv("RPN_DEFNS"));
+    if(!rpn_defns_file) {
+	rpn_defns_file=getenv("RPN_DEFNS");
+	/*if failed, check where default setting exists for a linux system, G. Shen, Dec 31, 2009 */
+	if(!rpn_defns_file) {
+#if defined(LINUX)
+	    if (!(stat(rpn_default, &sts) == -1 && errno == ENOENT)) { /* check whether default file exists */
+		rpn_defns = rpn_default;
+	    }
+#endif
+	}
+    }
+    rpn(rpn_defns_file);
+    /* rpn(rpn_defns_file?rpn_defns_file:getenv("RPN_DEFNS")); */
     if (rpn_init_command)
         rpn(rpn_init_command);
     x_rpn_var = rpn_create_mem("x", 0);

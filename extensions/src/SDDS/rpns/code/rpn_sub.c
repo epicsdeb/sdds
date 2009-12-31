@@ -62,6 +62,10 @@
  *
  * Michael Borland
  */
+#if defined(LINUX)
+#include <sys/stat.h>
+#endif
+
 #include "rpn_internal.h"
 
 double rpn_internal(char *expression)
@@ -181,14 +185,24 @@ double rpn(char *expression)
           }
           input_stack[istackptr++].filemode = NO_ECHO;
         }
-        else if ((rpn_defns=getenv("RPN_DEFNS"))) {
+        else { /*add default setting for a linux system, G. Shen, Dec 31, 2009 */
+	    rpn_defns=getenv("RPN_DEFNS");
+	    if(!rpn_defns) {
+#if defined(LINUX)
+		if (!(stat(rpn_default, &sts) == -1 && errno == ENOENT)) { /* check whether default file exists */
+		    rpn_defns = rpn_default;
+		}
+#endif
+	    }
+	    if (rpn_defns) {
             /* check environment variable RPN_DEFNS for setup file */
-            cp_str(&rpn_defns, getenv("RPN_DEFNS"));
-            if (strlen(rpn_defns)) {
-                input_stack[istackptr].fp = fopen_e(rpn_defns, "r", 0);
-                input_stack[istackptr++].filemode = NO_ECHO;
+		//cp_str(&rpn_defns, getenv("RPN_DEFNS"));
+		if (strlen(rpn_defns)) {
+		    input_stack[istackptr].fp = fopen_e(rpn_defns, "r", 0);
+		    input_stack[istackptr++].filemode = NO_ECHO;
                 }
             }
+	}
         expression = NULL;
 
         /* end of initialization section */

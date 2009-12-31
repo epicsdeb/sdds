@@ -56,6 +56,10 @@
  *
  * Michael Borland
  */
+#if defined(LINUX)
+#include <sys/stat.h>
+#endif
+
 #include "rpn_internal.h"
 
 #ifdef VAX_VMS
@@ -144,7 +148,16 @@ int main(int argc, char **argv)
         input_stack[istackptr++].filemode = NO_ECHO;
         }
 
-    if ((rpn_defns=getenv("RPN_DEFNS")) && (long)strlen(rpn_defns)>0 ) {
+    /*add default setting for a linux system, G. Shen, Dec 31, 2009 */
+    rpn_defns=getenv("RPN_DEFNS");
+    if(!rpn_defns) {
+#if defined(LINUX)
+	if (!(stat(rpn_default, &sts) == -1 && errno == ENOENT)) { /* check whether default file exists */
+	    rpn_defns = rpn_default;
+	}
+#endif
+    }
+    if (rpn_defns && (long)strlen(rpn_defns)>0 ) {
         /* push rpn definitions file onto top of the stack */
         input_stack[istackptr].fp = fopen_e(rpn_defns, "r", 0);
         input_stack[istackptr++].filemode = NO_ECHO;

@@ -224,6 +224,10 @@
  * First test release of the SDDS1.5 package.
  *
  */
+#if defined(LINUX)
+#include <sys/stat.h>
+#endif
+
 #include "mdb.h"
 #include "SDDS.h"
 #include "scan.h"
@@ -1265,7 +1269,17 @@ int main(int argc, char **argv)
     }
   }
   else {
-    rpn(getenv("RPN_DEFNS"));
+      rpn_defns=getenv("RPN_DEFNS");
+      /*if failed, check where default setting exists for a linux system, G. Shen, Dec 31, 2009 */
+      if(!rpn_defns) {
+#if defined(LINUX)
+	  if (!(stat(rpn_default, &sts) == -1 && errno == ENOENT)) { /* check whether default file exists */
+	      rpn_defns = rpn_default;
+	  }
+#endif
+      }
+      rpn(rpn_defns);
+      /*rpn(getenv("RPN_DEFNS"));*/
     if (rpn_check_error())
       return(1);
   }

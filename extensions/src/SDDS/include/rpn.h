@@ -121,6 +121,9 @@ typedef unsigned __int32 uint32_t;
 #endif
 #endif
 
+#if defined(LINUX)
+#define rpn_default = "/etc/sdds/defns.rpn"
+#endif
 
 #undef epicsShareFuncRPNLIB
 #if (defined(_WIN32) && !defined(__CYGWIN32__)) || (defined(__BORLANDC__) && defined(__linux__))
@@ -328,3 +331,4 @@ epicsShareFuncRPNLIB int if2pf(char *pfix, char *ifix, size_t size_of_pfix);
 #define STACKSIZE 5000
 epicsShareExtern long dstackptr;
 epicsShareExtern long sstackptr;
+

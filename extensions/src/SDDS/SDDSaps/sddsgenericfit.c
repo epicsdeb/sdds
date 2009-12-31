@@ -91,6 +91,10 @@
 
  *
  */
+#if defined(LINUX)
+#include <sys/stat.h>
+#endif
+
 #include "mdb.h"
 #include "SDDS.h"
 #include "SDDSaps.h"
@@ -197,7 +201,8 @@ int main(int argc, char **argv)
   char pfix[IFPF_BUF_SIZE];
   unsigned long simplexFlags = 0;
   char *ptr;
-
+  char * rpn_defns;
+  
   SDDS_RegisterProgramName(argv[0]);
   argc = scanargs(&s_arg, argc, argv);
 
@@ -375,8 +380,18 @@ int main(int argc, char **argv)
     SDDS_Bomb("you must give at least one -variables option");
   if (equation==NULL)
     SDDS_Bomb("you must give an equation string");
-  
-  rpn(getenv("RPN_DEFNS"));
+
+  rpn_defns=getenv("RPN_DEFNS");
+  /*if failed, check where default setting exists for a linux system, G. Shen, Dec 31, 2009 */
+  if(!rpn_defns) {
+#if defined(LINUX)
+      if (!(stat(rpn_default, &sts) == -1 && errno == ENOENT)) { /* check whether default file exists */
+	  rpn_defns = rpn_default;
+      }
+#endif
+  }
+  rpn(rpn_defns);
+  /*rpn(getenv("RPN_DEFNS"));*/
   if (rpn_check_error()) exit(1);
 
   if (!SDDS_InitializeInput(&InputTable, input))
