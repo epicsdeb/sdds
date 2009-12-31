@@ -1,0 +1,9 @@
+sdds for Debian
+--------------
+
+ The Self Describing Data Sets (SDDS) is for an accelerator simulation, beam commissioning, physics
+ study, and operation. A file protocol is the basis for a powerful and expanding toolkit of generic 
+ programs. These programs are used for simulation postprocessing, graphics, data preparation, program 
+ interfacing, and experimental data analysis. 
+
+ -- Guobao Shen <shengb@bnl.gov>  Mon, 30 Dec 2009 15:48:45 -0400

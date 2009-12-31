@@ -1,0 +1,41 @@
+Source: sdds
+Section: contrib/x11
+Priority: extra
+Maintainer: Guobao Shen <shengb@bnl.gov>
+Build-Depends: debhelper (>= 7), cdbs,
+               epics-dev (>= 3.14.10-10), epics-dev (<< 3.14.11),
+               epics-extensions-dev (>= 20091204),
+               libpng-dev, libz-dev, zlib1g, zlib1g-dev, libmotif3, libmotif-dev,
+               libxaw7-dev, libxaw-headers, libx11-dev, libxp-dev,  libxt-dev,
+               libxmu-headers, libxmu-dev, libxtst-dev, libgd2-xpm-dev,
+               x11proto-print-dev, tk (>=8.4)
+Standards-Version: 3.8.0
+Homepage: http://www.aps.anl.gov/Accelerator_Systems_Division/Operations_Analysis/software.shtml
+
+Package: sdds
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},
+Description: The Self Describing Data Sets
+ The Self Describing Data Sets (SDDS) is for an accelerator simulation, beam commissioning, physics
+ study, and operation. A file protocol is the basis for a powerful and expanding toolkit of generic 
+ programs. These programs are used for simulation postprocessing, graphics, data preparation, program 
+ interfacing, and experimental data analysis. 
+
+Package: sdds-dev
+Section: contrib/devel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},
+         sdds (= ${binary:Version}),
+         epics-dev (>= 3.14.10-10), epics-dev (<< 3.14.11),
+         epics-extensions-dev,
+         libpng-dev, libz-dev, zlib1g, zlib1g-dev, libmotif3, libmotif-dev,
+         libxaw7-dev, libxaw-headers, libx11-dev, libxp-dev,  libxt-dev,
+         libxmu-headers, libxmu-dev, libxtst-dev, libgd2-xpm-dev,
+         x11proto-print-dev, tk (>=8.4)
+Description: The Self Describing Data Sets
+ The Self Describing Data Sets (SDDS) is for an accelerator simulation, beam commissioning, physics
+ study, and operation. A file protocol is the basis for a powerful and expanding toolkit of generic 
+ programs. These programs are used for simulation postprocessing, graphics, data preparation, program 
+ interfacing, and experimental data analysis. 
+ .
+ Development libraries and headers
