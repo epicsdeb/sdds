@@ -60,10 +60,8 @@ sddslibs += SDDS1c
 binbuild=$(CURDIR)/bin/$(EPICS_HOST_ARCH)
 libbuild=$(CURDIR)/lib/$(EPICS_HOST_ARCH)
 
-common-build-arch:: build-obj-stamp
-
 clean::
-	rm -f build-obj-stamp configure
+	rm -f configure
 	rm -rf bin include lib/$(EPICS_HOST_ARCH)
 	find . -name 'O.*' -type d|xargs rm -rf
 
