@@ -1,0 +1,49 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for namelist
+# $Log: Makefile.Vx,v $
+# Revision 1.3  2003/08/28 20:35:17  soliday
+# Cleaned up the code.
+#
+# Revision 1.2  2002/08/14 16:23:48  soliday
+# Added Open License
+#
+# Revision 1.1  1999/12/15 16:44:28  soliday
+# First version of Makefile.Vx
+#
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+
+USR_CFLAGS += -I../../include
+
+SRCS.c = \
+	../escape_quotes.c ../free_namelist.c \
+	../free_namelist_text.c ../get_namelist.c \
+	../namelist_etc.c ../print_namelist.c \
+	../process_namelist.c ../scan_namelist.c \
+	../show_namelist.c ../show_namelist_fields.c \
+	../zero_namelist.c
+
+LIBOBJS = \
+	escape_quotes.o free_namelist.o \
+	free_namelist_text.o get_namelist.o \
+	namelist_etc.o print_namelist.o \
+	process_namelist.o scan_namelist.o \
+	show_namelist.o show_namelist_fields.o \
+	zero_namelist.o
+
+LIBNAME = namelist
+
+
+include $(TOP)/config/RULES.Vx
+

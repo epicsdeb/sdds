@@ -1,0 +1,51 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for include directory (only installs headers)
+# $Log: Makefile.Host,v $
+# Revision 1.8  2003/07/22 23:18:16  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+# Revision 1.7  2003/01/08 20:50:03  borland
+# Added several files to the makefile.
+#
+# Revision 1.6  2002/08/14 15:40:12  soliday
+# Added Open License
+#
+# Revision 1.5  2002/05/09 14:52:32  soliday
+# Added matlib.h to the INC line.
+#
+# Revision 1.4  2002/02/26 03:09:51  borland
+# Added fftpackC.h to INC list.
+#
+# Revision 1.3  2001/10/25 22:01:56  borland
+# Added contour.h
+#
+# Revision 1.2  1999/07/12 19:55:21  soliday
+# Added fdlibm.h for WIN32
+#
+# Revision 1.1  1999/04/14 15:14:45  borland
+# First version added to repository (per J. Anderson).
+#
+# Revision 1.3  1995/09/25  19:18:42  saunders
+# Added constants.h and mdbsunos4.h.
+#
+# Revision 1.2  1995/09/19  20:17:18  borland
+# Added SDDStypes.h to INC list.
+#
+# Revision 1.1  1995/09/18  16:08:16  saunders
+# Header file installation for SDDS1.5.
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/include/Makefile.OAG
+include $(TOP)/config/RULES.Host
+

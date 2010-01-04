@@ -1,0 +1,77 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.6  2005/10/12 18:13:45  borland
+# Removed torture.c from the build list since it contains main().
+#
+# Revision 1.5  2005/01/21 20:30:43  soliday
+# Updated to support purify on Linux
+#
+# Revision 1.4  2004/03/16 16:57:15  soliday
+# Updated purify, quantify, and purecov build rules
+#
+# Revision 1.3  2003/08/28 19:07:23  soliday
+# Fixed some minor issues with vxWorks.
+#
+# Revision 1.2  2003/07/23 15:06:24  soliday
+# Fixed to work with WIN32
+#
+# Revision 1.1  2003/07/22 21:25:44  soliday
+# Updated Makefiles to work with both epics 3.13 and 3.14.
+#
+#
+
+CMPLR = ANSI
+
+#RATIONAL = purify
+#RATIONAL = quantify
+#RATIONAL = purecov
+ifdef RATIONAL
+HOST_OPT = NO
+CC := $(RATIONAL) -best-effort $(CC)
+CCC := $(RATIONAL) -best-effort $(CCC)
+endif
+
+ifeq ($(T_A),vxWorks-68040lc)
+OPT_CFLAGS_YES =
+endif
+
+LIBRARY = meschach
+
+ifdef WIN32
+LIB_SUFFIX=.lib
+SHARED_LIBRARIES = NO
+endif
+ifdef KYLIX
+SHARED_LIBRARIES = NO
+endif
+
+ifeq ($(OS_CLASS),solaris)
+ACC_DEP_CFLAGS += -KPIC -v
+CCC_DEP_CFLAGS += -KPIC -v
+GCC_DEP_CFLAGS += -D__EXTENSIONS__
+endif
+
+LSRC1 = copy.c err.c matrixio.c memory.c vecop.c matop.c pxop.c \
+	submat.c init.c otherio.c machine.c matlab.c ivecop.c version.c \
+	meminfo.c memstat.c
+LSRC2 = lufactor.c bkpfacto.c chfactor.c qrfactor.c solve.c hsehldr.c \
+	givens.c update.c norm.c hessen.c symmeig.c schur.c svd.c \
+	mfunc.c bdfactor.c
+LSRC3 = sparse.c sprow.c sparseio.c spchfctr.c splufctr.c \
+	spbkp.c spswap.c iter0.c itersym.c iternsym.c
+LSRC4 = zmachine.c zcopy.c zmatio.c zmemory.c zvecop.c zmatop.c znorm.c \
+	 zfunc.c 
+LSRC5 = zlufctr.c zsolve.c zmatlab.c zhsehldr.c zqrfctr.c \
+         zgivens.c  zhessen.c zschur.c
+LIBSRCS = $(LSRC1) $(LSRC2) $(LSRC3) $(LSRC4) $(LSRC5)
+
+# sources are 1 directory up
+SRCS.c=$(LIBSRCS:%=../%)

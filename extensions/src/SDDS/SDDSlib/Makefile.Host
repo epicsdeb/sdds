@@ -1,0 +1,100 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# Makefile for SDDS library
+# $Log: Makefile.Host,v $
+# Revision 1.26  2003/07/23 00:42:07  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+# Revision 1.25  2003/07/22 19:49:19  soliday
+# Added shared library support with Kylix.
+#
+# Revision 1.24  2003/07/18 21:53:28  soliday
+# Added support for Kylix.
+#
+# Revision 1.23  2003/05/06 19:04:58  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.22  2003/02/19 17:02:37  soliday
+# Updated for Borland C when building inside cygwin
+#
+# Revision 1.21  2002/08/14 16:34:46  soliday
+# Added Open License
+#
+# Revision 1.20  2002/07/30 08:43:13  soliday
+# Changed the purify lines.
+#
+# Revision 1.19  2001/11/02 19:15:56  soliday
+# Removed purify which was left in by accident.
+#
+# Revision 1.18  2001/10/28 14:21:09  borland
+# Fixed bug in SDDS_AssertColumnFlags() (the column_order array was not
+# set up properly).  Simplified code in SDDS_GetRowType().
+#
+# Revision 1.17  2000/12/07 22:00:09  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.16  2000/10/04 19:49:41  soliday
+# Added support for shared libraries on Linux.
+#
+# Revision 1.15  2000/08/11 19:28:11  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris when using cc.
+#
+# Revision 1.14  2000/08/10 21:15:25  soliday
+# Added support for gcc on Solaris.
+#
+# Revision 1.13  2000/04/17 20:27:08  soliday
+# Added flag to define binaryInsert with Borland C.
+#
+# Revision 1.12  2000/04/11 16:30:52  soliday
+# SDDS library no longer requires mdbmth or fdlibm to link.
+#
+# Revision 1.11  2000/04/06 22:18:21  soliday
+# Added support for Borland C.
+#
+# Revision 1.10  2000/04/04 05:07:04  soliday
+# Added warning flag for solaris.
+#
+# Revision 1.9  2000/03/30 02:35:05  borland
+# Added SDDS_InitializeAppendToPage().
+#
+# Revision 1.8  2000/02/09 17:51:47  soliday
+# Fixed bug with nlpp not having the .exe extension on WIN32
+#
+# Revision 1.7  2000/01/18 20:15:46  soliday
+# Added support for ZLIB.
+#
+# Revision 1.6  1999/09/14 18:17:52  soliday
+# On WIN32 a dll file is now created
+#
+# Revision 1.5  1999/07/08 21:43:42  soliday
+# Added support for WIN32
+#
+# Revision 1.4  1999/06/03 21:12:18  soliday
+# Modified AR when run under Linux.
+#
+# Revision 1.3  1999/06/01 19:10:04  borland
+# Reorgnized a logic statement to make it more transparent.
+#
+# Revision 1.2  1999/04/16 14:05:30  borland
+# Added some lines to allow easier compiling for debugging.
+#
+# Revision 1.1  1999/04/14 15:14:44  borland
+# First version added to repository (per J. Anderson).
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/SDDSlib/Makefile.OAG
+include $(TOP)/config/RULES.Host
+
+all buildInstall::
+	$(MAKE) -f ../Makefile.Host.SDDS1
+	

@@ -1,0 +1,349 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.44  2009/12/02 22:31:48  soliday
+# Removed agilent scope programs on Windows.
+#
+# Revision 1.43  2009/08/18 19:14:34  soliday
+# Added the agilentwaveform2sdds and agilentcomm programs.
+#
+# Revision 1.42  2009/04/27 20:15:14  soliday
+# Updated so that the gsl library is only linked in for the programs that
+# need it.
+#
+# Revision 1.41  2009/04/27 19:00:59  shang
+# now uses the GSL bessel functions instead of NR.
+#
+# Revision 1.40  2009/04/27 16:01:42  soliday
+# Updated to link to gsl library when it is required.
+#
+# Revision 1.39  2008/11/13 18:28:20  soliday
+# Changed the name of the nn library to nnetwork because of a name conflict
+# on darwin-x86
+#
+# Revision 1.38  2008/09/15 21:36:03  soliday
+# Added sddscombinelogfiles
+#
+# Revision 1.37  2008/08/27 22:44:47  emery
+# sddstranspose now needs SDDSutils.c since Shang added getMatchingSDDSNames
+#
+# Revision 1.36  2008/02/26 19:48:06  soliday
+# Updated to get sdds2dinterpolate to compile on WIN32
+#
+# Revision 1.35  2007/11/09 20:33:19  soliday
+# Improved static build.
+#
+# Revision 1.34  2007/10/03 15:16:27  shang
+# added sdds2dinterpolate
+#
+# Revision 1.33  2007/04/17 17:24:33  soliday
+# Updated to better detect and use png, gd, and tiff system libraries.
+#
+# Revision 1.32  2006/09/12 14:09:38  borland
+# Added sddssyncflux.
+#
+# Revision 1.31  2006/08/08 17:07:40  emery
+# Added sddsbinarystring.
+#
+# Revision 1.30  2006/05/08 20:54:00  soliday
+# Updated to work with various build options on Linux.
+#
+# Revision 1.29  2006/05/05 21:56:50  soliday
+# Updated to work with all four combinations of SHARED_LIBRARIES and STATIC_BUILD
+# on Linux.
+#
+# Revision 1.28  2006/04/18 19:07:44  soliday
+# Removed debugging statement from last change.
+#
+# Revision 1.27  2006/04/11 15:49:50  soliday
+# Updated to work better under various build settings on Linux.
+#
+# Revision 1.26  2006/04/10 21:24:49  soliday
+# Updated to always use the included version of tiff.
+#
+# Revision 1.25  2006/03/10 16:26:20  soliday
+# Added SDDSutils to sddsdigfilter
+#
+# Revision 1.24  2006/02/10 21:14:56  soliday
+# Added wfm2sdds program.
+#
+# Revision 1.23  2005/11/29 18:38:21  shang
+# added SDDSutils to sddsdiff
+#
+# Revision 1.22  2005/09/22 16:54:12  borland
+# Added sddsdiff.
+#
+# Revision 1.21  2005/07/29 21:14:30  soliday
+# Updated to build with Blue Gene/L. linux-ppc-bgl-gnu
+#
+# Revision 1.20  2005/07/29 19:47:26  soliday
+# Changed curses to ncurses because some linux distributions only have
+# ncurses.
+#
+# Revision 1.19  2005/02/25 23:26:09  soliday
+# Updated so that a static build on solaris will work.
+#
+# Revision 1.18  2005/01/21 20:30:42  soliday
+# Updated to support purify on Linux
+#
+# Revision 1.17  2004/12/14 20:55:53  soliday
+# Added sdds2tiff
+#
+# Revision 1.16  2004/03/16 16:38:55  soliday
+# Updated purify, quantify, and purecov compiler definitions.
+#
+# Revision 1.15  2004/02/09 15:28:43  soliday
+# Added sddsmatrixop to the Makefile
+#
+# Revision 1.14  2004/01/20 20:12:45  soliday
+# Added sddsconvertlogonchange
+#
+# Revision 1.13  2004/01/06 21:15:00  soliday
+# Improved the method for locating an existing tiff library and header files.
+#
+# Revision 1.12  2003/10/06 20:34:26  soliday
+# Fixed a problem looking for libtiff.a
+#
+# Revision 1.11  2003/09/18 20:35:21  soliday
+# Made it easier to run purify.
+#
+# Revision 1.10  2003/08/28 22:24:55  soliday
+# Modified so that vxWorks does not try to build this with EPICS ver 3.14
+#
+# Revision 1.9  2003/08/25 15:03:10  soliday
+# Fixed a typo.
+#
+# Revision 1.8  2003/08/18 20:16:16  soliday
+# Fixed issue with OSX
+#
+# Revision 1.7  2003/08/04 15:22:27  soliday
+# Added change for Kylix
+#
+# Revision 1.6  2003/07/25 16:17:20  soliday
+# Simplified makefile
+#
+# Revision 1.5  2003/07/25 16:06:47  soliday
+# Fixed issue on Linux.
+#
+# Revision 1.4  2003/07/23 19:32:41  soliday
+# Added changes for solaris
+#
+# Revision 1.3  2003/07/23 18:41:25  soliday
+# Fixed for WIN32
+#
+# Revision 1.2  2003/07/23 06:39:45  soliday
+# Changed PROD_LIBS to USR_LIBS
+#
+# Revision 1.1  2003/07/23 03:54:09  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+#
+#
+
+CMPLR = ANSI
+
+#RATIONAL = purify
+#RATIONAL = quantify
+#RATIONAL = purecov
+ifdef RATIONAL
+HOST_OPT = NO
+CC := $(RATIONAL) -best-effort $(CC)
+CCC := $(RATIONAL) -best-effort $(CCC)
+endif
+
+SDDSPROD =  citi2sdds csv2sdds elegant2genesis \
+        hpif2sdds hpwf2sdds image2sdds \
+        lba2sdds mcs2sdds mpl2sdds \
+        plaindata2sdds raw2sdds sdds2math \
+        sdds2mpl sdds2plaindata sdds2spreadsheet \
+        sdds2stream sddsarray2column \
+        sddsbaseline sddsbinarystring sddsbreak sddscast \
+        sddschanges sddscheck sddscliptails \
+        sddscollapse sddscollect sddscombine \
+        sddsconvert sddsconvertlogonchange sddsconvolve \
+        sddscorrelate sddsderef sddsderiv \
+        sddsdigfilter sddsdistest sddsendian \
+        sddsenvelope sddseventhist sddsexpand \
+        sddsexpfit sddsfdfilter sddsfft \
+        sddsgenericfit sddsgfit sddshist \
+        sddsimageprofiles sddsinteg sddsinterp \
+        sddsinterpset sddsmakedataset sddsmatrixmult \
+        sddsmatrixop sddsminterp sddsmpfit \
+        sddsmselect sddsmultihist sddsmxref \
+        sddsnaff sddsnormalize sddsoutlier \
+        sddspeakfind sddspfit sddspoly \
+        sddsprintout sddsprocess sddsquery \
+        sddsregroup sddsrowstats sddsrunstats \
+        sddssampledist sddsselect sddssequence \
+        sddsseparate sddsshift sddsshiftcor \
+        sddssinefit sddsslopes sddssmooth \
+        sddssort sddssplit sddsspotanalysis \
+        sddstimeconvert sddstranspose sddsvslopes \
+        sddsxref sddszerofind tek2sdds \
+        TFS2sdds sddsdiff wfm2sdds sddssyncflux \
+        sdds2dinterpolate sddscombinelogfiles
+        
+
+ifndef WIN32
+SDDSPROD += agilentwaveform2sdds agilentcomm
+endif
+ifndef BGL
+SDDSPROD += sdds2tiff tiff2sdds
+endif
+
+ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
+PROD = $(SDDSPROD)
+else
+PROD_HOST = $(SDDSPROD)
+endif
+
+ifdef KYLIX
+LDFLAGS += -w-dup
+endif
+
+USR_CFLAGS += 	-I. -I../../include -I../../gsl -DzLib
+ifeq ($(OS_CLASS),solaris)
+ACC_DEP_CFLAGS += -KPIC -v
+CCC_DEP_CFLAGS += -KPIC -v
+GCC_DEP_CFLAGS += -D__EXTENSIONS__
+endif
+
+PROD_LIBS_DEFAULT = mdbcommon matlib fftpack rpnlib SDDS1 mdbmth mdblib nnetwork csa
+PROD_LIBS_WIN32 = mdbcommon matlib fftpack rpnlib SDDS1 mdbmth mdblib nnetwork csa z fdlibm
+PROD_LIBS_BORLANDC = mdbcommon matlib fftpack rpnlib SDDS1 mdbmth mdblib z fdlibm
+SYS_PROD_LIBS_DEFAULT = z
+ifeq ($(NCURSES),NO)
+SYS_PROD_LIBS_Linux = z 
+else
+SYS_PROD_LIBS_Linux = z ncurses 
+endif
+SYS_PROD_LIBS_solaris = curses
+SYS_PROD_LIBS_WIN32 = -nil-
+SYS_PROD_LIBS_BORLANDC = -nil-
+ifeq ($(OS_CLASS),solaris)
+OP_SYS_LDLIBS += -lz -lrt
+endif
+
+sddsprocess_LIBS = mdbcommon matlib fftpack rpnlib gsl SDDS1c mdbmth mdblib
+sddsgenericfit_LIBS = mdbcommon matlib fftpack rpnlib gsl SDDS1c mdbmth mdblib
+sddsmatrixop_LIBS = rpnlib gsl
+sddssyncflux_LIBS = rpnlib gsl
+
+z_DIR = $(INSTALL_LIB)
+mdbmth_DIR = $(INSTALL_LIB)
+SDDS1_DIR = $(INSTALL_LIB)
+fftpack_DIR = $(INSTALL_LIB)
+matlib_DIR = $(INSTALL_LIB)
+mdblib_DIR = $(INSTALL_LIB)
+mdbcommon_DIR = $(INSTALL_LIB)
+rpnlib_DIR = $(INSTALL_LIB)
+SDDS1c_DIR = $(INSTALL_LIB)
+fdlibm_DIR = $(INSTALL_LIB)
+nnetwork_dir = $(INSTALL_LIB)
+csa_dir = $(INSTALL_LIB)
+gsl_DIR = $(INSTALL_LIB)
+
+sddsprocess_CFLAGS = -DRPN_SUPPORT
+sddsgenericfit_CFLAGS = -DRPN_SUPPORT
+
+sdds2mpl_SRCS = SDDSaps.c sdds2mpl.c
+sddsbinarystring_SRCS = SDDSutils.c sddsbinarystring.c
+sddscorrelate_SRCS = SDDSutils.c sddscorrelate.c
+sddsderiv_SRCS = SDDSutils.c sddsderiv.c
+sddsdistest_SRCS = SDDSutils.c sddsdistest.c
+sddsfdfilter_SRCS = SDDSutils.c sddsfdfilter.c
+sddsfft_SRCS = SDDSutils.c sddsfft.c
+sddsgenericfit_SRCS = SDDSaps.c sddsgenericfit.c
+sddsnaff_SRCS = SDDSutils.c sddsnaff.c
+sddsinteg_SRCS = SDDSutils.c sddsinteg.c
+sddsinterp_SRCS = SDDSutils.c sddsinterp.c
+sddsmultihist_SRCS = SDDSutils.c sddsmultihist.c
+sddsmxref_SRCS = SDDSaps.c sddsmxref.c
+sddsoutlier_SRCS = SDDSutils.c sddsoutlier.c
+sddsprocess_SRCS = SDDSaps.c sddsprocess.c
+sddsrowstats_SRCS = SDDSutils.c sddsrowstats.c
+sddsrunstats_SRCS = SDDSutils.c sddsrunstats.c
+sddsshiftcor_SRCS = SDDSutils.c sddsshiftcor.c
+sddsspotanalysis_SRCS = sddsspotanalysis.c SDDSutils.c
+sddstranspose_SRCS = sddstranspose.c SDDSutils.c
+sddsxref_SRCS = SDDSaps.c sddsxref.c
+tiff2sdds_SRCS = tiff2sdds.c
+sddsdiff_SRCS = SDDSutils.c sddsdiff.c
+sddsdigfilter_SRCS = SDDSutils.c sddsdigfilter.c
+sddstranspose_SRCS = SDDSutils.c sddstranspose.c
+
+ifndef BGL
+TIFFLOCATION = $(wildcard /usr/lib/libtiff.a \
+                          /usr/lib/libtiff.so \
+                          /usr/lib64/libtiff.a \
+                          /usr/lib64/libtiff.so \
+                          /lib/libtiff.a \
+                          /lib/libtiff.so \
+                          /lib64/libtiff.a \
+                          /lib64/libtiff.so \
+                          /sw/lib/libtiff.a \
+                          /sw/lib/libtiff.dylib \
+                          /usr/sfw/lib/libtiff.a \
+                          /usr/sfw/lib/libtiff.so )
+TIFFINCLOCATION = $(wildcard /usr/include/tiffio.h \
+                             /include/tiffio.h \
+                             /sw/include/tiffio.h \
+                             /usr/sfw/include/tiffio.h )
+TIFF = $(words $(notdir $(TIFFLOCATION)))
+TIFFINC = $(words $(notdir $(TIFFINCLOCATION)))
+
+TIFFFOUND = 0
+ifneq ($(TIFF), 0)
+ifneq ($(TIFFINC), 0)
+ifeq ($(STATIC_BUILD),YES)
+ifneq ($(words $(notdir $(wildcard /usr/lib/libtiff.a \
+                                   /usr/lib64/libtiff.a \
+                                   /lib/libtiff.a \
+                                   /lib64/libtiff.a \
+                                   /sw/lib/libtiff.a \
+                                   /usr/sfw/lib/libtiff.a))), 0)
+SYS_PROD_LIBS += tiff
+else
+sdds2tiff_LDFLAGS_Linux += -Wl,-Bdynamic -ltiff -Wl,-Bstatic
+sdds2tiff_LDFLAGS_Default += -ltiff
+tiff2sdds_LDFLAGS_Linux += -Wl,-Bdynamic -ltiff -Wl,-Bstatic
+tiff2sdds_LDFLAGS_Default += -ltiff
+endif
+ifneq ($(words $(notdir $(wildcard /usr/lib/libjpeg.a \
+                                   /usr/lib64/libjpeg.a \
+                                   /lib/libjpeg.a \
+                                   /lib64/libjpeg.a \
+                                   /sw/lib/libjpeg.a \
+                                   /usr/sfw/lib/libjpeg.a))), 0)
+SYS_PROD_LIBS += jpeg
+else
+sdds2tiff_LDFLAGS_Linux += -Wl,-Bdynamic -ljpeg -Wl,-Bstatic
+sdds2tiff_LDFLAGS_Default += -ljpeg
+tiff2sdds_LDFLAGS_Linux += -Wl,-Bdynamic -ljpeg -Wl,-Bstatic
+tiff2sdds_LDFLAGS_Default += -ljpeg
+endif
+else
+SYS_PROD_LIBS += tiff jpeg
+endif
+TIFFFOUND = 1
+ifeq ($(OS_CLASS),solaris)
+OP_SYS_INCLUDES += -I/usr/sfw/include
+OP_SYS_LDFLAGS += -L/usr/sfw/lib -R/usr/sfw/lib
+endif
+endif #ifneq ($(TIFFINC), 0)
+endif #ifneq ($(TIFF), 0)
+
+ifeq ($(TIFFFOUND), 0)
+tiff2sdds_LIBS = tiff
+sdds2tiff_LIBS = tiff
+tiff_DIR = $(INSTALL_LIB)
+endif #ifeq ($(TIFFFOUND), 0)
+
+endif

@@ -1,0 +1,133 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.14  2009/10/27 21:03:02  soliday
+# Added location of mvapich2 compiler on our linux cluster.
+#
+# Revision 1.13  2009/06/02 17:40:06  soliday
+# Updated to fix issues on WIN32
+#
+# Revision 1.12  2009/06/01 20:53:36  soliday
+# Now sets SDDS_MPI_IO=0 when we don't want MPI-IO
+#
+# Revision 1.11  2009/04/17 03:00:39  ywang25
+# Changed the MPICH2 to mpich2_smpd_nemisis for performance and maintainability reason
+#
+# Revision 1.10  2009/04/14 01:10:38  ywang25
+# Updated to use new MPICH2 for better stability
+#
+# Revision 1.9  2008/04/14 18:27:26  shang
+# added parallel SDDS.
+#
+# Revision 1.8  2005/01/21 20:30:42  soliday
+# Updated to support purify on Linux
+#
+# Revision 1.7  2004/03/16 16:57:50  soliday
+# Updated purify, quantify, and purecov build rules
+#
+# Revision 1.6  2003/08/28 21:24:57  soliday
+# Cleaned up the code.
+#
+# Revision 1.5  2003/07/25 15:59:45  soliday
+# Simplified makefile
+#
+# Revision 1.4  2003/07/25 14:46:29  soliday
+# Simplified makefile
+#
+# Revision 1.3  2003/07/23 17:55:27  soliday
+# Fixed to work with WIN32
+#
+# Revision 1.2  2003/07/23 05:57:22  soliday
+# Changed PROD_LIBS to USR_LIBS
+#
+# Revision 1.1  2003/07/23 00:42:09  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+#
+
+CMPLR = ANSI
+# turn off the -g option
+OP_SYS_CFLAGS = 
+#RATIONAL = purify
+#RATIONAL = quantify
+#RATIONAL = purecov
+ifdef RATIONAL
+HOST_OPT = NO
+CC := $(RATIONAL) -best-effort $(CC)
+CCC := $(RATIONAL) -best-effort $(CCC)
+endif
+
+MPI = 0
+
+ifeq ($(MPI),1)
+  LIBRARY = SDDSmpi
+  USER_MPI_FLAGS += -DUSE_MPI=1 # 1 for parallel elegant, 0 for serial elegant  
+  USER_MPI_FLAGS += -DSDDS_MPI_IO=1
+ifdef WIN32
+    CC := $(CC) $(USER_MPI_FLAGS)
+    CCC := $(CCC) $(USER_MPI_FLAGS)
+    USR_CFLAGS_WIN32 = -Ic:/MPICH2/include
+    USR_LIBS += mpi
+    mpi_DIR = c:/MPICH2/lib
+else
+    #USER_MPI_FLAGS += -DMASTER_READTITLE_ONLY 
+    #only master processor read the layout, total_rows, parameters and arrays, 
+    #and then broadcast to others
+    #OP_SYS_LDLIBS += -lmpe -llmpe        # visualize the performance of the parallel elegant 
+    #USER_MPI_FLAGS+=  -DUSE_MPE          # user defined MPE event
+    #USER_MPI_FLAGS+=  -mpianim -L/usr/X11R6/lib -lX11   # animate MPI program in real-time
+    #USER_MPI_FLAGS+= -DMPI_DEBUG         # print debugging information for MPI 
+    #USER_MPI_FLAGS+= -DCHECKFLAGS=1      # if defined, check balance only at the beginning
+                                        # or the particle number is changed
+    MPI_PATH = $(wildcard /usr/local/software/mvapich2-gcc/bin/ /share/mpich2_smpd_nemesis/bin/ /act/mvapich2/gnu/bin/)
+    #MPI_PATH = /share/mpich2_mpd_sock/bin/
+    #MPI_PATH = /share/mpich/ch_p4/bin/
+    CC = $(MPI_PATH)mpicc  $(USER_MPI_FLAGS)   
+    CCC = $(MPI_PATH)mpicxx  $(USER_MPI_FLAGS)
+endif
+else
+  LIBRARY = SDDS1c
+endif
+
+USR_CFLAGS += 	-I. -I../../include -DEXPORT_SDDS -DzLib
+
+ifeq ($(OS_CLASS),solaris)
+ACC_DEP_CFLAGS += -KPIC -v
+CCC_DEP_CFLAGS += -KPIC -v
+GCC_DEP_CFLAGS += -D__EXTENSIONS__
+endif
+
+FN = cygpath -d -a
+
+LIBSRCS = 	SDDS_ascii.c SDDS_binary.c SDDS_copy.c \
+		SDDS_data.c SDDS_dataprep.c SDDS_extract.c \
+		SDDS_info.c SDDS_input.c SDDS_mplsupport.c \
+		SDDS_output.c SDDS_process.c  SDDS_rpn.c \
+		SDDS_transfer.c SDDS_utils.c SDDS_write.c
+ifeq ($(MPI),1)
+LIBSRCS += SDDS_MPI_binary.c SDDSmpi_input.c SDDSmpi_output.c
+endif
+
+SDDS_rpn_CFLAGS = -DRPN_SUPPORT
+ifeq ($(findstring orland, $(HOST_ARCH) $(EPICS_HOST_ARCH)),orland)
+SDDS_output_CFLAGS += -DDefineBinaryInsert
+endif
+
+ifdef WIN32
+DLL_LIBS += mdblib rpnlib z
+z_DIR = $(INSTALL_LIB)
+else
+USR_LIBS = rpnlib mdbmth mdblib
+LIB_SYS_LIBS_DEFAULT = z
+endif
+
+mdblib_DIR = $(INSTALL_LIB)
+mdbmth_DIR = $(INSTALL_LIB)
+rpnlib_DIR = $(INSTALL_LIB)

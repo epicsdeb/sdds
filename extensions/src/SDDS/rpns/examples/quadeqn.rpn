@@ -1,0 +1,10 @@
+/* definitions for solving quadratic equation ax^2+bx+c=0
+/* a,b, and c must be defined
+udf
+root1
+b chs = sqr 4 a c * * - sqrt + 2 a * /
+
+udf
+root2
+b chs = sqr 4 a c * * - sqrt - 2 a * /
+

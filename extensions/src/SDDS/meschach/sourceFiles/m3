@@ -1,0 +1,3326 @@
+#!/bin/sh
+# to unpack, sh this message in an empty directory
+PATH=/bin:/usr/bin
+cat > 24048P01 <<'bigmail CUT HERE............'
+-   m_sub(H,H1,H1);
+-  if (m_norm_inf(H1) > MACHEPS*x->dim)  
+-     printf(" (arnoldi) ||Q*A*Q^T - H|| = %g [cf. MACHEPS = %g]\n",
+-	    m_norm_inf(H1),MACHEPS);
+-   /* check Q*Q^T = I  */
+-   mmtr_mlt(Q,Q,H1);
+-   for (j=0; j < kk; j++)
+-     H1->me[j][j] -= 1.0;
+-   if (m_norm_inf(H1) > MACHEPS*x->dim)
+-     printf(" (arnoldi) ||Q*Q^T - I|| = %g [cf. MACHEPS = %g]\n",
+-	    m_norm_inf(H1),MACHEPS);
+-
+-   v_rand(u);
+-   mem_stat_mark(3);
+-   iter_sparnoldi(An,u,kk,&hh,Q,H);
+-   mem_stat_free(3);
+-
+-   /* check the equality:
+-      Q*A*Q^T = H; */
+-
+-   vt.dim = vt.max_dim = x->dim;
+-   vt1.dim = vt1.max_dim = x->dim;
+-   for (j=0; j < kk; j++) {
+-      vt.ve = Q->me[j];
+-      vt1.ve = Q1->me[j];
+-      sp_mv_mlt(An,&vt,&vt1);
+-   }
+-
+-   mmtr_mlt(Q,Q1,H1);
+-   m_sub(H,H1,H1);
+-   if (m_norm_inf(H1) > MACHEPS*x->dim)
+-     printf(" (sparnoldi) ||Q*A*Q^T - H|| = %g [cf. MACHEPS = %g]\n",
+-	    m_norm_inf(H1),MACHEPS);
+-   /* check Q*Q^T = I  */
+-   mmtr_mlt(Q,Q,H1);
+-   for (j=0; j < kk; j++)
+-     H1->me[j][j] -= 1.0;
+-   if (m_norm_inf(H1) > MACHEPS*x->dim)
+-     printf(" (sparnoldi) ||Q*Q^T - I|| = %g [cf. MACHEPS = %g]\n",
+-	    m_norm_inf(H1),MACHEPS);
+-
+-
+-
+-   /****** LANCZOS METHOD ******/
+-
+-   notice("lanczos method");
+-   kk = ipns1->k; 
+-   Q = m_resize(Q,kk,x->dim);
+-   Q1 = m_resize(Q1,kk,x->dim);
+-   H = m_resize(H,kk,kk);
+-   ips1->k = kk;
+-   v_rand(u);
+-   v_free(ips1->x);
+-   ips1->x = u;
+-   ips1->shared_x = TRUE;
+-
+-   mem_stat_mark(3);
+-   iter_lanczos(ips1,x,y,&hh,Q);
+-   mem_stat_free(3);
+-
+-   /* check the equality:
+-      Q*A*Q^T = H; */
+-
+-   vt.dim = vt1.dim = Q->n;
+-   vt.max_dim = vt1.max_dim = Q->max_n;
+-   Q1 = m_resize(Q1,Q->m,Q->n);
+-   for (j=0; j < Q->m; j++) {
+-      vt.ve = Q->me[j];
+-      vt1.ve = Q1->me[j];
+-      sp_mv_mlt(A,&vt,&vt1);
+-   }
+-   H1 = m_resize(H1,Q->m,Q->m);
+-   H = m_resize(H,Q->m,Q->m);
+-   mmtr_mlt(Q,Q1,H1);
+-
+-   m_zero(H);
+-   for (j=0; j < Q->m-1; j++) {
+-      H->me[j][j] = x->ve[j];
+-      H->me[j][j+1] = H->me[j+1][j] = y->ve[j];
+-   }
+-   H->me[Q->m-1][Q->m-1] = x->ve[Q->m-1];
+-
+-   m_sub(H,H1,H1);
+-   if (m_norm_inf(H1) > MACHEPS*x->dim)
+-     printf(" (lanczos) ||Q*A*Q^T - H|| = %g [cf. MACHEPS = %g]\n",
+-	    m_norm_inf(H1),MACHEPS);
+-
+-   /* check Q*Q^T = I  */
+-
+-   mmtr_mlt(Q,Q,H1);
+-   for (j=0; j < Q->m; j++)
+-     H1->me[j][j] -= 1.0;
+-   if (m_norm_inf(H1) > MACHEPS*x->dim)
+-     printf(" (lanczos) ||Q*Q^T - I|| = %g [cf. MACHEPS = %g]\n",
+-	    m_norm_inf(H1),MACHEPS);
+-
+-   mem_stat_mark(3);
+-   v_rand(u);
+-   iter_splanczos(A,kk,u,x,y,&hh,Q);
+-   mem_stat_free(3);
+-
+-   /* check the equality:
+-      Q*A*Q^T = H; */
+-
+-   vt.dim = vt1.dim = Q->n;
+-   vt.max_dim = vt1.max_dim = Q->max_n;
+-   Q1 = m_resize(Q1,Q->m,Q->n);
+-   for (j=0; j < Q->m; j++) {
+-      vt.ve = Q->me[j];
+-      vt1.ve = Q1->me[j];
+-      sp_mv_mlt(A,&vt,&vt1);
+-   }
+-   H1 = m_resize(H1,Q->m,Q->m);
+-   H = m_resize(H,Q->m,Q->m);
+-   mmtr_mlt(Q,Q1,H1);
+-   for (j=0; j < Q->m-1; j++) {
+-      H->me[j][j] = x->ve[j];
+-      H->me[j][j+1] = H->me[j+1][j] = y->ve[j];
+-   }
+-   H->me[Q->m-1][Q->m-1] = x->ve[Q->m-1];
+-
+-   m_sub(H,H1,H1);
+-   if (m_norm_inf(H1) > MACHEPS*x->dim)
+-     printf(" (splanczos) ||Q*A*Q^T - H|| = %g [cf. MACHEPS = %g]\n",
+-	    m_norm_inf(H1),MACHEPS);
+-   /* check Q*Q^T = I  */
+-   mmtr_mlt(Q,Q,H1);
+-   for (j=0; j < Q->m; j++)
+-     H1->me[j][j] -= 1.0;
+-   if (m_norm_inf(H1) > MACHEPS*x->dim)
+-     printf(" (splanczos) ||Q*Q^T - I|| = %g [cf. MACHEPS = %g]\n",
+-	    m_norm_inf(H1),MACHEPS);
+-
+-
+-
+-   /***** LANCZOS2 ****/
+-
+-   notice("lanczos2 method");
+-   kk = 50;  		/* # of dir. vectors */
+-   ips1->k = kk;
+-   v_rand(u);
+-   ips1->x = u;
+-   ips1->shared_x = TRUE;
+-
+-   for ( i = 0; i < xn->dim; i++ )
+-	xn->ve[i] = i;
+-   iter_Ax(ips1,Dv_mlt,xn);
+-   mem_stat_mark(3);
+-   iter_lanczos2(ips1,y,v);
+-   mem_stat_free(3);
+-
+-   printf("# Number of steps of Lanczos algorithm = %d\n", kk);
+-   printf("# Exact eigenvalues are 0, 1, 2, ..., %d\n",ANON-1);
+-   printf("# Extreme eigenvalues should be accurate; \n");
+-   printf("# interior values usually are not.\n");
+-   printf("# approx e-vals =\n");	v_output(y);
+-   printf("# Error in estimate of bottom e-vec (Lanczos) = %g\n",
+-	  fabs(v->ve[0]));
+-
+-   mem_stat_mark(3);
+-   v_rand(u);
+-   iter_splanczos2(A,kk,u,y,v);
+-   mem_stat_free(3);
+-
+-
+-   /***** FINISHING *******/
+-
+-   notice("release ITER variables");
+-   
+-   M_FREE(Q);
+-   M_FREE(Q1);
+-   M_FREE(H);
+-   M_FREE(H1);
+-
+-   ITER_FREE(ipns);
+-   ITER_FREE(ips);
+-   ITER_FREE(ipns1);
+-   ITER_FREE(ips1);
+-   SP_FREE(A);
+-   SP_FREE(B);
+-   SP_FREE(An);
+-   SP_FREE(Bn);
+-   
+-   V_FREE(x);
+-   V_FREE(y);
+-   V_FREE(u);
+-   V_FREE(v); 
+-   V_FREE(xn);
+-   V_FREE(yn);
+-
+-   printf("# Done testing (%s)\n",argv[0]);
+-   mem_info();
+-}
+//GO.SYSIN DD itertort.c
+echo mfuntort.c 1>&2
+sed >mfuntort.c <<'//GO.SYSIN DD mfuntort.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/* mfuntort.c,  10/11/93 */
+-
+-static char rcsid[] = "$Id: m3,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $";
+-
+-#include        <stdio.h>
+-#include        <math.h>
+-#include        "matrix.h"
+-#include        "matrix2.h"
+-
+-
+-#define errmesg(mesg)   printf("Error: %s error: line %d\n",mesg,__LINE__)
+-#define notice(mesg)    printf("# Testing %s...\n",mesg);
+-
+-#define DIM  10
+-
+-void main()
+-{
+-
+-   MAT *A, *B, *C, *OUTA, *OUTB, *TMP;
+-   MAT *exp_A_expected, *exp_A;
+-   VEC *x, *b;
+-   double c, eps = 1e-10;
+-   int i, j, q_out, j_out;
+-
+-   mem_info_on(TRUE);
+-
+-   A = m_get(DIM,DIM);
+-   B = m_get(DIM,DIM);
+-   C = m_get(DIM,DIM);
+-   OUTA = m_get(DIM,DIM);
+-   OUTB = m_get(DIM,DIM);
+-   TMP = m_get(DIM,DIM);
+-   x = v_get(DIM);
+-   b = v_get(6);
+-
+-   notice("exponent of a matrix");
+-
+-   m_ident(A);
+-   mem_stat_mark(1);
+-   _m_exp(A,eps,OUTA,&q_out,&j_out);
+-   printf("# q_out = %d, j_out = %d\n",q_out,j_out);
+-
+-   m_exp(A,eps,OUTA);
+-   sm_mlt(exp(1.0),A,A);
+-   m_sub(OUTA,A,TMP);
+-   printf("# ||exp(I) - e*I|| = %g\n",m_norm_inf(TMP));
+-
+-   m_rand(A);
+-   m_transp(A,TMP);
+-   m_add(A,TMP,A);
+-   B = m_copy(A,B);
+-
+-   m_exp(A,eps,OUTA);
+-
+-   symmeig(B,OUTB,x);
+-   m_zero(TMP);
+-   for (i=0; i < x->dim; i++)
+-     TMP->me[i][i] = exp(x->ve[i]);
+-   m_mlt(OUTB,TMP,C);
+-   mmtr_mlt(C,OUTB,TMP);
+-   m_sub(TMP,OUTA,TMP);
+-   printf("# ||exp(A) - Q*exp(lambda)*Q^T|| = %g\n",m_norm_inf(TMP));
+-
+-   notice("polynomial of a matrix");
+-   m_rand(A);
+-   m_transp(A,TMP);
+-   m_add(A,TMP,A);
+-   B = m_copy(A,B);
+-   v_rand(b);
+-
+-   m_poly(A,b,OUTA);
+-
+-   symmeig(B,OUTB,x);
+-   m_zero(TMP);
+-   for (i=0; i < x->dim; i++) {
+-      c = b->ve[b->dim-1];
+-      for (j=b->dim-2; j >= 0; j--) 
+-	c = c*x->ve[i] + b->ve[j];
+-      TMP->me[i][i] = c;
+-   }
+-   m_mlt(OUTB,TMP,C);
+-   mmtr_mlt(C,OUTB,TMP);
+-   m_sub(TMP,OUTA,TMP);
+-   printf("# ||poly(A) - Q*poly(lambda)*Q^T|| = %g\n",m_norm_inf(TMP));
+-   mem_stat_free(1);
+-
+-
+-   /* Brook Milligan's test */
+-
+-   M_FREE(A);
+-   M_FREE(B);
+-   M_FREE(C);
+-
+-   notice("exponent of a nonsymmetric matrix");
+-   A = m_get (2, 2);
+-   A -> me [0][0] = 1.0;
+-   A -> me [0][1] = 1.0;
+-   A -> me [1][0] = 4.0;
+-   A -> me [1][1] = 1.0;
+-   
+-   exp_A_expected = m_get(2, 2);
+-   exp_A_expected -> me [0][0] = exp (3.0) / 2.0 + exp (-1.0) / 2.0;
+-   exp_A_expected -> me [0][1] = exp (3.0) / 4.0 - exp (-1.0) / 4.0;
+-   exp_A_expected -> me [1][0] = exp (3.0)       - exp (-1.0);
+-   exp_A_expected -> me [1][1] = exp (3.0) / 2.0 + exp (-1.0) / 2.0;
+-   
+-   printf ("A:\n");
+-   for (i = 0; i < 2; i++)
+-   {
+-      for (j = 0; j < 2; j++)
+-        printf ("   %15.8e", A -> me [i][j]);
+-      printf ("\n");
+-   }
+-   
+-   printf ("\nexp(A) (expected):\n");
+-   for (i = 0; i < 2; i++)
+-   {
+-      for (j = 0; j < 2; j++)
+-        printf ("   %15.8e", exp_A_expected -> me [i][j]);
+-      printf ("\n");
+-   }
+-   
+-   mem_stat_mark(3);
+-   exp_A = m_exp (A, 1e-16,NULL);
+-   mem_stat_free(3);
+-
+-   printf ("\nexp(A):\n");
+-   for (i = 0; i < 2; i++)
+-   {
+-      for (j = 0; j < 2; j++)
+-        printf ("   %15.8e", exp_A -> me [i][j]);
+-      printf ("\n");
+-   }
+-   printf ("\nexp(A) - exp(A) (expected):\n");
+-   for (i = 0; i < 2; i++)
+-   {
+-      for (j = 0; j < 2; j++)
+-        printf ("   %15.8e", exp_A -> me [i][j] - exp_A_expected -> me [i][j]);
+-      printf ("\n");
+-   }
+-
+-   M_FREE(A);
+-   M_FREE(B);
+-   M_FREE(C);
+-   M_FREE(exp_A);
+-   M_FREE(exp_A_expected);
+-   M_FREE(OUTA);
+-   M_FREE(OUTB);
+-   M_FREE(TMP);
+-   V_FREE(b);
+-   V_FREE(x);
+-
+-   mem_info();
+-}
+-
+//GO.SYSIN DD mfuntort.c
+echo iotort.c 1>&2
+sed >iotort.c <<'//GO.SYSIN DD iotort.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-/* iotort.c  10/11/93 */
+-/* test of I/O functions */
+-
+-
+-static char rcsid[] = "$Id: m3,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $";
+-
+-#include "sparse.h"
+-#include "zmatrix.h"
+-
+-
+-#define	errmesg(mesg)	printf("Error: %s error: line %d\n",mesg,__LINE__)
+-#define notice(mesg)	printf("# Testing %s...\n",mesg);
+-
+-
+-void main()
+-{
+-   VEC *x;
+-   MAT *A;
+-   PERM *pivot;
+-   IVEC *ix;
+-   SPMAT *spA;
+-   ZVEC *zx;
+-   ZMAT *ZA;
+-   char yes;
+-   int i;
+-   FILE *fp;
+-
+-   mem_info_on(TRUE);
+-
+-   if ((fp = fopen("iotort.dat","w")) == NULL) {
+-      printf(" !!! Cannot open file %s for writing\n\n","iotort.dat");
+-      exit(1);
+-   }
+-     
+-   x = v_get(10);
+-   A = m_get(3,3);
+-   zx = zv_get(10);
+-   ZA = zm_get(3,3);
+-   pivot = px_get(10);
+-   ix = iv_get(10);
+-   spA = sp_get(3,3,2);
+-
+-   v_rand(x);
+-   m_rand(A);
+-   zv_rand(zx);
+-   zm_rand(ZA);
+-   px_ident(pivot);
+-   for (i=0; i < 10; i++)
+-     ix->ive[i] = i+1;
+-   for (i=0; i < spA->m; i++) {
+-      sp_set_val(spA,i,i,1.0);
+-      if (i > 0) sp_set_val(spA,i-1,i,-1.0);
+-   }
+-
+-   notice(" VEC output");
+-   v_foutput(fp,x);
+-   notice(" MAT output");
+-   m_foutput(fp,A);
+-   notice(" ZVEC output");
+-   zv_foutput(fp,zx);
+-   notice(" ZMAT output");
+-   zm_foutput(fp,ZA);
+-   notice(" PERM output");
+-   px_foutput(fp,pivot);
+-   notice(" IVEC output");
+-   iv_foutput(fp,ix);
+-   notice(" SPMAT output");
+-   sp_foutput(fp,spA);
+-   fprintf(fp,"Y");
+-   fclose(fp);
+-
+-   printf("\nENTER SOME VALUES:\n\n");
+-
+-   if ((fp = fopen("iotort.dat","r")) == NULL) {
+-      printf(" !!! Cannot open file %s for reading\n\n","iotort.dat");
+-      exit(1);
+-   }
+-
+-   notice(" VEC input/output");
+-   x = v_finput(fp,x);
+-   v_output(x);
+-
+-   notice(" MAT input/output");
+-   A = m_finput(fp,A);
+-   m_output(A);
+-
+-   notice(" ZVEC input/output");
+-   zx = zv_finput(fp,zx);
+-   zv_output(zx);
+-
+-   notice(" ZMAT input/output");
+-   ZA = zm_finput(fp,ZA);
+-   zm_output(ZA);
+-
+-   notice(" PERM input/output");
+-   pivot = px_finput(fp,pivot);
+-   px_output(pivot);
+-
+-   notice(" IVEC input/output");
+-   ix = iv_finput(fp,ix);
+-   iv_output(ix);
+-
+-   notice(" SPMAT input/output");
+-   SP_FREE(spA);
+-   spA = sp_finput(fp);
+-   sp_output(spA);
+-
+-   notice(" general input");
+-   finput(fp," finish the test?  ","%c",&yes);
+-   if (yes == 'y' || yes == 'Y' )
+-     printf(" YES\n");
+-   else printf(" NO\n");
+-   fclose(fp);
+-
+-   mem_info();
+-}
+//GO.SYSIN DD iotort.c
+echo err.h 1>&2
+sed >err.h <<'//GO.SYSIN DD err.h' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Stewart & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/* err.h  28/09/1993 */
+-
+-/*  RCS id: $Id: m3,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $  */
+-
+-
+-#ifndef ERRHEADER
+-#define ERRHEADER
+-
+-
+-#include        <setjmp.h>
+-#include        "machine.h"
+-
+-/* Error recovery */
+-
+-extern	jmp_buf	restart;
+-
+-
+-/* max. # of error lists */
+-#define ERR_LIST_MAX_LEN   10
+-
+-/* main error functions */
+-#ifndef ANSI_C
+-extern	int ev_err();			/* main error handler */
+-extern	int set_err_flag();		/* for different ways of handling
+-                                                errors, returns old value */
+-extern  int count_errs();		/* to avoid "too many errors" */
+-extern  int err_list_attach();		/* for attaching a list of errors */
+-extern  int err_is_list_attached();	/* checking if a list is attached */
+-extern  int err_list_free();		/* freeing a list of errors */
+-
+-#else  /* ANSI_C */
+-
+-extern	int ev_err(char *,int,int,char *,int);  /* main error handler */
+-extern	int set_err_flag(int flag);         /* for different ways of handling
+-                                                errors, returns old value */
+-extern  int count_errs(int true_false);     /* to avoid "too many errors" */
+-extern  int err_list_attach(int list_num, int list_len,
+-	       char **err_ptr,int warn);  /* for attaching a list of errors */
+-extern  int err_is_list_attached(int list_num);  /* checking if a list 
+-						    is attached */
+-extern  int err_list_free(int list_num);   /* freeing a list of errors */
+-
+-#endif
+-
+-
+-/* error(E_TYPE,"myfunc") raises error type E_TYPE for function my_func() */
+-#define	error(err_num,fn_name)	ev_err(__FILE__,err_num,__LINE__,fn_name,0)
+-
+-/* warning(WARN_TYPE,"myfunc") raises warning type WARN_TYPE for 
+-   function my_func() */
+-#define warning(err_num,fn_name) ev_err(__FILE__,err_num,__LINE__,fn_name,1) 
+-
+-
+-/* error flags */
+-#define	EF_EXIT		0	/* exit on error */
+-#define	EF_ABORT	1	/* abort (dump core) on error */
+-#define	EF_JUMP		2	/* jump on error */
+-#define	EF_SILENT	3	/* jump, but don't print message */
+-#define	ERREXIT()	set_err_flag(EF_EXIT)
+-#define	ERRABORT()	set_err_flag(EF_ABORT)
+-/* don't print message */
+-#define	SILENTERR()	if ( ! setjmp(restart) ) set_err_flag(EF_SILENT)
+-/* return here on error */
+-#define	ON_ERROR()	if ( ! setjmp(restart) ) set_err_flag(EF_JUMP)
+-
+-
+-/* error types */
+-#define	E_UNKNOWN	0
+-#define	E_SIZES		1
+-#define	E_BOUNDS	2
+-#define	E_MEM		3
+-#define	E_SING		4
+-#define	E_POSDEF	5
+-#define	E_FORMAT	6
+-#define	E_INPUT		7
+-#define	E_NULL		8
+-#define	E_SQUARE	9
+-#define	E_RANGE		10
+-#define	E_INSITU2	11
+-#define	E_INSITU	12
+-#define	E_ITER		13
+-#define	E_CONV		14
+-#define	E_START		15
+-#define	E_SIGNAL	16
+-#define	E_INTERN	17
+-#define	E_EOF		18
+-#define E_SHARED_VECS   19
+-#define E_NEG           20
+-#define E_OVERWRITE     21
+-#define E_BREAKDOWN     22
+-
+-/* warning types */
+-#define WARN_UNKNOWN     	0
+-#define WARN_WRONG_TYPE 	1
+-#define WARN_NO_MARK		2
+-#define WARN_RES_LESS_0         3
+-#define WARN_SHARED_VEC		4
+-
+-
+-/* error catching macros */
+-
+-/* execute err_part if error errnum is raised while executing ok_part */
+-#define	catch(errnum,ok_part,err_part)	\
+-	{	jmp_buf _save;	int _err_num, _old_flag; \
+-		_old_flag = set_err_flag(EF_SILENT); \
+-		MEM_COPY(restart,_save,sizeof(jmp_buf)); \
+-		if ( (_err_num=setjmp(restart)) == 0 ) \
+-		{	ok_part; \
+-			set_err_flag(_old_flag); \
+-			MEM_COPY(_save,restart,sizeof(jmp_buf));	} \
+-		else if ( _err_num == errnum ) \
+-		{	set_err_flag(_old_flag);  \
+-			MEM_COPY(_save,restart,sizeof(jmp_buf)); \
+-			err_part;	} \
+-		else {	set_err_flag(_old_flag); \
+-			MEM_COPY(_save,restart,sizeof(jmp_buf)); \
+-			error(_err_num,"catch"); \
+-		} \
+-	}
+-
+-
+-/* execute err_part if any error raised while executing ok_part */
+-#define	catchall(ok_part,err_part) \
+-	{	jmp_buf _save;	int _err_num, _old_flag; \
+-		_old_flag = set_err_flag(EF_SILENT); \
+-		MEM_COPY(restart,_save,sizeof(jmp_buf)); \
+-		if ( (_err_num=setjmp(restart)) == 0 ) \
+-		{	ok_part; \
+-			set_err_flag(_old_flag); \
+-			MEM_COPY(_save,restart,sizeof(jmp_buf));	} \
+-		else \
+-		{	set_err_flag(_old_flag);  \
+-			MEM_COPY(_save,restart,sizeof(jmp_buf)); \
+-			err_part;	} \
+-	}
+-
+-
+-/* print message if error raised while executing ok_part,
+-                then re-raise error to trace calls */
+-#define	tracecatch(ok_part,function) \
+-	{	jmp_buf _save;	int _err_num, _old_flag; \
+-		_old_flag = set_err_flag(EF_JUMP); \
+-		MEM_COPY(restart,_save,sizeof(jmp_buf)); \
+-		if ( (_err_num=setjmp(restart)) == 0 ) \
+-		{	ok_part; \
+-			set_err_flag(_old_flag); \
+-			MEM_COPY(_save,restart,sizeof(jmp_buf));	} \
+-		else \
+-		{	set_err_flag(_old_flag);  \
+-			MEM_COPY(_save,restart,sizeof(jmp_buf)); \
+-			error(_err_num,function);	} \
+-	}
+-
+-
+-
+-#endif   /* ERRHEADER */
+-
+//GO.SYSIN DD err.h
+echo meminfo.h 1>&2
+sed >meminfo.h <<'//GO.SYSIN DD meminfo.h' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/* meminfo.h  26/08/93 */
+-/* changed  11/12/93 */
+-
+-
+-#ifndef MEM_INFOH
+-#define MEM_INFOH
+-
+-
+-
+-/* for hash table in mem_stat.c */
+-/* Note: the hash size should be a prime, or at very least odd */
+-#define MEM_HASHSIZE         509
+-#define MEM_HASHSIZE_FILE    "meminfo.h"
+-
+-
+-/* default: memory information is off */
+-/* set it to 1 if you want it all the time */
+-#define MEM_SWITCH_ON_DEF	0
+-
+-
+-/* available standard types */
+-#define TYPE_NULL              (-1)
+-#define TYPE_MAT    	        0
+-#define TYPE_BAND               1
+-#define TYPE_PERM		2
+-#define TYPE_VEC		3
+-#define TYPE_IVEC		4
+-
+-#ifdef SPARSE
+-#define TYPE_ITER		5
+-#define TYPE_SPROW              6
+-#define TYPE_SPMAT		7
+-#endif
+-
+-#ifdef COMPLEX
+-#ifdef SPARSE
+-#define TYPE_ZVEC		8
+-#define TYPE_ZMAT		9
+-#else
+-#define TYPE_ZVEC		5
+-#define TYPE_ZMAT		6
+-#endif
+-#endif
+-
+-/* structure for memory information */
+-typedef struct {
+-   long bytes;       /* # of allocated bytes for each type (summary) */
+-   int  numvar;      /* # of allocated variables for each type */
+-} MEM_ARRAY;
+-
+-
+-
+-#ifdef ANSI_C
+-
+-int  mem_info_is_on(void);
+-int mem_info_on(int sw);
+-
+-long mem_info_bytes(int type,int list);
+-int mem_info_numvar(int type,int list);
+-void mem_info_file(FILE * fp,int list);
+-
+-void mem_bytes_list(int type,int old_size,int new_size,
+-		       int list);
+-void mem_numvar_list(int type, int num, int list);
+-
+-int mem_stat_reg_list(void **var,int type,int list);
+-int mem_stat_mark(int mark);
+-int mem_stat_free_list(int mark,int list);
+-int mem_stat_show_mark(void);
+-void mem_stat_dump(FILE *fp,int list);
+-int mem_attach_list(int list,int ntypes,char *type_names[],
+-	int (*free_funcs[])(), MEM_ARRAY info_sum[]);
+-int mem_free_vars(int list);
+-int mem_is_list_attached(int list);
+-void mem_dump_list(FILE *fp,int list);
+-int mem_stat_reg_vars(int list,int type,...);
+-
+-#else
+-int mem_info_is_on();
+-int mem_info_on();
+-
+-long mem_info_bytes();
+-int mem_info_numvar();
+-void mem_info_file();
+-
+-void mem_bytes_list();
+-void mem_numvar_list();
+-
+-int mem_stat_reg_list();
+-int mem_stat_mark();
+-int mem_stat_free_list();
+-int mem_stat_show_mark();
+-void mem_stat_dump();
+-int mem_attach_list();
+-int mem_free_vars();
+-int mem_is_list_attached();
+-void mem_dump_list();
+-int mem_stat_reg_vars();
+-
+-#endif 
+-
+-/* macros */
+-
+-#define mem_info()   mem_info_file(stdout,0)
+-
+-#define mem_stat_reg(var,type)  mem_stat_reg_list((void **)var,type,0)
+-#define MEM_STAT_REG(var,type)  mem_stat_reg_list((void **)&(var),type,0)
+-#define mem_stat_free(mark)   mem_stat_free_list(mark,0)
+-
+-#define mem_bytes(type,old_size,new_size)  \
+-  mem_bytes_list(type,old_size,new_size,0)
+-
+-#define mem_numvar(type,num) mem_numvar_list(type,num,0)
+-
+-
+-/* internal type */
+-
+-typedef struct {
+-   char **type_names;        /* array of names of types (strings) */
+-   int  (**free_funcs)();    /* array of functions for releasing types */
+-   unsigned ntypes;          /* max number of types */
+-   MEM_ARRAY *info_sum;      /* local array for keeping track of memory */
+-} MEM_CONNECT;
+-
+-/* max number of lists of types */
+-#define MEM_CONNECT_MAX_LISTS    5
+-
+-
+-#endif
+//GO.SYSIN DD meminfo.h
+echo machine.h 1>&2
+sed >machine.h <<'//GO.SYSIN DD machine.h' 's/^-//'
+-/* machine.h.  Generated automatically by configure.  */
+-/* Any machine specific stuff goes here */
+-/* Add details necessary for your own installation here! */
+-
+-/* RCS id: $Id: m3,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $ */
+-
+-/* This is for use with "configure" -- if you are not using configure
+-	then use machine.van for the "vanilla" version of machine.h */
+-
+-/* Note special macros: ANSI_C (ANSI C syntax)
+-			SEGMENTED (segmented memory machine e.g. MS-DOS)
+-			MALLOCDECL (declared if malloc() etc have
+-					been declared) */
+-
+-/* #undef const */
+-
+-/* #undef MALLOCDECL */
+-#define NOT_SEGMENTED 1
+-#define HAVE_MEMORY_H 1
+-/* #undef HAVE_COMPLEX_H */
+-#define HAVE_MALLOC_H 1
+-#define STDC_HEADERS 1
+-/* #undef HAVE_BCOPY */
+-/* #undef HAVE_BZERO */
+-#define CHAR0ISDBL0 1
+-#define WORDS_BIGENDIAN 1
+-/* #undef U_INT_DEF */
+-#define VARARGS 1
+-#define HAVE_PROTOTYPES 1
+-/* #undef HAVE_PROTOTYPES_IN_STRUCT */
+-
+-/* for inclusion into C++ files */
+-#ifdef __cplusplus
+-#define ANSI_C 1
+-#ifndef HAVE_PROTOTYPES 
+-#define HAVE_PROTOTYPES 1
+-#endif
+-#ifndef HAVE_PROTOTYPES_IN_STRUCT
+-#define HAVE_PROTOTYPES_IN_STRUCT 1
+-#endif
+-#endif /* __cplusplus */
+-
+-/* example usage: VEC *PROTO(v_get,(int dim)); */
+-#ifdef HAVE_PROTOTYPES
+-#define	PROTO(name,args)	name args
+-#else
+-#define PROTO(name,args)	name()
+-#endif /* HAVE_PROTOTYPES */
+-#ifdef HAVE_PROTOTYPES_IN_STRUCT
+-/* PROTO_() is to be used instead of PROTO() in struct's and typedef's */
+-#define	PROTO_(name,args)	name args
+-#else
+-#define PROTO_(name,args)	name()
+-#endif /* HAVE_PROTOTYPES_IN_STRUCT */
+-
+-/* for basic or larger versions */
+-#define COMPLEX 1
+-#define SPARSE 1
+-
+-/* for loop unrolling */
+-/* #undef VUNROLL */
+-/* #undef MUNROLL */
+-
+-/* for segmented memory */
+-#ifndef NOT_SEGMENTED
+-#define	SEGMENTED
+-#endif
+-
+-/* if the system has malloc.h */
+-#ifdef HAVE_MALLOC_H
+-#define	MALLOCDECL	1
+-#include	<malloc.h>
+-#endif
+-
+-/* any compiler should have this header */
+-/* if not, change it */
+-#include        <stdio.h>
+-
+-
+-/* Check for ANSI C memmove and memset */
+-#ifdef STDC_HEADERS
+-
+-/* standard copy & zero functions */
+-#define	MEM_COPY(from,to,size)	memmove((to),(from),(size))
+-#define	MEM_ZERO(where,size)	memset((where),'\0',(size))
+-
+-#ifndef ANSI_C
+-#define ANSI_C 1
+-#endif
+-
+-#endif
+-
+-/* standard headers */
+-#ifdef ANSI_C
+-#include	<stdlib.h>
+-#include	<stddef.h>
+-#include	<string.h>
+-#include	<float.h>
+-#endif
+-
+-
+-/* if have bcopy & bzero and no alternatives yet known, use them */
+-#ifdef HAVE_BCOPY
+-#ifndef MEM_COPY
+-/* nonstandard copy function */
+-#define	MEM_COPY(from,to,size)	bcopy((char *)(from),(char *)(to),(int)(size))
+-#endif
+-#endif
+-
+-#ifdef HAVE_BZERO
+-#ifndef MEM_ZERO
+-/* nonstandard zero function */
+-#define	MEM_ZERO(where,size)	bzero((char *)(where),(int)(size))
+-#endif
+-#endif
+-
+-/* if the system has complex.h */
+-#ifdef HAVE_COMPLEX_H
+-#include	<complex.h>
+-#endif
+-
+-/* If prototypes are available & ANSI_C not yet defined, then define it,
+-	but don't include any header files as the proper ANSI C headers
+-        aren't here */
+-#ifdef HAVE_PROTOTYPES
+-#ifndef ANSI_C
+-#define ANSI_C  1
+-#endif
+-#endif
+-
+-/* floating point precision */
+-
+-/* you can choose single, double or long double (if available) precision */
+-
+-#define FLOAT 		1
+-#define DOUBLE 		2
+-#define LONG_DOUBLE 	3
+-
+-/* #undef REAL_FLT */
+-/* #undef REAL_DBL */
+-
+-/* if nothing is defined, choose double precision */
+-#ifndef REAL_DBL
+-#ifndef REAL_FLT
+-#define REAL_DBL 1
+-#endif
+-#endif
+-
+-/* single precision */
+-#ifdef REAL_FLT
+-#define  Real float
+-#define  LongReal float
+-#define REAL FLOAT
+-#define LONGREAL FLOAT
+-#endif
+-
+-/* double precision */
+-#ifdef REAL_DBL
+-#define Real double
+-#define LongReal double
+-#define REAL DOUBLE
+-#define LONGREAL DOUBLE
+-#endif
+-
+-
+-/* machine epsilon or unit roundoff error */
+-/* This is correct on most IEEE Real precision systems */
+-#ifdef DBL_EPSILON
+-#if REAL == DOUBLE
+-#define	MACHEPS	DBL_EPSILON
+-#elif REAL == FLOAT
+-#define	MACHEPS	FLT_EPSILON
+-#elif REAL == LONGDOUBLE
+-#define MACHEPS LDBL_EPSILON
+-#endif
+-#endif
+-
+-#define F_MACHEPS 1.19209e-07
+-#define D_MACHEPS 2.22045e-16
+-
+-#ifndef MACHEPS
+-#if REAL == DOUBLE
+-#define	MACHEPS	D_MACHEPS
+-#elif REAL == FLOAT  
+-#define MACHEPS F_MACHEPS
+-#elif REAL == LONGDOUBLE
+-#define MACHEPS D_MACHEPS
+-#endif
+-#endif
+-
+-/* #undef M_MACHEPS */
+-
+-/********************
+-#ifdef DBL_EPSILON
+-#define	MACHEPS	DBL_EPSILON
+-#endif
+-#ifdef M_MACHEPS
+-#ifndef MACHEPS
+-#define MACHEPS	M_MACHEPS
+-#endif
+-#endif
+-********************/
+-
+-#define	M_MAX_INT 2147483647
+-#ifdef	M_MAX_INT
+-#ifndef MAX_RAND
+-#define	MAX_RAND ((double)(M_MAX_INT))
+-#endif
+-#endif
+-
+-/* for non-ANSI systems */
+-#ifndef HUGE_VAL
+-#define HUGE_VAL HUGE
+-#else
+-#ifndef HUGE
+-#define HUGE HUGE_VAL
+-#endif
+-#endif
+-
+-
+-#ifdef ANSI_C
+-extern	int	isatty(int);
+-#endif
+-
+//GO.SYSIN DD machine.h
+echo matrix.h 1>&2
+sed >matrix.h <<'//GO.SYSIN DD matrix.h' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-		Type definitions for general purpose maths package
+-*/
+-
+-#ifndef	MATRIXH
+-
+-/* RCS id: $Id: m3,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $ */
+-
+-#define	MATRIXH	
+-
+-#include	"machine.h"
+-#include        "err.h"
+-#include 	"meminfo.h"
+-
+-/* unsigned integer type */
+-#ifndef U_INT_DEF
+-typedef	unsigned int	u_int;
+-#define U_INT_DEF
+-#endif
+-
+-/* vector definition */
+-typedef	struct	{
+-		u_int	dim, max_dim;
+-		Real	*ve;
+-		} VEC;
+-
+-/* matrix definition */
+-typedef	struct	{
+-		u_int	m, n;
+-		u_int	max_m, max_n, max_size;
+-		Real	**me,*base;	/* base is base of alloc'd mem */
+-		} MAT;
+-
+-/* band matrix definition */
+-typedef struct {
+-               MAT   *mat;       /* matrix */
+-               int   lb,ub;    /* lower and upper bandwidth */
+-               } BAND;
+-
+-
+-/* permutation definition */
+-typedef	struct	{
+-		u_int	size, max_size, *pe;
+-		} PERM;
+-
+-/* integer vector definition */
+-typedef struct	{
+-		u_int	dim, max_dim;
+-		int	*ive;
+-	        } IVEC;
+-
+-
+-#ifndef MALLOCDECL
+-#ifndef ANSI_C
+-extern	char	*malloc(), *calloc(), *realloc();
+-#else
+-extern	void	*malloc(size_t),
+-		*calloc(size_t,size_t),
+-		*realloc(void *,size_t);
+-#endif
+-#endif
+-
+-#ifndef ANSI_C
+-extern void m_version();
+-#else
+-void	m_version( void );
+-#endif
+-
+-#ifndef ANSI_C
+-/* allocate one object of given type */
+-#define	NEW(type)	((type *)calloc(1,sizeof(type)))
+-
+-/* allocate num objects of given type */
+-#define	NEW_A(num,type)	((type *)calloc((unsigned)(num),sizeof(type)))
+-
+- /* re-allocate arry to have num objects of the given type */
+-#define	RENEW(var,num,type) \
+-    ((var)=(type *)((var) ? \
+-		    realloc((char *)(var),(unsigned)(num)*sizeof(type)) : \
+-		    calloc((unsigned)(num),sizeof(type))))
+-
+-#define	MEMCOPY(from,to,n_items,type) \
+-    MEM_COPY((char *)(from),(char *)(to),(unsigned)(n_items)*sizeof(type))
+-
+-#else
+-/* allocate one object of given type */
+-#define	NEW(type)	((type *)calloc((size_t)1,(size_t)sizeof(type)))
+-
+-/* allocate num objects of given type */
+-#define	NEW_A(num,type)	((type *)calloc((size_t)(num),(size_t)sizeof(type)))
+-
+- /* re-allocate arry to have num objects of the given type */
+-#define	RENEW(var,num,type) \
+-    ((var)=(type *)((var) ? \
+-		    realloc((char *)(var),(size_t)((num)*sizeof(type))) : \
+-		    calloc((size_t)(num),(size_t)sizeof(type))))
+-
+-#define	MEMCOPY(from,to,n_items,type) \
+- MEM_COPY((char *)(from),(char *)(to),(unsigned)(n_items)*sizeof(type))
+-
+-#endif
+-
+-/* type independent min and max operations */
+-#ifndef max
+-#define	max(a,b)	((a) > (b) ? (a) : (b))
+-#endif
+-#ifndef min
+-#define	min(a,b)	((a) > (b) ? (b) : (a))
+-#endif
+-
+-
+-#undef TRUE
+-#define	TRUE	1
+-#undef FALSE
+-#define	FALSE	0
+-
+-
+-/* for input routines */
+-#define MAXLINE 81
+-
+-
+-/* Dynamic memory allocation */
+-
+-/* Should use M_FREE/V_FREE/PX_FREE in programs instead of m/v/px_free()
+-   as this is considerably safer -- also provides a simple type check ! */
+-
+-#ifndef ANSI_C
+-
+-extern	VEC *v_get(), *v_resize();
+-extern	MAT *m_get(), *m_resize();
+-extern	PERM *px_get(), *px_resize();
+-extern	IVEC *iv_get(), *iv_resize();
+-extern	int m_free(),v_free();
+-extern  int px_free();
+-extern  int iv_free();
+-extern  BAND *bd_get(), *bd_resize();
+-extern  int bd_free();
+-
+-#else
+-
+-/* get/resize vector to given dimension */
+-extern	VEC *v_get(int), *v_resize(VEC *,int);
+-/* get/resize matrix to be m x n */
+-extern	MAT *m_get(int,int), *m_resize(MAT *,int,int);
+-/* get/resize permutation to have the given size */
+-extern	PERM *px_get(int), *px_resize(PERM *,int);
+-/* get/resize an integer vector to given dimension */
+-extern	IVEC *iv_get(int), *iv_resize(IVEC *,int);
+-/* get/resize a band matrix to given dimension */
+-extern  BAND *bd_get(int,int,int), *bd_resize(BAND *,int,int,int);
+-
+-/* free (de-allocate) (band) matrices, vectors, permutations and 
+-   integer vectors */
+-extern  int iv_free(IVEC *);
+-extern	m_free(MAT *),v_free(VEC *),px_free(PERM *);
+-extern   int bd_free(BAND *);
+-
+-#endif
+-
+-
+-/* MACROS */
+-
+-/* macros that also check types and sets pointers to NULL */
+-#define	M_FREE(mat)	( m_free(mat),	(mat)=(MAT *)NULL )
+-#define V_FREE(vec)	( v_free(vec),	(vec)=(VEC *)NULL )
+-#define	PX_FREE(px)	( px_free(px),	(px)=(PERM *)NULL )
+-#define	IV_FREE(iv)	( iv_free(iv),	(iv)=(IVEC *)NULL )
+-
+-#define MAXDIM  	2001
+-
+-
+-/* Entry level access to data structures */
+-#ifdef DEBUG
+-
+-/* returns x[i] */
+-#define	v_entry(x,i)	(((i) < 0 || (i) >= (x)->dim) ? \
+-			 error(E_BOUNDS,"v_entry"), 0.0 : (x)->ve[i] )
+-
+-/* x[i] <- val */
+-#define	v_set_val(x,i,val) ((x)->ve[i] = ((i) < 0 || (i) >= (x)->dim) ? \
+-			    error(E_BOUNDS,"v_set_val"), 0.0 : (val))
+-
+-/* x[i] <- x[i] + val */
+-#define	v_add_val(x,i,val) ((x)->ve[i] += ((i) < 0 || (i) >= (x)->dim) ? \
+-			    error(E_BOUNDS,"v_add_val"), 0.0 : (val))
+-
+-/* x[i] <- x[i] - val */
+-#define	v_sub_val(x,i,val) ((x)->ve[i] -= ((i) < 0 || (i) >= (x)->dim) ? \
+-			    error(E_BOUNDS,"v_sub_val"), 0.0 : (val))
+-
+-/* returns A[i][j] */
+-#define	m_entry(A,i,j)	(((i) < 0 || (i) >= (A)->m || \
+-			  (j) < 0 || (j) >= (A)->n) ? \
+-			 error(E_BOUNDS,"m_entry"), 0.0 : (A)->me[i][j] )
+-
+-/* A[i][j] <- val */
+-#define	m_set_val(A,i,j,val) ((A)->me[i][j] = ((i) < 0 || (i) >= (A)->m || \
+-					       (j) < 0 || (j) >= (A)->n) ? \
+-			      error(E_BOUNDS,"m_set_val"), 0.0 : (val) )
+-
+-/* A[i][j] <- A[i][j] + val */
+-#define	m_add_val(A,i,j,val) ((A)->me[i][j] += ((i) < 0 || (i) >= (A)->m || \
+-						(j) < 0 || (j) >= (A)->n) ? \
+-			      error(E_BOUNDS,"m_add_val"), 0.0 : (val) )
+-
+-/* A[i][j] <- A[i][j] - val */
+-#define	m_sub_val(A,i,j,val) ((A)->me[i][j] -= ((i) < 0 || (i) >= (A)->m || \
+-						(j) < 0 || (j) >= (A)->n) ? \
+-			      error(E_BOUNDS,"m_sub_val"), 0.0 : (val) )
+-#else
+-
+-/* returns x[i] */
+-#define	v_entry(x,i)		((x)->ve[i])
+-
+-/* x[i] <- val */
+-#define	v_set_val(x,i,val)	((x)->ve[i]  = (val))
+-
+-/* x[i] <- x[i] + val */
+-#define	v_add_val(x,i,val)	((x)->ve[i] += (val))
+-
+- /* x[i] <- x[i] - val */
+-#define	v_sub_val(x,i,val)	((x)->ve[i] -= (val))
+-
+-/* returns A[i][j] */
+-#define	m_entry(A,i,j)		((A)->me[i][j])
+-
+-/* A[i][j] <- val */
+-#define	m_set_val(A,i,j,val)	((A)->me[i][j]  = (val) )
+-
+-/* A[i][j] <- A[i][j] + val */
+-#define	m_add_val(A,i,j,val)	((A)->me[i][j] += (val) )
+-
+-/* A[i][j] <- A[i][j] - val */
+-#define	m_sub_val(A,i,j,val)	((A)->me[i][j] -= (val) )
+-
+-#endif
+-
+-
+-/* I/O routines */
+-#ifndef ANSI_C
+-
+-extern	void v_foutput(),m_foutput(),px_foutput();
+-extern  void iv_foutput();
+-extern	VEC *v_finput();
+-extern	MAT *m_finput();
+-extern	PERM *px_finput();
+-extern	IVEC *iv_finput();
+-extern	int fy_or_n(), fin_int(), yn_dflt(), skipjunk();
+-extern	double fin_double();
+-
+-#else
+-
+-/* print x on file fp */
+-void v_foutput(FILE *fp,VEC *x),
+-       /* print A on file fp */
+-	m_foutput(FILE *fp,MAT *A),
+-       /* print px on file fp */
+-	px_foutput(FILE *fp,PERM *px);
+-/* print ix on file fp */
+-void iv_foutput(FILE *fp,IVEC *ix);
+-
+-/* Note: if out is NULL, then returned object is newly allocated;
+-        Also: if out is not NULL, then that size is assumed */
+-
+-/* read in vector from fp */
+-VEC *v_finput(FILE *fp,VEC *out);
+-/* read in matrix from fp */
+-MAT *m_finput(FILE *fp,MAT *out);
+-/* read in permutation from fp */
+-PERM *px_finput(FILE *fp,PERM *out);
+-/* read in int vector from fp */
+-IVEC *iv_finput(FILE *fp,IVEC *out);
+-
+-/* fy_or_n -- yes-or-no to question in string s
+-        -- question written to stderr, input from fp 
+-        -- if fp is NOT a tty then return y_n_dflt */
+-int fy_or_n(FILE *fp,char *s);
+-
+-/* yn_dflt -- sets the value of y_n_dflt to val */
+-int yn_dflt(int val);
+-
+-/* fin_int -- return integer read from file/stream fp
+-        -- prompt s on stderr if fp is a tty
+-        -- check that x lies between low and high: re-prompt if
+-                fp is a tty, error exit otherwise
+-        -- ignore check if low > high           */
+-int fin_int(FILE *fp,char *s,int low,int high);
+-
+-/* fin_double -- return double read from file/stream fp
+-        -- prompt s on stderr if fp is a tty
+-        -- check that x lies between low and high: re-prompt if
+-                fp is a tty, error exit otherwise
+-        -- ignore check if low > high           */
+-double fin_double(FILE *fp,char *s,double low,double high);
+-
+-/* it skips white spaces and strings of the form #....\n
+-   Here .... is a comment string */
+-int skipjunk(FILE *fp);
+-
+-#endif
+-
+-
+-/* MACROS */
+-
+-/* macros to use stdout and stdin instead of explicit fp */
+-#define	v_output(vec)	v_foutput(stdout,vec)
+-#define	v_input(vec)	v_finput(stdin,vec)
+-#define	m_output(mat)	m_foutput(stdout,mat)
+-#define	m_input(mat)	m_finput(stdin,mat)
+-#define	px_output(px)	px_foutput(stdout,px)
+-#define	px_input(px)	px_finput(stdin,px)
+-#define	iv_output(iv)	iv_foutput(stdout,iv)
+-#define	iv_input(iv)	iv_finput(stdin,iv)
+-
+-/* general purpose input routine; skips comments # ... \n */
+-#define	finput(fp,prompt,fmt,var) \
+-	( ( isatty(fileno(fp)) ? fprintf(stderr,prompt) : skipjunk(fp) ), \
+-							fscanf(fp,fmt,var) )
+-#define	input(prompt,fmt,var)	finput(stdin,prompt,fmt,var)
+-#define	fprompter(fp,prompt) \
+-	( isatty(fileno(fp)) ? fprintf(stderr,prompt) : skipjunk(fp) )
+-#define	prompter(prompt)	fprompter(stdin,prompt)
+-#define	y_or_n(s)	fy_or_n(stdin,s)
+-#define	in_int(s,lo,hi)	fin_int(stdin,s,lo,hi)
+-#define	in_double(s,lo,hi)	fin_double(stdin,s,lo,hi)
+-
+-/* Copying routines */
+-#ifndef ANSI_C
+-extern	MAT	*_m_copy(), *m_move(), *vm_move();
+-extern	VEC	*_v_copy(), *v_move(), *mv_move();
+-extern	PERM	*px_copy();
+-extern	IVEC	*iv_copy(), *iv_move();
+-extern  BAND    *bd_copy();
+-
+-#else
+-
+-/* copy in to out starting at out[i0][j0] */
+-extern	MAT	*_m_copy(MAT *in,MAT *out,u_int i0,u_int j0),
+-		* m_move(MAT *in, int, int, int, int, MAT *out, int, int),
+-		*vm_move(VEC *in, int, MAT *out, int, int, int, int);
+-/* copy in to out starting at out[i0] */
+-extern	VEC	*_v_copy(VEC *in,VEC *out,u_int i0),
+-		* v_move(VEC *in, int, int, VEC *out, int),
+-		*mv_move(MAT *in, int, int, int, int, VEC *out, int);
+-extern	PERM	*px_copy(PERM *in,PERM *out);
+-extern	IVEC	*iv_copy(IVEC *in,IVEC *out),
+-		*iv_move(IVEC *in, int, int, IVEC *out, int);
+-extern  BAND    *bd_copy(BAND *in,BAND *out);
+-
+-#endif
+-
+-
+-/* MACROS */
+-#define	m_copy(in,out)	_m_copy(in,out,0,0)
+-#define	v_copy(in,out)	_v_copy(in,out,0)
+-
+-
+-/* Initialisation routines -- to be zero, ones, random or identity */
+-#ifndef ANSI_C
+-extern	VEC     *v_zero(), *v_rand(), *v_ones();
+-extern	MAT     *m_zero(), *m_ident(), *m_rand(), *m_ones();
+-extern	PERM    *px_ident();
+-extern  IVEC    *iv_zero();
+-#else
+-extern	VEC     *v_zero(VEC *), *v_rand(VEC *), *v_ones(VEC *);
+-extern	MAT     *m_zero(MAT *), *m_ident(MAT *), *m_rand(MAT *),
+-						*m_ones(MAT *);
+-extern	PERM    *px_ident(PERM *);
+-extern  IVEC    *iv_zero(IVEC *);
+-#endif
+-
+-/* Basic vector operations */
+-#ifndef ANSI_C
+-extern	VEC *sv_mlt(), *mv_mlt(), *vm_mlt(), *v_add(), *v_sub(),
+-		*px_vec(), *pxinv_vec(), *v_mltadd(), *v_map(), *_v_map(),
+-		*v_lincomb(), *v_linlist();
+-extern	double	v_min(), v_max(), v_sum();
+-extern	VEC	*v_star(), *v_slash(), *v_sort();
+-extern	double _in_prod(), __ip__();
+-extern	void	__mltadd__(), __add__(), __sub__(), 
+-                __smlt__(), __zero__();
+-#else
+-
+-extern	VEC	*sv_mlt(double,VEC *,VEC *),	/* out <- s.x */
+-		*mv_mlt(MAT *,VEC *,VEC *),	/* out <- A.x */
+-		*vm_mlt(MAT *,VEC *,VEC *),	/* out^T <- x^T.A */
+-		*v_add(VEC *,VEC *,VEC *), 	/* out <- x + y */
+-                *v_sub(VEC *,VEC *,VEC *),	/* out <- x - y */
+-		*px_vec(PERM *,VEC *,VEC *),	/* out <- P.x */
+-		*pxinv_vec(PERM *,VEC *,VEC *),	  /* out <- P^{-1}.x */
+-		*v_mltadd(VEC *,VEC *,double,VEC *),   /* out <- x + s.y */
+-#ifdef PROTOTYPES_IN_STRUCT
+-		*v_map(double (*f)(double),VEC *,VEC *),  
+-                                                 /* out[i] <- f(x[i]) */
+-		*_v_map(double (*f)(void *,double),void *,VEC *,VEC *),
+-#else
+-		*v_map(double (*f)(),VEC *,VEC *), /* out[i] <- f(x[i]) */
+-		*_v_map(double (*f)(),void *,VEC *,VEC *),
+-#endif
+-		*v_lincomb(int,VEC **,Real *,VEC *),   
+-                                                 /* out <- sum_i s[i].x[i] */
+-                *v_linlist(VEC *out,VEC *v1,double a1,...);
+-                                              /* out <- s1.x1 + s2.x2 + ... */
+-
+-/* returns min_j x[j] (== x[i]) */
+-extern	double	v_min(VEC *, int *), 
+-     /* returns max_j x[j] (== x[i]) */		
+-        v_max(VEC *, int *), 
+-        /* returns sum_i x[i] */
+-        v_sum(VEC *);
+-
+-/* Hadamard product: out[i] <- x[i].y[i] */
+-extern	VEC	*v_star(VEC *, VEC *, VEC *),
+-                 /* out[i] <- x[i] / y[i] */
+-		*v_slash(VEC *, VEC *, VEC *),
+-               /* sorts x, and sets order so that sorted x[i] = x[order[i]] */ 
+-		*v_sort(VEC *, PERM *);
+-
+-/* returns inner product starting at component i0 */
+-extern	double	_in_prod(VEC *x,VEC *y,u_int i0), 
+-                /* returns sum_{i=0}^{len-1} x[i].y[i] */
+-                __ip__(Real *,Real *,int);
+-
+-/* see v_mltadd(), v_add(), v_sub() and v_zero() */
+-extern	void	__mltadd__(Real *,Real *,double,int),
+-		__add__(Real *,Real *,Real *,int),
+-		__sub__(Real *,Real *,Real *,int),
+-                __smlt__(Real *,double,Real *,int),
+-		__zero__(Real *,int);
+-
+-#endif
+-
+-
+-/* MACRO */
+-/* usual way of computing the inner product */
+-#define	in_prod(a,b)	_in_prod(a,b,0)
+-
+-/* Norms */
+-/* scaled vector norms -- scale == NULL implies unscaled */
+-#ifndef ANSI_C
+-
+-extern	double	_v_norm1(), _v_norm2(), _v_norm_inf(),
+-		m_norm1(), m_norm_inf(), m_norm_frob();
+-
+-#else
+-               /* returns sum_i |x[i]/scale[i]| */
+-extern	double	_v_norm1(VEC *x,VEC *scale),   
+-               /* returns (scaled) Euclidean norm */
+-                _v_norm2(VEC *x,VEC *scale),
+-               /* returns max_i |x[i]/scale[i]| */
+-		_v_norm_inf(VEC *x,VEC *scale);
+-
+-/* unscaled matrix norms */
+-extern double m_norm1(MAT *A), m_norm_inf(MAT *A), m_norm_frob(MAT *A);
+-
+-#endif
+-
+-
+-/* MACROS */
+-/* unscaled vector norms */
+-#define	v_norm1(x)	_v_norm1(x,VNULL)
+-#define	v_norm2(x)	_v_norm2(x,VNULL)
+-#define	v_norm_inf(x)	_v_norm_inf(x,VNULL)
+-
+-/* Basic matrix operations */
+-#ifndef ANSI_C
+-
+-extern	MAT *sm_mlt(), *m_mlt(), *mmtr_mlt(), *mtrm_mlt(), *m_add(), *m_sub(),
+-		*sub_mat(), *m_transp(), *ms_mltadd();
+-
+-extern   BAND *bd_transp();
+-extern	MAT *px_rows(), *px_cols(), *swap_rows(), *swap_cols(),
+-             *_set_row(), *_set_col();
+-extern	VEC *get_row(), *get_col(), *sub_vec(),
+-		*mv_mltadd(), *vm_mltadd();
+-
+-#else
+-
+-extern	MAT	*sm_mlt(double s,MAT *A,MAT *out), 	/* out <- s.A */
+-		*m_mlt(MAT *A,MAT *B,MAT *out),	/* out <- A.B */
+-		*mmtr_mlt(MAT *A,MAT *B,MAT *out),	/* out <- A.B^T */
+-		*mtrm_mlt(MAT *A,MAT *B,MAT *out),	/* out <- A^T.B */
+-		*m_add(MAT *A,MAT *B,MAT *out),	/* out <- A + B */
+-		*m_sub(MAT *A,MAT *B,MAT *out),	/* out <- A - B */
+-		*sub_mat(MAT *A,u_int,u_int,u_int,u_int,MAT *out),
+-		*m_transp(MAT *A,MAT *out),		/* out <- A^T */
+-                /* out <- A + s.B */ 
+-		*ms_mltadd(MAT *A,MAT *B,double s,MAT *out);   
+-
+-
+-extern  BAND    *bd_transp(BAND *in, BAND *out);   /* out <- A^T */
+-extern	MAT	*px_rows(PERM *px,MAT *A,MAT *out),	/* out <- P.A */
+-		*px_cols(PERM *px,MAT *A,MAT *out),	/* out <- A.P^T */
+-		*swap_rows(MAT *,int,int,int,int),
+-		*swap_cols(MAT *,int,int,int,int),
+-                 /* A[i][j] <- out[j], j >= j0 */
+-		*_set_col(MAT *A,u_int i,VEC *out,u_int j0),
+-                 /* A[i][j] <- out[i], i >= i0 */
+-		*_set_row(MAT *A,u_int j,VEC *out,u_int i0);
+-
+-extern	VEC	*get_row(MAT *,u_int,VEC *),
+-		*get_col(MAT *,u_int,VEC *),
+-		*sub_vec(VEC *,int,int,VEC *),
+-                   /* out <- x + s.A.y */
+-		*mv_mltadd(VEC *x,VEC *y,MAT *A,double s,VEC *out),
+-                  /* out^T <- x^T + s.y^T.A */
+-		*vm_mltadd(VEC *x,VEC *y,MAT *A,double s,VEC *out);
+-#endif
+-
+-
+-/* MACROS */
+-/* row i of A <- vec */
+-#define	set_row(mat,row,vec)	_set_row(mat,row,vec,0) 
+-/* col j of A <- vec */
+-#define	set_col(mat,col,vec)	_set_col(mat,col,vec,0)
+-
+-
+-/* Basic permutation operations */
+-#ifndef ANSI_C
+-
+-extern	PERM *px_mlt(), *px_inv(), *px_transp();
+-extern	int  px_sign();
+-
+-#else
+-
+-extern	PERM	*px_mlt(PERM *px1,PERM *px2,PERM *out),	/* out <- px1.px2 */
+-		*px_inv(PERM *px,PERM *out),	/* out <- px^{-1} */
+-                 /* swap px[i] and px[j] */
+-		*px_transp(PERM *px,u_int i,u_int j);
+-
+-     /* returns sign(px) = +1 if px product of even # transpositions
+-                           -1 if ps product of odd  # transpositions */
+-extern	int	px_sign(PERM *);
+-
+-#endif
+-
+-
+-/* Basic integer vector operations */
+-#ifndef ANSI_C
+-
+-extern	IVEC	*iv_add(), *iv_sub(), *iv_sort();
+-
+-#else
+-
+-extern	IVEC	*iv_add(IVEC *ix,IVEC *iy,IVEC *out),  /* out <- ix + iy */
+-		*iv_sub(IVEC *ix,IVEC *iy,IVEC *out),  /* out <- ix - iy */
+-        /* sorts ix & sets order so that sorted ix[i] = old ix[order[i]] */
+-		*iv_sort(IVEC *ix, PERM *order);
+-
+-#endif
+-
+-
+-/* miscellaneous functions */
+-
+-#ifndef ANSI_C
+-
+-extern	double	square(), cube(), mrand();
+-extern	void	smrand(), mrandlist();
+-extern  void    m_dump(), px_dump(), v_dump(), iv_dump();
+-extern MAT *band2mat();
+-extern BAND *mat2band();
+-
+-#else
+-
+-double	square(double x), 	/* returns x^2 */
+-  cube(double x), 		/* returns x^3 */
+-  mrand(void);                  /* returns random # in [0,1) */
+-
+-void	smrand(int seed),            /* seeds mrand() */
+-  mrandlist(Real *x, int len);       /* generates len random numbers */
+-
+-void    m_dump(FILE *fp,MAT *a), px_dump(FILE *,PERM *px),
+-        v_dump(FILE *fp,VEC *x), iv_dump(FILE *fp, IVEC *ix);
+-
+-MAT *band2mat(BAND *bA, MAT *A);
+-BAND *mat2band(MAT *A, int lb,int ub, BAND *bA);
+-
+-#endif
+-
+-
+-/* miscellaneous constants */
+-#define	VNULL	((VEC *)NULL)
+-#define	MNULL	((MAT *)NULL)
+-#define	PNULL	((PERM *)NULL)
+-#define	IVNULL	((IVEC *)NULL)
+-#define BDNULL  ((BAND *)NULL)
+-
+-
+-
+-/* varying number of arguments */
+-
+-#ifdef ANSI_C
+-#include <stdarg.h>
+-
+-/* prototypes */
+-
+-int v_get_vars(int dim,...);
+-int iv_get_vars(int dim,...);
+-int m_get_vars(int m,int n,...);
+-int px_get_vars(int dim,...);
+-
+-int v_resize_vars(int new_dim,...);
+-int iv_resize_vars(int new_dim,...);
+-int m_resize_vars(int m,int n,...);
+-int px_resize_vars(int new_dim,...);
+-
+-int v_free_vars(VEC **,...);
+-int iv_free_vars(IVEC **,...);
+-int px_free_vars(PERM **,...);
+-int m_free_vars(MAT **,...);
+-
+-#elif VARARGS
+-/* old varargs is used */
+-
+-#include  <varargs.h>
+-
+-/* prototypes */
+-
+-int v_get_vars();
+-int iv_get_vars();
+-int m_get_vars();
+-int px_get_vars();
+-
+-int v_resize_vars();
+-int iv_resize_vars();
+-int m_resize_vars();
+-int px_resize_vars();
+-
+-int v_free_vars();
+-int iv_free_vars();
+-int px_free_vars();
+-int m_free_vars();
+-
+-#endif
+-
+-
+-#endif
+-
+-
+//GO.SYSIN DD matrix.h
+echo iter.h 1>&2
+sed >iter.h <<'//GO.SYSIN DD iter.h' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/* iter.h  14/09/93 */
+-
+-/* 
+-
+-  Structures for iterative methods
+-
+-*/
+-
+-#ifndef ITERHH
+-
+-#define ITERHH
+-
+-/* RCS id: $Id: m3,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $  */
+-
+-
+-#include	"sparse.h"
+-
+-
+-/* basic structure for iterative methods */
+-
+-/* type Fun_Ax for functions to get y = A*x */
+-#ifdef ANSI_C
+-typedef VEC  *(*Fun_Ax)(void *,VEC *,VEC *);
+-#else
+-typedef VEC *(*Fun_Ax)();
+-#endif
+-
+-
+-/* type ITER */
+-typedef struct Iter_data {
+-   int shared_x;   /* if TRUE then x is shared and it will not be free'd */ 
+-   int shared_b;   /* if TRUE then b is shared and it will not be free'd */
+-   unsigned k;   /* no. of direction (search) vectors; =0 - none */
+-   int limit;    /* upper bound on the no. of iter. steps */
+-   int steps;    /* no. of iter. steps done */
+-   Real eps;     /* accuracy required */
+-   
+-   VEC *x;       /* input: initial guess;
+-		    output: approximate solution */
+-   VEC *b;       /* right hand side of the equation A*x = b */
+-
+-   Fun_Ax   Ax;		 /* function computing y = A*x */
+-   void *A_par;         /* parameters for Ax */
+-
+-   Fun_Ax  ATx;		 /* function  computing y = A^T*x;
+-					       T = transpose */
+-   void *AT_par;         /* parameters for ATx */
+-
+-   Fun_Ax  Bx; /* function computing y = B*x; B - preconditioner */
+-   void *B_par;         /* parameters for Bx */
+-
+-#ifdef ANSI_C
+-
+-#ifdef PROTOTYPES_IN_STRUCT
+-   void (*info)(struct Iter_data *, double, VEC *,VEC *);
+-            /* function giving some information for a user;
+-	       nres - a norm of a residual res */
+-   
+-   int (*stop_crit)(struct Iter_data *, double, VEC *,VEC *);
+-           /* stopping criterion:
+-	      nres - a norm of res;
+-	      res - residual;
+-	    if returned value == TRUE then stop;
+-	    if returned value == FALSE then continue; */
+-#else
+-   void (*info)();
+-   int  (*stop_crit)();
+-#endif /* PROTOTYPES_IN_STRUCT */
+-
+-#else
+-
+-   void (*info)();
+-            /* function giving some information for a user */
+-   
+-   int (*stop_crit)();
+-           /* stopping criterion:
+-	    if returned value == TRUE then stop;
+-	    if returned value == FALSE then continue; */
+-
+-#endif /* ANSI_C */
+-
+-   Real init_res;   /* the norm of the initial residual */
+-
+-}  ITER;
+-
+-
+-#define INULL   (ITER *)NULL
+-
+-/* type Fun_info */
+-#ifdef ANSI_C
+-typedef void (*Fun_info)(ITER *, double, VEC *,VEC *);
+-#else
+-typedef void (*Fun_info)();
+-#endif
+-
+-/* type Fun_stp_crt */
+-#ifdef ANSI_C
+-typedef int (*Fun_stp_crt)(ITER *, double, VEC *,VEC *);
+-#else
+-typedef int (*Fun_stp_crt)();
+-#endif
+-
+-
+-
+-/* macros */
+-/* default values */
+-
+-#define ITER_LIMIT_DEF  1000
+-#define ITER_EPS_DEF    1e-6
+-
+-/* other macros */
+-
+-/* set ip->Ax=fun and ip->A_par=fun_par */
+-#define iter_Ax(ip,fun,fun_par) \
+-  (ip->Ax=(Fun_Ax)(fun),ip->A_par=(void *)(fun_par),0)
+-#define iter_ATx(ip,fun,fun_par) \
+-  (ip->ATx=(Fun_Ax)(fun),ip->AT_par=(void *)(fun_par),0)
+-#define iter_Bx(ip,fun,fun_par) \
+-  (ip->Bx=(Fun_Ax)(fun),ip->B_par=(void *)(fun_par),0)
+-
+-/* save free macro */
+-#define ITER_FREE(ip)  (iter_free(ip), (ip)=(ITER *)NULL)
+-
+-
+-/* prototypes from iter0.c */
+-
+-#ifdef ANSI_C
+-/* standard information */
+-void iter_std_info(ITER *ip,double nres,VEC *res,VEC *Bres);
+-/* standard stopping criterion */
+-int iter_std_stop_crit(ITER *ip, double nres, VEC *res,VEC *Bres);
+-
+-/* get, resize and free ITER variable */
+-ITER *iter_get(int lenb, int lenx);
+-ITER *iter_resize(ITER *ip,int lenb,int lenx);
+-int iter_free(ITER *ip);
+-
+-void iter_dump(FILE *fp,ITER *ip);
+-
+-/* copy ip1 to ip2 copying also elements of x and b */
+-ITER *iter_copy(ITER *ip1, ITER *ip2);
+-/* copy ip1 to ip2 without copying elements of x and b */
+-ITER *iter_copy2(ITER *ip1,ITER *ip2);
+-
+-/* functions for generating sparse matrices with random elements */
+-SPMAT	*iter_gen_sym(int n, int nrow);
+-SPMAT	*iter_gen_nonsym(int m,int n,int nrow,double diag);
+-SPMAT	*iter_gen_nonsym_posdef(int n,int nrow);
+-
+-#else
+-
+-void iter_std_info();
+-int iter_std_stop_crit();
+-ITER *iter_get();
+-int iter_free();
+-ITER *iter_resize();
+-void iter_dump();
+-ITER *iter_copy();
+-ITER *iter_copy2();
+-SPMAT	*iter_gen_sym();
+-SPMAT	*iter_gen_nonsym();
+-SPMAT	*iter_gen_nonsym_posdef();
+-
+-#endif
+-
+-/* prototypes from iter.c */
+-
+-/* different iterative procedures */
+-#ifdef ANSI_C
+-VEC  *iter_cg(ITER *ip);
+-VEC  *iter_cg1(ITER *ip);
+-VEC  *iter_spcg(SPMAT *A,SPMAT *LLT,VEC *b,double eps,VEC *x,int limit,
+-		int *steps);
+-VEC  *iter_cgs(ITER *ip,VEC *r0);
+-VEC  *iter_spcgs(SPMAT *A,SPMAT *B,VEC *b,VEC *r0,double eps,VEC *x,
+-		 int limit, int *steps);
+-VEC  *iter_lsqr(ITER *ip);
+-VEC  *iter_splsqr(SPMAT *A,VEC *b,double tol,VEC *x,
+-		  int limit,int *steps);
+-VEC  *iter_gmres(ITER *ip);
+-VEC  *iter_spgmres(SPMAT *A,SPMAT *B,VEC *b,double tol,VEC *x,int k,
+-		   int limit, int *steps);
+-MAT  *iter_arnoldi_iref(ITER *ip,Real *h,MAT *Q,MAT *H);
+-MAT  *iter_arnoldi(ITER *ip,Real *h,MAT *Q,MAT *H);
+-MAT  *iter_sparnoldi(SPMAT *A,VEC *x0,int k,Real *h,MAT *Q,MAT *H);
+-VEC  *iter_mgcr(ITER *ip);
+-VEC  *iter_spmgcr(SPMAT *A,SPMAT *B,VEC *b,double tol,VEC *x,int k,
+-		  int limit, int *steps);
+-void	iter_lanczos(ITER *ip,VEC *a,VEC *b,Real *beta2,MAT *Q);
+-void    iter_splanczos(SPMAT *A,int m,VEC *x0,VEC *a,VEC *b,Real *beta2,
+-		       MAT *Q);
+-VEC  *iter_lanczos2(ITER *ip,VEC *evals,VEC *err_est);
+-VEC  *iter_splanczos2(SPMAT *A,int m,VEC *x0,VEC *evals,VEC *err_est);
+-VEC  *iter_cgne(ITER *ip);
+-VEC  *iter_spcgne(SPMAT *A,SPMAT *B,VEC *b,double eps,VEC *x,
+-		  int limit,int *steps);
+-#else
+-VEC  *iter_cg();
+-VEC  *iter_cg1();
+-VEC  *iter_spcg();
+-VEC  *iter_cgs();
+-VEC  *iter_spcgs();
+-VEC  *iter_lsqr();
+-VEC  *iter_splsqr();
+-VEC  *iter_gmres();
+-VEC  *iter_spgmres();
+-MAT  *iter_arnoldi_iref();
+-MAT  *iter_arnoldi();
+-MAT  *iter_sparnoldi();
+-VEC  *iter_mgcr();
+-VEC  *iter_spmgcr();
+-void  iter_lanczos();
+-void  iter_splanczos();
+-VEC  *iter_lanczos2();
+-VEC  *iter_splanczos2();
+-VEC  *iter_cgne();
+-VEC  *iter_spcgne();
+-
+-#endif
+-
+-
+-#endif  /* ITERHH */
+//GO.SYSIN DD iter.h
+echo matlab.h 1>&2
+sed >matlab.h <<'//GO.SYSIN DD matlab.h' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/* matlab.h -- Header file for matlab.c, spmatlab.c and zmatlab.c
+-   for save/load formats */
+-
+-#ifndef MATLAB_DEF
+-
+-#define	MATLAB_DEF
+-
+-/* structure required by MATLAB */
+-typedef struct {
+-	long    type;   /* matrix type */
+-	long    m;      /* # rows */
+-	long    n;      /* # cols */
+-	long    imag;   /* is complex? */
+-	long    namlen; /* length of variable name */
+-		} matlab;
+-
+-/* macros for matrix storage type */
+-#define INTEL   0       /* for 80x87 format */
+-#define PC      INTEL
+-#define MOTOROLA        1       /* 6888x format */
+-#define SUN     MOTOROLA
+-#define APOLLO  MOTOROLA
+-#define MAC     MOTOROLA
+-#define VAX_D   2
+-#define VAX_G   3
+-
+-#define COL_ORDER       0
+-#define ROW_ORDER       1
+-
+-#define DOUBLE_PREC  0       /* double precision */
+-#define SINGLE_PREC  1       /* single precision */
+-#define INT_32  2       /* 32 bit integers (signed) */
+-#define INT_16  3       /* 16 bit integers (signed) */
+-#define INT_16u 4       /* 16 bit integers (unsigned) */
+-/* end of macros for matrix storage type */
+-
+-#ifndef MACH_ID
+-#define MACH_ID         MOTOROLA
+-#endif
+-
+-#define ORDER           ROW_ORDER
+-
+-#if REAL == DOUBLE
+-#define PRECISION       DOUBLE_PREC
+-#elif REAL == FLOAT
+-#define PRECISION  	SINGLE_PREC
+-#endif
+-
+-
+-/* prototypes */
+-
+-#ifdef ANSI_C
+-
+-MAT *m_save(FILE *,MAT *,char *);
+-MAT *m_load(FILE *,char **);
+-VEC *v_save(FILE *,VEC *,char *);
+-double d_save(FILE *,double,char *);
+-
+-#else
+-
+-extern	MAT *m_save(), *m_load();
+-extern	VEC *v_save();
+-extern	double d_save();
+-#endif
+-
+-/* complex variant */
+-#ifdef COMPLEX
+-#include "zmatrix.h"
+-
+-#ifdef ANSI_C
+-extern ZMAT	*zm_save(FILE *fp,ZMAT *A,char *name);
+-extern ZVEC	*zv_save(FILE *fp,ZVEC *x,char *name);
+-extern complex	z_save(FILE *fp,complex z,char *name);
+-extern ZMAT	*zm_load(FILE *fp,char **name);
+-
+-#else
+-
+-extern ZMAT	*zm_save();
+-extern ZVEC	*zv_save();
+-extern complex	z_save();
+-extern ZMAT	*zm_load();
+-
+-#endif
+-
+-#endif
+-
+-#endif
+//GO.SYSIN DD matlab.h
+echo matrix2.h 1>&2
+sed >matrix2.h <<'//GO.SYSIN DD matrix2.h' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-	Header file for ``matrix2.a'' library file
+-*/
+-
+-
+-#ifndef MATRIX2H
+-#define MATRIX2H
+-
+-#include "matrix.h"
+-
+-/* Unless otherwise specified, factorisation routines overwrite the
+-   matrix that is being factorised */
+-
+-#ifndef ANSI_C
+-
+-extern	MAT	*BKPfactor(), *CHfactor(), *LUfactor(), *QRfactor(),
+-		*QRCPfactor(), *LDLfactor(), *Hfactor(), *MCHfactor(),
+-		*m_inverse();
+-extern	double	LUcondest(), QRcondest();
+-extern	MAT	*makeQ(), *makeR(), *makeHQ(), *makeH();
+-extern	MAT	*LDLupdate(), *QRupdate();
+-
+-extern	VEC	*BKPsolve(), *CHsolve(), *LUsolve(), *_Qsolve(), *QRsolve(),
+-		*LDLsolve(), *Usolve(), *Lsolve(), *Dsolve(), *LTsolve(),
+-		*UTsolve(), *LUTsolve(), *QRCPsolve();
+-
+-extern  BAND    *bdLUfactor(), *bdLDLfactor();
+-extern  VEC     *bdLUsolve(), *bdLDLsolve();
+-
+-extern	VEC	*hhvec();
+-extern	VEC	*hhtrvec();
+-extern	MAT	*hhtrrows();
+-extern	MAT	*hhtrcols();
+-
+-extern	void	givens();
+-extern	VEC	*rot_vec();	/* in situ */
+-extern	MAT	*rot_rows();	/* in situ */
+-extern	MAT	*rot_cols();	/* in situ */
+-
+-
+-/* eigenvalue routines */
+-extern	VEC	*trieig(), *symmeig();
+-extern	MAT	*schur();
+-extern	void	schur_evals();
+-extern	MAT	*schur_vecs();
+-
+-/* singular value decomposition */
+-extern	VEC	*bisvd(), *svd();
+-
+-/* matrix powers and exponent */
+-MAT  *_m_pow();
+-MAT  *m_pow();
+-MAT  *m_exp(), *_m_exp();
+-MAT  *m_poly();
+-
+-/* FFT */
+-void fft();
+-void ifft();
+-
+-
+-#else
+-
+-                 /* forms Bunch-Kaufman-Parlett factorisation for
+-                        symmetric indefinite matrices */
+-extern	MAT	*BKPfactor(MAT *A,PERM *pivot,PERM *blocks),
+-                 /* Cholesky factorisation of A
+-                        (symmetric, positive definite) */
+-		*CHfactor(MAT *A),
+-                /* LU factorisation of A (with partial pivoting) */ 
+-                *LUfactor(MAT *A,PERM *pivot),
+-                /* QR factorisation of A; need dim(diag) >= # rows of A */
+-		*QRfactor(MAT *A,VEC *diag),
+-                /* QR factorisation of A with column pivoting */
+-		*QRCPfactor(MAT *A,VEC *diag,PERM *pivot),
+-                /* L.D.L^T factorisation of A */
+-		*LDLfactor(MAT *A), 
+-                /* Hessenberg factorisation of A -- for schur() */
+-                *Hfactor(MAT *A,VEC *diag1,VEC *diag2),
+-                /* modified Cholesky factorisation of A;
+-                        actually factors A+D, D diagonal with no
+-                        diagonal entry in the factor < sqrt(tol) */
+-                *MCHfactor(MAT *A,double tol),
+-		*m_inverse(MAT *A,MAT *out);
+-
+-                /* returns condition estimate for A after LUfactor() */
+-extern	double	LUcondest(MAT *A,PERM *pivot),
+-                /* returns condition estimate for Q after QRfactor() */
+-                QRcondest(MAT *A);
+-
+-/* Note: The make..() and ..update() routines assume that the factorisation
+-        has already been carried out */
+-
+-     /* Qout is the "Q" (orthongonal) matrix from QR factorisation */
+-extern	MAT	*makeQ(MAT *A,VEC *diag,MAT *Qout),
+-                /* Rout is the "R" (upper triangular) matrix
+-                        from QR factorisation */
+-		*makeR(MAT *A,MAT *Rout),
+-                /* Qout is orthogonal matrix in Hessenberg factorisation */
+-		*makeHQ(MAT *A,VEC *diag1,VEC *diag2,MAT *Qout),
+-                /* Hout is the Hessenberg matrix in Hessenberg factorisation */
+-		*makeH(MAT *A,MAT *Hout);
+-
+-                /* updates L.D.L^T factorisation for A <- A + alpha.u.u^T */
+-extern	MAT	*LDLupdate(MAT *A,VEC *u,double alpha),
+-                /* updates QR factorisation for QR <- Q.(R+u.v^T)
+-		   Note: we need explicit Q & R matrices,
+-                        from makeQ() and makeR() */
+-		*QRupdate(MAT *Q,MAT *R,VEC *u,VEC *v);
+-
+-/* Solve routines assume that the corresponding factorisation routine
+-        has already been applied to the matrix along with auxiliary
+-        objects (such as pivot permutations)
+-
+-        These solve the system A.x = b,
+-        except for LUTsolve and QRTsolve which solve the transposed system
+-                                A^T.x. = b.
+-        If x is NULL on entry, then it is created.
+-*/
+-
+-extern	VEC	*BKPsolve(MAT *A,PERM *pivot,PERM *blocks,VEC *b,VEC *x),
+-		*CHsolve(MAT *A,VEC *b,VEC *x),
+-		*LDLsolve(MAT *A,VEC *b,VEC *x),
+-		*LUsolve(MAT *A,PERM *pivot,VEC *b,VEC *x),
+-		*_Qsolve(MAT *A,VEC *,VEC *,VEC *, VEC *),
+-		*QRsolve(MAT *A,VEC *,VEC *b,VEC *x),
+-    		*QRTsolve(MAT *A,VEC *,VEC *b,VEC *x),
+-
+-
+-     /* Triangular equations solve routines;
+-        U for upper triangular, L for lower traingular, D for diagonal
+-        if diag_val == 0.0 use that values in the matrix */
+-
+-		*Usolve(MAT *A,VEC *b,VEC *x,double diag_val),
+-		*Lsolve(MAT *A,VEC *b,VEC *x,double diag_val),
+-		*Dsolve(MAT *A,VEC *b,VEC *x),
+-		*LTsolve(MAT *A,VEC *b,VEC *x,double diag_val),
+-		*UTsolve(MAT *A,VEC *b,VEC *x,double diag_val),
+-                *LUTsolve(MAT *A,PERM *,VEC *,VEC *),
+-                *QRCPsolve(MAT *QR,VEC *diag,PERM *pivot,VEC *b,VEC *x);
+-
+-extern  BAND    *bdLUfactor(BAND *A,PERM *pivot),
+-                *bdLDLfactor(BAND *A);
+-extern  VEC     *bdLUsolve(BAND *A,PERM *pivot,VEC *b,VEC *x),
+-                *bdLDLsolve(BAND *A,VEC *b,VEC *x);
+-
+-
+-
+-extern	VEC	*hhvec(VEC *,u_int,Real *,VEC *,Real *);
+-extern	VEC	*hhtrvec(VEC *,double,u_int,VEC *,VEC *);
+-extern	MAT	*hhtrrows(MAT *,u_int,u_int,VEC *,double);
+-extern	MAT	*hhtrcols(MAT *,u_int,u_int,VEC *,double);
+-
+-extern	void	givens(double,double,Real *,Real *);
+-extern	VEC	*rot_vec(VEC *,u_int,u_int,double,double,VEC *); /* in situ */
+-extern	MAT	*rot_rows(MAT *,u_int,u_int,double,double,MAT *); /* in situ */
+-extern	MAT	*rot_cols(MAT *,u_int,u_int,double,double,MAT *); /* in situ */
+-
+-
+-/* eigenvalue routines */
+-
+-               /* compute eigenvalues of tridiagonal matrix
+-                  with diagonal entries a[i], super & sub diagonal entries
+-                  b[i]; eigenvectors stored in Q (if not NULL) */
+-extern	VEC	*trieig(VEC *a,VEC *b,MAT *Q),
+-                 /* sets out to be vector of eigenvectors; eigenvectors
+-                   stored in Q (if not NULL). A is unchanged */
+-		*symmeig(MAT *A,MAT *Q,VEC *out);
+-
+-               /* computes real Schur form = Q^T.A.Q */
+-extern	MAT	*schur(MAT *A,MAT *Q);
+-         /* computes real and imaginary parts of the eigenvalues
+-                        of A after schur() */
+-extern	void	schur_evals(MAT *A,VEC *re_part,VEC *im_part);
+-          /* computes real and imaginary parts of the eigenvectors
+-                        of A after schur() */
+-extern	MAT	*schur_vecs(MAT *T,MAT *Q,MAT *X_re,MAT *X_im);
+-
+-
+-/* singular value decomposition */
+-
+-        /* computes singular values of bi-diagonal matrix with
+-                   diagonal entries a[i] and superdiagonal entries b[i];
+-                   singular vectors stored in U and V (if not NULL) */
+-VEC	*bisvd(VEC *a,VEC *b,MAT *U,MAT *V),
+-               /* sets out to be vector of singular values;
+-                   singular vectors stored in U and V */
+-	*svd(MAT *A,MAT *U,MAT *V,VEC *out);
+-
+-/* matrix powers and exponent */
+-MAT  *_m_pow(MAT *,int,MAT *,MAT *);
+-MAT  *m_pow(MAT *,int, MAT *);
+-MAT  *m_exp(MAT *,double,MAT *);
+-MAT  *_m_exp(MAT *,double,MAT *,int *,int *);
+-MAT  *m_poly(MAT *,VEC *,MAT *);
+-
+-/* FFT */
+-void fft(VEC *,VEC *);
+-void ifft(VEC *,VEC *);
+-
+-#endif
+-
+-
+-#endif
+//GO.SYSIN DD matrix2.h
+echo oldnames.h 1>&2
+sed >oldnames.h <<'//GO.SYSIN DD oldnames.h' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/* macros for names used in versions 1.0 and 1.1 */
+-/* 8/11/93 */
+-
+-
+-#ifndef OLDNAMESH
+-#define OLDNAMESH
+-
+-
+-/* type IVEC */
+-
+-#define get_ivec   iv_get
+-#define freeivec   IV_FREE
+-#define cp_ivec    iv_copy
+-#define fout_ivec  iv_foutput
+-#define out_ivec   iv_output
+-#define fin_ivec   iv_finput
+-#define in_ivec    iv_input
+-#define dump_ivec  iv_dump
+-
+-
+-/* type ZVEC */
+-
+-#define get_zvec   zv_get
+-#define freezvec   ZV_FREE
+-#define cp_zvec    zv_copy
+-#define fout_zvec  zv_foutput
+-#define out_zvec   zv_output
+-#define fin_zvec   zv_finput
+-#define in_zvec    zv_input
+-#define zero_zvec  zv_zero
+-#define rand_zvec  zv_rand
+-#define dump_zvec  zv_dump
+-
+-/* type ZMAT */
+-
+-#define get_zmat   zm_get
+-#define freezmat   ZM_FREE
+-#define cp_zmat    zm_copy
+-#define fout_zmat  zm_foutput
+-#define out_zmat   zm_output
+-#define fin_zmat   zm_finput
+-#define in_zmat    zm_input
+-#define zero_zmat  zm_zero
+-#define rand_zmat  zm_rand
+-#define dump_zmat  zm_dump
+-
+-/* types SPMAT */
+-
+-#define sp_mat        SPMAT
+-#define sp_get_mat    sp_get
+-#define sp_free_mat   sp_free
+-#define sp_cp_mat     sp_copy
+-#define sp_cp_mat2    sp_copy2
+-#define sp_fout_mat   sp_foutput
+-#define sp_fout_mat2  sp_foutput2
+-#define sp_out_mat    sp_output
+-#define sp_out_mat2   sp_output2
+-#define sp_fin_mat    sp_finput
+-#define sp_in_mat     sp_input
+-#define sp_zero_mat   sp_zero
+-#define sp_dump_mat   sp_dump
+-
+-
+-/* type SPROW */
+-
+-#define sp_row        SPROW
+-#define sp_get_idx    sprow_idx
+-#define row_xpd       sprow_xpd
+-#define sp_get_row    sprow_get
+-#define row_set_val   sprow_set_val
+-#define fout_row      sprow_foutput
+-#define _row_mltadd   sprow_mltadd
+-#define sp_row_copy   sprow_copy
+-#define sp_row_merge  sprow_merge
+-#define sp_row_ip     sprow_ip
+-#define sp_row_sqr    sprow_sqr
+-
+-
+-/* type MAT */
+-
+-#define get_mat   m_get
+-#define freemat   M_FREE
+-#define cp_mat    m_copy
+-#define fout_mat  m_foutput
+-#define out_mat   m_output
+-#define fin_mat   m_finput
+-#define in_mat    m_input
+-#define zero_mat  m_zero
+-#define id_mat    m_ident
+-#define rand_mat  m_rand
+-#define ones_mat  m_ones
+-#define dump_mat  m_dump
+-
+-/* type VEC */
+-
+-#define get_vec   v_get
+-#define freevec   V_FREE
+-#define cp_vec    v_copy
+-#define fout_vec  v_foutput
+-#define out_vec   v_output
+-#define fin_vec   v_finput
+-#define in_vec    v_input
+-#define zero_vec  v_zero
+-#define rand_vec  v_rand
+-#define ones_vec  v_ones
+-#define dump_vec  v_dump
+-
+-
+-/* type PERM */
+-
+-#define get_perm   px_get
+-#define freeperm   PX_FREE
+-#define cp_perm    px_copy
+-#define fout_perm  px_foutput
+-#define out_perm   px_output
+-#define fin_perm   px_finput
+-#define in_perm    px_input
+-#define id_perm    px_ident
+-#define px_id      px_ident
+-#define trans_px   px_transp
+-#define sign_px    px_sign
+-#define dump_perm  px_dump
+-
+-#endif
+//GO.SYSIN DD oldnames.h
+echo sparse.h 1>&2
+sed >sparse.h <<'//GO.SYSIN DD sparse.h' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-	Header for sparse matrix stuff.
+-	Basic sparse routines to be held in sparse.c
+-*/
+-
+-/* RCS id: $Id: m3,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $ */
+-
+-#ifndef SPARSEH
+-
+-#define SPARSEH 
+-
+-
+-#include        "matrix.h"
+-
+-
+-/* basic sparse types */
+-
+-typedef struct row_elt	{
+-	int	col, nxt_row, nxt_idx;
+-	Real	val;
+-		} row_elt;
+-
+-typedef struct SPROW {
+-	int	len, maxlen, diag;
+-	row_elt	*elt;		/* elt[maxlen] */
+-		} SPROW;
+-
+-typedef struct SPMAT {
+-	int	m, n, max_m, max_n;
+-	char	flag_col, flag_diag;
+-	SPROW	*row;		/* row[max_m] */
+-	int	*start_row;	/* start_row[max_n] */
+-	int	*start_idx;	/* start_idx[max_n] */
+-	      } SPMAT;
+-
+-/* Note that the first allocated entry in column j is start_row[j];
+-	This starts the chain down the columns using the nxt_row and nxt_idx
+-	fields of each entry in each row. */
+-
+-typedef struct pair { int pos;	Real val; } pair;
+-
+-typedef struct SPVEC {
+-	int	dim, max_dim;
+-	pair	*elt;		/* elt[max_dim] */
+-	       } SPVEC;
+-
+-#define	SMNULL	((SPMAT*)NULL)
+-#define	SVNULL	((SPVEC*)NULL)
+-
+-/* Macro for speedup */
+-#define	sprow_idx2(r,c,hint)	\
+-	( ( (hint) >= 0 && (hint) < (r)->len && \
+-	   (r)->elt[hint].col == (c)) ? (hint) : sprow_idx((r),(c)) )
+-
+-
+-
+-/* memory functions */
+-
+-#ifdef ANSI_C
+-int sp_get_vars(int m,int n,int deg,...);
+-int sp_resize_vars(int m,int n,...);
+-int sp_free_vars(SPMAT **,...);
+-#elif VARARGS
+-int sp_get_vars();
+-int sp_resize_vars();
+-int sp_free_vars();
+-
+-#endif
+-
+-/* Sparse Matrix Operations and Utilities */
+-#ifndef ANSI_C
+-extern	SPMAT	*sp_get(), *sp_copy(), *sp_copy2(),
+-			*sp_zero(), *sp_resize(), *sp_compact();
+-extern	double	sp_get_val(), sp_set_val();
+-extern	VEC	*sp_mv_mlt(), *sp_vm_mlt();
+-extern	int	sp_free();
+-
+-/* Access path operations */
+-extern	SPMAT	*sp_col_access();
+-extern	SPMAT	*sp_diag_access();
+-extern  int     chk_col_access();
+-
+-/* Input/output operations */
+-extern	SPMAT	*sp_finput();
+-extern	void sp_foutput(), sp_foutput2();
+-
+-/* algebraic operations */
+-extern SPMAT *sp_smlt(), *sp_add(), *sp_sub(), *sp_mltadd();
+-
+-
+-/* sparse row operations */
+-extern	SPROW	*sprow_get(), *sprow_xpd(), *sprow_merge(), *sprow_mltadd(),
+-  *sprow_resize(), *sprow_copy();
+-extern SPROW *sprow_add(), *sprow_sub(), *sprow_smlt();
+-extern	double	sprow_set_val();
+-extern	void	sprow_foutput();
+-extern	int	sprow_idx(), sprow_free();
+-
+-/* dump */
+-extern  void   sp_dump(), sprow_dump();
+-extern  MAT  *sp_m2dense();
+-
+-#else
+-SPMAT	*sp_get(int,int,int), *sp_copy(SPMAT *),
+-	*sp_copy2(SPMAT *,SPMAT *),
+-	*sp_zero(SPMAT *), *sp_resize(SPMAT *,int,int),
+-	*sp_compact(SPMAT *,double);
+-double	sp_get_val(SPMAT *,int,int), sp_set_val(SPMAT *,int,int,double);
+-VEC	*sp_mv_mlt(SPMAT *,VEC *,VEC *), *sp_vm_mlt(SPMAT *,VEC *,VEC *);
+-int	sp_free(SPMAT *);
+-
+-/* Access path operations */
+-SPMAT	*sp_col_access(SPMAT *);
+-SPMAT	*sp_diag_access(SPMAT *);
+-int     chk_col_access(SPMAT *);
+-
+-/* Input/output operations */
+-SPMAT	*sp_finput(FILE *);
+-void	sp_foutput(FILE *,SPMAT *), sp_foutput2(FILE *,SPMAT *);
+-
+-/* algebraic operations */
+-SPMAT *sp_smlt(SPMAT *A,double alpha,SPMAT *B),
+-      *sp_add(SPMAT *A,SPMAT *B,SPMAT *C),
+-      *sp_sub(SPMAT *A,SPMAT *B,SPMAT *C),
+-      *sp_mltadd(SPMAT *A,SPMAT *B,double alpha,SPMAT *C);
+-
+-/* sparse row operations */
+-SPROW	*sprow_get(int), *sprow_xpd(SPROW *r,int n,int type),
+-        *sprow_resize(SPROW *r,int n,int type),
+-	*sprow_merge(SPROW *,SPROW *,SPROW *,int type),
+-        *sprow_copy(SPROW *,SPROW *,SPROW *,int type),
+-	*sprow_mltadd(SPROW *,SPROW *,double,int,SPROW *,int type);
+-SPROW *sprow_add(SPROW *r1,SPROW *r2, int j0,SPROW *r_out, int type), 
+-        *sprow_sub(SPROW *r1,SPROW *r2, int j0,SPROW *r_out, int type), 
+-        *sprow_smlt(SPROW *r1,double alpha, int j0,SPROW *r_out, int type);
+-double	sprow_set_val(SPROW *,int,double);
+-int      sprow_free(SPROW *);
+-int	sprow_idx(SPROW *,int);
+-void	sprow_foutput(FILE *,SPROW *);
+-
+-/* dump */
+-void    sp_dump(FILE *fp, SPMAT *A);
+-void    sprow_dump(FILE *fp, SPROW *r);
+-MAT	*sp_m2dense(SPMAT *A,MAT *out);
+-
+-#endif
+-
+-/* MACROS */
+-
+-#define	sp_input()	sp_finput(stdin)
+-#define	sp_output(A)	sp_foutput(stdout,(A))
+-#define	sp_output2(A)	sp_foutput2(stdout,(A))
+-#define	row_mltadd(r1,r2,alpha,out)	sprow_mltadd(r1,r2,alpha,0,out)
+-#define	out_row(r)	sprow_foutput(stdout,(r))
+-
+-#define SP_FREE(A)    ( sp_free((A)),  (A)=(SPMAT *)NULL) 
+-
+-/* utility for index computations -- ensures index returned >= 0 */
+-#define	fixindex(idx)	((idx) == -1 ? (error(E_BOUNDS,"fixindex"),0) : \
+-			 (idx) < 0 ? -((idx)+2) : (idx))
+-
+-
+-/*  NOT USED */
+-
+-/* loop over the columns in a row */
+-/*
+-#define	loop_cols(r,e,code) \
+-    do { int _r_idx; row_elt *e; SPROW *_t_row;			\
+-	  _t_row = (r); e = &(_t_row->elt);				\
+-	  for ( _r_idx = 0; _r_idx < _t_row->len; _r_idx++, e++ )	\
+-	  {  code;  }  }  while ( 0 )
+-*/
+-/* loop over the rows in a column */
+-/*
+-#define	loop_cols(A,col,e,code) \
+-    do { int _r_num, _r_idx, _c; SPROW *_r; row_elt *e;		\
+-	  if ( ! (A)->flag_col )	sp_col_access((A));		\
+-	  col_num = (col);						\
+-	  if ( col_num < 0 || col_num >= A->n )				\
+-	      error(E_BOUNDS,"loop_cols");				\
+-          _r_num = (A)->start_row[_c]; _r_idx = (A)->start_idx[_c];	\
+-	  while ( _r_num >= 0 )  {					\
+-	      _r = &((A)->row[_r_num]);					\
+-              _r_idx = sprow_idx2(_r,_c,_r_idx);			\
+-              if ( _r_idx < 0 )  continue;				\
+-	      e = &(_r->elt[_r_idx]);	code;				\
+-	      _r_num = e->nxt_row;	_r_idx = e->nxt_idx;		\
+-	      } } while ( 0 )
+-
+-*/
+-
+-#endif
+-
+//GO.SYSIN DD sparse.h
+echo sparse2.h 1>&2
+sed >sparse2.h <<'//GO.SYSIN DD sparse2.h' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/* Sparse matrix factorise/solve header */
+-/* RCS id: $Id: m3,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $ */
+-
+-
+-
+-#ifndef SPARSE2H
+-
+-#define SPARSE2H
+-
+-#include "sparse.h"
+-
+-
+-#ifdef ANSI_C
+-SPMAT	*spCHfactor(SPMAT *), *spICHfactor(SPMAT *), *spCHsymb(SPMAT *);
+-VEC	*spCHsolve(SPMAT *,VEC *,VEC *);
+-
+-SPMAT	*spLUfactor(SPMAT *,PERM *,double);
+-SPMAT	*spILUfactor(SPMAT *,double);
+-VEC	*spLUsolve(SPMAT *,PERM *,VEC *,VEC *),
+-	*spLUTsolve(SPMAT *,PERM *,VEC *,VEC *);
+-
+-SPMAT	*spBKPfactor(SPMAT *, PERM *, PERM *, double);
+-VEC	*spBKPsolve(SPMAT *, PERM *, PERM *, VEC *, VEC *);
+-
+-VEC	*pccg(VEC *(*A)(),void *A_par,VEC *(*M_inv)(),void *M_par,VEC *b,
+-						double tol,VEC *x);
+-VEC	*sp_pccg(SPMAT *,SPMAT *,VEC *,double,VEC *);
+-VEC	*cgs(VEC *(*A)(),void *A_par,VEC *b,VEC *r0,double tol,VEC *x);
+-VEC	*sp_cgs(SPMAT *,VEC *,VEC *,double,VEC *);
+-VEC	*lsqr(VEC *(*A)(),VEC *(*AT)(),void *A_par,VEC *b,double tol,VEC *x);
+-VEC	*sp_lsqr(SPMAT *,VEC *,double,VEC *);
+-int	cg_set_maxiter(int);
+-
+-void	lanczos(VEC *(*A)(),void *A_par,int m,VEC *x0,VEC *a,VEC *b,
+-						Real *beta_m1,MAT *Q);
+-void	sp_lanczos(SPMAT *,int,VEC *,VEC *,VEC *,Real *,MAT *);
+-VEC	*lanczos2(VEC *(*A)(),void *A_par,int m,VEC *x0,VEC *evals,
+-						VEC *err_est);
+-VEC	*sp_lanczos2(SPMAT *,int,VEC *,VEC *,VEC *);
+-extern  void    scan_to(SPMAT *,IVEC *,IVEC *,IVEC *,int);
+-extern  row_elt  *chase_col(SPMAT *,int,int *,int *,int);
+-extern  row_elt  *chase_past(SPMAT *,int,int *,int *,int);
+-extern  row_elt  *bump_col(SPMAT *,int,int *,int *);
+-
+-#else
+-extern SPMAT	*spCHfactor(), *spICHfactor(), *spCHsymb();
+-extern VEC	*spCHsolve();
+-
+-extern SPMAT	*spLUfactor();
+-extern SPMAT	*spILUfactor();
+-extern VEC	*spLUsolve(), *spLUTsolve();
+-
+-extern SPMAT	*spBKPfactor();
+-extern VEC	*spBKPsolve();
+-
+-extern VEC	*pccg(), *sp_pccg(), *cgs(), *sp_cgs(), *lsqr(), *sp_lsqr();
+-extern int	cg_set_maxiter();
+-
+-void	lanczos(), sp_lanczos();
+-VEC	*lanczos2(), *sp_lanczos2();
+-extern  void    scan_to();
+-extern  row_elt  *chase_col();
+-extern  row_elt  *chase_past();
+-extern  row_elt  *bump_col();
+-
+-#endif
+-
+-
+-#endif
+//GO.SYSIN DD sparse2.h
+echo zmatrix.h 1>&2
+sed >zmatrix.h <<'//GO.SYSIN DD zmatrix.h' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/* Main include file for zmeschach library -- complex vectors and matrices */
+-
+-#ifndef ZMATRIXH
+-#define ZMATRIXH
+-
+-#include "matrix.h"
+-
+-
+-          /*  Type definitions for complex vectors and matrices  */
+-
+-
+-/* complex definition */
+-typedef struct  {
+-                Real re,im;
+-        } complex;
+-
+-/* complex vector definition */
+-typedef struct  {
+-                u_int   dim, max_dim;
+-                complex  *ve;
+-                } ZVEC;
+-
+-/* complex matrix definition */
+-typedef struct  {
+-                u_int   m, n;
+-                u_int   max_m, max_n, max_size;
+-                complex *base;          /* base is base of alloc'd mem */
+-                complex **me;
+-                } ZMAT;
+-
+-#define ZVNULL  ((ZVEC *)NULL)
+-#define ZMNULL  ((ZMAT *)NULL)
+-
+-#define	Z_CONJ		1
+-#define	Z_NOCONJ	0
+-
+-
+-/* memory functions */
+-
+-#ifdef ANSI_C
+-int zv_get_vars(int dim,...);
+-int zm_get_vars(int m,int n,...);
+-int zv_resize_vars(int new_dim,...);
+-int zm_resize_vars(int m,int n,...);
+-int zv_free_vars(ZVEC **,...);
+-int zm_free_vars(ZMAT **,...);
+-
+-#elif VARARGS
+-int zv_get_vars();
+-int zm_get_vars();
+-int zv_resize_vars();
+-int zm_resize_vars();
+-int zv_free_vars();
+-int zm_free_vars();
+-
+-#endif
+-
+-
+-
+-
+-#ifdef ANSI_C
+-extern ZMAT	*_zm_copy(ZMAT *in,ZMAT *out,u_int i0,u_int j0);
+-extern ZMAT	* zm_move(ZMAT *, int, int, int, int, ZMAT *, int, int);
+-extern ZMAT	*zvm_move(ZVEC *, int, ZMAT *, int, int, int, int);
+-extern ZVEC	*_zv_copy(ZVEC *in,ZVEC *out,u_int i0);
+-extern ZVEC	* zv_move(ZVEC *, int, int, ZVEC *, int);
+-extern ZVEC	*zmv_move(ZMAT *, int, int, int, int, ZVEC *, int);
+-extern complex	z_finput(FILE *fp);
+-extern ZMAT	*zm_finput(FILE *fp,ZMAT *a);
+-extern ZVEC     *zv_finput(FILE *fp,ZVEC *x);
+-extern ZMAT	*zm_add(ZMAT *mat1,ZMAT *mat2,ZMAT *out);
+-extern ZMAT	*zm_sub(ZMAT *mat1,ZMAT *mat2,ZMAT *out);
+-extern ZMAT	*zm_mlt(ZMAT *A,ZMAT *B,ZMAT *OUT);
+-extern ZMAT	*zmma_mlt(ZMAT *A,ZMAT *B,ZMAT *OUT);
+-extern ZMAT	*zmam_mlt(ZMAT *A,ZMAT *B,ZMAT *OUT);
+-extern ZVEC	*zmv_mlt(ZMAT *A,ZVEC *b,ZVEC *out);
+-extern ZMAT	*zsm_mlt(complex scalar,ZMAT *matrix,ZMAT *out);
+-extern ZVEC	*zvm_mlt(ZMAT *A,ZVEC *b,ZVEC *out);
+-extern ZMAT	*zm_adjoint(ZMAT *in,ZMAT *out);
+-extern ZMAT	*zswap_rows(ZMAT *A,int i,int j,int lo,int hi);
+-extern ZMAT	*zswap_cols(ZMAT *A,int i,int j,int lo,int hi);
+-extern ZMAT	*mz_mltadd(ZMAT *A1,ZMAT *A2,complex s,ZMAT *out);
+-extern ZVEC	*zmv_mltadd(ZVEC *v1,ZVEC *v2,ZMAT *A,complex alpha,ZVEC *out);
+-extern ZVEC	*zvm_mltadd(ZVEC *v1,ZVEC *v2,ZMAT *A,complex alpha,ZVEC *out);
+-extern ZVEC	*zv_zero(ZVEC *x);
+-extern ZMAT	*zm_zero(ZMAT *A);
+-extern ZMAT	*zm_get(int m,int n);
+-extern ZVEC	*zv_get(int dim);
+-extern ZMAT	*zm_resize(ZMAT *A,int new_m,int new_n);
+-extern complex	_zin_prod(ZVEC *x,ZVEC *y,u_int i0,u_int flag);
+-extern ZVEC	*zv_resize(ZVEC *x,int new_dim);
+-extern ZVEC	*zv_mlt(complex scalar,ZVEC *vector,ZVEC *out);
+-extern ZVEC	*zv_add(ZVEC *vec1,ZVEC *vec2,ZVEC *out);
+-extern ZVEC	*zv_mltadd(ZVEC *v1,ZVEC *v2,complex scale,ZVEC *out);
+-extern ZVEC	*zv_sub(ZVEC *vec1,ZVEC *vec2,ZVEC *out);
+-#ifdef PROTOTYPES_IN_STRUCT
+-extern ZVEC	*zv_map(complex (*f)(),ZVEC *x,ZVEC *out);
+-extern ZVEC	*_zv_map(complex (*f)(),void *params,ZVEC *x,ZVEC *out);
+-#else
+-extern ZVEC	*zv_map(complex (*f)(complex),ZVEC *x,ZVEC *out);
+-extern ZVEC	*_zv_map(complex (*f)(void *,complex),void *params,ZVEC *x,ZVEC *out);
+-#endif
+-extern ZVEC	*zv_lincomb(int n,ZVEC *v[],complex a[],ZVEC *out);
+-extern ZVEC	*zv_linlist(ZVEC *out,ZVEC *v1,complex a1,...);
+-extern ZVEC	*zv_star(ZVEC *x1, ZVEC *x2, ZVEC *out);
+-extern ZVEC	*zv_slash(ZVEC *x1, ZVEC *x2, ZVEC *out);
+-extern int	zm_free(ZMAT *mat);
+-extern int	zv_free(ZVEC *vec);
+-
+-extern ZVEC	*zv_rand(ZVEC *x);
+-extern ZMAT	*zm_rand(ZMAT *A);
+-
+-extern ZVEC	*zget_row(ZMAT *A, int i, ZVEC *out);
+-extern ZVEC	*zget_col(ZMAT *A, int j, ZVEC *out);
+-extern ZMAT	*zset_row(ZMAT *A, int i, ZVEC *in);
+-extern ZMAT	*zset_col(ZMAT *A, int j, ZVEC *in);
+-
+-extern ZVEC	*px_zvec(PERM *pi, ZVEC *in, ZVEC *out);
+-extern ZVEC	*pxinv_zvec(PERM *pi, ZVEC *in, ZVEC *out);
+-
+-extern void	__zconj__(complex zp[], int len);
+-extern complex	__zip__(complex zp1[],complex zp2[],int len,int flag);
+-extern void	__zmltadd__(complex zp1[],complex zp2[],
+-			    complex s,int len,int flag);
+-extern void	__zmlt__(complex zp[],complex s,complex out[],int len);
+-extern void	__zadd__(complex zp1[],complex zp2[],complex out[],int len);
+-extern void	__zsub__(complex zp1[],complex zp2[],complex out[],int len);
+-extern void	__zzero__(complex zp[],int len);
+-extern void	z_foutput(FILE *fp,complex z);
+-extern void     zm_foutput(FILE *fp,ZMAT *a);
+-extern void     zv_foutput(FILE *fp,ZVEC *x);
+-extern void     zm_dump(FILE *fp,ZMAT *a);
+-extern void     zv_dump(FILE *fp,ZVEC *x);
+-
+-extern double	_zv_norm1(ZVEC *x, VEC *scale);
+-extern double	_zv_norm2(ZVEC *x, VEC *scale);
+-extern double	_zv_norm_inf(ZVEC *x, VEC *scale);
+-extern double	zm_norm1(ZMAT *A);
+-extern double	zm_norm_inf(ZMAT *A);
+-extern double	zm_norm_frob(ZMAT *A);
+-
+-complex	zmake(double real, double imag);
+-double	zabs(complex z);
+-complex zadd(complex z1,complex z2);
+-complex zsub(complex z1,complex z2);
+-complex	zmlt(complex z1,complex z2);
+-complex	zinv(complex z);
+-complex	zdiv(complex z1,complex z2);
+-complex	zsqrt(complex z);
+-complex	zexp(complex z);
+-complex	zlog(complex z);
+-complex	zconj(complex z);
+-complex	zneg(complex z);
+-#else
+-extern ZMAT	*_zm_copy();
+-extern ZVEC	*_zv_copy();
+-extern ZMAT	*zm_finput();
+-extern ZVEC     *zv_finput();
+-extern ZMAT	*zm_add();
+-extern ZMAT	*zm_sub();
+-extern ZMAT	*zm_mlt();
+-extern ZMAT	*zmma_mlt();
+-extern ZMAT	*zmam_mlt();
+-extern ZVEC	*zmv_mlt();
+-extern ZMAT	*zsm_mlt();
+-extern ZVEC	*zvm_mlt();
+-extern ZMAT	*zm_adjoint();
+-extern ZMAT	*zswap_rows();
+-extern ZMAT	*zswap_cols();
+-extern ZMAT	*mz_mltadd();
+-extern ZVEC	*zmv_mltadd();
+-extern ZVEC	*zvm_mltadd();
+-extern ZVEC	*zv_zero();
+-extern ZMAT	*zm_zero();
+-extern ZMAT	*zm_get();
+-extern ZVEC	*zv_get();
+-extern ZMAT	*zm_resize();
+-extern ZVEC	*zv_resize();
+-extern complex	_zin_prod();
+-extern ZVEC	*zv_mlt();
+-extern ZVEC	*zv_add();
+-extern ZVEC	*zv_mltadd();
+-extern ZVEC	*zv_sub();
+-extern ZVEC	*zv_map();
+-extern ZVEC	*_zv_map();
+-extern ZVEC	*zv_lincomb();
+-extern ZVEC	*zv_linlist();
+-extern ZVEC	*zv_star();
+-extern ZVEC	*zv_slash();
+-
+-extern ZVEC	*px_zvec();
+-extern ZVEC	*pxinv_zvec();
+-
+-extern ZVEC	*zv_rand();
+-extern ZMAT	*zm_rand();
+-
+-extern ZVEC	*zget_row();
+-extern ZVEC	*zget_col();
+-extern ZMAT	*zset_row();
+-extern ZMAT	*zset_col();
+-
+-extern int	zm_free();
+-extern int	zv_free();
+-extern void	__zconj__();
+-extern complex	__zip__();
+-extern void	__zmltadd__();
+-extern void	__zmlt__();
+-extern void	__zadd__();
+-extern void	__zsub__();
+-extern void	__zzero__();
+-extern void    zm_foutput();
+-extern void    zv_foutput();
+-extern void    zm_dump();
+-extern void    zv_dump();
+-
+-extern double	_zv_norm1();
+-extern double	_zv_norm2();
+-extern double	_zv_norm_inf();
+-extern double	zm_norm1();
+-extern double	zm_norm_inf();
+-extern double	zm_norm_frob();
+-
+-complex	zmake();
+-double	zabs();
+-complex zadd();
+-complex zsub();
+-complex	zmlt();
+-complex	zinv();
+-complex	zdiv();
+-complex	zsqrt();
+-complex	zexp();
+-complex	zlog();
+-complex	zconj();
+-complex	zneg();
+-#endif
+-
+-#define	zv_copy(x,y)	_zv_copy(x,y,0)
+-#define	zm_copy(A,B)	_zm_copy(A,B,0,0)
+-
+-#define	z_input()	z_finput(stdin)
+-#define	zv_input(x)	zv_finput(stdin,x)
+-#define	zm_input(A)	zm_finput(stdin,A)
+-#define	z_output(z)	z_foutput(stdout,z)
+-#define	zv_output(x)	zv_foutput(stdout,x)
+-#define	zm_output(A)	zm_foutput(stdout,A)
+-
+-#define	ZV_FREE(x)	( zv_free(x), (x) = ZVNULL )
+-#define	ZM_FREE(A)	( zm_free(A), (A) = ZMNULL )
+-
+-#define	zin_prod(x,y)	_zin_prod(x,y,0,Z_CONJ)
+-
+-#define	zv_norm1(x)	_zv_norm1(x,VNULL)
+-#define	zv_norm2(x)	_zv_norm2(x,VNULL)
+-#define	zv_norm_inf(x)	_zv_norm_inf(x,VNULL)
+-
+-
+-#endif
+//GO.SYSIN DD zmatrix.h
+echo zmatrix2.h 1>&2
+sed >zmatrix2.h <<'//GO.SYSIN DD zmatrix2.h' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-	2nd header file for Meschach's complex routines.
+-	This file contains declarations for complex factorisation/solve
+-	routines.
+-
+-*/
+-
+-
+-#ifndef ZMATRIX2H
+-#define ZMATRIX2H
+-
+-#include "zmatrix.h"
+-
+-#ifdef ANSI_C
+-extern ZVEC	*zUsolve(ZMAT *matrix, ZVEC *b, ZVEC *out, double diag);
+-extern ZVEC	*zLsolve(ZMAT *matrix, ZVEC *b, ZVEC *out, double diag);
+-extern ZVEC	*zUAsolve(ZMAT *U, ZVEC *b, ZVEC *out, double diag);
+-extern ZVEC	*zDsolve(ZMAT *A, ZVEC *b, ZVEC *x);
+-extern ZVEC	*zLAsolve(ZMAT *L, ZVEC *b, ZVEC *out, double diag);
+-
+-extern ZVEC	*zhhvec(ZVEC *,int,Real *,ZVEC *,complex *);
+-extern ZVEC	*zhhtrvec(ZVEC *,double,int,ZVEC *,ZVEC *);
+-extern ZMAT	*zhhtrrows(ZMAT *,int,int,ZVEC *,double);
+-extern ZMAT	*zhhtrcols(ZMAT *,int,int,ZVEC *,double);
+-extern ZMAT     *zHfactor(ZMAT *,ZVEC *);
+-extern ZMAT     *zHQunpack(ZMAT *,ZVEC *,ZMAT *,ZMAT *);
+-
+-extern ZMAT	*zQRfactor(ZMAT *A, ZVEC *diag);
+-extern ZMAT	*zQRCPfactor(ZMAT *A, ZVEC *diag, PERM *px);
+-extern ZVEC	*_zQsolve(ZMAT *QR, ZVEC *diag, ZVEC *b, ZVEC *x, ZVEC *tmp);
+-extern ZMAT	*zmakeQ(ZMAT *QR, ZVEC *diag, ZMAT *Qout);
+-extern ZMAT	*zmakeR(ZMAT *QR, ZMAT *Rout);
+-extern ZVEC	*zQRsolve(ZMAT *QR, ZVEC *diag, ZVEC *b, ZVEC *x);
+-extern ZVEC	*zQRAsolve(ZMAT *QR, ZVEC *diag, ZVEC *b, ZVEC *x);
+-extern ZVEC	*zQRCPsolve(ZMAT *QR,ZVEC *diag,PERM *pivot,ZVEC *b,ZVEC *x);
+-extern ZVEC	*zUmlt(ZMAT *U, ZVEC *x, ZVEC *out);
+-extern ZVEC	*zUAmlt(ZMAT *U, ZVEC *x, ZVEC *out);
+-extern double	zQRcondest(ZMAT *QR);
+-
+-extern ZVEC	*zLsolve(ZMAT *, ZVEC *, ZVEC *, double);
+-extern ZMAT	*zset_col(ZMAT *, int, ZVEC *);
+-
+-extern ZMAT	*zLUfactor(ZMAT *A, PERM *pivot);
+-extern ZVEC	*zLUsolve(ZMAT *A, PERM *pivot, ZVEC *b, ZVEC *x);
+-extern ZVEC	*zLUAsolve(ZMAT *LU, PERM *pivot, ZVEC *b, ZVEC *x);
+-extern ZMAT	*zm_inverse(ZMAT *A, ZMAT *out);
+-extern double	zLUcondest(ZMAT *LU, PERM *pivot);
+-
+-extern void	zgivens(complex, complex, Real *, complex *);
+-extern ZMAT	*zrot_rows(ZMAT *A, int i, int k, double c, complex s,
+-			   ZMAT *out);
+-extern ZMAT	*zrot_cols(ZMAT *A, int i, int k, double c, complex s,
+-			   ZMAT *out);
+-extern ZVEC	*rot_zvec(ZVEC *x, int i, int k, double c, complex s,
+-			  ZVEC *out);
+-extern ZMAT	*zschur(ZMAT *A,ZMAT *Q);
+-/* extern ZMAT	*schur_vecs(ZMAT *T,ZMAT *Q,X_re,X_im) */
+-#else
+-extern ZVEC	*zUsolve(), *zLsolve(), *zUAsolve(), *zDsolve(), *zLAsolve();
+-
+-extern ZVEC	*zhhvec();
+-extern ZVEC	*zhhtrvec();
+-extern ZMAT	*zhhtrrows();
+-extern ZMAT     *zhhtrcols();
+-extern ZMAT     *zHfactor();
+-extern ZMAT     *zHQunpack();
+-
+-
+-extern ZMAT	*zQRfactor(), *zQRCPfactor();
+-extern ZVEC	*_zQsolve();
+-extern ZMAT	*zmakeQ(), *zmakeR();
+-extern ZVEC	*zQRsolve(), *zQRAsolve(), *zQRCPsolve();
+-extern ZVEC	*zUmlt(), *zUAmlt();
+-extern double	zQRcondest();
+-
+-extern ZVEC	*zLsolve();
+-extern ZMAT	*zset_col();
+-
+-extern ZMAT	*zLUfactor();
+-extern ZVEC	*zLUsolve(), *zLUAsolve();
+-extern ZMAT	*zm_inverse();
+-extern double	zLUcondest();
+-
+-extern void	zgivens();
+-extern ZMAT	*zrot_rows(), *zrot_cols();
+-extern ZVEC	*rot_zvec();
+-extern ZMAT	*zschur();
+-/* extern ZMAT	*schur_vecs(); */
+-#endif
+-
+-#endif
+-
+//GO.SYSIN DD zmatrix2.h
+mkdir DOC
+echo DOC/fnindex.txt 1>&2
+sed >DOC/fnindex.txt <<'//GO.SYSIN DD DOC/fnindex.txt' 's/^-//'
+-
+-			      FUNCTION INDEX
+-			      ==============
+-
+-In the descriptions below, matrices are represented by capital letters,
+-vectors by lower case letters and scalars by alpha.
+-
+- Function	Description
+-
+-band2mat()	Convert band matrix to dense matrix
+-bd_free()	Deallocate (destroy) band matrix
+-bd_get()	Allocate and initialise band matrix
+-bd_transp()	Transpose band matrix
+-bd_resize()	Resize band matrix
+-bdLDLfactor()	Band  LDL^T  factorisation
+-bdLDLsolve()	Solve  Ax=b  using band  LDL^T  factors
+-bdLUfactor()	Band  LU  factorisation
+-bdLUsolve()	Solve  Ax=b  using band  LU  factors
+-bisvd()		SVD of bi-diagonal matrix
+-BKPfactor()	Bunch-Kaufman-Parlett factorisation
+-BKPsolve()	Bunch-Kaufman-Parlett solver
+-catch()		Catch a raised error (macro)
+-catchall()	Catch any raised error (macro)
+-catch_FPE()	Catch floating point error (sets flag)
+-CHfactor()	Dense Cholesky factorisation
+-CHsolve()	Cholesky solver
+-d_save()	Save real in MATLAB format
+-Dsolve()	Solve  Dx=y ,  D  diagonal
+-ERRABORT()	Abort on error (sets flag, macro)
+-ERREXIT()	Exit on error (sets flag, macro)
+-error()		Raise an error (macro, see  ev_err())
+-err_list_attach()	 Attach new list of errors
+-err_list_free()	         Discard list of errors
+-err_is_list_attached()	 Checks for an error list
+-ev_err()	Raise an error (function)
+-fft()		Computes Fast Fourier Transform
+-finput()	Input a simple data item from a stream
+-fprompter()	Print prompt to  stderr
+-get_col()	Extract a column from a matrix
+-get_row()	Extract a row from a matrix
+-givens()	Compute Givens parameters
+-hhtrcols()	Compute  AP^T  where  P  is a Householder matrix
+-hhtrrows()	Compute  PA  where  P  is a Householder matrix
+-hhtrvec()	Compute  Px  where  P  is a Householder matrix
+-hhvec()		Compute parameters for a Householder matrix
+-ifft()		Computes inverse FFT
+-in_prod()	Inner product of vectors
+-input()		Input a simple data item from  stdin (macro)
+-iter_arnoldi()	Arnoldi iterative method
+-iter_arnoldi_iref()	Arnoldi iterative method with refinement
+-iter_ATx()	Set  A^T  in ITER structure
+-iter_Ax()	Set  A  in ITER structure
+-iter_Bx()	Set preconditioner in ITER structure
+-iter_cg()	Conjugate gradients iterative method
+-iter_cgne()     Conjugate gradients for normal equations
+-iter_cgs()	CGS iterative method
+-iter_copy()	Copy ITER data structures
+-iter_copy2()	Shallow copy of ITER data structures
+-iter_dump()	Dump ITER data structure to a stream
+-iter_free()	Free (deallocate) ITER structure
+-iter_get()	Allocate ITER structure
+-iter_gmres()    GMRES iterative method
+-iter_lanczos()	Lanczos iterative method
+-iter_lanczos2()	Lanczos method with Cullum and Willoughby extensions
+-iter_lsqr()	LSQR iterative method
+-iter_mgcr()	MGCR iterative method
+-iter_resize()	Resize vectors in an ITER data structure
+bigmail CUT HERE............
+test -w meschach0.shar &&
+test -r 24048P00 &&
+test -r 24048P01 &&
+test -r 24048P02 &&
+test -r 24048P03 &&
+(
+ cat 24048P00 >> meschach0.shar; rm 24048P00
+ cat 24048P01 >> meschach0.shar; rm 24048P01
+ cat 24048P02 >> meschach0.shar; rm 24048P02
+ cat 24048P03 >> meschach0.shar; rm 24048P03
+)

@@ -1,0 +1,54 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for mdbcommon
+# $Log: Makefile.Host,v $
+# Revision 1.12  2003/07/23 02:19:55  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+# Revision 1.11  2003/05/06 19:05:37  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.10  2003/01/16 19:55:29  soliday
+# Fixed rt problem with WIN32
+#
+# Revision 1.9  2003/01/07 15:03:49  soliday
+# Moved the rt library
+#
+# Revision 1.8  2002/08/14 16:48:27  soliday
+# Added Open License
+#
+# Revision 1.7  2002/07/30 08:55:12  soliday
+# Changed the purify lines.
+#
+# Revision 1.6  2002/07/24 21:28:16  shang
+# added logfile_gener.c
+#
+# Revision 1.5  2002/05/29 21:01:04  soliday
+# Added CXX line for purify.
+#
+# Revision 1.4  2000/12/07 22:00:13  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.3  2000/08/11 19:30:54  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris when using cc.
+#
+# Revision 1.2  2000/08/10 21:16:07  soliday
+# Added support for gcc on Solaris.
+#
+# Revision 1.1  2000/04/11 16:20:53  soliday
+# First version of Makefile.Host
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/mdbcommon/Makefile.OAG
+include $(TOP)/config/RULES.Host
+

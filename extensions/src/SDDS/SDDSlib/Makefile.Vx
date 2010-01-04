@@ -1,0 +1,55 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# Makefile for SDDS library
+# $Log: Makefile.Vx,v $
+# Revision 1.4  2003/09/17 19:21:20  soliday
+# Added zlib support.
+#
+# Revision 1.3  2003/08/28 21:24:57  soliday
+# Cleaned up the code.
+#
+# Revision 1.2  2002/08/14 16:34:46  soliday
+# Added Open License
+#
+# Revision 1.1  1999/12/15 16:51:37  soliday
+# First version of Makefile.Vx
+#
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+
+USR_CFLAGS += -I../../include -DzLib
+
+SRCS.c = \
+	../SDDS_ascii.c ../SDDS_binary.c ../SDDS_copy.c \
+	../SDDS_data.c ../SDDS_dataprep.c ../SDDS_extract.c \
+	../SDDS_info.c ../SDDS_input.c ../SDDS_mplsupport.c \
+	../SDDS_output.c ../SDDS_process.c ../SDDS_rpn.c \
+	../SDDS_transfer.c ../SDDS_utils.c ../SDDS_write.c
+
+LIBOBJS = \
+	SDDS_ascii.o SDDS_binary.o SDDS_copy.o \
+	SDDS_data.o SDDS_dataprep.o SDDS_extract.o \
+	SDDS_info.o SDDS_input.o SDDS_mplsupport.o \
+	SDDS_output.o SDDS_process.o SDDS_rpn.o \
+	SDDS_transfer.o SDDS_utils.o SDDS_write.o
+
+LIBNAME = SDDS1c
+
+
+SDDS_rpn_CFLAGS = -DRPN_SUPPORT
+
+
+include $(TOP)/config/RULES.Vx
+
+
+

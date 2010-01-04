@@ -1,0 +1,85 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for SDDS applications
+# $Log: Makefile.Host,v $
+# Revision 1.22  2003/07/23 19:37:18  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+# Revision 1.21  2003/07/22 20:01:16  soliday
+# Added support for Kylix.
+#
+# Revision 1.20  2003/05/06 19:04:54  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.19  2003/04/13 22:52:56  norume
+# No longer need to force flat memory space now that shared libraries are working.
+#
+# Revision 1.18  2002/11/14 03:21:07  borland
+# Added SDDS1 library to link.
+#
+# Revision 1.17  2002/08/14 17:29:24  soliday
+# Added Open License
+#
+# Revision 1.16  2002/08/08 15:15:35  soliday
+# Added support for OSX with lesstif.
+#
+# Revision 1.15  2000/12/07 22:00:07  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.14  2000/11/03 20:22:52  soliday
+# Added gd and png libraries.
+#
+# Revision 1.13  2000/08/23 14:52:54  soliday
+# Added link library advapi32 for WIN32
+#
+# Revision 1.12  2000/08/22 18:48:59  soliday
+# hclsdds is only linked with Borland C
+#
+# Revision 1.11  2000/08/11 19:29:28  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris when using cc.
+#
+# Revision 1.10  2000/08/10 21:17:42  soliday
+# Added support for gcc on Solaris.
+#
+# Revision 1.9  2000/04/17 18:41:39  soliday
+# Now works with Borland C.
+#
+# Revision 1.8  2000/04/11 16:45:53  soliday
+# Made minor modifications.
+#
+# Revision 1.7  2000/04/04 05:41:01  soliday
+# Added warning flag for solaris.
+#
+# Revision 1.6  2000/03/02 21:29:26  evans
+# Moved setting [NO]DEFAULTLIB's to CONFIG_SITE.Host.WIN32.
+#
+# Revision 1.5  2000/02/25 23:00:25  evans
+# Made changes for new way of doing Exceed in CONFIG_SITE.Host.WIN32.
+#
+# Revision 1.4  2000/01/18 20:19:57  soliday
+# Added support for ZLIB.
+#
+# Revision 1.3  1999/09/14 18:36:34  soliday
+# Made minor changes for WIN32
+#
+# Revision 1.2  1999/07/22 18:37:06  soliday
+# Added WIN32 support
+#
+# Revision 1.1  1999/04/14 15:14:38  borland
+# First version added to repository (per J. Anderson).
+#
+#
+
+TOP = ../../../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/SDDSaps/sddsplots/motifDriver/Makefile.OAG
+include $(TOP)/config/RULES.Host
+
+

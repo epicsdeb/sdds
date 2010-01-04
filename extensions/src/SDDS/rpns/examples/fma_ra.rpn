@@ -1,0 +1,78 @@
+/* rpn module: fma_ra.rpn
+/* purpose   : integrate a Newton's law type motion of the form
+/*             x''=f(x,t), using a second-order difference equation.
+/*             The final result is obtained using Richardson extrapolation.
+/*
+/* User's function f(x,t) is udf "fn".  It should take x as the top
+/* of the stack and t as the next item on the stack. 
+/* 
+/* Before calling load the variables x, x', t, and dt with the
+/* starting values and step size.  On exit, x, x', and t contain
+/* the new values from the integration.
+/* 
+/* The user must also define a udf "end" that returns true if
+/* the integration has reached the desired end and false if
+/* not.  It will have the current values of x and t available
+/* on the stack, in that order.
+/* 
+/* Michael Borland, 1988
+0 sto x1 sto x11 sto x0 sto x10 sto x21 sto x20 sto dt2
+  sto x2' sto x1' sto x sto t1 sto t
+pop
+
+udf
+solve
+do_solve
+x1 sto x11
+x0 sto x10
+dt 2 / sto dt
+do_solve
+x1 sto x21
+x0 sto x20
+dt 2 * sto dt
+cle
+extrap
+
+udf
+do_solve
+x sto x0
+x' dt * + sto x1
+t dt + sto t1
+dt sqr sto dt2
+fma_loop
+cle
+
+udf
+extrap
+x21 2 * x11 - sto x
+x21 x20 - dt 2 / / sto x2'
+x11 x10 - dt     / sto x1'
+x2' 2 * x1' -  sto x'
+t1 sto t
+cle
+
+udf
+fma_loop
+t1 x1 end 
+  ? 
+  : t1 x1 fn dt2 * x1 2 * + x0 - sto x2 
+    t1 dt + sto t1
+    x1 sto x0
+    x2 sto x1
+    cle
+    fma_loop
+  $
+
+udf
+fn
+pop sqr
+
+udf
+end
+pop 10 > pop pop 
+
+1 sto x 
+0 sto x'
+0 sto t 
+1e-3 sto dt
+

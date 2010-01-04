@@ -1,0 +1,79 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for SDDS applications
+# $Log: Makefile.Host,v $
+# Revision 1.20  2003/07/23 20:07:06  soliday
+# Modified makefiles to work with base version 3.13 and 3.14
+#
+# Revision 1.19  2003/07/22 20:01:16  soliday
+# Added support for Kylix.
+#
+# Revision 1.18  2003/05/06 19:04:43  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.17  2003/02/20 16:18:54  soliday
+# Makefiles now work to build static builds on windows.
+#
+# Revision 1.16  2002/08/14 17:35:27  soliday
+# Added Open License
+#
+# Revision 1.15  2000/12/07 22:00:05  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.14  2000/10/31 21:21:47  soliday
+# Added png library.
+#
+# Revision 1.13  2000/10/30 22:59:59  soliday
+# Added png library.
+#
+# Revision 1.12  2000/10/11 21:50:35  soliday
+# Changed definition of isinf so that sunmath is no longer needed.
+#
+# Revision 1.11  2000/08/23 21:52:32  soliday
+# Added link to advapi32 for WIN32.
+#
+# Revision 1.10  2000/08/11 19:29:41  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris when using cc.
+#
+# Revision 1.9  2000/08/10 21:18:30  soliday
+# Added support for gcc on Solaris.
+#
+# Revision 1.8  2000/04/11 16:56:12  soliday
+# Added mdbcommon library.
+#
+# Revision 1.7  2000/04/04 05:50:08  soliday
+# Added warning flag for solaris.
+#
+# Revision 1.6  2000/01/18 20:19:39  soliday
+# Added support for ZLIB.
+#
+# Revision 1.5  1999/09/14 18:34:28  soliday
+# Now uses WIN32 dll files except for SDDS1c, this is because of a conflict with
+# the rpnlib library.
+#
+# Revision 1.4  1999/07/23 15:52:59  soliday
+# Added WIN32 support
+#
+# Revision 1.3  1999/06/03 20:42:04  soliday
+# Added rpn support flag
+#
+# Revision 1.2  1999/05/04 18:24:16  jba
+# Moved gd from oag.
+#
+# Revision 1.1  1999/04/14 15:14:43  borland
+# First version added to repository (per J. Anderson).
+#
+#
+
+TOP = ../../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/SDDSaps/sddscontours/Makefile.OAG
+include $(TOP)/config/RULES.Host
+

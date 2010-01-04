@@ -1,0 +1,3971 @@
+#!/bin/sh
+# to unpack, sh this message in an empty directory
+PATH=/bin:/usr/bin
+cat > 24048P08 <<'bigmail CUT HERE............'
+-complex	__zip__(zp1,zp2,len,flag)
+-complex	*zp1, *zp2;
+-int	flag, len;
+-{
+-    complex	sum;
+-    int		i;
+-
+-    sum.re = sum.im = 0.0;
+-    if ( flag )
+-    {
+-	for ( i = 0; i < len; i++ )
+-	{
+-	    sum.re += zp1[i].re*zp2[i].re + zp1[i].im*zp2[i].im;
+-	    sum.im += zp1[i].re*zp2[i].im - zp1[i].im*zp2[i].re;
+-	}
+-    }
+-    else
+-    {
+-	for ( i = 0; i < len; i++ )
+-	{
+-	    sum.re += zp1[i].re*zp2[i].re - zp1[i].im*zp2[i].im;
+-	    sum.im += zp1[i].re*zp2[i].im + zp1[i].im*zp2[i].re;
+-	}
+-    }
+-
+-    return sum;
+-}
+-
+-/* __zmltadd__ -- scalar multiply and add i.e. complex saxpy
+-	-- computes zp1[i] += s.zp2[i]  if flag == 0
+-	-- computes zp1[i] += s.zp2[i]* if flag != 0 */
+-void	__zmltadd__(zp1,zp2,s,len,flag)
+-complex	*zp1, *zp2, s;
+-int	flag, len;
+-{
+-    int		i;
+-    LongReal	t_re, t_im;
+-
+-    if ( ! flag )
+-    {
+-	for ( i = 0; i < len; i++ )
+-	{
+-	    t_re = zp1[i].re + s.re*zp2[i].re - s.im*zp2[i].im;
+-	    t_im = zp1[i].im + s.re*zp2[i].im + s.im*zp2[i].re;
+-	    zp1[i].re = t_re;
+-	    zp1[i].im = t_im;
+-	}
+-    }
+-    else
+-    {
+-	for ( i = 0; i < len; i++ )
+-	{
+-	    t_re = zp1[i].re + s.re*zp2[i].re + s.im*zp2[i].im;
+-	    t_im = zp1[i].im - s.re*zp2[i].im + s.im*zp2[i].re;
+-	    zp1[i].re = t_re;
+-	    zp1[i].im = t_im;
+-	}
+-    }
+-}
+-
+-/* __zmlt__ scalar complex multiply array c.f. sv_mlt() */
+-void	__zmlt__(zp,s,out,len)
+-complex	*zp, s, *out;
+-register int	len;
+-{
+-    int		i;
+-    LongReal	t_re, t_im;
+-
+-    for ( i = 0; i < len; i++ )
+-    {
+-	t_re = s.re*zp[i].re - s.im*zp[i].im;
+-	t_im = s.re*zp[i].im + s.im*zp[i].re;
+-	out[i].re = t_re;
+-	out[i].im = t_im;
+-    }
+-}
+-
+-/* __zadd__ -- add complex arrays c.f. v_add() */
+-void	__zadd__(zp1,zp2,out,len)
+-complex	*zp1, *zp2, *out;
+-int	len;
+-{
+-    int		i;
+-    for ( i = 0; i < len; i++ )
+-    {
+-	out[i].re = zp1[i].re + zp2[i].re;
+-	out[i].im = zp1[i].im + zp2[i].im;
+-    }
+-}
+-
+-/* __zsub__ -- subtract complex arrays c.f. v_sub() */
+-void	__zsub__(zp1,zp2,out,len)
+-complex	*zp1, *zp2, *out;
+-int	len;
+-{
+-    int		i;
+-    for ( i = 0; i < len; i++ )
+-    {
+-	out[i].re = zp1[i].re - zp2[i].re;
+-	out[i].im = zp1[i].im - zp2[i].im;
+-    }
+-}
+-
+-/* __zzero__ -- zeros an array of complex numbers */
+-void	__zzero__(zp,len)
+-complex	*zp;
+-int	len;
+-{
+-    /* if a Real precision zero is equivalent to a string of nulls */
+-    MEM_ZERO((char *)zp,len*sizeof(complex));
+-    /* else, need to zero the array entry by entry */
+-    /******************************
+-    while ( len-- )
+-    {
+-	zp->re = zp->im = 0.0;
+-	zp++;
+-    }
+-    ******************************/
+-}
+-
+//GO.SYSIN DD zmachine.c
+echo zcopy.c 1>&2
+sed >zcopy.c <<'//GO.SYSIN DD zcopy.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-#include	<stdio.h>
+-#include	"zmatrix.h"
+-
+-
+-
+-/* _zm_copy -- copies matrix into new area */
+-ZMAT	*_zm_copy(in,out,i0,j0)
+-ZMAT	*in,*out;
+-u_int	i0,j0;
+-{
+-	u_int	i /* ,j */;
+-
+-	if ( in==ZMNULL )
+-		error(E_NULL,"_zm_copy");
+-	if ( in==out )
+-		return (out);
+-	if ( out==ZMNULL || out->m < in->m || out->n < in->n )
+-		out = zm_resize(out,in->m,in->n);
+-
+-	for ( i=i0; i < in->m; i++ )
+-		MEM_COPY(&(in->me[i][j0]),&(out->me[i][j0]),
+-				(in->n - j0)*sizeof(complex));
+-		/* for ( j=j0; j < in->n; j++ )
+-			out->me[i][j] = in->me[i][j]; */
+-
+-	return (out);
+-}
+-
+-/* _zv_copy -- copies vector into new area */
+-ZVEC	*_zv_copy(in,out,i0)
+-ZVEC	*in,*out;
+-u_int	i0;
+-{
+-	/* u_int	i,j; */
+-
+-	if ( in==ZVNULL )
+-		error(E_NULL,"_zv_copy");
+-	if ( in==out )
+-		return (out);
+-	if ( out==ZVNULL || out->dim < in->dim )
+-		out = zv_resize(out,in->dim);
+-
+-	MEM_COPY(&(in->ve[i0]),&(out->ve[i0]),(in->dim - i0)*sizeof(complex));
+-	/* for ( i=i0; i < in->dim; i++ )
+-		out->ve[i] = in->ve[i]; */
+-
+-	return (out);
+-}
+-
+-
+-/*
+-	The z._move() routines are for moving blocks of memory around
+-	within Meschach data structures and for re-arranging matrices,
+-	vectors etc.
+-*/
+-
+-/* zm_move -- copies selected pieces of a matrix
+-	-- moves the m0 x n0 submatrix with top-left cor-ordinates (i0,j0)
+-	   to the corresponding submatrix of out with top-left co-ordinates
+-	   (i1,j1)
+-	-- out is resized (& created) if necessary */
+-ZMAT	*zm_move(in,i0,j0,m0,n0,out,i1,j1)
+-ZMAT	*in, *out;
+-int	i0, j0, m0, n0, i1, j1;
+-{
+-    int		i;
+-
+-    if ( ! in )
+-	error(E_NULL,"zm_move");
+-    if ( i0 < 0 || j0 < 0 || i1 < 0 || j1 < 0 || m0 < 0 || n0 < 0 ||
+-	 i0+m0 > in->m || j0+n0 > in->n )
+-	error(E_BOUNDS,"zm_move");
+-
+-    if ( ! out )
+-	out = zm_resize(out,i1+m0,j1+n0);
+-    else if ( i1+m0 > out->m || j1+n0 > out->n )
+-	out = zm_resize(out,max(out->m,i1+m0),max(out->n,j1+n0));
+-
+-    for ( i = 0; i < m0; i++ )
+-	MEM_COPY(&(in->me[i0+i][j0]),&(out->me[i1+i][j1]),
+-		 n0*sizeof(complex));
+-
+-    return out;
+-}
+-
+-/* zv_move -- copies selected pieces of a vector
+-	-- moves the length dim0 subvector with initial index i0
+-	   to the corresponding subvector of out with initial index i1
+-	-- out is resized if necessary */
+-ZVEC	*zv_move(in,i0,dim0,out,i1)
+-ZVEC	*in, *out;
+-int	i0, dim0, i1;
+-{
+-    if ( ! in )
+-	error(E_NULL,"zv_move");
+-    if ( i0 < 0 || dim0 < 0 || i1 < 0 ||
+-	 i0+dim0 > in->dim )
+-	error(E_BOUNDS,"zv_move");
+-
+-    if ( (! out) || i1+dim0 > out->dim )
+-	out = zv_resize(out,i1+dim0);
+-
+-    MEM_COPY(&(in->ve[i0]),&(out->ve[i1]),dim0*sizeof(complex));
+-
+-    return out;
+-}
+-
+-
+-/* zmv_move -- copies selected piece of matrix to a vector
+-	-- moves the m0 x n0 submatrix with top-left co-ordinate (i0,j0) to
+-	   the subvector with initial index i1 (and length m0*n0)
+-	-- rows are copied contiguously
+-	-- out is resized if necessary */
+-ZVEC	*zmv_move(in,i0,j0,m0,n0,out,i1)
+-ZMAT	*in;
+-ZVEC	*out;
+-int	i0, j0, m0, n0, i1;
+-{
+-    int		dim1, i;
+-
+-    if ( ! in )
+-	error(E_NULL,"zmv_move");
+-    if ( i0 < 0 || j0 < 0 || m0 < 0 || n0 < 0 || i1 < 0 ||
+-	 i0+m0 > in->m || j0+n0 > in->n )
+-	error(E_BOUNDS,"zmv_move");
+-
+-    dim1 = m0*n0;
+-    if ( (! out) || i1+dim1 > out->dim )
+-	out = zv_resize(out,i1+dim1);
+-
+-    for ( i = 0; i < m0; i++ )
+-	MEM_COPY(&(in->me[i0+i][j0]),&(out->ve[i1+i*n0]),n0*sizeof(complex));
+-
+-    return out;
+-}
+-
+-/* zvm_move -- copies selected piece of vector to a matrix
+-	-- moves the subvector with initial index i0 and length m1*n1 to
+-	   the m1 x n1 submatrix with top-left co-ordinate (i1,j1)
+-        -- copying is done by rows
+-	-- out is resized if necessary */
+-ZMAT	*zvm_move(in,i0,out,i1,j1,m1,n1)
+-ZVEC	*in;
+-ZMAT	*out;
+-int	i0, i1, j1, m1, n1;
+-{
+-    int		dim0, i;
+-
+-    if ( ! in )
+-	error(E_NULL,"zvm_move");
+-    if ( i0 < 0 || i1 < 0 || j1 < 0 || m1 < 0 || n1 < 0 ||
+-	 i0+m1*n1 > in->dim )
+-	error(E_BOUNDS,"zvm_move");
+-
+-    if ( ! out )
+-	out = zm_resize(out,i1+m1,j1+n1);
+-    else
+-	out = zm_resize(out,max(i1+m1,out->m),max(j1+n1,out->n));
+-
+-    dim0 = m1*n1;
+-    for ( i = 0; i < m1; i++ )
+-	MEM_COPY(&(in->ve[i0+i*n1]),&(out->me[i1+i][j1]),n1*sizeof(complex));
+-
+-    return out;
+-}
+//GO.SYSIN DD zcopy.c
+echo zmatio.c 1>&2
+sed >zmatio.c <<'//GO.SYSIN DD zmatio.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-
+-#include        <stdio.h>
+-#include        <ctype.h>
+-#include        "zmatrix.h"
+-
+-static char rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-
+-
+-/* local variables */
+-static char line[MAXLINE];
+-
+-/**************************************************************************
+-  Input routines
+-  **************************************************************************/
+-
+-complex	z_finput(fp)
+-FILE	*fp;
+-{
+-    int		io_code;
+-    complex	z;
+-
+-    skipjunk(fp);
+-    if ( isatty(fileno(fp)) )
+-    {
+-	do {
+-	    fprintf(stderr,"real and imag parts: ");
+-	    if ( fgets(line,MAXLINE,fp) == NULL )
+-		error(E_EOF,"z_finput");
+-#if REAL == DOUBLE
+-	    io_code = sscanf(line,"%lf%lf",&z.re,&z.im);
+-#elif REAL == FLOAT
+-	    io_code = sscanf(line,"%f%f",&z.re,&z.im);
+-#endif
+-
+-	} while ( io_code != 2 );
+-    }
+-    else
+-#if REAL == DOUBLE
+-      if ( (io_code=fscanf(fp," (%lf,%lf)",&z.re,&z.im)) < 2 )
+-#elif REAL == FLOAT
+-      if ( (io_code=fscanf(fp," (%f,%f)",&z.re,&z.im)) < 2 )
+-#endif
+-	    error((io_code == EOF) ? E_EOF : E_FORMAT,"z_finput");
+-
+-    return z;
+-}
+-
+-
+-ZMAT	*zm_finput(fp,a)
+-FILE    *fp;
+-ZMAT	*a;
+-{
+-     ZMAT        *izm_finput(),*bzm_finput();
+-     
+-     if ( isatty(fileno(fp)) )
+-	  return izm_finput(fp,a);
+-     else
+-	  return bzm_finput(fp,a);
+-}
+-
+-/* izm_finput -- interactive input of matrix */
+-ZMAT     *izm_finput(fp,mat)
+-FILE    *fp;
+-ZMAT     *mat;
+-{
+-     char       c;
+-     u_int      i, j, m, n, dynamic;
+-     /* dynamic set to TRUE if memory allocated here */
+-     
+-     /* get matrix size */
+-     if ( mat != ZMNULL && mat->m<MAXDIM && mat->n<MAXDIM )
+-     {  m = mat->m;     n = mat->n;     dynamic = FALSE;        }
+-     else
+-     {
+-	  dynamic = TRUE;
+-	  do
+-	  {
+-	       fprintf(stderr,"ComplexMatrix: rows cols:");
+-	       if ( fgets(line,MAXLINE,fp)==NULL )
+-		    error(E_INPUT,"izm_finput");
+-	  } while ( sscanf(line,"%u%u",&m,&n)<2 || m>MAXDIM || n>MAXDIM );
+-	  mat = zm_get(m,n);
+-     }
+-     
+-     /* input elements */
+-     for ( i=0; i<m; i++ )
+-     {
+-     redo:
+-	  fprintf(stderr,"row %u:\n",i);
+-	  for ( j=0; j<n; j++ )
+-	       do
+-	       {
+-	       redo2:
+-		    fprintf(stderr,"entry (%u,%u): ",i,j);
+-		    if ( !dynamic )
+-			 fprintf(stderr,"old (%14.9g,%14.9g) new: ",
+-				 mat->me[i][j].re,mat->me[i][j].im);
+-		    if ( fgets(line,MAXLINE,fp)==NULL )
+-			 error(E_INPUT,"izm_finput");
+-		    if ( (*line == 'b' || *line == 'B') && j > 0 )
+-		    {   j--;    dynamic = FALSE;        goto redo2;     }
+-		    if ( (*line == 'f' || *line == 'F') && j < n-1 )
+-		    {   j++;    dynamic = FALSE;        goto redo2;     }
+-	       } while ( *line=='\0' ||
+-#if REAL == DOUBLE
+-			 sscanf(line,"%lf%lf",
+-#elif REAL == FLOAT
+-			sscanf(line,"%f%f",
+-#endif	
+-				&mat->me[i][j].re,&mat->me[i][j].im)<1 );
+-	  fprintf(stderr,"Continue: ");
+-	  fscanf(fp,"%c",&c);
+-	  if ( c == 'n' || c == 'N' )
+-	  {    dynamic = FALSE;                 goto redo;      }
+-	  if ( (c == 'b' || c == 'B') /* && i > 0 */ )
+-	  {     if ( i > 0 )
+-		    i--;
+-		dynamic = FALSE;        goto redo;
+-	  }
+-     }
+-     
+-     return (mat);
+-}
+-
+-/* bzm_finput -- batch-file input of matrix */
+-ZMAT     *bzm_finput(fp,mat)
+-FILE    *fp;
+-ZMAT     *mat;
+-{
+-     u_int      i,j,m,n,dummy;
+-     int        io_code;
+-     
+-     /* get dimension */
+-     skipjunk(fp);
+-     if ((io_code=fscanf(fp," ComplexMatrix: %u by %u",&m,&n)) < 2 ||
+-	 m>MAXDIM || n>MAXDIM )
+-	  error(io_code==EOF ? E_EOF : E_FORMAT,"bzm_finput");
+-     
+-     /* allocate memory if necessary */
+-     if ( mat==ZMNULL || mat->m<m || mat->n<n )
+-	  mat = zm_resize(mat,m,n);
+-     
+-     /* get entries */
+-     for ( i=0; i<m; i++ )
+-     {
+-	  skipjunk(fp);
+-	  if ( fscanf(fp," row %u:",&dummy) < 1 )
+-	       error(E_FORMAT,"bzm_finput");
+-	  for ( j=0; j<n; j++ )
+-	  {
+-	      /* printf("bzm_finput: j = %d\n", j); */
+-#if REAL == DOUBLE
+-	      if ((io_code=fscanf(fp," ( %lf , %lf )",
+-#elif REAL == FLOAT
+-	      if ((io_code=fscanf(fp," ( %f , %f )",
+-#endif
+-				  &mat->me[i][j].re,&mat->me[i][j].im)) < 2 )
+-		  error(io_code==EOF ? E_EOF : E_FORMAT,"bzm_finput");
+-	  }
+-     }
+-     
+-     return (mat);
+-}
+-
+-ZVEC     *zv_finput(fp,x)
+-FILE    *fp;
+-ZVEC     *x;
+-{
+-     ZVEC        *izv_finput(),*bzv_finput();
+-     
+-     if ( isatty(fileno(fp)) )
+-	  return izv_finput(fp,x);
+-     else
+-	  return bzv_finput(fp,x);
+-}
+-
+-/* izv_finput -- interactive input of vector */
+-ZVEC     *izv_finput(fp,vec)
+-FILE    *fp;
+-ZVEC     *vec;
+-{
+-     u_int      i,dim,dynamic;  /* dynamic set if memory allocated here */
+-     
+-     /* get vector dimension */
+-     if ( vec != ZVNULL && vec->dim<MAXDIM )
+-     {  dim = vec->dim; dynamic = FALSE;        }
+-     else
+-     {
+-	  dynamic = TRUE;
+-	  do
+-	  {
+-	       fprintf(stderr,"ComplexVector: dim: ");
+-	       if ( fgets(line,MAXLINE,fp)==NULL )
+-		    error(E_INPUT,"izv_finput");
+-	  } while ( sscanf(line,"%u",&dim)<1 || dim>MAXDIM );
+-	  vec = zv_get(dim);
+-     }
+-     
+-     /* input elements */
+-     for ( i=0; i<dim; i++ )
+-	  do
+-	  {
+-	  redo:
+-	       fprintf(stderr,"entry %u: ",i);
+-	       if ( !dynamic )
+-		    fprintf(stderr,"old (%14.9g,%14.9g) new: ",
+-			    vec->ve[i].re,vec->ve[i].im);
+-	       if ( fgets(line,MAXLINE,fp)==NULL )
+-		    error(E_INPUT,"izv_finput");
+-	       if ( (*line == 'b' || *line == 'B') && i > 0 )
+-	       {        i--;    dynamic = FALSE;        goto redo;         }
+-	       if ( (*line == 'f' || *line == 'F') && i < dim-1 )
+-	       {        i++;    dynamic = FALSE;        goto redo;         }
+-	  } while ( *line=='\0' ||
+-#if REAL == DOUBLE
+-		    sscanf(line,"%lf%lf",
+-#elif REAL == FLOAT
+-		    sscanf(line,"%f%f",
+-#endif  
+-			   &vec->ve[i].re,&vec->ve[i].im) < 2 );
+-     
+-     return (vec);
+-}
+-
+-/* bzv_finput -- batch-file input of vector */
+-ZVEC     *bzv_finput(fp,vec)
+-FILE    *fp;
+-ZVEC    *vec;
+-{
+-     u_int      i,dim;
+-     int        io_code;
+-     
+-     /* get dimension */
+-     skipjunk(fp);
+-     if ((io_code=fscanf(fp," ComplexVector: dim:%u",&dim)) < 1 ||
+-	  dim>MAXDIM )
+-	 error(io_code==EOF ? 7 : 6,"bzv_finput");
+-
+-     
+-     /* allocate memory if necessary */
+-     if ( vec==ZVNULL || vec->dim<dim )
+-	  vec = zv_resize(vec,dim);
+-     
+-     /* get entries */
+-     skipjunk(fp);
+-     for ( i=0; i<dim; i++ )
+-#if REAL == DOUBLE
+-	  if ((io_code=fscanf(fp," (%lf,%lf)",
+-#elif REAL == FLOAT
+-          if ((io_code=fscanf(fp," (%f,%f)",
+-#endif
+-			      &vec->ve[i].re,&vec->ve[i].im)) < 2 )
+-	       error(io_code==EOF ? 7 : 6,"bzv_finput");
+-     
+-     return (vec);
+-}
+-
+-/**************************************************************************
+-  Output routines
+-  **************************************************************************/
+-static char    *zformat = " (%14.9g, %14.9g) ";
+-
+-char	*setzformat(f_string)
+-char    *f_string;
+-{
+-    char	*old_f_string;
+-    old_f_string = zformat;
+-    if ( f_string != (char *)NULL && *f_string != '\0' )
+-	zformat = f_string;
+-
+-    return old_f_string;
+-}
+-
+-void	z_foutput(fp,z)
+-FILE	*fp;
+-complex	z;
+-{
+-    fprintf(fp,zformat,z.re,z.im);
+-    putc('\n',fp);
+-}
+-
+-void    zm_foutput(fp,a)
+-FILE    *fp;
+-ZMAT     *a;
+-{
+-     u_int      i, j, tmp;
+-     
+-     if ( a == ZMNULL )
+-     {  fprintf(fp,"ComplexMatrix: NULL\n");   return;         }
+-     fprintf(fp,"ComplexMatrix: %d by %d\n",a->m,a->n);
+-     if ( a->me == (complex **)NULL )
+-     {  fprintf(fp,"NULL\n");           return;         }
+-     for ( i=0; i<a->m; i++ )   /* for each row... */
+-     {
+-	  fprintf(fp,"row %u: ",i);
+-	  for ( j=0, tmp=1; j<a->n; j++, tmp++ )
+-	  {             /* for each col in row... */
+-	       fprintf(fp,zformat,a->me[i][j].re,a->me[i][j].im);
+-	       if ( ! (tmp % 2) )       putc('\n',fp);
+-	  }
+-	  if ( tmp % 2 != 1 )   putc('\n',fp);
+-     }
+-}
+-
+-void    zv_foutput(fp,x)
+-FILE    *fp;
+-ZVEC     *x;
+-{
+-     u_int      i, tmp;
+-     
+-     if ( x == ZVNULL )
+-     {  fprintf(fp,"ComplexVector: NULL\n");   return;         }
+-     fprintf(fp,"ComplexVector: dim: %d\n",x->dim);
+-     if ( x->ve == (complex *)NULL )
+-     {  fprintf(fp,"NULL\n");   return;         }
+-     for ( i=0, tmp=0; i<x->dim; i++, tmp++ )
+-     {
+-	  fprintf(fp,zformat,x->ve[i].re,x->ve[i].im);
+-	  if ( (tmp % 2) == 1 )   putc('\n',fp);
+-     }
+-     if ( (tmp % 2) != 0 )        putc('\n',fp);
+-}
+-
+-
+-void    zm_dump(fp,a)
+-FILE    *fp;
+-ZMAT     *a;
+-{
+-	u_int   i, j, tmp;
+-     
+-     if ( a == ZMNULL )
+-     {  fprintf(fp,"ComplexMatrix: NULL\n");   return;         }
+-     fprintf(fp,"ComplexMatrix: %d by %d @ 0x%lx\n",a->m,a->n,(long)a);
+-     fprintf(fp,"\tmax_m = %d, max_n = %d, max_size = %d\n",
+-	     a->max_m, a->max_n, a->max_size);
+-     if ( a->me == (complex **)NULL )
+-     {  fprintf(fp,"NULL\n");           return;         }
+-     fprintf(fp,"a->me @ 0x%lx\n",(long)(a->me));
+-     fprintf(fp,"a->base @ 0x%lx\n",(long)(a->base));
+-     for ( i=0; i<a->m; i++ )   /* for each row... */
+-     {
+-	  fprintf(fp,"row %u: @ 0x%lx ",i,(long)(a->me[i]));
+-	  for ( j=0, tmp=1; j<a->n; j++, tmp++ )
+-	  {             /* for each col in row... */
+-	       fprintf(fp,zformat,a->me[i][j].re,a->me[i][j].im);
+-	       if ( ! (tmp % 2) )       putc('\n',fp);
+-	  }
+-	  if ( tmp % 2 != 1 )   putc('\n',fp);
+-     }
+-}
+-
+-
+-
+-void    zv_dump(fp,x)
+-FILE    *fp;
+-ZVEC     *x;
+-{
+-     u_int      i, tmp;
+-     
+-     if ( ! x )
+-     {  fprintf(fp,"ComplexVector: NULL\n");   return;         }
+-     fprintf(fp,"ComplexVector: dim: %d @ 0x%lx\n",x->dim,(long)(x));
+-     if ( ! x->ve )
+-     {  fprintf(fp,"NULL\n");   return;         }
+-     fprintf(fp,"x->ve @ 0x%lx\n",(long)(x->ve));
+-     for ( i=0, tmp=0; i<x->dim; i++, tmp++ )
+-     {
+-	  fprintf(fp,zformat,x->ve[i].re,x->ve[i].im);
+-	  if ( tmp % 2 == 1 )   putc('\n',fp);
+-     }
+-     if ( tmp % 2 != 0 )        putc('\n',fp);
+-}
+-
+//GO.SYSIN DD zmatio.c
+echo zmemory.c 1>&2
+sed >zmemory.c <<'//GO.SYSIN DD zmemory.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/* Memory allocation and de-allocation for complex matrices and vectors */
+-
+-#include	<stdio.h>
+-#include	"zmatrix.h"
+-
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-
+-
+-/* zv_zero -- zeros all entries of a complex vector
+-   -- uses __zzero__() */
+-ZVEC	*zv_zero(x)
+-ZVEC	*x;
+-{
+-   if ( ! x )
+-     error(E_NULL,"zv_zero");
+-   __zzero__(x->ve,x->dim);
+-   
+-   return x;
+-}
+-
+-/* zm_zero -- zeros all entries of a complex matrix
+-   -- uses __zzero__() */
+-ZMAT	*zm_zero(A)
+-ZMAT	*A;
+-{
+-   int		i;
+-   
+-   if ( ! A )
+-     error(E_NULL,"zm_zero");
+-   for ( i = 0; i < A->m; i++ )
+-     __zzero__(A->me[i],A->n);
+-   
+-   return A;
+-}
+-
+-/* zm_get -- gets an mxn complex matrix (in ZMAT form) */
+-ZMAT	*zm_get(m,n)
+-int	m,n;
+-{
+-   ZMAT	*matrix;
+-   u_int	i;
+-   
+-   if (m < 0 || n < 0)
+-     error(E_NEG,"zm_get");
+-
+-   if ((matrix=NEW(ZMAT)) == (ZMAT *)NULL )
+-     error(E_MEM,"zm_get");
+-   else if (mem_info_is_on()) {
+-      mem_bytes(TYPE_ZMAT,0,sizeof(ZMAT));
+-      mem_numvar(TYPE_ZMAT,1);
+-   }
+-   
+-   matrix->m = m;		matrix->n = matrix->max_n = n;
+-   matrix->max_m = m;	matrix->max_size = m*n;
+-#ifndef SEGMENTED
+-   if ((matrix->base = NEW_A(m*n,complex)) == (complex *)NULL )
+-   {
+-      free(matrix);
+-      error(E_MEM,"zm_get");
+-   }
+-   else if (mem_info_is_on()) {
+-      mem_bytes(TYPE_ZMAT,0,m*n*sizeof(complex));
+-   }
+-#else
+-   matrix->base = (complex *)NULL;
+-#endif
+-   if ((matrix->me = (complex **)calloc(m,sizeof(complex *))) == 
+-       (complex **)NULL )
+-   {	free(matrix->base);	free(matrix);
+-	error(E_MEM,"zm_get");
+-     }
+-   else if (mem_info_is_on()) {
+-      mem_bytes(TYPE_ZMAT,0,m*sizeof(complex *));
+-   }
+-#ifndef SEGMENTED
+-   /* set up pointers */
+-   for ( i=0; i<m; i++ )
+-     matrix->me[i] = &(matrix->base[i*n]);
+-#else
+-   for ( i = 0; i < m; i++ )
+-     if ( (matrix->me[i]=NEW_A(n,complex)) == (complex *)NULL )
+-       error(E_MEM,"zm_get");
+-     else if (mem_info_is_on()) {
+-	mem_bytes(TYPE_ZMAT,0,n*sizeof(complex));
+-     }
+-#endif
+-   
+-   return (matrix);
+-}
+-
+-
+-/* zv_get -- gets a ZVEC of dimension 'dim'
+-   -- Note: initialized to zero */
+-ZVEC	*zv_get(size)
+-int	size;
+-{
+-   ZVEC	*vector;
+-
+-   if (size < 0)
+-     error(E_NEG,"zv_get");
+-
+-   if ((vector=NEW(ZVEC)) == (ZVEC *)NULL )
+-     error(E_MEM,"zv_get");
+-   else if (mem_info_is_on()) {
+-      mem_bytes(TYPE_ZVEC,0,sizeof(ZVEC));
+-      mem_numvar(TYPE_ZVEC,1);
+-   }
+-   vector->dim = vector->max_dim = size;
+-   if ((vector->ve=NEW_A(size,complex)) == (complex *)NULL )
+-   {
+-      free(vector);
+-      error(E_MEM,"zv_get");
+-   }
+-   else if (mem_info_is_on()) {
+-      mem_bytes(TYPE_ZVEC,0,size*sizeof(complex));
+-   }
+-   return (vector);
+-}
+-
+-/* zm_free -- returns ZMAT & asoociated memory back to memory heap */
+-int	zm_free(mat)
+-ZMAT	*mat;
+-{
+-#ifdef SEGMENTED
+-   int	i;
+-#endif
+-   
+-   if ( mat==(ZMAT *)NULL || (int)(mat->m) < 0 ||
+-       (int)(mat->n) < 0 )
+-     /* don't trust it */
+-     return (-1);
+-   
+-#ifndef SEGMENTED
+-   if ( mat->base != (complex *)NULL ) {
+-      if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_ZMAT,mat->max_m*mat->max_n*sizeof(complex),0);
+-      }	   
+-      free((char *)(mat->base));
+-   }
+-#else
+-   for ( i = 0; i < mat->max_m; i++ )
+-     if ( mat->me[i] != (complex *)NULL ) {
+-	if (mem_info_is_on()) {
+-	   mem_bytes(TYPE_ZMAT,mat->max_n*sizeof(complex),0);
+-	}
+-	free((char *)(mat->me[i]));
+-     }
+-#endif
+-   if ( mat->me != (complex **)NULL ) {
+-      if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_ZMAT,mat->max_m*sizeof(complex *),0);
+-      }	   
+-      free((char *)(mat->me));
+-   }
+-   
+-   if (mem_info_is_on()) {
+-      mem_bytes(TYPE_ZMAT,sizeof(ZMAT),0);
+-      mem_numvar(TYPE_ZMAT,-1);
+-   }
+-   free((char *)mat);
+-   
+-   return (0);
+-}
+-
+-
+-/* zv_free -- returns ZVEC & asoociated memory back to memory heap */
+-int	zv_free(vec)
+-ZVEC	*vec;
+-{
+-   if ( vec==(ZVEC *)NULL || (int)(vec->dim) < 0 )
+-     /* don't trust it */
+-     return (-1);
+-   
+-   if ( vec->ve == (complex *)NULL ) {
+-      if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_ZVEC,sizeof(ZVEC),0);
+-	 mem_numvar(TYPE_ZVEC,-1);
+-      }
+-      free((char *)vec);
+-   }
+-   else
+-   {
+-      if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_ZVEC,vec->max_dim*sizeof(complex)+
+-		      sizeof(ZVEC),0);
+-	 mem_numvar(TYPE_ZVEC,-1);
+-      }
+-      
+-      free((char *)vec->ve);
+-      free((char *)vec);
+-   }
+-   
+-   return (0);
+-}
+-
+-
+-/* zm_resize -- returns the matrix A of size new_m x new_n; A is zeroed
+-   -- if A == NULL on entry then the effect is equivalent to m_get() */
+-ZMAT	*zm_resize(A,new_m,new_n)
+-ZMAT	*A;
+-int	new_m, new_n;
+-{
+-   u_int	i, new_max_m, new_max_n, new_size, old_m, old_n;
+-   
+-   if (new_m < 0 || new_n < 0)
+-     error(E_NEG,"zm_resize");
+-
+-   if ( ! A )
+-     return zm_get(new_m,new_n);
+-   
+-   if (new_m == A->m && new_n == A->n)
+-     return A;
+-
+-   old_m = A->m;	old_n = A->n;
+-   if ( new_m > A->max_m )
+-   {	/* re-allocate A->me */
+-      if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_ZMAT,A->max_m*sizeof(complex *),
+-		      new_m*sizeof(complex *));
+-      }
+-
+-      A->me = RENEW(A->me,new_m,complex *);
+-      if ( ! A->me )
+-	error(E_MEM,"zm_resize");
+-   }
+-   new_max_m = max(new_m,A->max_m);
+-   new_max_n = max(new_n,A->max_n);
+-   
+-#ifndef SEGMENTED
+-   new_size = new_max_m*new_max_n;
+-   if ( new_size > A->max_size )
+-   {	/* re-allocate A->base */
+-      if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_ZMAT,A->max_m*A->max_n*sizeof(complex),
+-		new_size*sizeof(complex));      
+-      }
+-
+-      A->base = RENEW(A->base,new_size,complex);
+-      if ( ! A->base )
+-	error(E_MEM,"zm_resize");
+-      A->max_size = new_size;
+-   }
+-   
+-   /* now set up A->me[i] */
+-   for ( i = 0; i < new_m; i++ )
+-     A->me[i] = &(A->base[i*new_n]);
+-   
+-   /* now shift data in matrix */
+-   if ( old_n > new_n )
+-   {
+-      for ( i = 1; i < min(old_m,new_m); i++ )
+-	MEM_COPY((char *)&(A->base[i*old_n]),
+-		 (char *)&(A->base[i*new_n]),
+-		 sizeof(complex)*new_n);
+-   }
+-   else if ( old_n < new_n )
+-   {
+-      for ( i = min(old_m,new_m)-1; i > 0; i-- )
+-      {   /* copy & then zero extra space */
+-	 MEM_COPY((char *)&(A->base[i*old_n]),
+-		  (char *)&(A->base[i*new_n]),
+-		  sizeof(complex)*old_n);
+-	 __zzero__(&(A->base[i*new_n+old_n]),(new_n-old_n));
+-      }
+-      __zzero__(&(A->base[old_n]),(new_n-old_n));
+-      A->max_n = new_n;
+-   }
+-   /* zero out the new rows.. */
+-   for ( i = old_m; i < new_m; i++ )
+-     __zzero__(&(A->base[i*new_n]),new_n);
+-#else
+-   if ( A->max_n < new_n )
+-   {
+-      complex	*tmp;
+-      
+-      for ( i = 0; i < A->max_m; i++ )
+-      {
+-	 if (mem_info_is_on()) {
+-	    mem_bytes(TYPE_ZMAT,A->max_n*sizeof(complex),
+-			 new_max_n*sizeof(complex));
+-	 }
+-
+-	 if ( (tmp = RENEW(A->me[i],new_max_n,complex)) == NULL )
+-	   error(E_MEM,"zm_resize");
+-	 else {
+-	    A->me[i] = tmp;
+-	 }
+-      }
+-      for ( i = A->max_m; i < new_max_m; i++ )
+-      {
+-	 if ( (tmp = NEW_A(new_max_n,complex)) == NULL )
+-	   error(E_MEM,"zm_resize");
+-	 else {
+-	    A->me[i] = tmp;
+-	    if (mem_info_is_on()) {
+-	       mem_bytes(TYPE_ZMAT,0,new_max_n*sizeof(complex));
+-	    }
+-	 }
+-      }
+-   }
+-   else if ( A->max_m < new_m )
+-   {
+-      for ( i = A->max_m; i < new_m; i++ )
+-	if ( (A->me[i] = NEW_A(new_max_n,complex)) == NULL )
+-	  error(E_MEM,"zm_resize");
+-	else if (mem_info_is_on()) {
+-	   mem_bytes(TYPE_ZMAT,0,new_max_n*sizeof(complex));
+-	}
+-      
+-   }
+-   
+-   if ( old_n < new_n )
+-   {
+-      for ( i = 0; i < old_m; i++ )
+-	__zzero__(&(A->me[i][old_n]),new_n-old_n);
+-   }
+-   
+-   /* zero out the new rows.. */
+-   for ( i = old_m; i < new_m; i++ )
+-     __zzero__(A->me[i],new_n);
+-#endif
+-   
+-   A->max_m = new_max_m;
+-   A->max_n = new_max_n;
+-   A->max_size = A->max_m*A->max_n;
+-   A->m = new_m;	A->n = new_n;
+-   
+-   return A;
+-}
+-
+-
+-/* zv_resize -- returns the (complex) vector x with dim new_dim
+-   -- x is set to the zero vector */
+-ZVEC	*zv_resize(x,new_dim)
+-ZVEC	*x;
+-int	new_dim;
+-{
+-   if (new_dim < 0)
+-     error(E_NEG,"zv_resize");
+-
+-   if ( ! x )
+-     return zv_get(new_dim);
+-
+-   if (new_dim == x->dim)
+-     return x;
+-
+-   if ( x->max_dim == 0 )	/* assume that it's from sub_zvec */
+-     return zv_get(new_dim);
+-   
+-   if ( new_dim > x->max_dim )
+-   {
+-      if (mem_info_is_on()) { 
+-	 mem_bytes(TYPE_ZVEC,x->max_dim*sizeof(complex),
+-		      new_dim*sizeof(complex));
+-      }
+-
+-      x->ve = RENEW(x->ve,new_dim,complex);
+-      if ( ! x->ve )
+-	error(E_MEM,"zv_resize");
+-      x->max_dim = new_dim;
+-   }
+-   
+-   if ( new_dim > x->dim )
+-     __zzero__(&(x->ve[x->dim]),new_dim - x->dim);
+-   x->dim = new_dim;
+-   
+-   return x;
+-}
+-
+-
+-/* varying arguments */
+-
+-#ifdef ANSI_C
+-
+-#include <stdarg.h>
+-
+-
+-/* To allocate memory to many arguments. 
+-   The function should be called:
+-   zv_get_vars(dim,&x,&y,&z,...,NULL);
+-   where 
+-     int dim;
+-     ZVEC *x, *y, *z,...;
+-     The last argument should be NULL ! 
+-     dim is the length of vectors x,y,z,...
+-     returned value is equal to the number of allocated variables
+-     Other gec_... functions are similar.
+-*/
+-
+-int zv_get_vars(int dim,...) 
+-{
+-   va_list ap;
+-   int i=0;
+-   ZVEC **par;
+-   
+-   va_start(ap, dim);
+-   while (par = va_arg(ap,ZVEC **)) {   /* NULL ends the list*/
+-      *par = zv_get(dim);
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-
+-int zm_get_vars(int m,int n,...) 
+-{
+-   va_list ap;
+-   int i=0;
+-   ZMAT **par;
+-   
+-   va_start(ap, n);
+-   while (par = va_arg(ap,ZMAT **)) {   /* NULL ends the list*/
+-      *par = zm_get(m,n);
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-
+-/* To resize memory for many arguments. 
+-   The function should be called:
+-   v_resize_vars(new_dim,&x,&y,&z,...,NULL);
+-   where 
+-     int new_dim;
+-     ZVEC *x, *y, *z,...;
+-     The last argument should be NULL ! 
+-     rdim is the resized length of vectors x,y,z,...
+-     returned value is equal to the number of allocated variables.
+-     If one of x,y,z,.. arguments is NULL then memory is allocated to this 
+-     argument. 
+-     Other *_resize_list() functions are similar.
+-*/
+-
+-int zv_resize_vars(int new_dim,...)
+-{
+-   va_list ap;
+-   int i=0;
+-   ZVEC **par;
+-   
+-   va_start(ap, new_dim);
+-   while (par = va_arg(ap,ZVEC **)) {   /* NULL ends the list*/
+-      *par = zv_resize(*par,new_dim);
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-
+-int zm_resize_vars(int m,int n,...) 
+-{
+-   va_list ap;
+-   int i=0;
+-   ZMAT **par;
+-   
+-   va_start(ap, n);
+-   while (par = va_arg(ap,ZMAT **)) {   /* NULL ends the list*/
+-      *par = zm_resize(*par,m,n);
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-/* To deallocate memory for many arguments. 
+-   The function should be called:
+-   v_free_vars(&x,&y,&z,...,NULL);
+-   where 
+-     ZVEC *x, *y, *z,...;
+-     The last argument should be NULL ! 
+-     There must be at least one not NULL argument.
+-     returned value is equal to the number of allocated variables.
+-     Returned value of x,y,z,.. is VNULL.
+-     Other *_free_list() functions are similar.
+-*/
+-
+-int zv_free_vars(ZVEC **pv,...)
+-{
+-   va_list ap;
+-   int i=1;
+-   ZVEC **par;
+-   
+-   zv_free(*pv);
+-   *pv = ZVNULL;
+-   va_start(ap, pv);
+-   while (par = va_arg(ap,ZVEC **)) {   /* NULL ends the list*/
+-      zv_free(*par); 
+-      *par = ZVNULL;
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-
+-int zm_free_vars(ZMAT **va,...)
+-{
+-   va_list ap;
+-   int i=1;
+-   ZMAT **par;
+-   
+-   zm_free(*va);
+-   *va = ZMNULL;
+-   va_start(ap, va);
+-   while (par = va_arg(ap,ZMAT **)) {   /* NULL ends the list*/
+-      zm_free(*par); 
+-      *par = ZMNULL;
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-
+-#elif VARARGS
+-
+-#include <varargs.h>
+-
+-/* To allocate memory to many arguments. 
+-   The function should be called:
+-   v_get_vars(dim,&x,&y,&z,...,NULL);
+-   where 
+-     int dim;
+-     ZVEC *x, *y, *z,...;
+-     The last argument should be NULL ! 
+-     dim is the length of vectors x,y,z,...
+-     returned value is equal to the number of allocated variables
+-     Other gec_... functions are similar.
+-*/
+-
+-int zv_get_vars(va_alist) va_dcl
+-{
+-   va_list ap;
+-   int dim,i=0;
+-   ZVEC **par;
+-   
+-   va_start(ap);
+-   dim = va_arg(ap,int);
+-   while (par = va_arg(ap,ZVEC **)) {   /* NULL ends the list*/
+-      *par = zv_get(dim);
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-
+-int zm_get_vars(va_alist) va_dcl
+-{
+-   va_list ap;
+-   int i=0, n, m;
+-   ZMAT **par;
+-   
+-   va_start(ap);
+-   m = va_arg(ap,int);
+-   n = va_arg(ap,int);
+-   while (par = va_arg(ap,ZMAT **)) {   /* NULL ends the list*/
+-      *par = zm_get(m,n);
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-
+-/* To resize memory for many arguments. 
+-   The function should be called:
+-   v_resize_vars(new_dim,&x,&y,&z,...,NULL);
+-   where 
+-     int new_dim;
+-     ZVEC *x, *y, *z,...;
+-     The last argument should be NULL ! 
+-     rdim is the resized length of vectors x,y,z,...
+-     returned value is equal to the number of allocated variables.
+-     If one of x,y,z,.. arguments is NULL then memory is allocated to this 
+-     argument. 
+-     Other *_resize_list() functions are similar.
+-*/
+-
+-int zv_resize_vars(va_alist) va_dcl
+-{
+-   va_list ap;
+-   int i=0, new_dim;
+-   ZVEC **par;
+-   
+-   va_start(ap);
+-   new_dim = va_arg(ap,int);
+-   while (par = va_arg(ap,ZVEC **)) {   /* NULL ends the list*/
+-      *par = zv_resize(*par,new_dim);
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-int zm_resize_vars(va_alist) va_dcl
+-{
+-   va_list ap;
+-   int i=0, m, n;
+-   ZMAT **par;
+-   
+-   va_start(ap);
+-   m = va_arg(ap,int);
+-   n = va_arg(ap,int);
+-   while (par = va_arg(ap,ZMAT **)) {   /* NULL ends the list*/
+-      *par = zm_resize(*par,m,n);
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-
+-/* To deallocate memory for many arguments. 
+-   The function should be called:
+-   v_free_vars(&x,&y,&z,...,NULL);
+-   where 
+-     ZVEC *x, *y, *z,...;
+-     The last argument should be NULL ! 
+-     There must be at least one not NULL argument.
+-     returned value is equal to the number of allocated variables.
+-     Returned value of x,y,z,.. is VNULL.
+-     Other *_free_list() functions are similar.
+-*/
+-
+-int zv_free_vars(va_alist) va_dcl
+-{
+-   va_list ap;
+-   int i=0;
+-   ZVEC **par;
+-   
+-   va_start(ap);
+-   while (par = va_arg(ap,ZVEC **)) {   /* NULL ends the list*/
+-      zv_free(*par); 
+-      *par = ZVNULL;
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-
+-int zm_free_vars(va_alist) va_dcl
+-{
+-   va_list ap;
+-   int i=0;
+-   ZMAT **par;
+-   
+-   va_start(ap);
+-   while (par = va_arg(ap,ZMAT **)) {   /* NULL ends the list*/
+-      zm_free(*par); 
+-      *par = ZMNULL;
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-#endif
+-
+//GO.SYSIN DD zmemory.c
+echo zvecop.c 1>&2
+sed >zvecop.c <<'//GO.SYSIN DD zvecop.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-#include	<stdio.h>
+-#include	"matrix.h"
+-#include	"zmatrix.h"
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-
+-
+-/* _zin_prod -- inner product of two vectors from i0 downwards
+-	-- flag != 0 means compute sum_i a[i]*.b[i];
+-	-- flag == 0 means compute sum_i a[i].b[i] */
+-complex	_zin_prod(a,b,i0,flag)
+-ZVEC	*a,*b;
+-u_int	i0, flag;
+-{
+-	u_int	limit;
+-
+-	if ( a==ZVNULL || b==ZVNULL )
+-		error(E_NULL,"_zin_prod");
+-	limit = min(a->dim,b->dim);
+-	if ( i0 > limit )
+-		error(E_BOUNDS,"_zin_prod");
+-
+-	return __zip__(&(a->ve[i0]),&(b->ve[i0]),(int)(limit-i0),flag);
+-}
+-
+-/* zv_mlt -- scalar-vector multiply -- may be in-situ */
+-ZVEC	*zv_mlt(scalar,vector,out)
+-complex	scalar;
+-ZVEC	*vector,*out;
+-{
+-	/* u_int	dim, i; */
+-	/* complex	*out_ve, *vec_ve; */
+-
+-	if ( vector==ZVNULL )
+-		error(E_NULL,"zv_mlt");
+-	if ( out==ZVNULL || out->dim != vector->dim )
+-		out = zv_resize(out,vector->dim);
+-	if ( scalar.re == 0.0 && scalar.im == 0.0 )
+-		return zv_zero(out);
+-	if ( scalar.re == 1.0 && scalar.im == 0.0 )
+-		return zv_copy(vector,out);
+-
+-	__zmlt__(vector->ve,scalar,out->ve,(int)(vector->dim));
+-
+-	return (out);
+-}
+-
+-/* zv_add -- vector addition -- may be in-situ */
+-ZVEC	*zv_add(vec1,vec2,out)
+-ZVEC	*vec1,*vec2,*out;
+-{
+-	u_int	dim;
+-
+-	if ( vec1==ZVNULL || vec2==ZVNULL )
+-		error(E_NULL,"zv_add");
+-	if ( vec1->dim != vec2->dim )
+-		error(E_SIZES,"zv_add");
+-	if ( out==ZVNULL || out->dim != vec1->dim )
+-		out = zv_resize(out,vec1->dim);
+-	dim = vec1->dim;
+-	__zadd__(vec1->ve,vec2->ve,out->ve,(int)dim);
+-
+-	return (out);
+-}
+-
+-/* zv_mltadd -- scalar/vector multiplication and addition
+-		-- out = v1 + scale.v2		*/
+-ZVEC	*zv_mltadd(v1,v2,scale,out)
+-ZVEC	*v1,*v2,*out;
+-complex	scale;
+-{
+-	/* register u_int	dim, i; */
+-	/* complex	*out_ve, *v1_ve, *v2_ve; */
+-
+-	if ( v1==ZVNULL || v2==ZVNULL )
+-		error(E_NULL,"zv_mltadd");
+-	if ( v1->dim != v2->dim )
+-		error(E_SIZES,"zv_mltadd");
+-	if ( scale.re == 0.0 && scale.im == 0.0 )
+-		return zv_copy(v1,out);
+-	if ( scale.re == 1.0 && scale.im == 0.0 )
+-		return zv_add(v1,v2,out);
+-
+-	if ( v2 != out )
+-	{
+-	    tracecatch(out = zv_copy(v1,out),"zv_mltadd");
+-
+-	    /* dim = v1->dim; */
+-	    __zmltadd__(out->ve,v2->ve,scale,(int)(v1->dim),0);
+-	}
+-	else
+-	{
+-	    tracecatch(out = zv_mlt(scale,v2,out),"zv_mltadd");
+-	    out = zv_add(v1,out,out);
+-	}
+-
+-	return (out);
+-}
+-
+-/* zv_sub -- vector subtraction -- may be in-situ */
+-ZVEC	*zv_sub(vec1,vec2,out)
+-ZVEC	*vec1,*vec2,*out;
+-{
+-	/* u_int	i, dim; */
+-	/* complex	*out_ve, *vec1_ve, *vec2_ve; */
+-
+-	if ( vec1==ZVNULL || vec2==ZVNULL )
+-		error(E_NULL,"zv_sub");
+-	if ( vec1->dim != vec2->dim )
+-		error(E_SIZES,"zv_sub");
+-	if ( out==ZVNULL || out->dim != vec1->dim )
+-		out = zv_resize(out,vec1->dim);
+-
+-	__zsub__(vec1->ve,vec2->ve,out->ve,(int)(vec1->dim));
+-
+-	return (out);
+-}
+-
+-/* zv_map -- maps function f over components of x: out[i] = f(x[i])
+-	-- _zv_map sets out[i] = f(x[i],params) */
+-ZVEC	*zv_map(f,x,out)
+-#ifdef PROTOYPES_IN_STRUCT
+-complex	(*f)(complex);
+-#else
+-complex (*f)();
+-#endif
+-ZVEC	*x, *out;
+-{
+-	complex	*x_ve, *out_ve;
+-	int	i, dim;
+-
+-	if ( ! x || ! f )
+-		error(E_NULL,"zv_map");
+-	if ( ! out || out->dim != x->dim )
+-		out = zv_resize(out,x->dim);
+-
+-	dim = x->dim;	x_ve = x->ve;	out_ve = out->ve;
+-	for ( i = 0; i < dim; i++ )
+-		out_ve[i] = (*f)(x_ve[i]);
+-
+-	return out;
+-}
+-
+-ZVEC	*_zv_map(f,params,x,out)
+-#ifdef PROTOTYPES_IN_STRUCT
+-complex	(*f)(void *,complex);
+-#else
+-complex	(*f)();
+-#endif
+-ZVEC	*x, *out;
+-void	*params;
+-{
+-	complex	*x_ve, *out_ve;
+-	int	i, dim;
+-
+-	if ( ! x || ! f )
+-		error(E_NULL,"_zv_map");
+-	if ( ! out || out->dim != x->dim )
+-		out = zv_resize(out,x->dim);
+-
+-	dim = x->dim;	x_ve = x->ve;	out_ve = out->ve;
+-	for ( i = 0; i < dim; i++ )
+-		out_ve[i] = (*f)(params,x_ve[i]);
+-
+-	return out;
+-}
+-
+-/* zv_lincomb -- returns sum_i a[i].v[i], a[i] real, v[i] vectors */
+-ZVEC	*zv_lincomb(n,v,a,out)
+-int	n;	/* number of a's and v's */
+-complex	a[];
+-ZVEC	*v[], *out;
+-{
+-	int	i;
+-
+-	if ( ! a || ! v )
+-		error(E_NULL,"zv_lincomb");
+-	if ( n <= 0 )
+-		return ZVNULL;
+-
+-	for ( i = 1; i < n; i++ )
+-		if ( out == v[i] )
+-		    error(E_INSITU,"zv_lincomb");
+-
+-	out = zv_mlt(a[0],v[0],out);
+-	for ( i = 1; i < n; i++ )
+-	{
+-		if ( ! v[i] )
+-			error(E_NULL,"zv_lincomb");
+-		if ( v[i]->dim != out->dim )
+-			error(E_SIZES,"zv_lincomb");
+-		out = zv_mltadd(out,v[i],a[i],out);
+-	}
+-
+-	return out;
+-}
+-
+-
+-#ifdef ANSI_C
+-
+-
+-/* zv_linlist -- linear combinations taken from a list of arguments;
+-   calling:
+-      zv_linlist(out,v1,a1,v2,a2,...,vn,an,NULL);
+-   where vi are vectors (ZVEC *) and ai are numbers (complex)
+-*/
+-
+-ZVEC	*zv_linlist(ZVEC *out,ZVEC *v1,complex a1,...)
+-{
+-   va_list ap;
+-   ZVEC *par;
+-   complex a_par;
+-
+-   if ( ! v1 )
+-     return ZVNULL;
+-   
+-   va_start(ap, a1);
+-   out = zv_mlt(a1,v1,out);
+-   
+-   while (par = va_arg(ap,ZVEC *)) {   /* NULL ends the list*/
+-      a_par = va_arg(ap,complex);
+-      if (a_par.re == 0.0 && a_par.im == 0.0) continue;
+-      if ( out == par )		
+-	error(E_INSITU,"zv_linlist");
+-      if ( out->dim != par->dim )	
+-	error(E_SIZES,"zv_linlist");
+-
+-      if (a_par.re == 1.0 && a_par.im == 0.0)
+-	out = zv_add(out,par,out);
+-      else if (a_par.re == -1.0 && a_par.im == 0.0)
+-	out = zv_sub(out,par,out);
+-      else
+-	out = zv_mltadd(out,par,a_par,out); 
+-   } 
+-   
+-   va_end(ap);
+-   return out;
+-}
+-
+-
+-#elif VARARGS
+-
+-/* zv_linlist -- linear combinations taken from a list of arguments;
+-   calling:
+-      zv_linlist(out,v1,a1,v2,a2,...,vn,an,NULL);
+-   where vi are vectors (ZVEC *) and ai are numbers (complex)
+-*/
+-ZVEC  *zv_linlist(va_alist) va_dcl
+-{
+-   va_list ap;
+-   ZVEC *par, *out;
+-   complex a_par;
+-
+-   va_start(ap);
+-   out = va_arg(ap,ZVEC *);
+-   par = va_arg(ap,ZVEC *);
+-   if ( ! par ) {
+-      va_end(ap);
+-      return ZVNULL;
+-   }
+-   
+-   a_par = va_arg(ap,complex);
+-   out = zv_mlt(a_par,par,out);
+-   
+-   while (par = va_arg(ap,ZVEC *)) {   /* NULL ends the list*/
+-      a_par = va_arg(ap,complex);
+-      if (a_par.re == 0.0 && a_par.im == 0.0) continue;
+-      if ( out == par )		
+-	error(E_INSITU,"zv_linlist");
+-      if ( out->dim != par->dim )	
+-	error(E_SIZES,"zv_linlist");
+-
+-      if (a_par.re == 1.0 && a_par.im == 0.0)
+-	out = zv_add(out,par,out);
+-      else if (a_par.re == -1.0 && a_par.im == 0.0)
+-	out = zv_sub(out,par,out);
+-      else
+-	out = zv_mltadd(out,par,a_par,out); 
+-   } 
+-   
+-   va_end(ap);
+-   return out;
+-}
+-
+-
+-#endif
+-
+-
+-
+-/* zv_star -- computes componentwise (Hadamard) product of x1 and x2
+-	-- result out is returned */
+-ZVEC	*zv_star(x1, x2, out)
+-ZVEC	*x1, *x2, *out;
+-{
+-    int		i;
+-    Real	t_re, t_im;
+-
+-    if ( ! x1 || ! x2 )
+-	error(E_NULL,"zv_star");
+-    if ( x1->dim != x2->dim )
+-	error(E_SIZES,"zv_star");
+-    out = zv_resize(out,x1->dim);
+-
+-    for ( i = 0; i < x1->dim; i++ )
+-    {
+-	/* out->ve[i] = x1->ve[i] * x2->ve[i]; */
+-	t_re = x1->ve[i].re*x2->ve[i].re - x1->ve[i].im*x2->ve[i].im;
+-	t_im = x1->ve[i].re*x2->ve[i].im + x1->ve[i].im*x2->ve[i].re;
+-	out->ve[i].re = t_re;
+-	out->ve[i].im = t_im;
+-    }
+-
+-    return out;
+-}
+-
+-/* zv_slash -- computes componentwise ratio of x2 and x1
+-	-- out[i] = x2[i] / x1[i]
+-	-- if x1[i] == 0 for some i, then raise E_SING error
+-	-- result out is returned */
+-ZVEC	*zv_slash(x1, x2, out)
+-ZVEC	*x1, *x2, *out;
+-{
+-    int		i;
+-    Real	r2, t_re, t_im;
+-    complex	tmp;
+-
+-    if ( ! x1 || ! x2 )
+-	error(E_NULL,"zv_slash");
+-    if ( x1->dim != x2->dim )
+-	error(E_SIZES,"zv_slash");
+-    out = zv_resize(out,x1->dim);
+-
+-    for ( i = 0; i < x1->dim; i++ )
+-    {
+-	r2 = x1->ve[i].re*x1->ve[i].re + x1->ve[i].im*x1->ve[i].im;
+-	if ( r2 == 0.0 )
+-	    error(E_SING,"zv_slash");
+-	tmp.re =   x1->ve[i].re / r2;
+-	tmp.im = - x1->ve[i].im / r2;
+-	t_re = tmp.re*x2->ve[i].re - tmp.im*x2->ve[i].im;
+-	t_im = tmp.re*x2->ve[i].im - tmp.im*x2->ve[i].re;
+-	out->ve[i].re = t_re;
+-	out->ve[i].im = t_im;
+-    }
+-
+-    return out;
+-}
+-
+-/* zv_sum -- returns sum of entries of a vector */
+-complex	zv_sum(x)
+-ZVEC	*x;
+-{
+-    int		i;
+-    complex	sum;
+-
+-    if ( ! x )
+-	error(E_NULL,"zv_sum");
+-
+-    sum.re = sum.im = 0.0;
+-    for ( i = 0; i < x->dim; i++ )
+-    {
+-	sum.re += x->ve[i].re;
+-	sum.im += x->ve[i].im;
+-    }
+-
+-    return sum;
+-}
+-
+-/* px_zvec -- permute vector */
+-ZVEC	*px_zvec(px,vector,out)
+-PERM	*px;
+-ZVEC	*vector,*out;
+-{
+-    u_int	old_i, i, size, start;
+-    complex	tmp;
+-    
+-    if ( px==PNULL || vector==ZVNULL )
+-	error(E_NULL,"px_zvec");
+-    if ( px->size > vector->dim )
+-	error(E_SIZES,"px_zvec");
+-    if ( out==ZVNULL || out->dim < vector->dim )
+-	out = zv_resize(out,vector->dim);
+-    
+-    size = px->size;
+-    if ( size == 0 )
+-	return zv_copy(vector,out);
+-    
+-    if ( out != vector )
+-    {
+-	for ( i=0; i<size; i++ )
+-	    if ( px->pe[i] >= size )
+-		error(E_BOUNDS,"px_vec");
+-	    else
+-		out->ve[i] = vector->ve[px->pe[i]];
+-    }
+-    else
+-    {	/* in situ algorithm */
+-	start = 0;
+-	while ( start < size )
+-	{
+-	    old_i = start;
+-	    i = px->pe[old_i];
+-	    if ( i >= size )
+-	    {
+-		start++;
+-		continue;
+-	    }
+-	    tmp = vector->ve[start];
+-	    while ( TRUE )
+-	    {
+-		vector->ve[old_i] = vector->ve[i];
+-		px->pe[old_i] = i+size;
+-		old_i = i;
+-		i = px->pe[old_i];
+-		if ( i >= size )
+-		    break;
+-		if ( i == start )
+-		{
+-		    vector->ve[old_i] = tmp;
+-		    px->pe[old_i] = i+size;
+-		    break;
+-		}
+-	    }
+-	    start++;
+-	}
+-	
+-	for ( i = 0; i < size; i++ )
+-	    if ( px->pe[i] < size )
+-		error(E_BOUNDS,"px_vec");
+-	    else
+-		px->pe[i] = px->pe[i]-size;
+-    }
+-    
+-    return out;
+-}
+-
+-/* pxinv_zvec -- apply the inverse of px to x, returning the result in out
+-		-- may NOT be in situ */
+-ZVEC	*pxinv_zvec(px,x,out)
+-PERM	*px;
+-ZVEC	*x, *out;
+-{
+-    u_int	i, size;
+-    
+-    if ( ! px || ! x )
+-	error(E_NULL,"pxinv_zvec");
+-    if ( px->size > x->dim )
+-	error(E_SIZES,"pxinv_zvec");
+-    if ( ! out || out->dim < x->dim )
+-	out = zv_resize(out,x->dim);
+-    
+-    size = px->size;
+-    if ( size == 0 )
+-	return zv_copy(x,out);
+-    if ( out != x )
+-    {
+-	for ( i=0; i<size; i++ )
+-	    if ( px->pe[i] >= size )
+-		error(E_BOUNDS,"pxinv_vec");
+-	    else
+-		out->ve[px->pe[i]] = x->ve[i];
+-    }
+-    else
+-    {	/* in situ algorithm --- cheat's way out */
+-	px_inv(px,px);
+-	px_zvec(px,x,out);
+-	px_inv(px,px);
+-    }
+-    
+-    
+-    return out;
+-}
+-
+-/* zv_rand -- randomise a complex vector; uniform in [0,1)+[0,1)*i */
+-ZVEC	*zv_rand(x)
+-ZVEC	*x;
+-{
+-    if ( ! x )
+-	error(E_NULL,"zv_rand");
+-
+-    mrandlist((Real *)(x->ve),2*x->dim);
+-
+-    return x;
+-}
+//GO.SYSIN DD zvecop.c
+echo zmatop.c 1>&2
+sed >zmatop.c <<'//GO.SYSIN DD zmatop.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-
+-#include	<stdio.h>
+-#include	"zmatrix.h"
+-
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-
+-#define	is_zero(z)	((z).re == 0.0 && (z).im == 0.0)
+-
+-/* zm_add -- matrix addition -- may be in-situ */
+-ZMAT	*zm_add(mat1,mat2,out)
+-ZMAT	*mat1,*mat2,*out;
+-{
+-    u_int	m,n,i;
+-    
+-    if ( mat1==ZMNULL || mat2==ZMNULL )
+-	error(E_NULL,"zm_add");
+-    if ( mat1->m != mat2->m || mat1->n != mat2->n )
+-	error(E_SIZES,"zm_add");
+-    if ( out==ZMNULL || out->m != mat1->m || out->n != mat1->n )
+-	out = zm_resize(out,mat1->m,mat1->n);
+-    m = mat1->m;	n = mat1->n;
+-    for ( i=0; i<m; i++ )
+-    {
+-	__zadd__(mat1->me[i],mat2->me[i],out->me[i],(int)n);
+-	/**************************************************
+-	  for ( j=0; j<n; j++ )
+-	  out->me[i][j] = mat1->me[i][j]+mat2->me[i][j];
+-	  **************************************************/
+-    }
+-    
+-    return (out);
+-}
+-
+-/* zm_sub -- matrix subtraction -- may be in-situ */
+-ZMAT	*zm_sub(mat1,mat2,out)
+-ZMAT	*mat1,*mat2,*out;
+-{
+-    u_int	m,n,i;
+-    
+-    if ( mat1==ZMNULL || mat2==ZMNULL )
+-	error(E_NULL,"zm_sub");
+-    if ( mat1->m != mat2->m || mat1->n != mat2->n )
+-	error(E_SIZES,"zm_sub");
+-    if ( out==ZMNULL || out->m != mat1->m || out->n != mat1->n )
+-	out = zm_resize(out,mat1->m,mat1->n);
+-    m = mat1->m;	n = mat1->n;
+-    for ( i=0; i<m; i++ )
+-    {
+-	__zsub__(mat1->me[i],mat2->me[i],out->me[i],(int)n);
+-	/**************************************************
+-	  for ( j=0; j<n; j++ )
+-	  out->me[i][j] = mat1->me[i][j]-mat2->me[i][j];
+-	**************************************************/
+-    }
+-    
+-    return (out);
+-}
+-
+-/*
+-  Note: In the following routines, "adjoint" means complex conjugate
+-  transpose:
+-  A* = conjugate(A^T)
+-  */
+-
+-/* zm_mlt -- matrix-matrix multiplication */
+-ZMAT	*zm_mlt(A,B,OUT)
+-ZMAT	*A,*B,*OUT;
+-{
+-    u_int	i, /* j, */ k, m, n, p;
+-    complex	**A_v, **B_v /*, *B_row, *OUT_row, sum, tmp */;
+-    
+-    if ( A==ZMNULL || B==ZMNULL )
+-	error(E_NULL,"zm_mlt");
+-    if ( A->n != B->m )
+-	error(E_SIZES,"zm_mlt");
+-    if ( A == OUT || B == OUT )
+-	error(E_INSITU,"zm_mlt");
+-    m = A->m;	n = A->n;	p = B->n;
+-    A_v = A->me;		B_v = B->me;
+-    
+-    if ( OUT==ZMNULL || OUT->m != A->m || OUT->n != B->n )
+-	OUT = zm_resize(OUT,A->m,B->n);
+-    
+-    /****************************************************************
+-      for ( i=0; i<m; i++ )
+-      for  ( j=0; j<p; j++ )
+-      {
+-      sum = 0.0;
+-      for ( k=0; k<n; k++ )
+-      sum += A_v[i][k]*B_v[k][j];
+-      OUT->me[i][j] = sum;
+-      }
+-    ****************************************************************/
+-    zm_zero(OUT);
+-    for ( i=0; i<m; i++ )
+-	for ( k=0; k<n; k++ )
+-	{
+-	    if ( ! is_zero(A_v[i][k]) )
+-		__zmltadd__(OUT->me[i],B_v[k],A_v[i][k],(int)p,Z_NOCONJ);
+-	    /**************************************************
+-	      B_row = B_v[k];	OUT_row = OUT->me[i];
+-	      for ( j=0; j<p; j++ )
+-	      (*OUT_row++) += tmp*(*B_row++);
+-	    **************************************************/
+-	}
+-    
+-    return OUT;
+-}
+-
+-/* zmma_mlt -- matrix-matrix adjoint multiplication
+-   -- A.B* is returned, and stored in OUT */
+-ZMAT	*zmma_mlt(A,B,OUT)
+-ZMAT	*A, *B, *OUT;
+-{
+-    int	i, j, limit;
+-    /* complex	*A_row, *B_row, sum; */
+-    
+-    if ( ! A || ! B )
+-	error(E_NULL,"zmma_mlt");
+-    if ( A == OUT || B == OUT )
+-	error(E_INSITU,"zmma_mlt");
+-    if ( A->n != B->n )
+-	error(E_SIZES,"zmma_mlt");
+-    if ( ! OUT || OUT->m != A->m || OUT->n != B->m )
+-	OUT = zm_resize(OUT,A->m,B->m);
+-    
+-    limit = A->n;
+-    for ( i = 0; i < A->m; i++ )
+-	for ( j = 0; j < B->m; j++ )
+-	{
+-	    OUT->me[i][j] = __zip__(B->me[j],A->me[i],(int)limit,Z_CONJ);
+-	    /**************************************************
+-	      sum = 0.0;
+-	      A_row = A->me[i];
+-	      B_row = B->me[j];
+-	      for ( k = 0; k < limit; k++ )
+-	      sum += (*A_row++)*(*B_row++);
+-	      OUT->me[i][j] = sum;
+-	      **************************************************/
+-	}
+-    
+-    return OUT;
+-}
+-
+-/* zmam_mlt -- matrix adjoint-matrix multiplication
+-   -- A*.B is returned, result stored in OUT */
+-ZMAT	*zmam_mlt(A,B,OUT)
+-ZMAT	*A, *B, *OUT;
+-{
+-    int	i, k, limit;
+-    /* complex	*B_row, *OUT_row, multiplier; */
+-    complex	tmp;
+-    
+-    if ( ! A || ! B )
+-	error(E_NULL,"zmam_mlt");
+-    if ( A == OUT || B == OUT )
+-	error(E_INSITU,"zmam_mlt");
+-    if ( A->m != B->m )
+-	error(E_SIZES,"zmam_mlt");
+-    if ( ! OUT || OUT->m != A->n || OUT->n != B->n )
+-	OUT = zm_resize(OUT,A->n,B->n);
+-    
+-    limit = B->n;
+-    zm_zero(OUT);
+-    for ( k = 0; k < A->m; k++ )
+-	for ( i = 0; i < A->n; i++ )
+-	{
+-	    tmp.re =   A->me[k][i].re;
+-	    tmp.im = - A->me[k][i].im;
+-	    if ( ! is_zero(tmp) )
+-		__zmltadd__(OUT->me[i],B->me[k],tmp,(int)limit,Z_NOCONJ);
+-	}
+-    
+-    return OUT;
+-}
+-
+-/* zmv_mlt -- matrix-vector multiplication 
+-   -- Note: b is treated as a column vector */
+-ZVEC	*zmv_mlt(A,b,out)
+-ZMAT	*A;
+-ZVEC	*b,*out;
+-{
+-    u_int	i, m, n;
+-    complex	**A_v, *b_v /*, *A_row */;
+-    /* register complex	sum; */
+-    
+-    if ( A==ZMNULL || b==ZVNULL )
+-	error(E_NULL,"zmv_mlt");
+-    if ( A->n != b->dim )
+-	error(E_SIZES,"zmv_mlt");
+-    if ( b == out )
+-	error(E_INSITU,"zmv_mlt");
+-    if ( out == ZVNULL || out->dim != A->m )
+-	out = zv_resize(out,A->m);
+-    
+-    m = A->m;		n = A->n;
+-    A_v = A->me;		b_v = b->ve;
+-    for ( i=0; i<m; i++ )
+-    {
+-	/* for ( j=0; j<n; j++ )
+-	   sum += A_v[i][j]*b_v[j]; */
+-	out->ve[i] = __zip__(A_v[i],b_v,(int)n,Z_NOCONJ);
+-	/**************************************************
+-	  A_row = A_v[i];		b_v = b->ve;
+-	  for ( j=0; j<n; j++ )
+-	  sum += (*A_row++)*(*b_v++);
+-	  out->ve[i] = sum;
+-	**************************************************/
+-    }
+-    
+-    return out;
+-}
+-
+-/* zsm_mlt -- scalar-matrix multiply -- may be in-situ */
+-ZMAT	*zsm_mlt(scalar,matrix,out)
+-complex	scalar;
+-ZMAT	*matrix,*out;
+-{
+-    u_int	m,n,i;
+-    
+-    if ( matrix==ZMNULL )
+-	error(E_NULL,"zsm_mlt");
+-    if ( out==ZMNULL || out->m != matrix->m || out->n != matrix->n )
+-	out = zm_resize(out,matrix->m,matrix->n);
+-    m = matrix->m;	n = matrix->n;
+-    for ( i=0; i<m; i++ )
+-	__zmlt__(matrix->me[i],scalar,out->me[i],(int)n);
+-    /**************************************************
+-      for ( j=0; j<n; j++ )
+-      out->me[i][j] = scalar*matrix->me[i][j];
+-      **************************************************/
+-    return (out);
+-}
+-
+-/* zvm_mlt -- vector adjoint-matrix multiplication */
+-ZVEC	*zvm_mlt(A,b,out)
+-ZMAT	*A;
+-ZVEC	*b,*out;
+-{
+-    u_int	j,m,n;
+-    /* complex	sum,**A_v,*b_v; */
+-    
+-    if ( A==ZMNULL || b==ZVNULL )
+-	error(E_NULL,"zvm_mlt");
+-    if ( A->m != b->dim )
+-	error(E_SIZES,"zvm_mlt");
+-    if ( b == out )
+-	error(E_INSITU,"zvm_mlt");
+-    if ( out == ZVNULL || out->dim != A->n )
+-	out = zv_resize(out,A->n);
+-    
+-    m = A->m;		n = A->n;
+-    
+-    zv_zero(out);
+-    for ( j = 0; j < m; j++ )
+-	if ( b->ve[j].re != 0.0 || b->ve[j].im != 0.0  )
+-	    __zmltadd__(out->ve,A->me[j],b->ve[j],(int)n,Z_CONJ);
+-    /**************************************************
+-      A_v = A->me;		b_v = b->ve;
+-      for ( j=0; j<n; j++ )
+-      {
+-      sum = 0.0;
+-      for ( i=0; i<m; i++ )
+-      sum += b_v[i]*A_v[i][j];
+-      out->ve[j] = sum;
+-      }
+-      **************************************************/
+-    
+-    return out;
+-}
+-
+-/* zm_adjoint -- adjoint matrix */
+-ZMAT	*zm_adjoint(in,out)
+-ZMAT	*in, *out;
+-{
+-    int	i, j;
+-    int	in_situ;
+-    complex	tmp;
+-    
+-    if ( in == ZMNULL )
+-	error(E_NULL,"zm_adjoint");
+-    if ( in == out && in->n != in->m )
+-	error(E_INSITU2,"zm_adjoint");
+-    in_situ = ( in == out );
+-    if ( out == ZMNULL || out->m != in->n || out->n != in->m )
+-	out = zm_resize(out,in->n,in->m);
+-    
+-    if ( ! in_situ )
+-    {
+-	for ( i = 0; i < in->m; i++ )
+-	    for ( j = 0; j < in->n; j++ )
+-	    {
+-		out->me[j][i].re =   in->me[i][j].re;
+-		out->me[j][i].im = - in->me[i][j].im;
+-	    }
+-    }
+-    else
+-    {
+-	for ( i = 0 ; i < in->m; i++ )
+-	{
+-	    for ( j = 0; j < i; j++ )
+-	    {
+-		tmp.re = in->me[i][j].re;
+-		tmp.im = in->me[i][j].im;
+-		in->me[i][j].re =   in->me[j][i].re;
+-		in->me[i][j].im = - in->me[j][i].im;
+-		in->me[j][i].re =   tmp.re;
+-		in->me[j][i].im = - tmp.im;
+-	    }
+-	    in->me[i][i].im = - in->me[i][i].im;
+-	}
+-    }
+-    
+-    return out;
+-}
+-
+-/* zswap_rows -- swaps rows i and j of matrix A upto column lim */
+-ZMAT	*zswap_rows(A,i,j,lo,hi)
+-ZMAT	*A;
+-int	i, j, lo, hi;
+-{
+-    int	k;
+-    complex	**A_me, tmp;
+-    
+-    if ( ! A )
+-	error(E_NULL,"swap_rows");
+-    if ( i < 0 || j < 0 || i >= A->m || j >= A->m )
+-	error(E_SIZES,"swap_rows");
+-    lo = max(0,lo);
+-    hi = min(hi,A->n-1);
+-    A_me = A->me;
+-    
+-    for ( k = lo; k <= hi; k++ )
+-    {
+-	tmp = A_me[k][i];
+-	A_me[k][i] = A_me[k][j];
+-	A_me[k][j] = tmp;
+-    }
+-    return A;
+-}
+-
+-/* zswap_cols -- swap columns i and j of matrix A upto row lim */
+-ZMAT	*zswap_cols(A,i,j,lo,hi)
+-ZMAT	*A;
+-int	i, j, lo, hi;
+-{
+-    int	k;
+-    complex	**A_me, tmp;
+-    
+-    if ( ! A )
+-	error(E_NULL,"swap_cols");
+-    if ( i < 0 || j < 0 || i >= A->n || j >= A->n )
+-	error(E_SIZES,"swap_cols");
+-    lo = max(0,lo);
+-    hi = min(hi,A->m-1);
+-    A_me = A->me;
+-    
+-    for ( k = lo; k <= hi; k++ )
+-    {
+-	tmp = A_me[i][k];
+-	A_me[i][k] = A_me[j][k];
+-	A_me[j][k] = tmp;
+-    }
+-    return A;
+-}
+-
+-/* mz_mltadd -- matrix-scalar multiply and add
+-   -- may be in situ
+-   -- returns out == A1 + s*A2 */
+-ZMAT	*mz_mltadd(A1,A2,s,out)
+-ZMAT	*A1, *A2, *out;
+-complex	s;
+-{
+-    /* register complex	*A1_e, *A2_e, *out_e; */
+-    /* register int	j; */
+-    int	i, m, n;
+-    
+-    if ( ! A1 || ! A2 )
+-	error(E_NULL,"mz_mltadd");
+-    if ( A1->m != A2->m || A1->n != A2->n )
+-	error(E_SIZES,"mz_mltadd");
+-    
+-    if ( s.re == 0.0 && s.im == 0.0 )
+-	return zm_copy(A1,out);
+-    if ( s.re == 1.0 && s.im == 0.0 )
+-	return zm_add(A1,A2,out);
+-    
+-    tracecatch(out = zm_copy(A1,out),"mz_mltadd");
+-    
+-    m = A1->m;	n = A1->n;
+-    for ( i = 0; i < m; i++ )
+-    {
+-	__zmltadd__(out->me[i],A2->me[i],s,(int)n,Z_NOCONJ);
+-	/**************************************************
+-	  A1_e = A1->me[i];
+-	  A2_e = A2->me[i];
+-	  out_e = out->me[i];
+-	  for ( j = 0; j < n; j++ )
+-	  out_e[j] = A1_e[j] + s*A2_e[j];
+-	  **************************************************/
+-    }
+-    
+-    return out;
+-}
+-
+-/* zmv_mltadd -- matrix-vector multiply and add
+-   -- may not be in situ
+-   -- returns out == v1 + alpha*A*v2 */
+-ZVEC	*zmv_mltadd(v1,v2,A,alpha,out)
+-ZVEC	*v1, *v2, *out;
+-ZMAT	*A;
+-complex	alpha;
+-{
+-    /* register	int	j; */
+-    int	i, m, n;
+-    complex	tmp, *v2_ve, *out_ve;
+-    
+-    if ( ! v1 || ! v2 || ! A )
+-	error(E_NULL,"zmv_mltadd");
+-    if ( out == v2 )
+-	error(E_INSITU,"zmv_mltadd");
+-    if ( v1->dim != A->m || v2->dim != A-> n )
+-	error(E_SIZES,"zmv_mltadd");
+-    
+-    tracecatch(out = zv_copy(v1,out),"zmv_mltadd");
+-    
+-    v2_ve = v2->ve;	out_ve = out->ve;
+-    m = A->m;	n = A->n;
+-    
+-    if ( alpha.re == 0.0 && alpha.im == 0.0 )
+-	return out;
+-    
+-    for ( i = 0; i < m; i++ )
+-    {
+-	tmp = __zip__(A->me[i],v2_ve,(int)n,Z_NOCONJ);
+-	out_ve[i].re += alpha.re*tmp.re - alpha.im*tmp.im;
+-	out_ve[i].im += alpha.re*tmp.im + alpha.im*tmp.re;
+-	/**************************************************
+-	  A_e = A->me[i];
+-	  sum = 0.0;
+-	  for ( j = 0; j < n; j++ )
+-	  sum += A_e[j]*v2_ve[j];
+-	  out_ve[i] = v1->ve[i] + alpha*sum;
+-	  **************************************************/
+-    }
+-    
+-    return out;
+-}
+-
+-/* zvm_mltadd -- vector-matrix multiply and add a la zvm_mlt()
+-   -- may not be in situ
+-   -- returns out == v1 + v2*.A */
+-ZVEC	*zvm_mltadd(v1,v2,A,alpha,out)
+-ZVEC	*v1, *v2, *out;
+-ZMAT	*A;
+-complex	alpha;
+-{
+-    int	/* i, */ j, m, n;
+-    complex	tmp, /* *A_e, */ *out_ve;
+-    
+-    if ( ! v1 || ! v2 || ! A )
+-	error(E_NULL,"zvm_mltadd");
+-    if ( v2 == out )
+-	error(E_INSITU,"zvm_mltadd");
+-    if ( v1->dim != A->n || A->m != v2->dim )
+-	error(E_SIZES,"zvm_mltadd");
+-    
+-    tracecatch(out = zv_copy(v1,out),"zvm_mltadd");
+-    
+-    out_ve = out->ve;	m = A->m;	n = A->n;
+-    for ( j = 0; j < m; j++ )
+-    {
+-	/* tmp = zmlt(v2->ve[j],alpha); */
+-	tmp.re =   v2->ve[j].re*alpha.re - v2->ve[j].im*alpha.im;
+-	tmp.im =   v2->ve[j].re*alpha.im + v2->ve[j].im*alpha.re;
+-	if ( tmp.re != 0.0 || tmp.im != 0.0 )
+-	    __zmltadd__(out_ve,A->me[j],tmp,(int)n,Z_CONJ);
+-	/**************************************************
+-	  A_e = A->me[j];
+-	  for ( i = 0; i < n; i++ )
+-	  out_ve[i] += A_e[i]*tmp;
+-	**************************************************/
+-    }
+-    
+-    return out;
+-}
+-
+-/* zget_col -- gets a specified column of a matrix; returned as a vector */
+-ZVEC	*zget_col(mat,col,vec)
+-int	col;
+-ZMAT	*mat;
+-ZVEC	*vec;
+-{
+-	u_int	i;
+-
+-	if ( mat==ZMNULL )
+-		error(E_NULL,"zget_col");
+-	if ( col < 0 || col >= mat->n )
+-		error(E_RANGE,"zget_col");
+-	if ( vec==ZVNULL || vec->dim<mat->m )
+-		vec = zv_resize(vec,mat->m);
+-
+-	for ( i=0; i<mat->m; i++ )
+-	    vec->ve[i] = mat->me[i][col];
+-
+-	return (vec);
+-}
+-
+-/* zget_row -- gets a specified row of a matrix and retruns it as a vector */
+-ZVEC	*zget_row(mat,row,vec)
+-int	row;
+-ZMAT	*mat;
+-ZVEC	*vec;
+-{
+-	int	/* i, */ lim;
+-
+-	if ( mat==ZMNULL )
+-		error(E_NULL,"zget_row");
+-	if ( row < 0 || row >= mat->m )
+-		error(E_RANGE,"zget_row");
+-	if ( vec==ZVNULL || vec->dim<mat->n )
+-		vec = zv_resize(vec,mat->n);
+-
+-	lim = min(mat->n,vec->dim);
+-
+-	/* for ( i=0; i<mat->n; i++ ) */
+-	/*     vec->ve[i] = mat->me[row][i]; */
+-	MEMCOPY(mat->me[row],vec->ve,lim,complex);
+-
+-	return (vec);
+-}
+-
+-/* zset_col -- sets column of matrix to values given in vec (in situ) */
+-ZMAT	*zset_col(mat,col,vec)
+-ZMAT	*mat;
+-ZVEC	*vec;
+-int	col;
+-{
+-	u_int	i,lim;
+-
+-	if ( mat==ZMNULL || vec==ZVNULL )
+-		error(E_NULL,"zset_col");
+-	if ( col < 0 || col >= mat->n )
+-		error(E_RANGE,"zset_col");
+-	lim = min(mat->m,vec->dim);
+-	for ( i=0; i<lim; i++ )
+-	    mat->me[i][col] = vec->ve[i];
+-
+-	return (mat);
+-}
+-
+-/* zset_row -- sets row of matrix to values given in vec (in situ) */
+-ZMAT	*zset_row(mat,row,vec)
+-ZMAT	*mat;
+-ZVEC	*vec;
+-int	row;
+-{
+-	u_int	/* j, */ lim;
+-
+-	if ( mat==ZMNULL || vec==ZVNULL )
+-		error(E_NULL,"zset_row");
+-	if ( row < 0 || row >= mat->m )
+-		error(E_RANGE,"zset_row");
+-	lim = min(mat->n,vec->dim);
+-	/* for ( j=j0; j<lim; j++ ) */
+-	/*     mat->me[row][j] = vec->ve[j]; */
+-	MEMCOPY(vec->ve,mat->me[row],lim,complex);
+-
+-	return (mat);
+-}
+-
+-/* zm_rand -- randomise a complex matrix; uniform in [0,1)+[0,1)*i */
+-ZMAT	*zm_rand(A)
+-ZMAT	*A;
+-{
+-    int		i;
+-
+-    if ( ! A )
+-	error(E_NULL,"zm_rand");
+-
+-    for ( i = 0; i < A->m; i++ )
+-	mrandlist((Real *)(A->me[i]),2*A->n);
+-
+-    return A;
+-}
+//GO.SYSIN DD zmatop.c
+echo znorm.c 1>&2
+sed >znorm.c <<'//GO.SYSIN DD znorm.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-	A collection of functions for computing norms: scaled and unscaled
+-	Complex version
+-*/
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-#include	<stdio.h>
+-#include	"zmatrix.h"
+-#include	<math.h>
+-
+-
+-
+-/* _zv_norm1 -- computes (scaled) 1-norms of vectors */
+-double	_zv_norm1(x,scale)
+-ZVEC	*x;
+-VEC	*scale;
+-{
+-    int	i, dim;
+-    Real	s, sum;
+-    
+-    if ( x == ZVNULL )
+-	error(E_NULL,"_zv_norm1");
+-    dim = x->dim;
+-    
+-    sum = 0.0;
+-    if ( scale == VNULL )
+-	for ( i = 0; i < dim; i++ )
+-	    sum += zabs(x->ve[i]);
+-    else if ( scale->dim < dim )
+-	error(E_SIZES,"_zv_norm1");
+-    else
+-	for ( i = 0; i < dim; i++ )
+-	{
+-	    s = scale->ve[i];
+-	    sum += ( s== 0.0 ) ? zabs(x->ve[i]) : zabs(x->ve[i])/fabs(s);
+-	}
+-    
+-    return sum;
+-}
+-
+-/* square -- returns x^2 */
+-/******************************
+-double	square(x)
+-double	x;
+-{	return x*x;	}
+-******************************/
+-
+-#define	square(x)	((x)*(x))
+-
+-/* _zv_norm2 -- computes (scaled) 2-norm (Euclidean norm) of vectors */
+-double	_zv_norm2(x,scale)
+-ZVEC	*x;
+-VEC	*scale;
+-{
+-    int	i, dim;
+-    Real	s, sum;
+-    
+-    if ( x == ZVNULL )
+-	error(E_NULL,"_zv_norm2");
+-    dim = x->dim;
+-    
+-    sum = 0.0;
+-    if ( scale == VNULL )
+-	for ( i = 0; i < dim; i++ )
+-	    sum += square(x->ve[i].re) + square(x->ve[i].im);
+-    else if ( scale->dim < dim )
+-	error(E_SIZES,"_v_norm2");
+-    else
+-	for ( i = 0; i < dim; i++ )
+-	{
+-	    s = scale->ve[i];
+-	    sum += ( s== 0.0 ) ? square(x->ve[i].re) + square(x->ve[i].im) :
+-		(square(x->ve[i].re) + square(x->ve[i].im))/square(s);
+-	}
+-    
+-    return sqrt(sum);
+-}
+-
+-#define	max(a,b)	((a) > (b) ? (a) : (b))
+-
+-/* _zv_norm_inf -- computes (scaled) infinity-norm (supremum norm) of vectors */
+-double	_zv_norm_inf(x,scale)
+-ZVEC	*x;
+-VEC	*scale;
+-{
+-    int	i, dim;
+-    Real	s, maxval, tmp;
+-    
+-    if ( x == ZVNULL )
+-	error(E_NULL,"_zv_norm_inf");
+-    dim = x->dim;
+-    
+-    maxval = 0.0;
+-    if ( scale == VNULL )
+-	for ( i = 0; i < dim; i++ )
+-	{
+-	    tmp = zabs(x->ve[i]);
+-	    maxval = max(maxval,tmp);
+-	}
+-    else if ( scale->dim < dim )
+-	error(E_SIZES,"_zv_norm_inf");
+-    else
+-	for ( i = 0; i < dim; i++ )
+-	{
+-	    s = scale->ve[i];
+-	    tmp = ( s == 0.0 ) ? zabs(x->ve[i]) : zabs(x->ve[i])/fabs(s);
+-	    maxval = max(maxval,tmp);
+-	}
+-    
+-    return maxval;
+-}
+-
+-/* zm_norm1 -- compute matrix 1-norm -- unscaled
+-	-- complex version */
+-double	zm_norm1(A)
+-ZMAT	*A;
+-{
+-    int	i, j, m, n;
+-    Real	maxval, sum;
+-    
+-    if ( A == ZMNULL )
+-	error(E_NULL,"zm_norm1");
+-
+-    m = A->m;	n = A->n;
+-    maxval = 0.0;
+-    
+-    for ( j = 0; j < n; j++ )
+-    {
+-	sum = 0.0;
+-	for ( i = 0; i < m; i ++ )
+-	    sum += zabs(A->me[i][j]);
+-	maxval = max(maxval,sum);
+-    }
+-    
+-    return maxval;
+-}
+-
+-/* zm_norm_inf -- compute matrix infinity-norm -- unscaled
+-	-- complex version */
+-double	zm_norm_inf(A)
+-ZMAT	*A;
+-{
+-    int	i, j, m, n;
+-    Real	maxval, sum;
+-    
+-    if ( A == ZMNULL )
+-	error(E_NULL,"zm_norm_inf");
+-    
+-    m = A->m;	n = A->n;
+-    maxval = 0.0;
+-    
+-    for ( i = 0; i < m; i++ )
+-    {
+-	sum = 0.0;
+-	for ( j = 0; j < n; j ++ )
+-	    sum += zabs(A->me[i][j]);
+-	maxval = max(maxval,sum);
+-    }
+-    
+-    return maxval;
+-}
+-
+-/* zm_norm_frob -- compute matrix frobenius-norm -- unscaled */
+-double	zm_norm_frob(A)
+-ZMAT	*A;
+-{
+-    int	i, j, m, n;
+-    Real	sum;
+-    
+-    if ( A == ZMNULL )
+-	error(E_NULL,"zm_norm_frob");
+-    
+-    m = A->m;	n = A->n;
+-    sum = 0.0;
+-    
+-    for ( i = 0; i < m; i++ )
+-	for ( j = 0; j < n; j ++ )
+-	    sum += square(A->me[i][j].re) + square(A->me[i][j].im);
+-    
+-    return sqrt(sum);
+-}
+-
+//GO.SYSIN DD znorm.c
+echo zfunc.c 1>&2
+sed >zfunc.c <<'//GO.SYSIN DD zfunc.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-/*
+-	Elementary functions for complex numbers
+-	-- if not already defined
+-*/
+-
+-#include	"zmatrix.h"
+-#include	<math.h>
+-
+-static char rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-#ifndef COMPLEX_H
+-
+-#ifndef zmake
+-/* zmake -- create complex number real + i*imag */
+-complex	zmake(real,imag)
+-double	real, imag;
+-{
+-    complex	w;	/* == real + i*imag */
+-
+-    w.re = real;	w.im = imag;
+-    return w;
+-}
+-#endif
+-
+-#ifndef zneg
+-/* zneg -- returns negative of z */
+-complex	zneg(z)
+-complex	z;
+-{
+-    z.re = - z.re;
+-    z.im = - z.im;
+-
+-    return z;
+-}
+-#endif
+-
+-#ifndef zabs
+-/* zabs -- returns |z| */
+-double	zabs(z)
+-complex	z;
+-{
+-    Real	x, y, tmp;
+-    int		x_expt, y_expt;
+-
+-    /* Note: we must ensure that overflow does not occur! */
+-    x = ( z.re >= 0.0 ) ? z.re : -z.re;
+-    y = ( z.im >= 0.0 ) ? z.im : -z.im;
+-    if ( x < y )
+-    {
+-	tmp = x;
+-	x = y;
+-	y = tmp;
+-    }
+-    if ( x == 0.0 ) /* then y == 0.0 as well */
+-	return 0.0;
+-    x = frexp(x,&x_expt);
+-    y = frexp(y,&y_expt);
+-    y = ldexp(y,y_expt-x_expt);
+-    tmp = sqrt(x*x+y*y);
+-
+-    return ldexp(tmp,x_expt);
+-}
+-#endif
+-
+-#ifndef zadd
+-/* zadd -- returns z1+z2 */
+-complex zadd(z1,z2)
+-complex	z1, z2;
+-{
+-    complex z;
+-
+-    z.re = z1.re + z2.re;
+-    z.im = z1.im + z2.im;
+-
+-    return z;
+-}
+-#endif
+-
+-#ifndef zsub
+-/* zsub -- returns z1-z2 */
+-complex zsub(z1,z2)
+-complex	z1, z2;
+-{
+-    complex z;
+-
+-    z.re = z1.re - z2.re;
+-    z.im = z1.im - z2.im;
+-
+-    return z;
+-}
+-#endif
+-
+-#ifndef zmlt
+-/* zmlt -- returns z1*z2 */
+-complex	zmlt(z1,z2)
+-complex	z1, z2;
+-{
+-    complex z;
+-
+-    z.re = z1.re * z2.re - z1.im * z2.im;
+-    z.im = z1.re * z2.im + z1.im * z2.re;
+-
+-    return z;
+-}
+-#endif
+-
+-#ifndef zinv
+-/* zmlt -- returns 1/z */
+-complex	zinv(z)
+-complex	z;
+-{
+-    Real	x, y, tmp;
+-    int		x_expt, y_expt;
+-
+-    if ( z.re == 0.0 && z.im == 0.0 )
+-	error(E_SING,"zinv");
+-    /* Note: we must ensure that overflow does not occur! */
+-    x = ( z.re >= 0.0 ) ? z.re : -z.re;
+-    y = ( z.im >= 0.0 ) ? z.im : -z.im;
+-    if ( x < y )
+-    {
+-	tmp = x;
+-	x = y;
+-	y = tmp;
+-    }
+-    x = frexp(x,&x_expt);
+-    y = frexp(y,&y_expt);
+-    y = ldexp(y,y_expt-x_expt);
+-
+-    tmp = 1.0/(x*x + y*y);
+-    z.re =  z.re*tmp*ldexp(1.0,-2*x_expt);
+-    z.im = -z.im*tmp*ldexp(1.0,-2*x_expt);
+-
+-    return z;
+-}
+-#endif
+-
+-#ifndef zdiv
+-/* zdiv -- returns z1/z2 */
+-complex	zdiv(z1,z2)
+-complex	z1, z2;
+-{
+-    return zmlt(z1,zinv(z2));
+-}
+-#endif
+-
+-#ifndef zsqrt
+-/* zsqrt -- returns sqrt(z); uses branch with Re sqrt(z) >= 0 */
+-complex	zsqrt(z)
+-complex	z;
+-{
+-    complex	w;	/* == sqrt(z) at end */
+-    Real	alpha;
+-
+-    alpha = sqrt(0.5*(fabs(z.re) + zabs(z)));
+-    if ( z.re >= 0.0 )
+-    {
+-	w.re = alpha;
+-	w.im = z.im / (2.0*alpha);
+-    }
+-    else
+-    {
+-	w.re = fabs(z.im)/(2.0*alpha);
+-	w.im = ( z.im >= 0 ) ? alpha : - alpha;
+-    }
+-
+-    return w;
+-}
+-#endif
+-
+-#ifndef	zexp
+-/* zexp -- returns exp(z) */
+-complex	zexp(z)
+-complex	z;
+-{
+-    complex	w;	/* == exp(z) at end */
+-    Real	r;
+-
+-    r = exp(z.re);
+-    w.re = r*cos(z.im);
+-    w.im = r*sin(z.im);
+-
+-    return w;
+-}
+-#endif
+-
+-#ifndef	zlog
+-/* zlog -- returns log(z); uses principal branch with -pi <= Im log(z) <= pi */
+-complex	zlog(z)
+-complex	z;
+-{
+-    complex	w;	/* == log(z) at end */
+-
+-    w.re = log(zabs(z));
+-    w.im = atan2(z.im,z.re);
+-
+-    return w;
+-}
+-#endif
+-
+-#ifndef zconj
+-complex	zconj(z)
+-complex	z;
+-{
+-    complex	w;	/* == conj(z) */
+-
+-    w.re =   z.re;
+-    w.im = - z.im;
+-    return w;
+-}
+-#endif
+-
+-#endif
+//GO.SYSIN DD zfunc.c
+echo zlufctr.c 1>&2
+sed >zlufctr.c <<'//GO.SYSIN DD zlufctr.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-/*
+-	Matrix factorisation routines to work with the other matrix files.
+-	Complex version
+-*/
+-
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-#include	<stdio.h>
+-#include	"zmatrix.h"
+-#include        "zmatrix2.h"
+-#include	<math.h>
+-
+-#define	is_zero(z)	((z).re == 0.0 && (z).im == 0.0)
+-
+-
+-/* Most matrix factorisation routines are in-situ unless otherwise specified */
+-
+-/* zLUfactor -- Gaussian elimination with scaled partial pivoting
+-		-- Note: returns LU matrix which is A */
+-ZMAT	*zLUfactor(A,pivot)
+-ZMAT	*A;
+-PERM	*pivot;
+-{
+-	u_int	i, j, k, k_max, m, n;
+-	int	i_max;
+-	Real	dtemp, max1;
+-	complex	**A_v, *A_piv, *A_row, temp;
+-	static	VEC	*scale = VNULL;
+-
+-	if ( A==ZMNULL || pivot==PNULL )
+-		error(E_NULL,"zLUfactor");
+-	if ( pivot->size != A->m )
+-		error(E_SIZES,"zLUfactor");
+-	m = A->m;	n = A->n;
+-	scale = v_resize(scale,A->m);
+-	MEM_STAT_REG(scale,TYPE_VEC);
+-	A_v = A->me;
+-
+-	/* initialise pivot with identity permutation */
+-	for ( i=0; i<m; i++ )
+-	    pivot->pe[i] = i;
+-
+-	/* set scale parameters */
+-	for ( i=0; i<m; i++ )
+-	{
+-		max1 = 0.0;
+-		for ( j=0; j<n; j++ )
+-		{
+-			dtemp = zabs(A_v[i][j]);
+-			max1 = max(max1,dtemp);
+-		}
+-		scale->ve[i] = max1;
+-	}
+-
+-	/* main loop */
+-	k_max = min(m,n)-1;
+-	for ( k=0; k<k_max; k++ )
+-	{
+-	    /* find best pivot row */
+-	    max1 = 0.0;	i_max = -1;
+-	    for ( i=k; i<m; i++ )
+-		if ( scale->ve[i] > 0.0 )
+-		{
+-		    dtemp = zabs(A_v[i][k])/scale->ve[i];
+-		    if ( dtemp > max1 )
+-		    { max1 = dtemp;	i_max = i;	}
+-		}
+-	    
+-	    /* if no pivot then ignore column k... */
+-	    if ( i_max == -1 )
+-		continue;
+-
+-	    /* do we pivot ? */
+-	    if ( i_max != k )	/* yes we do... */
+-	    {
+-		px_transp(pivot,i_max,k);
+-		for ( j=0; j<n; j++ )
+-		{
+-		    temp = A_v[i_max][j];
+-		    A_v[i_max][j] = A_v[k][j];
+-		    A_v[k][j] = temp;
+-		}
+-	    }
+-	    
+-	    /* row operations */
+-	    for ( i=k+1; i<m; i++ )	/* for each row do... */
+-	    {	/* Note: divide by zero should never happen */
+-		temp = A_v[i][k] = zdiv(A_v[i][k],A_v[k][k]);
+-		A_piv = &(A_v[k][k+1]);
+-		A_row = &(A_v[i][k+1]);
+-		temp.re = - temp.re;
+-		temp.im = - temp.im;
+-		if ( k+1 < n )
+-		    __zmltadd__(A_row,A_piv,temp,(int)(n-(k+1)),Z_NOCONJ);
+-		/*********************************************
+-		  for ( j=k+1; j<n; j++ )
+-		  A_v[i][j] -= temp*A_v[k][j];
+-		  (*A_row++) -= temp*(*A_piv++);
+-		*********************************************/
+-	    }
+-	}
+-
+-	return A;
+-}
+-
+-
+-/* zLUsolve -- given an LU factorisation in A, solve Ax=b */
+-ZVEC	*zLUsolve(A,pivot,b,x)
+-ZMAT	*A;
+-PERM	*pivot;
+-ZVEC	*b,*x;
+-{
+-	if ( A==ZMNULL || b==ZVNULL || pivot==PNULL )
+-		error(E_NULL,"zLUsolve");
+-	if ( A->m != A->n || A->n != b->dim )
+-		error(E_SIZES,"zLUsolve");
+-
+-	x = px_zvec(pivot,b,x);	/* x := P.b */
+-	zLsolve(A,x,x,1.0);	/* implicit diagonal = 1 */
+-	zUsolve(A,x,x,0.0);	/* explicit diagonal */
+-
+-	return (x);
+-}
+-
+-/* zLUAsolve -- given an LU factorisation in A, solve A^*.x=b */
+-ZVEC	*zLUAsolve(LU,pivot,b,x)
+-ZMAT	*LU;
+-PERM	*pivot;
+-ZVEC	*b,*x;
+-{
+-	if ( ! LU || ! b || ! pivot )
+-		error(E_NULL,"zLUAsolve");
+-	if ( LU->m != LU->n || LU->n != b->dim )
+-		error(E_SIZES,"zLUAsolve");
+-
+-	x = zv_copy(b,x);
+-	zUAsolve(LU,x,x,0.0);	/* explicit diagonal */
+-	zLAsolve(LU,x,x,1.0);	/* implicit diagonal = 1 */
+-	pxinv_zvec(pivot,x,x);	/* x := P^*.x */
+-
+-	return (x);
+-}
+-
+-/* zm_inverse -- returns inverse of A, provided A is not too rank deficient
+-	-- uses LU factorisation */
+-ZMAT	*zm_inverse(A,out)
+-ZMAT	*A, *out;
+-{
+-	int	i;
+-	ZVEC	*tmp, *tmp2;
+-	ZMAT	*A_cp;
+-	PERM	*pivot;
+-
+-	if ( ! A )
+-	    error(E_NULL,"zm_inverse");
+-	if ( A->m != A->n )
+-	    error(E_SQUARE,"zm_inverse");
+-	if ( ! out || out->m < A->m || out->n < A->n )
+-	    out = zm_resize(out,A->m,A->n);
+-
+-	A_cp = zm_copy(A,ZMNULL);
+-	tmp = zv_get(A->m);
+-	tmp2 = zv_get(A->m);
+-	pivot = px_get(A->m);
+-	tracecatch(zLUfactor(A_cp,pivot),"zm_inverse");
+-	for ( i = 0; i < A->n; i++ )
+-	{
+-	    zv_zero(tmp);
+-	    tmp->ve[i].re = 1.0;
+-	    tmp->ve[i].im = 0.0;
+-	    tracecatch(zLUsolve(A_cp,pivot,tmp,tmp2),"m_inverse");
+-	    zset_col(out,i,tmp2);
+-	}
+-
+-	ZM_FREE(A_cp);
+-	ZV_FREE(tmp);	ZV_FREE(tmp2);
+-	PX_FREE(pivot);
+-
+-	return out;
+-}
+-
+-/* zLUcondest -- returns an estimate of the condition number of LU given the
+-	LU factorisation in compact form */
+-double	zLUcondest(LU,pivot)
+-ZMAT	*LU;
+-PERM	*pivot;
+-{
+-    static	ZVEC	*y = ZVNULL, *z = ZVNULL;
+-    Real	cond_est, L_norm, U_norm, norm, sn_inv;
+-    complex	sum;
+-    int		i, j, n;
+-
+-    if ( ! LU || ! pivot )
+-	error(E_NULL,"zLUcondest");
+-    if ( LU->m != LU->n )
+-	error(E_SQUARE,"zLUcondest");
+-    if ( LU->n != pivot->size )
+-	error(E_SIZES,"zLUcondest");
+-
+-    n = LU->n;
+-    y = zv_resize(y,n);
+-    z = zv_resize(z,n);
+-    MEM_STAT_REG(y,TYPE_ZVEC);
+-    MEM_STAT_REG(z,TYPE_ZVEC);
+-
+-    cond_est = 0.0;		/* should never be returned */
+-
+-    for ( i = 0; i < n; i++ )
+-    {
+-	sum.re = 1.0;
+-	sum.im = 0.0;
+-	for ( j = 0; j < i; j++ )
+-	    /* sum -= LU->me[j][i]*y->ve[j]; */
+-	    sum = zsub(sum,zmlt(LU->me[j][i],y->ve[j]));
+-	/* sum -= (sum < 0.0) ? 1.0 : -1.0; */
+-	sn_inv = 1.0 / zabs(sum);
+-	sum.re += sum.re * sn_inv;
+-	sum.im += sum.im * sn_inv;
+-	if ( is_zero(LU->me[i][i]) )
+-	    return HUGE;
+-	/* y->ve[i] = sum / LU->me[i][i]; */
+-	y->ve[i] = zdiv(sum,LU->me[i][i]);
+-    }
+-
+-    zLAsolve(LU,y,y,1.0);
+-    zLUsolve(LU,pivot,y,z);
+-
+-    /* now estimate norm of A (even though it is not directly available) */
+-    /* actually computes ||L||_inf.||U||_inf */
+-    U_norm = 0.0;
+-    for ( i = 0; i < n; i++ )
+-    {
+-	norm = 0.0;
+-	for ( j = i; j < n; j++ )
+-	    norm += zabs(LU->me[i][j]);
+-	if ( norm > U_norm )
+-	    U_norm = norm;
+-    }
+-    L_norm = 0.0;
+-    for ( i = 0; i < n; i++ )
+-    {
+-	norm = 1.0;
+-	for ( j = 0; j < i; j++ )
+-	    norm += zabs(LU->me[i][j]);
+-	if ( norm > L_norm )
+-	    L_norm = norm;
+-    }
+-
+-    tracecatch(cond_est = U_norm*L_norm*zv_norm_inf(z)/zv_norm_inf(y),
+-	       "LUcondest");
+-
+-    return cond_est;
+-}
+//GO.SYSIN DD zlufctr.c
+echo zsolve.c 1>&2
+sed >zsolve.c <<'//GO.SYSIN DD zsolve.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-	Matrix factorisation routines to work with the other matrix files.
+-	Complex case
+-*/
+-
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-#include	<stdio.h>
+-#include        "zmatrix2.h"
+-#include	<math.h>
+-
+-
+-#define	is_zero(z)	((z).re == 0.0 && (z).im == 0.0 )
+-
+-/* Most matrix factorisation routines are in-situ unless otherwise specified */
+-
+-/* zUsolve -- back substitution with optional over-riding diagonal
+-		-- can be in-situ but doesn't need to be */
+-ZVEC	*zUsolve(matrix,b,out,diag)
+-ZMAT	*matrix;
+-ZVEC	*b, *out;
+-double	diag;
+-{
+-    u_int	dim /* , j */;
+-    int	i, i_lim;
+-    complex	**mat_ent, *mat_row, *b_ent, *out_ent, *out_col, sum;
+-    
+-    if ( matrix==ZMNULL || b==ZVNULL )
+-	error(E_NULL,"zUsolve");
+-    dim = min(matrix->m,matrix->n);
+-    if ( b->dim < dim )
+-	error(E_SIZES,"zUsolve");
+-    if ( out==ZVNULL || out->dim < dim )
+-	out = zv_resize(out,matrix->n);
+-    mat_ent = matrix->me;	b_ent = b->ve;	out_ent = out->ve;
+-    
+-    for ( i=dim-1; i>=0; i-- )
+-	if ( ! is_zero(b_ent[i]) )
+-	    break;
+-	else
+-	    out_ent[i].re = out_ent[i].im = 0.0;
+-    i_lim = i;
+-    
+-    for ( i = i_lim; i>=0; i-- )
+-    {
+-	sum = b_ent[i];
+-	mat_row = &(mat_ent[i][i+1]);
+-	out_col = &(out_ent[i+1]);
+-	sum = zsub(sum,__zip__(mat_row,out_col,i_lim-i,Z_NOCONJ));
+-	/******************************************************
+-	  for ( j=i+1; j<=i_lim; j++ )
+-	  sum -= mat_ent[i][j]*out_ent[j];
+-	  sum -= (*mat_row++)*(*out_col++);
+-	******************************************************/
+-	if ( diag == 0.0 )
+-	{
+-	    if ( is_zero(mat_ent[i][i]) )
+-		error(E_SING,"zUsolve");
+-	    else
+-		/* out_ent[i] = sum/mat_ent[i][i]; */
+-		out_ent[i] = zdiv(sum,mat_ent[i][i]);
+-	}
+-	else
+-	{
+-	    /* out_ent[i] = sum/diag; */
+-	    out_ent[i].re = sum.re / diag;
+-	    out_ent[i].im = sum.im / diag;
+-	}
+-    }
+-    
+-    return (out);
+-}
+-
+-/* zLsolve -- forward elimination with (optional) default diagonal value */
+-ZVEC	*zLsolve(matrix,b,out,diag)
+-ZMAT	*matrix;
+-ZVEC	*b,*out;
+-double	diag;
+-{
+-    u_int	dim, i, i_lim /* , j */;
+-    complex	**mat_ent, *mat_row, *b_ent, *out_ent, *out_col, sum;
+-    
+-    if ( matrix==ZMNULL || b==ZVNULL )
+-	error(E_NULL,"zLsolve");
+-    dim = min(matrix->m,matrix->n);
+-    if ( b->dim < dim )
+-	error(E_SIZES,"zLsolve");
+-    if ( out==ZVNULL || out->dim < dim )
+-	out = zv_resize(out,matrix->n);
+-    mat_ent = matrix->me;	b_ent = b->ve;	out_ent = out->ve;
+-    
+-    for ( i=0; i<dim; i++ )
+-	if ( ! is_zero(b_ent[i]) )
+-	    break;
+-	else
+-	    out_ent[i].re = out_ent[i].im = 0.0;
+-    i_lim = i;
+-    
+-    for ( i = i_lim; i<dim; i++ )
+-    {
+-	sum = b_ent[i];
+-	mat_row = &(mat_ent[i][i_lim]);
+-	out_col = &(out_ent[i_lim]);
+-	sum = zsub(sum,__zip__(mat_row,out_col,(int)(i-i_lim),Z_NOCONJ));
+-	/*****************************************************
+-	  for ( j=i_lim; j<i; j++ )
+-	  sum -= mat_ent[i][j]*out_ent[j];
+-	  sum -= (*mat_row++)*(*out_col++);
+-	******************************************************/
+-	if ( diag == 0.0 )
+-	{
+-	    if ( is_zero(mat_ent[i][i]) )
+-		error(E_SING,"zLsolve");
+-	    else
+-		out_ent[i] = zdiv(sum,mat_ent[i][i]);
+-	}
+-	else
+-	{
+-	    out_ent[i].re = sum.re / diag;
+-	    out_ent[i].im = sum.im / diag;
+-	}
+-    }
+-    
+-    return (out);
+-}
+-
+-
+-/* zUAsolve -- forward elimination with (optional) default diagonal value
+-		using UPPER triangular part of matrix */
+-ZVEC	*zUAsolve(U,b,out,diag)
+-ZMAT	*U;
+-ZVEC	*b,*out;
+-double	diag;
+-{
+-    u_int	dim, i, i_lim /* , j */;
+-    complex	**U_me, *b_ve, *out_ve, tmp;
+-    Real	invdiag;
+-    
+-    if ( ! U || ! b )
+-	error(E_NULL,"zUAsolve");
+-    dim = min(U->m,U->n);
+-    if ( b->dim < dim )
+-	error(E_SIZES,"zUAsolve");
+-    out = zv_resize(out,U->n);
+-    U_me = U->me;	b_ve = b->ve;	out_ve = out->ve;
+-    
+-    for ( i=0; i<dim; i++ )
+-	if ( ! is_zero(b_ve[i]) )
+-	    break;
+-	else
+-	    out_ve[i].re = out_ve[i].im = 0.0;
+-    i_lim = i;
+-    if ( b != out )
+-    {
+-	__zzero__(out_ve,out->dim);
+-	/* MEM_COPY(&(b_ve[i_lim]),&(out_ve[i_lim]),
+-	   (dim-i_lim)*sizeof(complex)); */
+-	MEMCOPY(&(b_ve[i_lim]),&(out_ve[i_lim]),dim-i_lim,complex);
+-    }
+-
+-    if ( diag == 0.0 )
+-    {
+-	for (    ; i<dim; i++ )
+-	{
+-	    tmp = zconj(U_me[i][i]);
+-	    if ( is_zero(tmp) )
+-		error(E_SING,"zUAsolve");
+-	    /* out_ve[i] /= tmp; */
+-	    out_ve[i] = zdiv(out_ve[i],tmp);
+-	    tmp.re = - out_ve[i].re;
+-	    tmp.im = - out_ve[i].im;
+-	    __zmltadd__(&(out_ve[i+1]),&(U_me[i][i+1]),tmp,dim-i-1,Z_CONJ);
+-	}
+-    }
+-    else
+-    {
+-	invdiag = 1.0/diag;
+-	for (    ; i<dim; i++ )
+-	{
+-	    out_ve[i].re *= invdiag;
+-	    out_ve[i].im *= invdiag;
+-	    tmp.re = - out_ve[i].re;
+-	    tmp.im = - out_ve[i].im;
+-	    __zmltadd__(&(out_ve[i+1]),&(U_me[i][i+1]),tmp,dim-i-1,Z_CONJ);
+-	}
+-    }
+-    return (out);
+-}
+-
+-/* zDsolve -- solves Dx=b where D is the diagonal of A -- may be in-situ */
+-ZVEC	*zDsolve(A,b,x)
+-ZMAT	*A;
+-ZVEC	*b,*x;
+-{
+-    u_int	dim, i;
+-    
+-    if ( ! A || ! b )
+-	error(E_NULL,"zDsolve");
+-    dim = min(A->m,A->n);
+-    if ( b->dim < dim )
+-	error(E_SIZES,"zDsolve");
+-    x = zv_resize(x,A->n);
+-    
+-    dim = b->dim;
+-    for ( i=0; i<dim; i++ )
+-	if ( is_zero(A->me[i][i]) )
+-	    error(E_SING,"zDsolve");
+-	else
+-	    x->ve[i] = zdiv(b->ve[i],A->me[i][i]);
+-    
+-    return (x);
+-}
+-
+-/* zLAsolve -- back substitution with optional over-riding diagonal
+-		using the LOWER triangular part of matrix
+-		-- can be in-situ but doesn't need to be */
+-ZVEC	*zLAsolve(L,b,out,diag)
+-ZMAT	*L;
+-ZVEC	*b, *out;
+-double	diag;
+-{
+-    u_int	dim;
+-    int		i, i_lim;
+-    complex	**L_me, *b_ve, *out_ve, tmp;
+-    Real	invdiag;
+-    
+-    if ( ! L || ! b )
+-	error(E_NULL,"zLAsolve");
+-    dim = min(L->m,L->n);
+-    if ( b->dim < dim )
+-	error(E_SIZES,"zLAsolve");
+-    out = zv_resize(out,L->n);
+-    L_me = L->me;	b_ve = b->ve;	out_ve = out->ve;
+-    
+-    for ( i=dim-1; i>=0; i-- )
+-	if ( ! is_zero(b_ve[i]) )
+-	    break;
+-    i_lim = i;
+-
+-    if ( b != out )
+-    {
+-	__zzero__(out_ve,out->dim);
+-	/* MEM_COPY(b_ve,out_ve,(i_lim+1)*sizeof(complex)); */
+-	MEMCOPY(b_ve,out_ve,i_lim+1,complex);
+-    }
+-
+-    if ( diag == 0.0 )
+-    {
+-	for (        ; i>=0; i-- )
+-	{
+-	    tmp = zconj(L_me[i][i]);
+-	    if ( is_zero(tmp) )
+-		error(E_SING,"zLAsolve");
+-	    out_ve[i] = zdiv(out_ve[i],tmp);
+-	    tmp.re = - out_ve[i].re;
+-	    tmp.im = - out_ve[i].im;
+-	    __zmltadd__(out_ve,L_me[i],tmp,i,Z_CONJ);
+-	}
+-    }
+-    else
+-    {
+-	invdiag = 1.0/diag;
+-	for (        ; i>=0; i-- )
+-	{
+-	    out_ve[i].re *= invdiag;
+-	    out_ve[i].im *= invdiag;
+-	    tmp.re = - out_ve[i].re;
+-	    tmp.im = - out_ve[i].im;
+-	    __zmltadd__(out_ve,L_me[i],tmp,i,Z_CONJ);
+-	}
+-    }
+-    
+-    return (out);
+-}
+//GO.SYSIN DD zsolve.c
+echo zmatlab.c 1>&2
+sed >zmatlab.c <<'//GO.SYSIN DD zmatlab.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-	This file contains routines for import/exporting complex data
+-	to/from MATLAB. The main routines are:
+-			ZMAT *zm_save(FILE *fp,ZMAT *A,char *name)
+-			ZVEC *zv_save(FILE *fp,ZVEC *x,char *name)
+-			complex z_save(FILE *fp,complex z,char *name)
+-			ZMAT *zm_load(FILE *fp,char **name)
+-*/
+-
+-#include        <stdio.h>
+-#include        "zmatrix.h"
+-#include	"matlab.h"
+-
+-static char rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-/* zm_save -- save matrix in ".mat" file for MATLAB
+-   -- returns matrix to be saved */
+-ZMAT    *zm_save(fp,A,name)
+-FILE    *fp;
+-ZMAT    *A;
+-char    *name;
+-{
+-    int     i, j;
+-    matlab  mat;
+-    
+-    if ( ! A )
+-	error(E_NULL,"zm_save");
+-    
+-    mat.type = 1000*MACH_ID + 100*ORDER + 10*PRECISION + 0;
+-    mat.m = A->m;
+-    mat.n = A->n;
+-    mat.imag = TRUE;
+-    mat.namlen = (name == (char *)NULL) ? 1 : strlen(name)+1;
+-    
+-    /* write header */
+-    fwrite(&mat,sizeof(matlab),1,fp);
+-    /* write name */
+-    if ( name == (char *)NULL )
+-	fwrite("",sizeof(char),1,fp);
+-    else
+-	fwrite(name,sizeof(char),(int)(mat.namlen),fp);
+-    /* write actual data */
+-    for ( i = 0; i < A->m; i++ )
+-	for ( j = 0; j < A->n; j++ )
+-	    fwrite(&(A->me[i][j].re),sizeof(Real),1,fp);
+-    for ( i = 0; i < A->m; i++ )
+-	for ( j = 0; j < A->n; j++ )
+-	    fwrite(&(A->me[i][j].im),sizeof(Real),1,fp);
+-    
+-    return A;
+-}
+-
+-
+-/* zv_save -- save vector in ".mat" file for MATLAB
+-   -- saves it as a row vector
+-   -- returns vector to be saved */
+-ZVEC    *zv_save(fp,x,name)
+-FILE    *fp;
+-ZVEC    *x;
+-char    *name;
+-{
+-    int	i;
+-    matlab  mat;
+-    
+-    if ( ! x )
+-	error(E_NULL,"zv_save");
+-    
+-    mat.type = 1000*MACH_ID + 100*ORDER + 10*PRECISION + 0;
+-    mat.m = x->dim;
+-    mat.n = 1;
+-    mat.imag = TRUE;
+-    mat.namlen = (name == (char *)NULL) ? 1 : strlen(name)+1;
+-    
+-    /* write header */
+-    fwrite(&mat,sizeof(matlab),1,fp);
+-    /* write name */
+-    if ( name == (char *)NULL )
+-	fwrite("",sizeof(char),1,fp);
+-    else
+-	fwrite(name,sizeof(char),(int)(mat.namlen),fp);
+-    /* write actual data */
+-    for ( i = 0; i < x->dim; i++ )
+-	fwrite(&(x->ve[i].re),sizeof(Real),1,fp);
+-    for ( i = 0; i < x->dim; i++ )
+-	fwrite(&(x->ve[i].im),sizeof(Real),1,fp);
+-    
+-    return x;
+-}
+-
+-/* z_save -- saves complex number in ".mat" file for MATLAB
+-	-- returns complex number to be saved */
+-complex	z_save(fp,z,name)
+-FILE	*fp;
+-complex	z;
+-char	*name;
+-{
+-    matlab  mat;
+-    
+-    mat.type = 1000*MACH_ID + 100*ORDER + 10*PRECISION + 0;
+-    mat.m = 1;
+-    mat.n = 1;
+-    mat.imag = TRUE;
+-    mat.namlen = (name == (char *)NULL) ? 1 : strlen(name)+1;
+-    
+-    /* write header */
+-    fwrite(&mat,sizeof(matlab),1,fp);
+-    /* write name */
+-    if ( name == (char *)NULL )
+-	fwrite("",sizeof(char),1,fp);
+-    else
+-	fwrite(name,sizeof(char),(int)(mat.namlen),fp);
+-    /* write actual data */
+-    fwrite(&z,sizeof(complex),1,fp);
+-    
+-    return z;
+-}
+-
+-
+-
+-/* zm_load -- loads in a ".mat" file variable as produced by MATLAB
+-   -- matrix returned; imaginary parts ignored */
+-ZMAT    *zm_load(fp,name)
+-FILE    *fp;
+-char    **name;
+-{
+-    ZMAT     *A;
+-    int     i;
+-    int     m_flag, o_flag, p_flag, t_flag;
+-    float   f_temp;
+-    double  d_temp;
+-    matlab  mat;
+-    
+-    if ( fread(&mat,sizeof(matlab),1,fp) != 1 )
+-	error(E_FORMAT,"zm_load");
+-    if ( mat.type >= 10000 )	/* don't load a sparse matrix! */
+-	error(E_FORMAT,"zm_load");
+-    m_flag = (mat.type/1000) % 10;
+-    o_flag = (mat.type/100) % 10;
+-    p_flag = (mat.type/10) % 10;
+-    t_flag = (mat.type) % 10;
+-    if ( m_flag != MACH_ID )
+-	error(E_FORMAT,"zm_load");
+-    if ( t_flag != 0 )
+-	error(E_FORMAT,"zm_load");
+-    if ( p_flag != DOUBLE_PREC && p_flag != SINGLE_PREC )
+-	error(E_FORMAT,"zm_load");
+-    *name = (char *)malloc((unsigned)(mat.namlen)+1);
+-    if ( fread(*name,sizeof(char),(unsigned)(mat.namlen),fp) == 0 )
+-	error(E_FORMAT,"zm_load");
+-    A = zm_get((unsigned)(mat.m),(unsigned)(mat.n));
+-    for ( i = 0; i < A->m*A->n; i++ )
+-    {
+-	if ( p_flag == DOUBLE_PREC )
+-	    fread(&d_temp,sizeof(double),1,fp);
+-	else
+-	{
+-	    fread(&f_temp,sizeof(float),1,fp);
+-	    d_temp = f_temp;
+-	}
+-	if ( o_flag == ROW_ORDER )
+-	    A->me[i / A->n][i % A->n].re = d_temp;
+-	else if ( o_flag == COL_ORDER )
+-	    A->me[i % A->m][i / A->m].re = d_temp;
+-	else
+-	    error(E_FORMAT,"zm_load");
+-    }
+-    
+-    if ( mat.imag )         /* skip imaginary part */
+-	for ( i = 0; i < A->m*A->n; i++ )
+-	{
+-	    if ( p_flag == DOUBLE_PREC )
+-		fread(&d_temp,sizeof(double),1,fp);
+-	    else
+-	    {
+-		fread(&f_temp,sizeof(float),1,fp);
+-		d_temp = f_temp;
+-	    }
+-	    if ( o_flag == ROW_ORDER )
+-		A->me[i / A->n][i % A->n].im = d_temp;
+-	    else if ( o_flag == COL_ORDER )
+-		A->me[i % A->m][i / A->m].im = d_temp;
+-	    else
+-		error(E_FORMAT,"zm_load");
+-	}
+-    
+-    return A;
+-}
+-
+//GO.SYSIN DD zmatlab.c
+echo zhsehldr.c 1>&2
+sed >zhsehldr.c <<'//GO.SYSIN DD zhsehldr.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-		Files for matrix computations
+-
+-	Householder transformation file. Contains routines for calculating
+-	householder transformations, applying them to vectors and matrices
+-	by both row & column.
+-
+-	Complex version
+-*/
+-
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-#include	<stdio.h>
+-#include	"zmatrix.h"
+-#include        "zmatrix2.h"
+-#include	<math.h>
+-
+-#define	is_zero(z)	((z).re == 0.0 && (z).im == 0.0)
+-
+-/* zhhvec -- calulates Householder vector to eliminate all entries after the
+-	i0 entry of the vector vec. It is returned as out. May be in-situ */
+-ZVEC	*zhhvec(vec,i0,beta,out,newval)
+-ZVEC	*vec,*out;
+-int	i0;
+-Real	*beta;
+-complex	*newval;
+-{
+-	complex	tmp;
+-	Real	norm, abs_val;
+-
+-	if ( i0 < 0 || i0 >= vec->dim )
+-	    error(E_BOUNDS,"zhhvec");
+-	out = _zv_copy(vec,out,i0);
+-	tmp = _zin_prod(out,out,i0,Z_CONJ);
+-	if ( tmp.re <= 0.0 )
+-	{
+-		*beta = 0.0;
+-		*newval = out->ve[i0];
+-		return (out);
+-	}
+-	norm = sqrt(tmp.re);
+-	abs_val = zabs(out->ve[i0]);
+-	*beta = 1.0/(norm * (norm+abs_val));
+-	if ( abs_val == 0.0 )
+-	{
+-	  newval->re = norm;
+-	  newval->im = 0.0;
+-	}
+-	else
+-	{ 
+-	  abs_val = -norm / abs_val;
+-	  newval->re = abs_val*out->ve[i0].re;
+-	  newval->im = abs_val*out->ve[i0].im;
+-	}	abs_val = -norm / abs_val;
+-	out->ve[i0].re -= newval->re;
+-	out->ve[i0].im -= newval->im;
+-
+-	return (out);
+-}
+-
+-/* zhhtrvec -- apply Householder transformation to vector -- may be in-situ */
+-ZVEC	*zhhtrvec(hh,beta,i0,in,out)
+-ZVEC	*hh,*in,*out;	/* hh = Householder vector */
+-int	i0;
+-double	beta;
+-{
+-	complex	scale, tmp;
+-	/* u_int	i; */
+-
+-	if ( hh==ZVNULL || in==ZVNULL )
+-		error(E_NULL,"zhhtrvec");
+-	if ( in->dim != hh->dim )
+-		error(E_SIZES,"zhhtrvec");
+-	if ( i0 < 0 || i0 > in->dim )
+-	    error(E_BOUNDS,"zhhvec");
+-
+-	tmp = _zin_prod(hh,in,i0,Z_CONJ);
+-	scale.re = -beta*tmp.re;
+-	scale.im = -beta*tmp.im;
+-	out = zv_copy(in,out);
+-	__zmltadd__(&(out->ve[i0]),&(hh->ve[i0]),scale,
+-		    (int)(in->dim-i0),Z_NOCONJ);
+-	/************************************************************
+-	for ( i=i0; i<in->dim; i++ )
+-		out->ve[i] = in->ve[i] - scale*hh->ve[i];
+-	************************************************************/
+-
+-	return (out);
+-}
+-
+-/* zhhtrrows -- transform a matrix by a Householder vector by rows
+-	starting at row i0 from column j0 -- in-situ */
+-ZMAT	*zhhtrrows(M,i0,j0,hh,beta)
+-ZMAT	*M;
+-int	i0, j0;
+-ZVEC	*hh;
+-double	beta;
+-{
+-	complex	ip, scale;
+-	int	i /*, j */;
+-
+-	if ( M==ZMNULL || hh==ZVNULL )
+-		error(E_NULL,"zhhtrrows");
+-	if ( M->n != hh->dim )
+-		error(E_RANGE,"zhhtrrows");
+-	if ( i0 < 0 || i0 > M->m || j0 < 0 || j0 > M->n )
+-		error(E_BOUNDS,"zhhtrrows");
+-
+-	if ( beta == 0.0 )	return (M);
+-
+-	/* for each row ... */
+-	for ( i = i0; i < M->m; i++ )
+-	{	/* compute inner product */
+-		ip = __zip__(&(M->me[i][j0]),&(hh->ve[j0]),
+-			     (int)(M->n-j0),Z_NOCONJ);
+bigmail CUT HERE............
+test -w meschach4.shar &&
+test -r 24048P08 &&
+test -r 24048P09 &&
+(
+ cat 24048P08 >> meschach4.shar; rm 24048P08
+ cat 24048P09 >> meschach4.shar; rm 24048P09
+)

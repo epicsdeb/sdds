@@ -1,0 +1,97 @@
+#!/bin/sh  
+# \
+exec tclsh "$0" "$@"
+
+file copy data/APS.twi .
+file copy data/APS0.twi .
+if [catch {set device $env(SDDS_DEVICE)}] {
+    set device motif
+}
+
+puts stderr "** Make various plots as in the sddsplot manual page"
+exec sddsplot -device=$device -columnNames=s,betax APS0.twi "-title=A simple plot of one beta function"
+exec sddsplot -device=$device -columnNames=s,(beta?,etax) APS0.twi -graph=line,vary \
+ "-title=Principle Twiss parameters for APS design" 
+exec sddsplot -device=$device -columnNames=s,(beta?,etax) APS.twi -graphic=line,vary -legend \
+        -split=page -separate=page \
+        "-title=Twiss parameters for APS lattices"
+exec sddsprocess APS.twi -nowarning "-define=col,etax10,etax 10 *,units=m,symbol=10\$gc\$r\$bx\$n"
+exec sddsplot -device=$device -layout=2,2 \
+    -columnNames=s,(beta?,etax10) APS.twi -graphic=line,vary -legend \
+        -split=page -separate=page \
+        "-title=Twiss parameters for APS lattices"
+exec sddsplot -device=$device -columnNames=s,(beta?,etax) APS.twi -graphic=line,vary \
+        -split=page -groupby=nameIndex -separate=nameIndex -unsuppress=y \
+        "-title=Twiss parameters for APS lattices"
+
+puts stderr "**"
+puts stderr "** Compute and plot changes in Twiss parameters in file APS.twi relative"
+puts stderr "** to the design (APS0.twi)"
+exec sddschanges APS.twi -baseline=APS0.twi APS.changes -copy=s -changesIn=betax,betay,etax
+exec sddsplot -device=$device -column=s,(ChangeInbeta?,ChangeInetax) -graphic=line,vary APS.changes \
+ "-title=Changes from Design Lattice" -groupby=page -separate=page -split=page \
+ -legend=edit=%/ChangeIn/\$gD\$r/
+file delete APS.changes
+
+puts stderr "**"
+puts stderr "** Collapse the APS.twi file down to parameters, then fit nuy as a function of nux"
+catch {exec sddscollapse APS.twi -pipe=out \
+| tee APS.twic \
+| sddspfit -pipe=in APS.twic.fit -column=nux,nuy -verbose} result
+puts stderr "$result"
+exec sddsplot -device=$device -column=nux,nuy APS.twic -graph=symbol -legend=spec=Data \
+ -column=nux,nuyFit APS.twic.fit -graph=line,type=1 -legend=spec=Fit \
+ "-title=Fit of y tune vs x tune"
+eval file delete APS.twic APS.twic.fit
+
+puts stderr "** "
+puts stderr "** Compute and plot envelopes of twiss parameters"
+exec sddsenvelope APS.twi APS.twi.env -copy=s -minimum=beta?,etax -maximum=beta?,etax
+exec sddsplot -device=$device -graph=line,vary,eachreq -unsuppress=y \
+        -column=s,*Min* APS.twi.env -legend=yname,edit=%/Min// \
+        -column=s,*Max* APS.twi.env \
+        "-title=Min and max values for APS lattices"
+eval file delete APS.twi.env
+
+puts stderr "** "
+puts stderr "** Interpolate Twiss parameters and plot original and interpolated data"
+exec sddsinterp APS0.twi APS0.interp -column=s,betax,betay,etax -order=2 -sequence=250
+exec sddsplot -device=$device -groupby=namei -separate=namei -unsuppress=y -graph=line,vary \
+      -column=s,(beta?,etax) APS0.twi  -legend=spec=Original \
+      -column=s,(beta?,etax) APS0.interp -legend=spec=Interpolated \
+      "-title=Original and interpolated Twiss functions" \
+      "-topline=Interpolation is obviously a risky business"
+eval file delete APS0.interp
+
+puts stderr "**"
+puts stderr "** Compute and plot beam sizes"
+exec sddsprocess APS0.twi -nowarning -define=parameter,epsx,8.2e-9,units=nm -define=parameter,sigmaDelta,1e-3 \
+  -define=parameter,coupling,0.01 "-define=parameter,epsy,epsx coupling *" \
+  "-define=column,sigmax,epsx betax *  sigmaDelta etax * sqr + sqrt,units=m,symbol=\$gs\$r\$bx\$n" \
+  "-define=column,sigmay,epsy betay * sqrt,units=m,symbol=\$gs\$r\$by\$n"
+exec sddsplot -device=$device -column=s,sigma? -graph=line,vary -legend APS0.twi -unsuppress=y \
+        "-title=Beam sizes for APS design with 1% coupling"
+
+puts stderr "** "
+puts stderr "** Make list of quad names"
+exec sddsconvert APS.twi -pipe=out -retain=column,ElementName,ElementType \
+| sddsprocess -pipe -match=column,ElementType=QUAD \
+| sddssort -pipe=in quadNames.sdds -unique -column=ElementName
+exec sddsconvert quadNames.sdds -pipe=out -toPage=1 \
+| sdds2stream -column=ElementName -pipe=in 
+
+puts stderr "** "
+puts stderr "** Make twiss files for quads only and for nonquads only"
+exec sddsselect APS.twi quadNames.sdds APSquad.twi -match=ElementName -reuse
+exec sddsselect APS.twi quadNames.sdds APSnquad.twi -match=ElementName -reuse -invert
+eval file delete quadNames.sdds
+
+exec sddsplot -device=$device -groupby=page -separate=page -split=page \
+ "-topline=Twiss parameters at the ends of quads and other elements" \
+ -column=s,(betax,betay,etax) APSquad.twi -graph=symbol,type=0,vary=subtype,scale=2,eachreq \
+        "-legend=ysym,edit=i/QUAD /" \
+ -column=s,(betax,betay,etax) APSnquad.twi -graph=symbol,type=1,vary=subtype,scale=2,eachreq \
+        "-legend=ysym,edit=i/NOT QUAD /" \
+ -column=s,(betax,betay,etax) APS.twi -graph=line,vary 
+
+eval file delete [glob -nocomplain APS*quad.twi* APS.twi*  APS0.twi* ]

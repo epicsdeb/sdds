@@ -1,0 +1,44 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.1  2009/12/01 19:22:50  soliday
+# I am putting the SDDS3 library files into CVS.
+#
+#
+#
+
+CMPLR = ANSI
+
+#RATIONAL = purify
+#RATIONAL = quantify
+#RATIONAL = purecov
+ifdef RATIONAL
+HOST_OPT = NO
+CC := $(RATIONAL) -best-effort $(CC)
+CCC := $(RATIONAL) -best-effort $(CCC)
+endif
+
+LIBRARY = SDDS3
+
+USR_CXXFLAGS = -I../../include -DEXPORT_SDDS3 -DzLib
+
+LIB_SRCS = SDDSFile.cc \
+           SDDSArray.cc \
+           SDDSParameter.cc \
+           SDDSColumn.cc \
+           SDDSUtil.cc
+
+USR_LIBS_WIN32 += z
+LIB_SYS_LIBS_DEFAULT = z
+LIB_SYS_LIBS_WIN32 = -nil-
+
+z_DIR = $(INSTALL_LIB)
+
+

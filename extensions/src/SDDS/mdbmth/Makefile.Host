@@ -1,0 +1,78 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for mdbmth
+# $Log: Makefile.Host,v $
+# Revision 1.20  2003/07/22 23:13:00  soliday
+# Modified makefiles to work with base 3.13 and 3.14
+#
+# Revision 1.19  2003/06/14 21:34:29  borland
+# Added several Double precision BESSEL functions in dbessel.c.
+#
+# Revision 1.18  2003/05/06 19:05:44  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.17  2002/08/14 16:18:52  soliday
+# Added Open License
+#
+# Revision 1.16  2002/07/30 08:38:19  soliday
+# Changed the purify lines.
+#
+# Revision 1.15  2002/06/18 13:43:23  borland
+# Added trapInteg.c (trapazoidIntegration function).
+#
+# Revision 1.14  2001/07/23 16:39:01  borland
+# Added onedoptimize.c
+#
+# Revision 1.13  2000/12/07 22:00:14  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.12  2000/11/06 17:58:48  borland
+# Added powellMin.c
+#
+# Revision 1.11  2000/11/04 17:52:27  borland
+# The value argument to startHaltonSequence point is no longer a pointer.
+#
+# Revision 1.10  2000/08/11 19:27:38  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris when using cc.
+#
+# Revision 1.9  2000/08/10 21:14:42  soliday
+# Added support for gcc on Solaris.
+#
+# Revision 1.8  2000/04/11 16:26:59  soliday
+# mdbmth no longer requires SDDS, matlib, or fftpack functions to link.
+#
+# Revision 1.7  2000/04/04 04:56:11  soliday
+# Added warning flag for solaris.
+#
+# Revision 1.6  1999/09/14 18:13:02  soliday
+# On WIN32 a dll file is now created
+#
+# Revision 1.5  1999/07/29 21:24:31  borland
+# Added convenience line for quantify program.
+#
+# Revision 1.4  1999/07/08 22:10:32  soliday
+# Added support for WIN32
+#
+# Revision 1.3  1999/06/21 20:40:27  borland
+# Added savitzkyGolay.c
+#
+# Revision 1.2  1999/04/30 13:22:19  borland
+# Added zeroIH.c to makefile.  Fixed bug in zeroIH code.
+#
+# Revision 1.1  1999/04/14 15:14:46  borland
+# First version added to repository (per J. Anderson).
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/mdbmth/Makefile.OAG
+include $(TOP)/config/RULES.Host
+

@@ -1,0 +1,29 @@
+/* rpn udf:  trapiz
+/* purpose:  trapizoid rule integration
+/* user's function is "fn"
+/* lower limit stored in "a"
+/* upper limit stored in "b"
+/* number of panels stored in "n"
+/* call to do integral is "trapiz"
+/*
+/* Michael Borland, 1988
+0 sto a sto b sto dx sto n sto i
+  sto sum sto ilim
+udf
+trapiz
+b a - n / sto dx 
+a + sto x  
+1 sto i  
+n 1 - sto ilim 
+0 sto sum 
+cle 
+sum_terms
+
+udf
+sum_terms
+i ilim == cle ? fini : x fn sum + sto sum x dx + sto x i 1 + sto i sum_terms $
+
+udf
+fini
+a fn b fn + 2 / sum + dx * sto sum cle sum
+

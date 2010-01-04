@@ -1,0 +1,13 @@
+#!/bin/csh
+#
+# $Log: jsddsEdit,v $
+# Revision 1.2  2005/05/16 15:00:00  soliday
+# Updated to use java version 1.5
+#
+# Revision 1.1  2000/05/01 15:14:31  soliday
+# First version.
+#
+# Revision 1.0  1996/09/25 20:06:58  soliday
+#
+#
+/usr/local/oag/jre1.5.0_03/bin/java -jar `which SDDSedit.jar`

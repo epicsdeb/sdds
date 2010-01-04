@@ -1,0 +1,156 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for SDDS applications
+# $Log: Makefile.Host,v $
+# Revision 1.46  2003/07/23 03:54:08  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+# Revision 1.45  2003/07/22 20:01:15  soliday
+# Added support for Kylix.
+#
+# Revision 1.44  2003/06/02 21:39:11  soliday
+# Added the function to add parentheses around a string before calling if2pf
+#
+# Revision 1.43  2003/05/06 19:04:32  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.42  2003/04/14 18:00:35  shang
+# added sddsmakedataset
+#
+# Revision 1.41  2003/04/11 16:00:25  soliday
+# Changed so that rt system library is only used for solaris.
+#
+# Revision 1.40  2003/03/28 20:32:03  shang
+# added system libary for using time functions
+#
+# Revision 1.39  2002/09/26 15:25:28  soliday
+# Made a modification for OSX and where it should find the tiff library.
+#
+# Revision 1.38  2002/09/19 16:41:03  soliday
+# Added tiff2sdds support for WIN32
+#
+# Revision 1.37  2002/09/19 15:38:08  soliday
+# Fixed for tiff2sdds on Linux
+#
+# Revision 1.36  2002/09/19 15:29:21  soliday
+# Added tiff2sdds
+#
+# Revision 1.35  2002/08/14 17:12:34  soliday
+# Added Open License
+#
+# Revision 1.34  2002/07/30 00:04:14  borland
+# Added sddspoly.c
+#
+# Revision 1.33  2002/03/24 03:28:31  borland
+# Added sddscast and sddsinterpset to product list.
+#
+# Revision 1.32  2002/01/05 05:18:19  borland
+# Added sddssampledist.
+#
+# Revision 1.31  2001/11/30 16:11:13  borland
+# Added sddsseparate.
+#
+# Revision 1.30  2001/10/19 21:04:05  borland
+# Added sddsnaff.
+#
+# Revision 1.29  2001/09/07 18:07:16  soliday
+# Added sddsmpfit
+#
+# Revision 1.28  2001/05/03 20:54:22  soliday
+# Added rpnlib to the PROD_LIBS
+#
+# Revision 1.27  2001/04/30 22:55:24  borland
+# Added sddscliptails and sddsbaseline to toolkit.
+#
+# Revision 1.26  2001/03/20 15:18:13  borland
+# Added sddsgenericfit.
+#
+# Revision 1.25  2001/01/23 19:46:52  soliday
+# Rearranged build order.
+#
+# Revision 1.24  2000/12/07 22:00:04  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.23  2000/11/20 21:46:51  soliday
+# Added sddsnormalize.
+#
+# Revision 1.22  2000/11/01 22:49:24  borland
+# Added sddsarray2column.
+#
+# Revision 1.21  2000/10/23 16:06:04  soliday
+# Added sddsimageprofiles
+#
+# Revision 1.20  2000/10/11 21:50:23  soliday
+# Changed definition of isinf so that sunmath is no longer needed.
+#
+# Revision 1.19  2000/10/05 17:59:41  borland
+# Added sddsspotanalysis.
+#
+# Revision 1.18  2000/08/11 19:28:55  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris when using cc.
+#
+# Revision 1.17  2000/08/10 21:16:59  soliday
+# Added support for gcc on Solaris.
+#
+# Revision 1.16  2000/04/11 19:54:22  soliday
+# Fixed missing definition for mdbcommon_DIR.
+#
+# Revision 1.15  2000/04/11 16:33:32  soliday
+# Added mdbcommon library.
+#
+# Revision 1.14  2000/04/04 05:29:58  soliday
+# Added warning flag for solaris.
+#
+# Revision 1.13  2000/01/18 20:18:53  soliday
+# Added support for ZLIB.
+#
+# Revision 1.12  2000/01/06 18:02:58  soliday
+# Added elegant2genesis.c
+#
+# Revision 1.11  1999/11/11 15:53:00  soliday
+# Added plaindata2sdds
+#
+# Revision 1.10  1999/10/13 21:11:17  soliday
+# Added sdds2plaindata
+#
+# Revision 1.9  1999/09/14 18:28:18  soliday
+# Made minor modifications for WIN32
+#
+# Revision 1.8  1999/07/29 21:21:39  borland
+# ADded several programs.
+#
+# Revision 1.7  1999/07/12 21:12:46  soliday
+# Added fdlibm library for WIN32
+#
+# Revision 1.6  1999/07/09 15:05:17  soliday
+# Added WIN32 support
+#
+# Revision 1.5  1999/07/08 16:54:35  borland
+# Added sddsshiftcor
+#
+# Revision 1.4  1999/06/03 16:48:12  soliday
+# Removed references for testout1.c
+#
+# Revision 1.3  1999/06/01 19:16:50  borland
+# Added some lines for convenient debugging builds.
+#
+# Revision 1.2  1999/05/04 14:44:17  borland
+# Added sddseventhist.
+#
+# Revision 1.1  1999/04/14 15:14:43  borland
+# First version added to repository (per J. Anderson).
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/SDDSaps/Makefile.OAG
+include $(TOP)/config/RULES.Host
+

@@ -1,0 +1,40 @@
+% $Log: hdf2sdds.tex,v $
+% Revision 1.1  2000/09/15 23:30:52  emery
+% first installation for R. Soliday.
+%
+%
+\begin{latexonly}
+\newpage
+\end{latexonly}
+\subsection{hdf2sdds}
+\label{hdf2sdds}
+
+\begin{itemize}
+\item {\bf description:} Converts Hierarchical Data Format (HDF) to SDDS.
+\item {\bf example:} 
+\begin{flushleft}{\tt
+hdf2sdds ./ data.hdf data.sdds -withIndex
+}\end{flushleft}
+\item {\bf synopsis:}
+\begin{flushleft}{\tt
+hdf2sdds [{\em HDF filepath}] [{\em HDF filename}] [{\em SDDSfile}]
+[\{-arraysPreferred | -columnsPreferred\}]
+[\{-binary | -ascii\}] [-withIndex] [-verbose]
+}\end{flushleft}
+\item {\bf files: }
+
+{\em HDF filepath} is the name of the directory containing the HDF file.
+
+{\em HDF filename} is the filename of the HDF file excluding the path.
+
+{\em SDDSfile} is the SDDS output that is created.
+
+\item {\bf switches:}
+\begin{itemize}
+    \item {\tt \{-arraysPreferred | -columnsPreferred\}} --- Requests that the output be in the form of an SDDS array or SDDS columns. By default, -columnsPreferred is used.
+    \item {\tt \{-binary | -ascii\}} --- Requests that the output be binary or ASCII.
+    \item {\tt -withIndex} --- An index column is added to the output file.
+    \item {\tt -verbose} --- Prints out steps as the program runs.
+\end{itemize}
+\item {\bf author:} R. Soliday, ANL/APS.
+\end{itemize}

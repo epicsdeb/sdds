@@ -1,0 +1,355 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.34  2009/12/03 17:17:45  soliday
+# The fdlibm library is only needed by Windows.
+#
+# Revision 1.33  2009/12/02 22:32:08  soliday
+# Updated the libaries that are linked in.
+#
+# Revision 1.32  2009/05/13 19:13:37  soliday
+# Updated to fix an issue on WIN32 with recent versions of BASE
+#
+# Revision 1.31  2009/04/27 16:02:49  soliday
+# Updated to link to the gsl library.
+#
+# Revision 1.30  2009/01/13 21:55:24  soliday
+# Fixed some issues on WIN32
+#
+# Revision 1.29  2009/01/08 16:17:31  soliday
+# Fixed an issue for 64 linux systems were HOST_ARCH is set to Linux.
+#
+# Revision 1.28  2008/08/22 15:38:28  shang
+# added sddsmatrixop
+#
+# Revision 1.27  2008/06/03 16:15:59  soliday
+# Added back CLAPACK support on Windows.
+#
+# Revision 1.26  2008/04/16 22:51:26  emery
+# Removed -I$(CLAPACK_INCLUDE) for linux and CLAPACK flag
+# since the C-lapack hearder file is no longer necessary.
+# (LAPACK is compiled in gfortran for linux now.)
+#
+# Revision 1.25  2008/04/16 15:20:59  soliday
+# Fixed issues with building CLAPACK version on Solaris.
+#
+# Revision 1.24  2008/04/14 18:50:50  soliday
+# Fixed some changes in the Makefile.
+#
+# Revision 1.23  2008/04/11 21:34:19  emery
+# Added comments on the use of the CLAPACK flag.
+# Added comment on how the nested if statements is structured.
+# Changed the libraries for CLAPACK macro set; this is due to the
+# different set of libraries that the new version of ATLAS
+# produces. Use pthread for CLAPACK (ATLAS).
+# Added macro definitions and libs for 64-bit compilation.
+# Define F77SYSLIB for CLAPACK (ATLAS).
+# Added comment that meschach include file is necessary for all
+# methods because of the matrix structure from meschach is adopted
+# in sddspeudoinverse.c
+#
+# Revision 1.22  2007/07/16 16:56:10  soliday
+# Updated to work on Windows computers without CLAPACK.
+#
+# Revision 1.21  2007/03/30 18:49:17  soliday
+# Changed so that it always uses CLPACK on Windows
+#
+# Revision 1.20  2006/08/24 21:22:52  soliday
+# Updated to work with CLAPACK on WIN32
+#
+# Revision 1.19  2006/02/14 20:44:33  soliday
+# Modified so that -dalign is only used with the Solaris compiler.
+#
+# Revision 1.18  2005/12/20 16:37:30  soliday
+# Changed so that the SUNPERF library is not used by default even
+# if it is found.
+#
+# Revision 1.17  2005/11/17 17:44:52  soliday
+# Accidentally made CLAPACK the default in the last change.
+#
+# Revision 1.16  2005/11/17 17:36:48  soliday
+# Updated to work cleaner with CLAPACK libraries.
+#
+# Revision 1.15  2005/08/03 22:29:19  emery
+# Moved choice of SUNPERF to bottom of ifdef structure to avoid
+# having it selected before checking for CLAPACK or LAPACK.
+#
+# Revision 1.14  2005/08/01 21:37:34  emery
+# This revision is not changed from 1.13; just the log
+# message is changed.
+# For CLAPACK and LAPACK, use USR_LIBS macro instead of
+# USR_LDFLAGS and OP_SYS_LDFLAGS.
+# Added many macros of the type <package>_INSTALL_DIR
+# where package is one of LAPACK CLAPACK ATLAS F2C
+# for use in conjunction with USR_LIBS. For example
+# for USR_LIB += lapack, then a macro lapack_DIR must
+# exist and its value must contain the directory
+# where file lapack.a is found.
+#
+# Revision 1.13  2005/07/17 04:04:08  emery
+# First installation.
+#
+# Revision 1.12  2005/07/14 18:41:48  emery
+# Corrected bug where NUMERICAL_RECIPES flags was always selected.
+# Added statement to set linear algebra package selection macros to zero
+# if they were previously not defined.
+#
+# Revision 1.11  2005/07/14 17:58:13  emery
+# Added MACRO flags in a commented block which allow for benchmarking various
+# methods of SVD. The file as is will link to the meschach SVD by
+# default in general or to SunPerf on a solaris system.
+#
+# Revision 1.10  2005/07/13 15:30:30  soliday
+# Updated to properly link when using the sun performance library.
+#
+# Revision 1.9  2005/02/25 23:26:13  soliday
+# Updated so that a static build on solaris will work.
+#
+# Revision 1.8  2005/01/21 20:30:42  soliday
+# Updated to support purify on Linux
+#
+# Revision 1.7  2004/12/16 16:13:20  soliday
+# Updated to detect GNU builds on solaris with newer version of Base.
+#
+# Revision 1.6  2004/09/24 17:05:10  soliday
+# Updated to work on solaris machines without the sunperf library installed.
+#
+# Revision 1.5  2004/03/16 16:58:06  soliday
+# Updated purify, quantify, and purecov build rules
+#
+# Revision 1.4  2003/08/28 22:37:48  soliday
+# Modified so that vxWorks does not try to build this with EPICS 3.14
+#
+# Revision 1.3  2003/07/25 16:17:21  soliday
+# Simplified makefile
+#
+# Revision 1.2  2003/07/23 21:43:15  soliday
+# Fixed issue with Linux
+#
+# Revision 1.1  2003/07/23 19:58:02  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+#
+#
+
+CMPLR = ANSI
+
+#RATIONAL = purify
+#RATIONAL = quantify
+#RATIONAL = purecov
+ifdef RATIONAL
+HOST_OPT = NO
+CC := $(RATIONAL) -best-effort $(CC)
+CCC := $(RATIONAL) -best-effort $(CCC)
+endif
+
+ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
+PROD = sddspseudoinverse sddsmatrixop
+else
+PROD_HOST = sddspseudoinverse sddsmatrixop
+endif
+
+# Choices of linear algebra packages
+# MESCHACH              free, distributed in package, and compilation default.
+# NUMERICAL_RECIPES     needs copyrighted svd_nr.c (not for distribution)
+# SUNPERF               runs only on solaris. Need license.
+# CLAPACK               free, LAPACK that uses ATLAS. 
+#                       This flag should be changed to ATLAS in the future
+#                       here and in sddspseudoinverse to avoid confusion
+#                       as we no longer use the general lapack translated to C.
+#                       ATLAS does provide some functions of type clapack_<...>
+# LAPACK                free, plain LAPACK found on linux systems with no
+#                       optimization.
+#for sddsmatrixop, only CLPACK, LAPACK and oag own matrix library (no flag)
+#are avaible, all other flags are ignored.
+
+MESCHACH = ../../meschach
+
+# MESCHACH header file is required for the matrix type definition
+USR_CFLAGS += 	-I../../../include -I$(MESCHACH) -DzLib
+
+sddspseudoinverse_SRCS = sddspseudoinverse.c
+sddsmatrixop_SRCS = matrix.c sddsmatrixop.c
+
+ifeq ($(EPICS_HOST_ARCH),solaris-sparc)
+DALIGN=1
+endif
+ifeq ($(HOST_ARCH),solaris)
+DALIGN=1
+endif
+ifeq ($(EPICS_HOST_ARCH),linux-x86)
+MALIGN=1
+endif
+ifeq ($(HOST_ARCH),Linux)
+ifneq ($(EPICS_HOST_ARCH),linux-x86_64)
+MALIGN=1
+endif
+endif
+
+ifdef DALIGN
+USR_CFLAGS += -dalign
+endif
+ifdef MALIGN
+USR_CFLAGS += -malign-double
+endif
+
+SUNPERF = 0
+ifeq ($(OS_CLASS),solaris)
+ifneq ($(ANSI),GCC)
+ifneq ($(GNU),YES)
+SUNPERF = $(words $(notdir $(wildcard /opt/SUNWspro/prod/include/cc/sunperf.h)))
+SUNPERF = 0
+endif
+endif
+ACC_OPT_YES = -fast
+CCC_OPT_YES = -fast
+endif
+
+ifdef WIN32
+CLAPACK = $(words $(notdir $(wildcard c:/CLAPACK/include/clapack.h)))
+endif
+
+# For benchmarking purposes, use the four MACRO assignment lines
+# to force a particular SVD method explicitly.  Because of the
+# structure of the following "ifneq" statements the first one that has a
+# value of 1 will be used. If none are set, then meschach, the default,
+# is used.
+#SUNPERF = 1
+#NUMERICAL_RECIPES = 1
+#CLAPACK = 1
+#LAPACK = 1
+
+ifndef NUMERICAL_RECIPES 
+NUMERICAL_RECIPES = 0
+endif
+ifndef CLAPACK
+CLAPACK = 0
+endif
+ifndef LAPACK
+LAPACK = 0
+endif
+
+# for four choices:
+#ifneq
+#else
+#  ifneq
+#  else
+#    ifneq
+#    else
+#      ifneq
+#      else
+#      endif
+#    endif
+#  endif
+#endif
+# section on numercial recipes
+ifneq ($(NUMERICAL_RECIPES), 0)
+  USR_CFLAGS += -DNUMERICAL_RECIPES
+  sddspseudoinverse_SRCS += nr_svd.c
+  sddsmatrixop_SRCS += nr_svd.c
+else
+  # section on CLAPACK
+  ifneq ($(CLAPACK), 0)
+    ifdef WIN32
+      # there's a CLAPACK_INCLUDE defined?
+      USR_CPPFLAGS += -DCLAPACK -DF2C -I$(CLAPACK_INCLUDE)
+      USR_LDFLAGS += $(CLAPACK_LIB)/clapack.lib
+    else
+      ifeq ($(OS_CLASS),solaris)
+        # One can choose threaded ptcblas ptf77blas or unthreaded cblas f77blas
+        USR_CPPFLAGS += -DCLAPACK -DF2C -I$(CLAPACK_INCLUDE) -I$(ATLAS_INCLUDE)
+        USR_LIBS += lapack cblaswr cblas atlas F77 I77 
+#        USR_LIBS += lapack ptcblas ptf77blas  atlas 
+#        OP_SYS_LDLIBS += -lgfortran
+      else
+        # One can choose threaded ptcblas ptf77blas or unthreaded cblas f77blas
+        USR_CPPFLAGS += -DCLAPACK  -I$(ATLAS_INCLUDE)
+        USR_LIBS += lapack ptcblas ptf77blas  atlas 
+        OP_SYS_LDLIBS += -lgfortran
+      endif
+    endif
+  else 
+    # section on LAPACK
+    ifneq ($(LAPACK), 0)
+      ifdef WIN32
+        USR_CPPFLAGS += -DLAPACK -I$(LAPACK_INCLUDE)
+        USR_LIBS += lapack
+      else
+        # there is no lapack header file
+	OP_SYS_LDLIBS += -llapack -lblas -lgfortran
+        USR_CPPFLAGS += -DLAPACK 
+      endif
+    else
+      # SUNPERF choice is placed last since it may be set to 1
+      # because of the existence of the library.
+      ifneq ($(SUNPERF), 0)
+        USR_CPPFLAGS += -DSUNPERF
+        OP_SYS_LDLIBS += -xlic_lib=sunperf -lsunperf
+        OP_SYS_LDFLAGS = $(COMPILER_LDFLAGS) -z combreloc -z lazyload
+      endif
+    endif
+  endif
+endif
+
+# if LAPACK macro is set, then the lapack lib is found in the 
+# standard /usr/lib
+ifneq ($(CLAPACK), 0)
+ifeq ($(OS_CLASS),solaris)
+lapack_DIR = $(CLAPACK_LIB)
+cblaswr_DIR = $(CLAPACK_LIB)
+else
+lapack_DIR = $(ATLAS_LIB)
+endif
+endif
+
+clapack_DIR = $(CLAPACK_LIB)
+
+#pthread_DIR = /usr/lib
+cblas_DIR = $(ATLAS_LIB)
+ptcblas_DIR = $(ATLAS_LIB)
+f77blas_DIR = $(ATLAS_LIB)
+ptf77blas_DIR = $(ATLAS_LIB)
+atlas_DIR = $(ATLAS_LIB)
+F77_DIR = $(F2C_LIB)
+I77_DIR = $(F2C_LIB)
+
+ifeq ($(OS_CLASS),solaris)
+ACC_DEP_CFLAGS += -KPIC -v
+CCC_DEP_CFLAGS += -KPIC -v
+GCC_DEP_CFLAGS += -D__EXTENSIONS__
+endif
+
+# meschach library is required for all methods because of the general matrix
+# operations, such as allocating and freeing memory.
+PROD_LIBS_WIN32 = mdbcommon rpnlib SDDS1 mdbmth mdblib meschach z fdlibm
+PROD_LIBS_BORLANDC = mdbcommon rpnlib SDDS1 mdbmth mdblib meschach z fdlibm
+PROD_LIBS_DEFAULT = mdbcommon matlib fftpack rpnlib SDDS1 rpnlib mdbmth mdblib meschach
+SYS_PROD_LIBS_DEFAULT = z
+SYS_PROD_LIBS_Linux = z ncurses
+SYS_PROD_LIBS_solaris = curses
+SYS_PROD_LIBS_WIN32 = -nil-
+SYS_PROD_LIBS_BORLANDC = -nil-
+ifeq ($(OS_CLASS),solaris)
+OP_SYS_LDLIBS += -lz
+endif
+
+sddsmatrixop_LIBS = rpnlib gsl
+
+z_DIR = $(INSTALL_LIB)
+SDDS1_DIR = $(INSTALL_LIB)
+rpnlib_DIR = $(INSTALL_LIB)
+meschach_DIR = $(INSTALL_LIB)
+mdblib_DIR = $(INSTALL_LIB)
+mdbcommon_DIR = $(INSTALL_LIB)
+mdbmth_DIR = $(INSTALL_LIB)
+matlib_DIR = $(INSTALL_LIB)
+fftpack_DIR = $(INSTALL_LIB)
+gsl_DIR = $(INSTALL_LIB)
+fdlibm_DIR = $(INSTALL_LIB)

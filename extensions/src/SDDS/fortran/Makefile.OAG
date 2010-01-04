@@ -1,0 +1,55 @@
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.3  2009/09/01 20:39:40  soliday
+# Fixed support for Windows using Intel Visual Fortran and added support
+# for cygwin-x86.
+#
+# Revision 1.2  2005/01/21 20:30:43  soliday
+# Updated to support purify on Linux
+#
+# Revision 1.1  2004/05/03 15:49:26  soliday
+# Updated to work with Epics/Base 3.14 build rules.
+#
+#
+#
+
+CMPLR = ANSI
+
+#RATIONAL = purify
+#RATIONAL = quantify
+#RATIONAL = purecov
+ifdef RATIONAL
+HOST_OPT = NO
+CC := $(RATIONAL) -best-effort $(CC)
+CCC := $(RATIONAL) -best-effort $(CCC)
+endif
+
+FC = f77
+
+TARGETS = fortranReadExample fortranWriteExample
+
+USR_CFLAGS = 	-I../../include \
+		-DIEEE_MATH 
+USR_CFLAGS_Linux = -Df2cFortran
+USR_CFLAGS_WIN32 = -DINTEL_COMPILER
+
+ifeq ($(ANSI),GCC)
+f77_OPTIONS = -O -Wall -fno-second-underscore -Wno-globals -Wimplicit -Wno-unused
+else 
+#f77_OPTIONS = -O -u -erroff=WDECL_LOCAL_NOTUSED
+f77_OPTIONS = -O -u
+ifeq ($(OS_CLASS),Linux)
+f77_OPTIONS = -O -Wall -fno-second-underscore -Wno-globals -Wimplicit -Wno-unused
+endif
+ifeq ($(OS_CLASS),cygwin32)
+f77_OPTIONS = -O -Wall -Wno-unused
+endif
+#f77_OPTIONS = -O
+endif
+
+ifeq ($(OS_CLASS),solaris)
+ACC_DEP_CFLAGS += -KPIC -v
+CCC_DEP_CFLAGS += -KPIC -v
+GCC_DEP_CFLAGS += -D__EXTENSIONS__
+endif
+

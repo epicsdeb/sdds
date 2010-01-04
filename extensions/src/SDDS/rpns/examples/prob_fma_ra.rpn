@@ -1,0 +1,33 @@
+/* example problem for fma_ra.rpn 
+/* solves x'' + kx = 0 for value at t=tlim
+0 sto k sto tlim sto dt sto x sto x' sto t sto dt 
+
+udf
+setup
+.1 sto k
+1 sto x
+0 sto x'
+0 sto t
+.08 sto dt 
+500 * sto tlim
+
+
+"fma_ra.rpn,s" @
+udf
+fn
+k chs *
+
+udf
+end
+pop tlim - chs abs dt 100 / < 
+
+udf
+go
+solve
+t 1 "t = %le\n" fprf
+x 1 "x = %le\n" fprf
+x' 1 "x' = %le\n" fprf
+x' sqr k / x sqr + 1 "amplitude = %le\n" fprf
+3 popn
+cle
+

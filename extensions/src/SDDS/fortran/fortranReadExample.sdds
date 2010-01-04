@@ -1,0 +1,36 @@
+SDDS1
+&description text="fortran example file", contents="simple data" , &end
+&parameter name=ShortP, type=short, &end
+&parameter name=LongP, type=long, &end
+&parameter name=FloatP, type=float, &end
+&parameter name=DoubleP, type=double, &end
+&parameter name=StringP, type=string, &end
+&parameter name=CharacterP, type=character, &end
+&column name=ShortC, type=short,  &end
+&column name=LongC, type=long,  &end
+&column name=FloatC, type=float,  &end
+&column name=DoubleC, type=double,  &end
+&column name=StringC, type=string,  &end
+&column name=CharacterC, type=character,  &end
+&data mode=ascii, &end
+! page number 1
+1
+2
+3.3
+4.4
+"parameter on page 1"
+a
+                   3
+1 3 6.6 9.9 "row 1" x
+2 4 7.7 10.1 "row 2" y
+3 5 8.8 11.1 "row 3" z
+! page number 2
+5
+6
+7.7
+8.8
+"parameter on page 2"
+b
+	2
+-1 -3 -5.5 -7.7 "Row 1" i
+-2 -4 -6.6 -8.8 "Row 2" j

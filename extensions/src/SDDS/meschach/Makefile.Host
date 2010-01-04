@@ -1,0 +1,63 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for mdbmth
+# $Log: Makefile.Host,v $
+# Revision 1.14  2003/07/23 15:06:24  soliday
+# Fixed to work with WIN32
+#
+# Revision 1.13  2003/07/22 21:25:43  soliday
+# Updated Makefiles to work with both epics 3.13 and 3.14.
+#
+# Revision 1.12  2003/07/22 20:00:31  soliday
+# Change for Kylix.
+#
+# Revision 1.11  2003/05/06 19:05:47  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.10  2003/02/20 16:18:54  soliday
+# Makefiles now work to build static builds on windows.
+#
+# Revision 1.9  2002/08/14 15:47:59  soliday
+# Added Open License
+#
+# Revision 1.8  2002/07/30 08:29:20  soliday
+# Changed the purify lines.
+#
+# Revision 1.7  2000/12/07 22:00:15  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.6  2000/10/04 19:35:23  soliday
+# Shared libraries are now allowed on operating systems other then WIN32
+#
+# Revision 1.5  2000/08/11 19:25:33  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris compiled with cc.
+#
+# Revision 1.4  2000/08/10 21:14:07  soliday
+# Added support for gcc on Solaris.
+#
+# Revision 1.3  2000/04/04 04:41:12  soliday
+# Added an extra flag for solaris, so that warnings are displayed.
+#
+# Revision 1.2  1999/07/23 15:30:02  soliday
+# Added support for WIN32
+#
+# Revision 1.1.1.1  1999/04/14 14:16:19  borland
+# Moved from OAG area
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/meschach/Makefile.OAG
+ifdef WIN32
+LIBNAME = meschach.lib
+endif
+include $(TOP)/config/RULES.Host
+

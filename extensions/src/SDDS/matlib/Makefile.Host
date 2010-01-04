@@ -1,0 +1,57 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for matlib
+# $Log: Makefile.Host,v $
+# Revision 1.13  2003/07/23 02:14:40  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+# Revision 1.12  2003/05/06 19:05:33  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.11  2002/08/15 15:48:38  soliday
+# The PROD_LIBS got messed up somehow
+#
+# Revision 1.10  2002/08/14 16:45:20  soliday
+# Added Open License
+#
+# Revision 1.9  2002/08/07 18:53:04  borland
+# Added fmat.c
+#
+# Revision 1.8  2002/07/30 08:46:03  soliday
+# Changed the purify lines.
+#
+# Revision 1.7  2000/12/07 22:00:12  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.6  2000/08/11 19:28:35  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris when using cc.
+#
+# Revision 1.5  2000/08/10 21:15:52  soliday
+# Added support for gcc on Solaris.
+#
+# Revision 1.4  2000/04/04 05:15:19  soliday
+# Added warning flag for solaris.
+#
+# Revision 1.3  1999/09/14 18:20:09  soliday
+# On WIN32 a dll file is now created
+#
+# Revision 1.2  1999/07/08 22:05:16  soliday
+# Added support for WIN32
+#
+# Revision 1.1  1999/04/14 15:14:45  borland
+# First version added to repository (per J. Anderson).
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/matlib/Makefile.OAG
+include $(TOP)/config/RULES.Host
+

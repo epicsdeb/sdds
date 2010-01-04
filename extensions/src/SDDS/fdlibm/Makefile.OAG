@@ -1,0 +1,44 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.2  2003/07/23 15:37:09  soliday
+# Fixed for BORLANDC
+#
+# Revision 1.1  2003/07/23 15:13:44  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+# Revision 1.1  2003/07/22 21:25:44  soliday
+# Updated Makefiles to work with both epics 3.13 and 3.14.
+#
+#
+
+CMPLR = ANSI
+#HOST_OPT = NO
+#CC = purify $($(ANSI)_$(CMPLR))
+
+LIBRARY = fdlibm
+USR_CFLAGS = -I../../include -DEXPORT_FDLIBM
+
+ifdef WIN32
+LIBSRCS = 	e_exp.c e_lgamma_r.c e_log.c \
+		s_erf.c s_rint.c s_signgam.c \
+		w_lgamma.c k_cos.c k_sin.c k_standard.c
+
+ifdef BORLANDC
+LIBSRCS += 	e_j0.c e_j1.c e_jn.c w_j0.c w_j1.c w_jn.c 
+endif
+endif
+
+ifdef KYLIX
+LIBSRCS = 	e_exp.c e_lgamma_r.c e_log.c \
+		s_erf.c s_rint.c s_signgam.c \
+		w_lgamma.c k_cos.c k_sin.c k_standard.c \
+		e_j0.c e_j1.c e_jn.c w_j0.c w_j1.c w_jn.c
+endif

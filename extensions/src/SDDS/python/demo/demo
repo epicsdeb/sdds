@@ -1,0 +1,17 @@
+#! /usr/bin/env python
+import sys, sdds, time
+
+def sddsDemo1(output):
+     sdds.demo(output)
+    
+def sddsDemo2(output):
+     sdds.demo2(output)
+
+def sddsDemo3(input, output):
+     x = sdds.SDDS(0)
+     x.load(input)
+     x.save(output)
+
+#sddsDemo1('pythonWriteExample.sdds')
+#sddsDemo2('pythonWriteExample.sdds')
+sddsDemo3('pythonReadExample.sdds', 'pythonWriteExample.sdds')

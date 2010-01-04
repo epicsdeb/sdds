@@ -1,0 +1,12 @@
+/* open output file on unit 2
+2 open 
+/* open input file on unit 3
+3 open
+
+udf
+readloop
+3 gets 
+   ? 2 puts  readloop
+   : 2 clos 3 clos $
+
+readloop

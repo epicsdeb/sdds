@@ -1,0 +1,3900 @@
+#!/bin/sh
+# to unpack, sh this message in an empty directory
+PATH=/bin:/usr/bin
+cat > 24048P06 <<'bigmail CUT HERE............'
+-     /* don't trust it */
+-     return (-1);
+-
+-   if (A->mat) m_free(A->mat);
+-
+-   if (mem_info_is_on()) {
+-      mem_bytes(TYPE_BAND,sizeof(BAND),0);
+-      mem_numvar(TYPE_BAND,-1);
+-   }
+-
+-   free((char *)A);
+-   return 0;
+-}
+-
+-
+-/* resize band matrix */
+-
+-BAND *bd_resize(A,new_lb,new_ub,new_n)
+-BAND *A;
+-int new_lb,new_ub,new_n;
+-{
+-   int lb,ub,i,j,l,shift,umin;
+-   Real **Av;
+-
+-   if (new_lb < 0 || new_ub < 0 || new_n <= 0)
+-     error(E_NEG,"bd_resize");
+-   if ( ! A )
+-     return bd_get(new_lb,new_ub,new_n);
+-    if ( A->lb+A->ub+1 > A->mat->m )
+-	error(E_INTERN,"bd_resize");
+-
+-   if ( A->lb == new_lb && A->ub == new_ub && A->mat->n == new_n )
+-	return A;
+-
+-   lb = A->lb;
+-   ub = A->ub;
+-   Av = A->mat->me;
+-   umin = min(ub,new_ub);
+-
+-    /* ensure that unused triangles at edges are zero'd */
+-
+-   for ( i = 0; i < lb; i++ )
+-      for ( j = A->mat->n - lb + i; j < A->mat->n; j++ )
+-	Av[i][j] = 0.0;  
+-    for ( i = lb+1,l=1; l <= umin; i++,l++ )
+-      for ( j = 0; j < l; j++ )
+-	Av[i][j] = 0.0; 
+-
+-   new_lb = A->lb = min(new_lb,new_n-1);
+-   new_ub = A->ub = min(new_ub,new_n-1);
+-   A->mat = m_resize(A->mat,new_lb+new_ub+1,new_n);
+-   Av = A->mat->me;
+-
+-   /* if new_lb != lb then move the rows to get the main diag 
+-      in the new_lb row */
+-
+-   if (new_lb > lb) {
+-      shift = new_lb-lb;
+-
+-      for (i=lb+umin, l=i+shift; i >= 0; i--,l--)
+-	MEM_COPY(Av[i],Av[l],new_n*sizeof(Real));
+-      for (l=shift-1; l >= 0; l--)
+-	__zero__(Av[l],new_n);
+-   }
+-   else if (new_lb < lb) { 
+-      shift = lb - new_lb;
+-
+-      for (i=shift, l=0; i <= lb+umin; i++,l++)
+-	MEM_COPY(Av[i],Av[l],new_n*sizeof(Real));
+-      for (i=lb+umin+1; i <= new_lb+new_ub; i++)
+-	__zero__(Av[i],new_n);
+-   }
+-
+-   return A;
+-}
+-
+-
+-
+-BAND *bd_copy(A,B)
+-BAND *A,*B;
+-{
+-   int lb,ub,i,j,n;
+-   
+-   if ( !A )
+-     error(E_NULL,"bd_copy");
+-
+-   if (A == B) return B;
+-   
+-   n = A->mat->n;
+-   if ( !B )
+-     B = bd_get(A->lb,A->ub,n);
+-   else if (B->lb != A->lb || B->ub != A->ub || B->mat->n != n )
+-     B = bd_resize(B,A->lb,A->ub,n);
+-   
+-   if (A->mat == B->mat) return B;
+-   ub = B->ub = A->ub;
+-   lb = B->lb = A->lb;
+-
+-   for ( i=0, j=n-lb; i <= lb; i++, j++ )
+-     MEM_COPY(A->mat->me[i],B->mat->me[i],j*sizeof(Real));   
+-
+-   for ( i=lb+1, j=1; i <= lb+ub; i++, j++ )
+-     MEM_COPY(A->mat->me[i]+j,B->mat->me[i]+j,(n - j)*sizeof(Real));     
+-
+-   return B;
+-}
+-
+-
+-/* copy band matrix to a square matrix */
+-MAT *band2mat(bA,A)
+-BAND *bA;
+-MAT *A;
+-{
+-   int i,j,l,n,n1;
+-   int lb, ub;
+-   Real **bmat;
+-
+-   if ( !bA || !A)
+-     error(E_NULL,"band2mat");
+-   if ( bA->mat == A )
+-     error(E_INSITU,"band2mat");
+-
+-   ub = bA->ub;
+-   lb = bA->lb;
+-   n = bA->mat->n;
+-   n1 = n-1;
+-   bmat = bA->mat->me;
+-
+-   A = m_resize(A,n,n);
+-   m_zero(A);
+-
+-   for (j=0; j < n; j++)
+-     for (i=min(n1,j+lb),l=lb+j-i; i >= max(0,j-ub); i--,l++)
+-       A->me[i][j] = bmat[l][j];
+-
+-   return A;
+-}
+-
+-/* copy a square matrix to a band matrix with 
+-   lb subdiagonals and ub superdiagonals */
+-BAND *mat2band(A,lb,ub,bA)
+-BAND *bA;
+-MAT *A;
+-int lb, ub;
+-{
+-   int i, j, l, n1;
+-   Real **bmat;
+-   
+-   if (! A || ! bA)
+-     error(E_NULL,"mat2band");
+-   if (ub < 0 || lb < 0)
+-     error(E_SIZES,"mat2band");
+-   if (bA->mat == A)
+-     error(E_INSITU,"mat2band");
+-
+-   n1 = A->n-1;
+-   lb = min(n1,lb);
+-   ub = min(n1,ub);
+-   bA = bd_resize(bA,lb,ub,n1+1);
+-   bmat = bA->mat->me;
+-
+-   for (j=0; j <= n1; j++)
+-     for (i=min(n1,j+lb),l=lb+j-i; i >= max(0,j-ub); i--,l++)
+-       bmat[l][j] = A->me[i][j];
+-
+-   return bA;
+-}
+-
+-
+-
+-/* transposition of matrix in;
+-   out - matrix after transposition;
+-   can be done in situ
+-*/
+-
+-BAND *bd_transp(in,out)
+-BAND *in, *out;
+-{
+-   int i, j, jj, l, k, lb, ub, lub, n, n1;
+-   int in_situ;
+-   Real  **in_v, **out_v;
+-   
+-   if ( in == (BAND *)NULL || in->mat == (MAT *)NULL )
+-     error(E_NULL,"bd_transp");
+-
+-   lb = in->lb;
+-   ub = in->ub;
+-   lub = lb+ub;
+-   n = in->mat->n;
+-   n1 = n-1;
+-
+-   in_situ = ( in == out );
+-   if ( ! in_situ )
+-       out = bd_resize(out,ub,lb,n);
+-   else
+-   {   /* only need to swap lb and ub fields */
+-       out->lb = ub;
+-       out->ub = lb;
+-   }
+-
+-   in_v = in->mat->me;
+-   
+-   if (! in_situ) {
+-      int sh_in,sh_out; 
+-
+-      out_v = out->mat->me;
+-      for (i=0, l=lub, k=lb-i; i <= lub; i++,l--,k--) {
+-	 sh_in = max(-k,0);
+-	 sh_out = max(k,0);
+-	 MEM_COPY(&(in_v[i][sh_in]),&(out_v[l][sh_out]),
+-		  (n-sh_in-sh_out)*sizeof(Real));
+-	 /**********************************
+-	 for (j=n1-sh_out, jj=n1-sh_in; j >= sh_in; j--,jj--) {
+-	    out_v[l][jj] = in_v[i][j];
+-	 }
+-	 **********************************/
+-      }
+-   }
+-   else if (ub == lb) {
+-      Real tmp;
+-
+-      for (i=0, l=lub, k=lb-i; i < lb; i++,l--,k--) {
+-	 for (j=n1-k, jj=n1; j >= 0; j--,jj--) {
+-	    tmp = in_v[l][jj];
+-	    in_v[l][jj] = in_v[i][j];
+-	    in_v[i][j] = tmp;
+-	 }
+-      }
+-   }
+-   else if (ub > lb) {  /* hence i-ub <= 0 & l-lb >= 0 */
+-      int p,pp,lbi;
+-      
+-      for (i=0, l=lub; i < (lub+1)/2; i++,l--) {
+-	 lbi = lb-i;
+-	 for (j=l-lb, jj=0, p=max(-lbi,0), pp = max(l-ub,0); j <= n1; 
+-	      j++,jj++,p++,pp++) {
+-	    in_v[l][pp] = in_v[i][p];
+-	    in_v[i][jj] = in_v[l][j];
+-	 }
+-	 for (  ; p <= n1-max(lbi,0); p++,pp++)
+-	   in_v[l][pp] = in_v[i][p];
+-      }
+-      
+-      if (lub%2 == 0) { /* shift only */
+-	 i = lub/2;
+-	 for (j=max(i-lb,0), jj=0; jj <= n1-ub+i; j++,jj++) 
+-	   in_v[i][jj] = in_v[i][j];
+-      }
+-   }
+-   else {      /* ub < lb, hence ub-l <= 0 & lb-i >= 0 */
+-      int p,pp,ubi;
+-
+-      for (i=0, l=lub; i < (lub+1)/2; i++,l--) {
+-	 ubi = i-ub;
+-	 for (j=n1-max(lb-l,0), jj=n1-max(-ubi,0), p=n1-lb+i, pp=n1;
+-	      p >= 0; j--, jj--, pp--, p--) {
+-	    in_v[i][jj] = in_v[l][j];
+-	    in_v[l][pp] = in_v[i][p];
+-	 }
+-	 for (  ; jj >= max(ubi,0); j--, jj--)
+-	   in_v[i][jj] = in_v[l][j];
+-      }
+-
+-      if (lub%2 == 0) {  /* shift only */
+-	 i = lub/2;
+-	 for (j=n1-lb+i, jj=n1-max(ub-i,0); j >= 0; j--, jj--) 
+-	    in_v[i][jj] = in_v[i][j];
+-      }
+-   }
+-
+-   return out;
+-}
+-
+-
+-
+-/* bdLUfactor -- gaussian elimination with partial pivoting
+-   -- on entry, the matrix A in band storage with elements 
+-      in rows 0 to lb+ub; 
+-      The jth column of A is stored in the jth column of 
+-      band A (bA) as follows:
+-      bA->mat->me[lb+j-i][j] = A->me[i][j] for 
+-      max(0,j-lb) <= i <= min(A->n-1,j+ub);
+-   -- on exit: U is stored as an upper triangular matrix
+-      with lb+ub superdiagonals in rows lb to 2*lb+ub, 
+-      and the matrix L is stored in rows 0 to lb-1.
+-      Matrix U is permuted, whereas L is not permuted !!!
+-      Therefore we save some memory.
+-   */
+-BAND	*bdLUfactor(bA,pivot)
+-BAND	*bA;
+-PERM	*pivot;
+-{
+-   int	i, j, k, l, n, n1, lb, ub, lub, k_end, k_lub;
+-   int	i_max, shift;
+-   Real	**bA_v;
+-   Real max1, temp;
+-   
+-   if ( bA==(BAND *)NULL || pivot==(PERM *)NULL )
+-     error(E_NULL,"bdLUfactor");
+-
+-   lb = bA->lb;
+-   ub = bA->ub;
+-   lub = lb+ub;
+-   n = bA->mat->n;
+-   n1 = n-1;
+-   lub = lb+ub;
+-
+-   if ( pivot->size != n )
+-     error(E_SIZES,"bdLUfactor");
+-
+-   
+-   /* initialise pivot with identity permutation */
+-   for ( i=0; i < n; i++ )
+-     pivot->pe[i] = i;
+-
+-   /* extend band matrix */
+-   /* extended part is filled with zeros */
+-   bA = bd_resize(bA,lb,min(n1,lub),n);
+-   bA_v = bA->mat->me;
+-
+-
+-   /* main loop */
+-
+-   for ( k=0; k < n1; k++ )
+-   {
+-      k_end = max(0,lb+k-n1);
+-      k_lub = min(k+lub,n1);
+-
+-      /* find the best pivot row */
+-      
+-      max1 = 0.0;	
+-      i_max = -1;
+-      for ( i=lb; i >= k_end; i-- ) {
+-	 temp = fabs(bA_v[i][k]);
+-	 if ( temp > max1 )
+-	 { max1 = temp;	i_max = i; }
+-      }
+-      
+-      /* if no pivot then ignore column k... */
+-      if ( i_max == -1 )
+-	continue;
+-      
+-      /* do we pivot ? */
+-      if ( i_max != lb )	/* yes we do... */
+-      {
+-	 /* save transposition using non-shifted indices */
+-	 shift = lb-i_max;
+-	 px_transp(pivot,k+shift,k);
+-	 for ( i=lb, j=k; j <= k_lub; i++,j++ )
+-	 {
+-	    temp = bA_v[i][j];
+-	    bA_v[i][j] = bA_v[i-shift][j];
+-	    bA_v[i-shift][j] = temp;
+-	 }
+-      }
+-      
+-      /* row operations */
+-      for ( i=lb-1; i >= k_end; i-- ) {
+-	 temp = bA_v[i][k] /= bA_v[lb][k];
+-	 shift = lb-i;
+-	 for ( j=k+1,l=i+1; j <= k_lub; l++,j++ )
+-	   bA_v[l][j] -= temp*bA_v[l+shift][j];
+-      }
+-   }
+-   
+-   return bA;
+-}
+-
+-
+-/* bdLUsolve -- given an LU factorisation in bA, solve bA*x=b */
+-/* pivot is changed upon return  */
+-VEC	*bdLUsolve(bA,pivot,b,x)
+-BAND	*bA;
+-PERM	*pivot;
+-VEC	*b,*x;
+-{
+-   int i,j,l,n,n1,pi,lb,ub,jmin, maxj;
+-   Real c;
+-   Real **bA_v;
+-
+-   if ( bA==(BAND *)NULL || b==(VEC *)NULL || pivot==(PERM *)NULL )
+-     error(E_NULL,"bdLUsolve");
+-   if ( bA->mat->n != b->dim || bA->mat->n != pivot->size)
+-     error(E_SIZES,"bdLUsolve");
+- 
+-   lb = bA->lb;
+-   ub = bA->ub;
+-   n = b->dim;
+-   n1 = n-1;
+-   bA_v = bA->mat->me;
+-
+-   x = v_resize(x,b->dim);
+-   px_vec(pivot,b,x);
+-
+-   /* solve Lx = b; implicit diagonal = 1 
+-      L is not permuted, therefore it must be permuted now
+-    */
+-   
+-   px_inv(pivot,pivot);
+-   for (j=0; j < n; j++) {
+-      jmin = j+1;
+-      c = x->ve[j];
+-      maxj = max(0,j+lb-n1);
+-      for (i=jmin,l=lb-1; l >= maxj; i++,l--) {
+-	 if ( (pi = pivot->pe[i]) < jmin) 
+-	   pi = pivot->pe[i] = pivot->pe[pi];
+-	 x->ve[pi] -= bA_v[l][j]*c;
+-      }
+-   }
+-
+-   /* solve Ux = b; explicit diagonal */
+-
+-   x->ve[n1] /= bA_v[lb][n1];
+-   for (i=n-2; i >= 0; i--) {
+-      c = x->ve[i];
+-      for (j=min(n1,i+ub), l=lb+j-i; j > i; j--,l--)
+-	c -= bA_v[l][j]*x->ve[j];
+-      x->ve[i] = c/bA_v[lb][i];
+-   }
+-   
+-   return (x);
+-}
+-
+-/* LDLfactor -- L.D.L' factorisation of A in-situ;
+-   A is a band matrix
+-   it works using only lower bandwidth & main diagonal
+-   so it is possible to set A->ub = 0
+- */
+-
+-BAND *bdLDLfactor(A)
+-BAND *A;
+-{
+-   int i,j,k,n,n1,lb,ki,jk,ji,lbkm,lbkp;
+-   Real **Av;
+-   Real c, cc;
+-
+-   if ( ! A )
+-     error(E_NULL,"bdLDLfactor");
+-
+-   if (A->lb == 0) return A;
+-
+-   lb = A->lb;
+-   n = A->mat->n;
+-   n1 = n-1;
+-   Av = A->mat->me;
+-   
+-   for (k=0; k < n; k++) {    
+-      lbkm = lb-k;
+-      lbkp = lb+k;
+-
+-      /* matrix D */
+-      c = Av[lb][k];
+-      for (j=max(0,-lbkm), jk=lbkm+j; j < k; j++, jk++) {
+-	 cc = Av[jk][j];
+-	 c -= Av[lb][j]*cc*cc;
+-      }
+-      if (c == 0.0)
+-	error(E_SING,"bdLDLfactor");
+-      Av[lb][k] = c;
+-
+-      /* matrix L */
+-      
+-      for (i=min(n1,lbkp), ki=lbkp-i; i > k; i--,ki++) {
+-	 c = Av[ki][k];
+-	 for (j=max(0,i-lb), ji=lb+j-i, jk=lbkm+j; j < k;
+-	      j++, ji++, jk++)
+-	   c -= Av[lb][j]*Av[ji][j]*Av[jk][j];
+-	 Av[ki][k] = c/Av[lb][k];
+-      }
+-   }
+-   
+-   return A;
+-}
+-
+-/* solve A*x = b, where A is factorized by 
+-   Choleski LDL^T factorization */
+-VEC    *bdLDLsolve(A,b,x)
+-BAND   *A;
+-VEC    *b, *x;
+-{
+-   int i,j,l,n,n1,lb,ilb;
+-   Real **Av, *Avlb;
+-   Real c;
+-
+-   if ( ! A || ! b )
+-     error(E_NULL,"bdLDLsolve");
+-   if ( A->mat->n != b->dim )
+-     error(E_SIZES,"bdLDLsolve");
+-
+-   n = A->mat->n;
+-   n1 = n-1;
+-   x = v_resize(x,n);
+-   lb = A->lb;
+-   Av = A->mat->me;  
+-   Avlb = Av[lb];
+-   
+-   /* solve L*y = b */
+-   x->ve[0] = b->ve[0];
+-   for (i=1; i < n; i++) {
+-      ilb = i-lb;
+-      c = b->ve[i];
+-      for (j=max(0,ilb), l=j-ilb; j < i; j++,l++)
+-	c -= Av[l][j]*x->ve[j];
+-      x->ve[i] = c;
+-   }
+-
+-   /* solve D*z = y */
+-   for (i=0; i < n; i++) 
+-     x->ve[i] /= Avlb[i];
+-
+-   /* solve L^T*x = z */
+-   for (i=n-2; i >= 0; i--) {
+-      ilb = i+lb;
+-      c = x->ve[i];
+-      for (j=min(n1,ilb), l=ilb-j; j > i; j--,l++)
+-	c -= Av[l][i]*x->ve[j];
+-      x->ve[i] = c;
+-   }
+-
+-   return x;
+-}
+-
+-
+-/* ******************************************************
+-  This function is a contribution from Ruediger Franke.
+-   His e-mail addres is: Ruediger.Franke@rz.tu-ilmenau.de
+-   
+-   ******************************************************
+-*/
+-
+-/* bd_mv_mlt --
+- *   computes out = A * x
+- *   may not work in situ (x != out)
+- */
+-
+-VEC *bd_mv_mlt(A, x, out)
+-BAND *A;
+-VEC *x, *out;
+-{
+-  int i, j, j_end, k;
+-  int start_idx, end_idx;
+-  int n, m, lb, ub;
+-  Real **A_me;
+-  Real *x_ve;
+-  Real sum;
+-
+-  if (!A || !x)
+-    error(E_NULL,"bd_mv_mlt");
+-  if (x->dim != A->mat->n)
+-    error(E_SIZES,"bd_mv_mlt");
+-  if (!out || out->dim != A->mat->n)
+-    out = v_resize(out, A->mat->n);
+-  if (out == x)
+-    error(E_INSITU,"bd_mv_mlt");
+-
+-  n = A->mat->n;
+-  m = A->mat->m;
+-  lb = A->lb;
+-  ub = A->ub;
+-  A_me = A->mat->me;
+-  start_idx = lb;
+-  end_idx = m + n-1 - ub;
+-  for (i=0; i<n; i++, start_idx--, end_idx--) {
+-    j = max(0, start_idx);
+-    k = max(0, -start_idx);
+-    j_end = min(m, end_idx);
+-    x_ve = x->ve + k;
+-    sum = 0.0;	     
+-    for (; j < j_end; j++, k++)
+-      sum += A_me[j][k] * *x_ve++;
+-    out->ve[i] = sum;
+-  }
+-
+-  return out;
+-}
+-
+-
+-
+//GO.SYSIN DD bdfactor.c
+bigmail CUT HERE............
+test -w meschach2.shar &&
+test -r 24048P05 &&
+test -r 24048P06 &&
+(
+ cat 24048P05 >> meschach2.shar; rm 24048P05
+ cat 24048P06 >> meschach2.shar; rm 24048P06
+)
+cat > meschach3.shar <<'bigmail CUT HERE............'
+# to unbundle, sh this file (in an empty directory)
+echo sparse.c 1>&2
+sed >sparse.c <<'//GO.SYSIN DD sparse.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-/*
+-  Sparse matrix package
+-  See also: sparse.h, matrix.h
+-  */
+-
+-#include	<stdio.h>
+-#include	<math.h>
+-#include        <stdlib.h>
+-#include	"sparse.h"
+-
+-
+-static char	rcsid[] = "$Id: m8,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-#define	MINROWLEN	10
+-
+-
+-
+-/* sp_get_val -- returns the (i,j) entry of the sparse matrix A */
+-double	sp_get_val(A,i,j)
+-SPMAT	*A;
+-int	i, j;
+-{
+-   SPROW	*r;
+-   int	idx;
+-   
+-   if ( A == SMNULL )
+-     error(E_NULL,"sp_get_val");
+-   if ( i < 0 || i >= A->m || j < 0 || j >= A->n )
+-     error(E_SIZES,"sp_get_val");
+-   
+-   r = A->row+i;
+-   idx = sprow_idx(r,j);
+-   if ( idx < 0 )
+-     return 0.0;
+-   /* else */
+-   return r->elt[idx].val;
+-}
+-
+-/* sp_set_val -- sets the (i,j) entry of the sparse matrix A */
+-double	sp_set_val(A,i,j,val)
+-SPMAT	*A;
+-int	i, j;
+-double	val;
+-{
+-   SPROW	*r;
+-   int	idx, idx2, new_len;
+-   
+-   if ( A == SMNULL )
+-     error(E_NULL,"sp_set_val");
+-   if ( i < 0 || i >= A->m || j < 0 || j >= A->n )
+-     error(E_SIZES,"sp_set_val");
+-   
+-   r = A->row+i;
+-   idx = sprow_idx(r,j);
+-   /* printf("sp_set_val: idx = %d\n",idx); */
+-   if ( idx >= 0 )
+-   {	r->elt[idx].val = val;	return val;	}
+-   /* else */ if ( idx < -1 )
+-   {
+-      /* Note: this destroys the column & diag access paths */
+-      A->flag_col = A->flag_diag = FALSE;
+-      /* shift & insert new value */
+-      idx = -(idx+2);	/* this is the intended insertion index */
+-      if ( r->len >= r->maxlen )
+-      {
+-	 r->len = r->maxlen;
+-	 new_len = max(2*r->maxlen+1,5);
+-	 if (mem_info_is_on()) {
+-	    mem_bytes(TYPE_SPMAT,A->row[i].maxlen*sizeof(row_elt),
+-			    new_len*sizeof(row_elt));
+-	 }
+-
+-	 r->elt = RENEW(r->elt,new_len,row_elt);
+-	 if ( ! r->elt )	/* can't allocate */
+-	   error(E_MEM,"sp_set_val");
+-	 r->maxlen = 2*r->maxlen+1;
+-      }
+-      for ( idx2 = r->len-1; idx2 >= idx; idx2-- )
+-	MEM_COPY((char *)(&(r->elt[idx2])),
+-		 (char *)(&(r->elt[idx2+1])),sizeof(row_elt));
+-      /************************************************************
+-	if ( idx < r->len )
+-	MEM_COPY((char *)(&(r->elt[idx])),(char *)(&(r->elt[idx+1])),
+-	(r->len-idx)*sizeof(row_elt));
+-	************************************************************/
+-      r->len++;
+-      r->elt[idx].col = j;
+-      return r->elt[idx].val = val;
+-   }
+-   /* else -- idx == -1, error in index/matrix! */
+-   return 0.0;
+-}
+-
+-/* sp_mv_mlt -- sparse matrix/dense vector multiply
+-   -- result is in out, which is returned unless out==NULL on entry
+-   --  if out==NULL on entry then the result vector is created */
+-VEC	*sp_mv_mlt(A,x,out)
+-SPMAT	*A;
+-VEC	*x, *out;
+-{
+-   int	i, j_idx, m, n, max_idx;
+-   Real	sum, *x_ve;
+-   SPROW	*r;
+-   row_elt	*elts;
+-   
+-   if ( ! A || ! x )
+-     error(E_NULL,"sp_mv_mlt");
+-   if ( x->dim != A->n )
+-     error(E_SIZES,"sp_mv_mlt");
+-   if ( ! out || out->dim < A->m )
+-     out = v_resize(out,A->m);
+-   if ( out == x )
+-     error(E_INSITU,"sp_mv_mlt");
+-   m = A->m;	n = A->n;
+-   x_ve = x->ve;
+-   
+-   for ( i = 0; i < m; i++ )
+-   {
+-      sum = 0.0;
+-      r = &(A->row[i]);
+-      max_idx = r->len;
+-      elts    = r->elt;
+-      for ( j_idx = 0; j_idx < max_idx; j_idx++, elts++ )
+-	sum += elts->val*x_ve[elts->col];
+-      out->ve[i] = sum;
+-   }
+-   return out;
+-}
+-
+-/* sp_vm_mlt -- sparse matrix/dense vector multiply from left
+-   -- result is in out, which is returned unless out==NULL on entry
+-   -- if out==NULL on entry then result vector is created & returned */
+-VEC	*sp_vm_mlt(A,x,out)
+-SPMAT	*A;
+-VEC	*x, *out;
+-{
+-   int	i, j_idx, m, n, max_idx;
+-   Real	tmp, *x_ve, *out_ve;
+-   SPROW	*r;
+-   row_elt	*elts;
+-   
+-   if ( ! A || ! x )
+-     error(E_NULL,"sp_vm_mlt");
+-   if ( x->dim != A->m )
+-     error(E_SIZES,"sp_vm_mlt");
+-   if ( ! out || out->dim < A->n )
+-     out = v_resize(out,A->n);
+-   if ( out == x )
+-     error(E_INSITU,"sp_vm_mlt");
+-   
+-   m = A->m;	n = A->n;
+-   v_zero(out);
+-   x_ve = x->ve;	out_ve = out->ve;
+-   
+-   for ( i = 0; i < m; i++ )
+-   {
+-      r = A->row+i;
+-      max_idx = r->len;
+-      elts    = r->elt;
+-      tmp = x_ve[i];
+-      for ( j_idx = 0; j_idx < max_idx; j_idx++, elts++ )
+-	out_ve[elts->col] += elts->val*tmp;
+-   }
+-   
+-   return out;
+-}
+-
+-
+-/* sp_get -- get sparse matrix
+-   -- len is number of elements available for each row without
+-   allocating further memory */
+-SPMAT	*sp_get(m,n,maxlen)
+-int	m, n, maxlen;
+-{
+-   SPMAT	*A;
+-   SPROW	*rows;
+-   int	i;
+-   
+-   if ( m < 0 || n < 0 )
+-     error(E_NEG,"sp_get");
+-
+-   maxlen = max(maxlen,1);
+-   
+-   A = NEW(SPMAT);
+-   if ( ! A )		/* can't allocate */
+-     error(E_MEM,"sp_get");
+-   else if (mem_info_is_on()) {
+-      mem_bytes(TYPE_SPMAT,0,sizeof(SPMAT));
+-      mem_numvar(TYPE_SPMAT,1);
+-   }
+-   /* fprintf(stderr,"Have SPMAT structure\n"); */
+-   
+-   A->row = rows = NEW_A(m,SPROW);
+-   if ( ! A->row )		/* can't allocate */
+-     error(E_MEM,"sp_get");
+-   else if (mem_info_is_on()) {
+-      mem_bytes(TYPE_SPMAT,0,m*sizeof(SPROW));
+-   }
+-   /* fprintf(stderr,"Have row structure array\n"); */
+-   
+-   A->start_row = NEW_A(n,int);
+-   A->start_idx = NEW_A(n,int);
+-   if ( ! A->start_row || ! A->start_idx )	/* can't allocate */
+-     error(E_MEM,"sp_get");
+-   else if (mem_info_is_on()) {
+-      mem_bytes(TYPE_SPMAT,0,2*n*sizeof(int));
+-   }
+-   for ( i = 0; i < n; i++ )
+-     A->start_row[i] = A->start_idx[i] = -1;
+-   /* fprintf(stderr,"Have start_row array\n"); */
+-   
+-   A->m = A->max_m = m;
+-   A->n = A->max_n = n;
+-   
+-   for ( i = 0; i < m; i++, rows++ )
+-   {
+-      rows->elt = NEW_A(maxlen,row_elt);
+-      if ( ! rows->elt )
+-	error(E_MEM,"sp_get");
+-      else if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_SPMAT,0,maxlen*sizeof(row_elt));
+-      }
+-      /* fprintf(stderr,"Have row %d element array\n",i); */
+-      rows->len = 0;
+-      rows->maxlen = maxlen;
+-      rows->diag = -1;
+-   }
+-   
+-   return A;
+-}
+-
+-
+-/* sp_free -- frees up the memory for a sparse matrix */
+-int	sp_free(A)
+-SPMAT	*A;
+-{
+-   SPROW	*r;
+-   int	i;
+-   
+-   if ( ! A )
+-     return -1;
+-   if ( A->start_row != (int *)NULL ) {
+-      if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_SPMAT,A->max_n*sizeof(int),0);
+-      }
+-      free((char *)(A->start_row));
+-   }
+-   if ( A->start_idx != (int *)NULL ) {
+-      if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_SPMAT,A->max_n*sizeof(int),0);
+-      }
+-      
+-      free((char *)(A->start_idx));
+-   }
+-   if ( ! A->row )
+-   {
+-      if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_SPMAT,sizeof(SPMAT),0);
+-	 mem_numvar(TYPE_SPMAT,-1);
+-      }
+-      
+-      free((char *)A);
+-      return 0;
+-   }
+-   for ( i = 0; i < A->m; i++ )
+-   {
+-      r = &(A->row[i]);
+-      if ( r->elt != (row_elt *)NULL ) {
+-	 if (mem_info_is_on()) {
+-	    mem_bytes(TYPE_SPMAT,A->row[i].maxlen*sizeof(row_elt),0);
+-	 }
+-	 free((char *)(r->elt));
+-      }
+-   }
+-   
+-   if (mem_info_is_on()) {
+-      if (A->row) 
+-	mem_bytes(TYPE_SPMAT,A->max_m*sizeof(SPROW),0);
+-      mem_bytes(TYPE_SPMAT,sizeof(SPMAT),0);
+-      mem_numvar(TYPE_SPMAT,-1);
+-   }
+-   
+-   free((char *)(A->row));
+-   free((char *)A);
+-
+-   return 0;
+-}
+-
+-
+-/* sp_copy -- constructs a copy of a given matrix
+-   -- note that the max_len fields (etc) are no larger in the copy
+-   than necessary
+-   -- result is returned */
+-SPMAT	*sp_copy(A)
+-SPMAT	*A;
+-{
+-   SPMAT	*out;
+-   SPROW	*row1, *row2;
+-   int	i;
+-   
+-   if ( A == SMNULL )
+-     error(E_NULL,"sp_copy");
+-   if ( ! (out=NEW(SPMAT)) )
+-     error(E_MEM,"sp_copy");
+-   else if (mem_info_is_on()) {
+-      mem_bytes(TYPE_SPMAT,0,sizeof(SPMAT));
+-      mem_numvar(TYPE_SPMAT,1);
+-   }
+-   out->m = out->max_m = A->m;	out->n = out->max_n = A->n;
+-   
+-   /* set up rows */
+-   if ( ! (out->row=NEW_A(A->m,SPROW)) )
+-     error(E_MEM,"sp_copy");
+-   else if (mem_info_is_on()) {
+-      mem_bytes(TYPE_SPMAT,0,A->m*sizeof(SPROW));
+-   }
+-   for ( i = 0; i < A->m; i++ )
+-   {
+-      row1 = &(A->row[i]);
+-      row2 = &(out->row[i]);
+-      if ( ! (row2->elt=NEW_A(max(row1->len,3),row_elt)) )
+-	error(E_MEM,"sp_copy");
+-      else if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_SPMAT,0,max(row1->len,3)*sizeof(row_elt));
+-      }
+-      row2->len = row1->len;
+-      row2->maxlen = max(row1->len,3);
+-      row2->diag = row1->diag;
+-      MEM_COPY((char *)(row1->elt),(char *)(row2->elt),
+-	       row1->len*sizeof(row_elt));
+-   }
+-   
+-   /* set up start arrays -- for column access */
+-   if ( ! (out->start_idx=NEW_A(A->n,int)) ||
+-       ! (out->start_row=NEW_A(A->n,int)) )
+-     error(E_MEM,"sp_copy");
+-   else if (mem_info_is_on()) {
+-      mem_bytes(TYPE_SPMAT,0,2*A->n*sizeof(int));
+-   }
+-   MEM_COPY((char *)(A->start_idx),(char *)(out->start_idx),
+-	    A->n*sizeof(int));
+-   MEM_COPY((char *)(A->start_row),(char *)(out->start_row),
+-	    A->n*sizeof(int));
+-   
+-   return out;
+-}
+-
+-/* sp_col_access -- set column access path; i.e. nxt_row, nxt_idx fields
+-   -- returns A */
+-SPMAT	*sp_col_access(A)
+-SPMAT	*A;
+-{
+-   int	i, j, j_idx, len, m, n;
+-   SPROW	*row;
+-   row_elt	*r_elt;
+-   int	*start_row, *start_idx;
+-   
+-   if ( A == SMNULL )
+-     error(E_NULL,"sp_col_access");
+-   
+-   m = A->m;	n = A->n;
+-   
+-   /* initialise start_row and start_idx */
+-   start_row = A->start_row;	start_idx = A->start_idx;
+-   for ( j = 0; j < n; j++ )
+-   {	*start_row++ = -1;	*start_idx++ = -1;	}
+-   
+-   start_row = A->start_row;	start_idx = A->start_idx;
+-   
+-   /* now work UP the rows, setting nxt_row, nxt_idx fields */
+-   for ( i = m-1; i >= 0; i-- )
+-   {
+-      row = &(A->row[i]);
+-      r_elt = row->elt;
+-      len   = row->len;
+-      for ( j_idx = 0; j_idx < len; j_idx++, r_elt++ )
+-      {
+-	 j = r_elt->col;
+-	 r_elt->nxt_row = start_row[j];
+-	 r_elt->nxt_idx = start_idx[j];
+-	 start_row[j] = i;
+-	 start_idx[j] = j_idx;
+-      }
+-   }
+-   
+-   A->flag_col = TRUE;
+-   return A;
+-}
+-
+-/* sp_diag_access -- set diagonal access path(s) */
+-SPMAT	*sp_diag_access(A)
+-SPMAT	*A;
+-{
+-   int	i, m;
+-   SPROW	*row;
+-   
+-   if ( A == SMNULL )
+-     error(E_NULL,"sp_diag_access");
+-   
+-   m = A->m;
+-   
+-   row = A->row;
+-   for ( i = 0; i < m; i++, row++ )
+-     row->diag = sprow_idx(row,i);
+-   
+-   A->flag_diag = TRUE;
+-   
+-   return A;
+-}
+-
+-/* sp_m2dense -- convert a sparse matrix to a dense one */
+-MAT	*sp_m2dense(A,out)
+-SPMAT	*A;
+-MAT	*out;
+-{
+-   int	i, j_idx;
+-   SPROW	*row;
+-   row_elt	*elt;
+-   
+-   if ( ! A )
+-     error(E_NULL,"sp_m2dense");
+-   if ( ! out || out->m < A->m || out->n < A->n )
+-     out = m_get(A->m,A->n);
+-   
+-   m_zero(out);
+-   for ( i = 0; i < A->m; i++ )
+-   {
+-      row = &(A->row[i]);
+-      elt = row->elt;
+-      for ( j_idx = 0; j_idx < row->len; j_idx++, elt++ )
+-	out->me[i][elt->col] = elt->val;
+-   }
+-   
+-   return out;
+-}
+-
+-
+-/*  C = A+B, can be in situ */
+-SPMAT *sp_add(A,B,C)
+-SPMAT *A, *B, *C;
+-{
+-   int i, in_situ;
+-   SPROW *rc;
+-   static SPROW *tmp;
+-
+-   if ( ! A || ! B )
+-     error(E_NULL,"sp_add");
+-   if ( A->m != B->m || A->n != B->n )
+-     error(E_SIZES,"sp_add");
+-   if (C == A || C == B)
+-     in_situ = TRUE;
+-   else in_situ = FALSE;
+-
+-   if ( ! C )
+-     C = sp_get(A->m,A->n,5);
+-   else {
+-      if ( C->m != A->m || C->n != A->n  )
+-	error(E_SIZES,"sp_add");
+-      if (!in_situ) sp_zero(C);
+-   }
+-
+-   if (tmp == (SPROW *)NULL && in_situ) {
+-      tmp = sprow_get(MINROWLEN);
+-      MEM_STAT_REG(tmp,TYPE_SPROW);
+-   }
+-
+-   if (in_situ)
+-     for (i=0; i < A->m; i++) {
+-	rc = &(C->row[i]);
+-	sprow_add(&(A->row[i]),&(B->row[i]),0,tmp,TYPE_SPROW);
+-	sprow_resize(rc,tmp->len,TYPE_SPMAT);
+-	MEM_COPY(tmp->elt,rc->elt,tmp->len*sizeof(row_elt));
+-	rc->len = tmp->len;
+-     }
+-   else
+-     for (i=0; i < A->m; i++) {
+-	sprow_add(&(A->row[i]),&(B->row[i]),0,&(C->row[i]),TYPE_SPMAT);
+-     }
+-
+-   C->flag_col = C->flag_diag = FALSE;
+-
+-   return C;
+-}
+-
+-/*  C = A-B, cannot be in situ */
+-SPMAT *sp_sub(A,B,C)
+-SPMAT *A, *B, *C;
+-{
+-   int i, in_situ;
+-   SPROW *rc;
+-   static SPROW *tmp;
+-   
+-   if ( ! A || ! B )
+-     error(E_NULL,"sp_sub");
+-   if ( A->m != B->m || A->n != B->n )
+-     error(E_SIZES,"sp_sub");
+-   if (C == A || C == B)
+-     in_situ = TRUE;
+-   else in_situ = FALSE;
+-
+-   if ( ! C )
+-     C = sp_get(A->m,A->n,5);
+-   else {
+-      if ( C->m != A->m || C->n != A->n  )
+-	error(E_SIZES,"sp_sub");
+-      if (!in_situ) sp_zero(C);
+-   }
+-
+-   if (tmp == (SPROW *)NULL && in_situ) {
+-      tmp = sprow_get(MINROWLEN);
+-      MEM_STAT_REG(tmp,TYPE_SPROW);
+-   }
+-
+-   if (in_situ)
+-     for (i=0; i < A->m; i++) {
+-	rc = &(C->row[i]);
+-	sprow_sub(&(A->row[i]),&(B->row[i]),0,tmp,TYPE_SPROW);
+-	sprow_resize(rc,tmp->len,TYPE_SPMAT);
+-	MEM_COPY(tmp->elt,rc->elt,tmp->len*sizeof(row_elt));
+-	rc->len = tmp->len;
+-     }
+-   else
+-     for (i=0; i < A->m; i++) {
+-	sprow_sub(&(A->row[i]),&(B->row[i]),0,&(C->row[i]),TYPE_SPMAT);
+-     }
+-
+-   C->flag_col = C->flag_diag = FALSE;
+-   
+-   return C;
+-}
+-
+-/*  C = A+alpha*B, cannot be in situ */
+-SPMAT *sp_mltadd(A,B,alpha,C)
+-SPMAT *A, *B, *C;
+-double alpha;
+-{
+-   int i, in_situ;
+-   SPROW *rc;
+-   static SPROW *tmp;
+-
+-   if ( ! A || ! B )
+-     error(E_NULL,"sp_mltadd");
+-   if ( A->m != B->m || A->n != B->n )
+-     error(E_SIZES,"sp_mltadd");
+-   if (C == A || C == B)
+-     in_situ = TRUE;
+-   else in_situ = FALSE;
+-
+-   if ( ! C )
+-     C = sp_get(A->m,A->n,5);
+-   else {
+-      if ( C->m != A->m || C->n != A->n  )
+-	error(E_SIZES,"sp_mltadd");
+-      if (!in_situ) sp_zero(C);
+-   }
+-
+-   if (tmp == (SPROW *)NULL && in_situ) {
+-      tmp = sprow_get(MINROWLEN);
+-      MEM_STAT_REG(tmp,TYPE_SPROW);
+-   }
+-
+-   if (in_situ)
+-     for (i=0; i < A->m; i++) {
+-	rc = &(C->row[i]);
+-	sprow_mltadd(&(A->row[i]),&(B->row[i]),alpha,0,tmp,TYPE_SPROW);
+-	sprow_resize(rc,tmp->len,TYPE_SPMAT);
+-	MEM_COPY(tmp->elt,rc->elt,tmp->len*sizeof(row_elt));
+-	rc->len = tmp->len;
+-     }
+-   else
+-     for (i=0; i < A->m; i++) {
+-	sprow_mltadd(&(A->row[i]),&(B->row[i]),alpha,0,
+-		     &(C->row[i]),TYPE_SPMAT);
+-     }
+-   
+-   C->flag_col = C->flag_diag = FALSE;
+-   
+-   return C;
+-}
+-
+-
+-
+-/*  B = alpha*A, can be in situ */
+-SPMAT *sp_smlt(A,alpha,B)
+-SPMAT *A, *B;
+-double alpha;
+-{
+-   int i;
+-
+-   if ( ! A )
+-     error(E_NULL,"sp_smlt");
+-   if ( ! B )
+-     B = sp_get(A->m,A->n,5);
+-   else
+-     if ( A->m != B->m || A->n != B->n )
+-       error(E_SIZES,"sp_smlt");
+-
+-   for (i=0; i < A->m; i++) {
+-      sprow_smlt(&(A->row[i]),alpha,0,&(B->row[i]),TYPE_SPMAT);
+-   }
+-   return B;
+-}
+-
+-
+-
+-/* sp_zero -- zero all the (represented) elements of a sparse matrix */
+-SPMAT	*sp_zero(A)
+-SPMAT	*A;
+-{
+-   int	i, idx, len;
+-   row_elt	*elt;
+-   
+-   if ( ! A )
+-     error(E_NULL,"sp_zero");
+-   
+-   for ( i = 0; i < A->m; i++ )
+-   {
+-      elt = A->row[i].elt;
+-      len = A->row[i].len;
+-      for ( idx = 0; idx < len; idx++ )
+-	(*elt++).val = 0.0;
+-   }
+-   
+-   return A;
+-}
+-
+-/* sp_copy2 -- copy sparse matrix (type 2) 
+-   -- keeps structure of the OUT matrix */
+-SPMAT	*sp_copy2(A,OUT)
+-SPMAT	*A, *OUT;
+-{
+-   int	i /* , idx, len1, len2 */;
+-   SPROW	*r1, *r2;
+-   static SPROW	*scratch = (SPROW *)NULL;
+-   /* row_elt	*e1, *e2; */
+-   
+-   if ( ! A )
+-     error(E_NULL,"sp_copy2");
+-   if ( ! OUT )
+-     OUT = sp_get(A->m,A->n,10);
+-   if ( ! scratch ) {
+-      scratch = sprow_xpd(scratch,MINROWLEN,TYPE_SPROW);
+-      MEM_STAT_REG(scratch,TYPE_SPROW);
+-   }
+-
+-   if ( OUT->m < A->m )
+-   {
+-      if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_SPMAT,A->max_m*sizeof(SPROW),
+-		      A->m*sizeof(SPROW));
+-      }
+-
+-      OUT->row = RENEW(OUT->row,A->m,SPROW);
+-      if ( ! OUT->row )
+-	error(E_MEM,"sp_copy2");
+-      
+-      for ( i = OUT->m; i < A->m; i++ )
+-      {
+-	 OUT->row[i].elt = NEW_A(MINROWLEN,row_elt);
+-	 if ( ! OUT->row[i].elt )
+-	   error(E_MEM,"sp_copy2");
+-	 else if (mem_info_is_on()) {
+-	    mem_bytes(TYPE_SPMAT,0,MINROWLEN*sizeof(row_elt));
+-	 }
+-	 
+-	 OUT->row[i].maxlen = MINROWLEN;
+-	 OUT->row[i].len = 0;
+-      }
+-      OUT->m = A->m;
+-   }
+-   
+-   OUT->flag_col = OUT->flag_diag = FALSE;
+-   /* sp_zero(OUT); */
+-
+-   for ( i = 0; i < A->m; i++ )
+-   {
+-      r1 = &(A->row[i]);	r2 = &(OUT->row[i]);
+-      sprow_copy(r1,r2,scratch,TYPE_SPROW);
+-      if ( r2->maxlen < scratch->len )
+-	sprow_xpd(r2,scratch->len,TYPE_SPMAT);
+-      MEM_COPY((char *)(scratch->elt),(char *)(r2->elt),
+-	       scratch->len*sizeof(row_elt));
+-      r2->len = scratch->len;
+-      /*******************************************************
+-	e1 = r1->elt;		e2 = r2->elt;
+-	len1 = r1->len;		len2 = r2->len;
+-	for ( idx = 0; idx < len2; idx++, e2++ )
+-	e2->val = 0.0;
+-	for ( idx = 0; idx < len1; idx++, e1++ )
+-	sprow_set_val(r2,e1->col,e1->val);
+-	*******************************************************/
+-   }
+-
+-   sp_col_access(OUT);
+-   return OUT;
+-}
+-
+-/* sp_resize -- resize a sparse matrix
+-   -- don't destroying any contents if possible
+-   -- returns resized matrix */
+-SPMAT	*sp_resize(A,m,n)
+-SPMAT	*A;
+-int	m, n;
+-{
+-   int	i, len;
+-   SPROW	*r;
+-   
+-   if (m < 0 || n < 0)
+-     error(E_NEG,"sp_resize");
+-
+-   if ( ! A )
+-     return sp_get(m,n,10);
+-
+-   if (m == A->m && n == A->n)
+-     return A;
+-
+-   if ( m <= A->max_m )
+-   {
+-      for ( i = A->m; i < m; i++ )
+-	A->row[i].len = 0;
+-      A->m = m;
+-   }
+-   else
+-   {
+-      if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_SPMAT,A->max_m*sizeof(SPROW),
+-			 m*sizeof(SPROW));
+-      }
+-
+-      A->row = RENEW(A->row,(unsigned)m,SPROW);
+-      if ( ! A->row )
+-	error(E_MEM,"sp_resize");
+-      for ( i = A->m; i < m; i++ )
+-      {
+-	 if ( ! (A->row[i].elt = NEW_A(MINROWLEN,row_elt)) )
+-	   error(E_MEM,"sp_resize");
+-	 else if (mem_info_is_on()) {
+-	    mem_bytes(TYPE_SPMAT,0,MINROWLEN*sizeof(row_elt));
+-	 }
+-	 A->row[i].len = 0;	A->row[i].maxlen = MINROWLEN;
+-      }
+-      A->m = A->max_m = m;
+-   }
+-
+-   /* update number of rows */
+-   A->n = n;
+-
+-   /* do we need to increase the size of start_idx[] and start_row[] ? */
+-   if ( n > A->max_n )
+-   {	/* only have to update the start_idx & start_row arrays */
+-      if (mem_info_is_on())
+-      {
+-	  mem_bytes(TYPE_SPMAT,2*A->max_n*sizeof(int),
+-		    2*n*sizeof(int));
+-      }
+-
+-      A->start_row = RENEW(A->start_row,(unsigned)n,int);
+-      A->start_idx = RENEW(A->start_idx,(unsigned)n,int);
+-      if ( ! A->start_row || ! A->start_idx )
+-	error(E_MEM,"sp_resize");
+-      A->max_n = n;	/* ...and update max_n */
+-
+-      return A;
+-   }
+-
+-   if ( n <= A->n )
+-       /* make sure that all rows are truncated just before column n */
+-       for ( i = 0; i < A->m; i++ )
+-       {
+-	   r = &(A->row[i]);
+-	   len = sprow_idx(r,n);
+-	   if ( len < 0 )
+-	       len = -(len+2);
+-	   if ( len < 0 )
+-	       error(E_MEM,"sp_resize");
+-	   r->len = len;
+-       }
+-   
+-   return A;
+-}
+-
+-
+-/* sp_compact -- removes zeros and near-zeros from a sparse matrix */
+-SPMAT	*sp_compact(A,tol)
+-SPMAT	*A;
+-double	tol;
+-{
+-   int	i, idx1, idx2;
+-   SPROW	*r;
+-   row_elt	*elt1, *elt2;
+-   
+-   if (  ! A )
+-     error(E_NULL,"sp_compact");
+-   if ( tol < 0.0 )
+-     error(E_RANGE,"sp_compact");
+-   
+-   A->flag_col = A->flag_diag = FALSE;
+-   
+-   for ( i = 0; i < A->m; i++ )
+-   {
+-      r = &(A->row[i]);
+-      elt1 = elt2 = r->elt;
+-      idx1 = idx2 = 0;
+-      while ( idx1 < r->len )
+-      {
+-	 /* printf("# sp_compact: idx1 = %d, idx2 = %d\n",idx1,idx2); */
+-	 if ( fabs(elt1->val) <= tol )
+-	 {	idx1++;	elt1++;	continue;	}
+-	 if ( elt1 != elt2 )
+-	   MEM_COPY(elt1,elt2,sizeof(row_elt));
+-	 idx1++;	elt1++;
+-	 idx2++;	elt2++;
+-      }
+-      r->len = idx2;
+-   }
+-   
+-   return A;
+-}
+-
+-/* varying number of arguments */
+-
+-#ifdef ANSI_C
+-
+-/* To allocate memory to many arguments. 
+-   The function should be called:
+-   sp_get_vars(m,n,deg,&x,&y,&z,...,NULL);
+-   where 
+-     int m,n,deg;
+-     SPMAT *x, *y, *z,...;
+-     The last argument should be NULL ! 
+-     m x n is the dimension of matrices x,y,z,...
+-     returned value is equal to the number of allocated variables
+-*/
+-
+-int sp_get_vars(int m,int n,int deg,...) 
+-{
+-   va_list ap;
+-   int i=0;
+-   SPMAT **par;
+-   
+-   va_start(ap, deg);
+-   while (par = va_arg(ap,SPMAT **)) {   /* NULL ends the list*/
+-      *par = sp_get(m,n,deg);
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-/* To resize memory for many arguments. 
+-   The function should be called:
+-   sp_resize_vars(m,n,&x,&y,&z,...,NULL);
+-   where 
+-     int m,n;
+-     SPMAT *x, *y, *z,...;
+-     The last argument should be NULL ! 
+-     m X n is the resized dimension of matrices x,y,z,...
+-     returned value is equal to the number of allocated variables.
+-     If one of x,y,z,.. arguments is NULL then memory is allocated to this 
+-     argument. 
+-*/
+-  
+-int sp_resize_vars(int m,int n,...) 
+-{
+-   va_list ap;
+-   int i=0;
+-   SPMAT **par;
+-   
+-   va_start(ap, n);
+-   while (par = va_arg(ap,SPMAT **)) {   /* NULL ends the list*/
+-      *par = sp_resize(*par,m,n);
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-/* To deallocate memory for many arguments. 
+-   The function should be called:
+-   sp_free_vars(&x,&y,&z,...,NULL);
+-   where 
+-     SPMAT *x, *y, *z,...;
+-     The last argument should be NULL ! 
+-     There must be at least one not NULL argument.
+-     returned value is equal to the number of allocated variables.
+-     Returned value of x,y,z,.. is VNULL.
+-*/
+-
+-int sp_free_vars(SPMAT **va,...)
+-{
+-   va_list ap;
+-   int i=1;
+-   SPMAT **par;
+-   
+-   sp_free(*va);
+-   *va = (SPMAT *) NULL;
+-   va_start(ap, va);
+-   while (par = va_arg(ap,SPMAT **)) {   /* NULL ends the list*/
+-      sp_free(*par); 
+-      *par = (SPMAT *)NULL;
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-#elif VARARGS
+-
+-/* To allocate memory to many arguments. 
+-   The function should be called:
+-   sp_get_vars(m,n,deg,&x,&y,&z,...,NULL);
+-   where 
+-     int m,n,deg;
+-     SPMAT *x, *y, *z,...;
+-     The last argument should be NULL ! 
+-     m x n is the dimension of matrices x,y,z,...
+-     returned value is equal to the number of allocated variables
+-*/
+-
+-int sp_get_vars(va_alist) va_dcl
+-{
+-   va_list ap;
+-   int i=0, m, n, deg;
+-   SPMAT **par;
+-   
+-   va_start(ap);
+-   m = va_arg(ap,int);
+-   n = va_arg(ap,int);
+-   deg = va_arg(ap,int);
+-   while (par = va_arg(ap,SPMAT **)) {   /* NULL ends the list*/
+-      *par = sp_get(m,n,deg);
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-/* To resize memory for many arguments. 
+-   The function should be called:
+-   sp_resize_vars(m,n,&x,&y,&z,...,NULL);
+-   where 
+-     int m,n;
+-     SPMAT *x, *y, *z,...;
+-     The last argument should be NULL ! 
+-     m X n is the resized dimension of matrices x,y,z,...
+-     returned value is equal to the number of allocated variables.
+-     If one of x,y,z,.. arguments is NULL then memory is allocated to this 
+-     argument. 
+-*/
+-
+-int sp_resize_vars(va_alist) va_dcl
+-{
+-   va_list ap;
+-   int i=0, m, n;
+-   SPMAT **par;
+-   
+-   va_start(ap);
+-   m = va_arg(ap,int);
+-   n = va_arg(ap,int);
+-   while (par = va_arg(ap,SPMAT **)) {   /* NULL ends the list*/
+-      *par = sp_resize(*par,m,n);
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-
+-/* To deallocate memory for many arguments. 
+-   The function should be called:
+-   sp_free_vars(&x,&y,&z,...,NULL);
+-   where 
+-     SPMAT *x, *y, *z,...;
+-     The last argument should be NULL ! 
+-     There must be at least one not NULL argument.
+-     returned value is equal to the number of allocated variables.
+-     Returned value of x,y,z,.. is VNULL.
+-*/
+-
+-int sp_free_vars(va_alist) va_dcl
+-{
+-   va_list ap;
+-   int i=0;
+-   SPMAT **par;
+-   
+-   va_start(ap);
+-   while (par = va_arg(ap,SPMAT **)) {   /* NULL ends the list*/
+-      sp_free(*par); 
+-      *par = (SPMAT *)NULL;
+-      i++;
+-   } 
+-
+-   va_end(ap);
+-   return i;
+-}
+-
+-
+-
+-#endif
+-
+//GO.SYSIN DD sparse.c
+echo sprow.c 1>&2
+sed >sprow.c <<'//GO.SYSIN DD sprow.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-/*
+-  Sparse rows package
+-  See also: sparse.h, matrix.h
+-  */
+-
+-#include	<stdio.h>
+-#include	<math.h>
+-#include        <stdlib.h>
+-#include	"sparse.h"
+-
+-
+-static char	rcsid[] = "$Id: m8,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-#define	MINROWLEN	10
+-
+-
+-/* sprow_dump - prints relevant information about the sparse row r */
+-
+-void sprow_dump(fp,r)
+-FILE *fp;
+-SPROW *r;
+-{
+-   int  j_idx;
+-   row_elt *elts;
+-   
+-   fprintf(fp,"SparseRow dump:\n");
+-   if ( ! r )
+-   {       fprintf(fp,"*** NULL row ***\n");   return; }
+-   
+-   fprintf(fp,"row: len = %d, maxlen = %d, diag idx = %d\n",
+-	   r->len,r->maxlen,r->diag);
+-   fprintf(fp,"element list @ 0x%lx\n",(long)(r->elt));
+-   if ( ! r->elt )
+-   {
+-      fprintf(fp,"*** NULL element list ***\n");
+-      return;
+-   }
+-   elts = r->elt;
+-   for ( j_idx = 0; j_idx < r->len; j_idx++, elts++ )
+-     fprintf(fp,"Col: %d, Val: %g, nxt_row = %d, nxt_idx = %d\n",
+-	     elts->col,elts->val,elts->nxt_row,elts->nxt_idx);
+-   fprintf(fp,"\n");
+-}
+-
+-
+-/* sprow_idx -- get index into row for a given column in a given row
+-   -- return -1 on error
+-   -- return -(idx+2) where idx is index to insertion point */
+-int	sprow_idx(r,col)
+-SPROW	*r;
+-int	col;
+-{
+-   register int		lo, hi, mid;
+-   int			tmp;
+-   register row_elt	*r_elt;
+-   
+-   /*******************************************
+-     if ( r == (SPROW *)NULL )
+-     return -1;
+-     if ( col < 0 )
+-     return -1;
+-     *******************************************/
+-   
+-   r_elt = r->elt;
+-   if ( r->len <= 0 )
+-     return -2;
+-   
+-   /* try the hint */
+-   /* if ( hint >= 0 && hint < r->len && r_elt[hint].col == col )
+-      return hint; */
+-   
+-   /* otherwise use binary search... */
+-   /* code from K&R Ch. 6, p. 125 */
+-   lo = 0;		hi = r->len - 1;	mid = lo;
+-   while ( lo <= hi )
+-   {
+-      mid = (hi + lo)/2;
+-      if ( (tmp=r_elt[mid].col-col) > 0 )
+-	hi = mid-1;
+-      else if ( tmp < 0 )
+-	lo = mid+1;
+-      else /* tmp == 0 */
+-	return mid;
+-   }
+-   tmp = r_elt[mid].col - col;
+-   
+-   if ( tmp > 0 )
+-     return -(mid+2);	/* insert at mid   */
+-   else /* tmp < 0 */
+-     return -(mid+3);	/* insert at mid+1 */
+-}
+-
+-
+-/* sprow_get -- gets, initialises and returns a SPROW structure
+-   -- max. length is maxlen */
+-SPROW	*sprow_get(maxlen)
+-int	maxlen;
+-{
+-   SPROW	*r;
+-   
+-   if ( maxlen < 0 )
+-     error(E_NEG,"sprow_get");
+-
+-   r = NEW(SPROW);
+-   if ( ! r )
+-     error(E_MEM,"sprow_get");
+-   else if (mem_info_is_on()) {
+-      mem_bytes(TYPE_SPROW,0,sizeof(SPROW));
+-      mem_numvar(TYPE_SPROW,1);
+-   }
+-   r->elt = NEW_A(maxlen,row_elt);
+-   if ( ! r->elt )
+-     error(E_MEM,"sprow_get");
+-   else if (mem_info_is_on()) {
+-      mem_bytes(TYPE_SPROW,0,maxlen*sizeof(row_elt));
+-   }
+-   r->len = 0;
+-   r->maxlen = maxlen;
+-   r->diag = -1;
+-   
+-   return r;
+-}
+-
+-
+-/* sprow_xpd -- expand row by means of realloc()
+-   -- type must be TYPE_SPMAT if r is a row of a SPMAT structure,
+-      otherwise it must be TYPE_SPROW
+-   -- returns r */
+-SPROW	*sprow_xpd(r,n,type)
+-SPROW	*r;
+-int	n,type;
+-{
+-   int	newlen;
+-   
+-   if ( ! r ) {
+-     r = NEW(SPROW);
+-     if (! r ) 
+-       error(E_MEM,"sprow_xpd");
+-     else if ( mem_info_is_on()) {
+-	if (type != TYPE_SPMAT && type != TYPE_SPROW)
+-	  warning(WARN_WRONG_TYPE,"sprow_xpd");
+-	mem_bytes(type,0,sizeof(SPROW));
+-	if (type == TYPE_SPROW)
+-	  mem_numvar(type,1);
+-     }
+-   }
+-
+-   if ( ! r->elt )
+-   {
+-      r->elt = NEW_A((unsigned)n,row_elt);
+-      if ( ! r->elt )
+-	error(E_MEM,"sprow_xpd");
+-      else if (mem_info_is_on()) {
+-	 mem_bytes(type,0,n*sizeof(row_elt));
+-      }
+-      r->len = 0;
+-      r->maxlen = n;
+-      return r;
+-   }
+-   if ( n <= r->len )
+-     newlen = max(2*r->len + 1,MINROWLEN);
+-   else
+-     newlen = n;
+-   if ( newlen <= r->maxlen )
+-   {
+-      MEM_ZERO((char *)(&(r->elt[r->len])),
+-	       (newlen-r->len)*sizeof(row_elt));
+-      r->len = newlen;
+-   }
+-   else
+-   {
+-      if (mem_info_is_on()) {
+-	 mem_bytes(type,r->maxlen*sizeof(row_elt),
+-		     newlen*sizeof(row_elt)); 
+-      }
+-      r->elt = RENEW(r->elt,newlen,row_elt);
+-      if ( ! r->elt )
+-	error(E_MEM,"sprow_xpd");
+-      r->maxlen = newlen;
+-      r->len = newlen;
+-   }
+-   
+-   return r;
+-}
+-
+-/* sprow_resize -- resize a SPROW variable by means of realloc()
+-   -- n is a new size
+-   -- returns r */
+-SPROW	*sprow_resize(r,n,type)
+-SPROW	*r;
+-int	n,type;
+-{
+-   if (n < 0)
+-     error(E_NEG,"sprow_resize");
+-
+-   if ( ! r ) 
+-     return sprow_get(n);
+-   
+-   if (n == r->len)
+-     return r;
+-
+-   if ( ! r->elt )
+-   {
+-      r->elt = NEW_A((unsigned)n,row_elt);
+-      if ( ! r->elt )
+-	error(E_MEM,"sprow_resize");
+-      else if (mem_info_is_on()) {
+-	 mem_bytes(type,0,n*sizeof(row_elt));
+-      }
+-      r->maxlen = r->len = n;
+-      return r;
+-   }
+-
+-   if ( n <= r->maxlen )
+-     r->len = n;
+-   else
+-   {
+-      if (mem_info_is_on()) {
+-	 mem_bytes(type,r->maxlen*sizeof(row_elt),
+-		   n*sizeof(row_elt)); 
+-      }
+-      r->elt = RENEW(r->elt,n,row_elt);
+-      if ( ! r->elt )
+-	error(E_MEM,"sprow_resize");
+-      r->maxlen = r->len = n;
+-   }
+-   
+-   return r;
+-}
+-
+-
+-/* release a row of a matrix */
+-int sprow_free(r)
+-SPROW	*r;
+-{
+-   if ( ! r )
+-     return -1;
+-
+-   if (mem_info_is_on()) {
+-      mem_bytes(TYPE_SPROW,sizeof(SPROW),0);
+-      mem_numvar(TYPE_SPROW,-1);
+-   }
+-   
+-   if ( r->elt )
+-   {
+-      if (mem_info_is_on()) {
+-	 mem_bytes(TYPE_SPROW,r->maxlen*sizeof(row_elt),0);
+-      }
+-      free((char *)r->elt);
+-   }
+-   free((char *)r);
+-   return 0;
+-}
+-
+-
+-/* sprow_merge -- merges r1 and r2 into r_out
+-   -- cannot be done in-situ
+-   -- type must be SPMAT or SPROW depending on
+-      whether r_out is a row of a SPMAT structure
+-      or a SPROW variable
+-   -- returns r_out */
+-SPROW	*sprow_merge(r1,r2,r_out,type)
+-SPROW	*r1, *r2, *r_out;
+-int type;
+-{
+-   int	idx1, idx2, idx_out, len1, len2, len_out;
+-   row_elt	*elt1, *elt2, *elt_out;
+-   
+-   if ( ! r1 || ! r2 )
+-     error(E_NULL,"sprow_merge");
+-   if ( ! r_out )
+-     r_out = sprow_get(MINROWLEN);
+-   if ( r1 == r_out || r2 == r_out )
+-     error(E_INSITU,"sprow_merge");
+-   
+-   /* Initialise */
+-   len1 = r1->len;	len2 = r2->len;	len_out = r_out->maxlen;
+-   idx1 = idx2 = idx_out = 0;
+-   elt1 = r1->elt;	elt2 = r2->elt;	elt_out = r_out->elt;
+-   
+-   while ( idx1 < len1 || idx2 < len2 )
+-   {
+-      if ( idx_out >= len_out )
+-      {   /* r_out is too small */
+-	 r_out->len = idx_out;
+-	 r_out = sprow_xpd(r_out,0,type);
+-	 len_out = r_out->len;
+-	 elt_out = &(r_out->elt[idx_out]);
+-      }
+-      if ( idx2 >= len2 || (idx1 < len1 && elt1->col <= elt2->col) )
+-      {
+-	 elt_out->col = elt1->col;
+-	 elt_out->val = elt1->val;
+-	 if ( elt1->col == elt2->col && idx2 < len2 )
+-	 {	elt2++;		idx2++;	}
+-	 elt1++;	idx1++;
+-      }
+-      else
+-      {
+-	 elt_out->col = elt2->col;
+-	 elt_out->val = elt2->val;
+-	 elt2++;	idx2++;
+-      }
+-      elt_out++;	idx_out++;
+-   }
+-   r_out->len = idx_out;
+-   
+-   return r_out;
+-}
+-
+-/* sprow_copy -- copies r1 and r2 into r_out
+-   -- cannot be done in-situ
+-   -- type must be SPMAT or SPROW depending on
+-      whether r_out is a row of a SPMAT structure
+-      or a SPROW variable
+-   -- returns r_out */
+-SPROW	*sprow_copy(r1,r2,r_out,type)
+-SPROW	*r1, *r2, *r_out;
+-int type;
+-{
+-   int	idx1, idx2, idx_out, len1, len2, len_out;
+-   row_elt	*elt1, *elt2, *elt_out;
+-   
+-   if ( ! r1 || ! r2 )
+-     error(E_NULL,"sprow_copy");
+-   if ( ! r_out )
+-     r_out = sprow_get(MINROWLEN);
+-   if ( r1 == r_out || r2 == r_out )
+-     error(E_INSITU,"sprow_copy");
+-   
+-   /* Initialise */
+-   len1 = r1->len;	len2 = r2->len;	len_out = r_out->maxlen;
+-   idx1 = idx2 = idx_out = 0;
+-   elt1 = r1->elt;	elt2 = r2->elt;	elt_out = r_out->elt;
+-   
+-   while ( idx1 < len1 || idx2 < len2 )
+-   {
+-      while ( idx_out >= len_out )
+-      {   /* r_out is too small */
+-	 r_out->len = idx_out;
+-	 r_out = sprow_xpd(r_out,0,type);
+-	 len_out = r_out->maxlen;
+-	 elt_out = &(r_out->elt[idx_out]);
+-      }
+-      if ( idx2 >= len2 || (idx1 < len1 && elt1->col <= elt2->col) )
+-      {
+-	 elt_out->col = elt1->col;
+-	 elt_out->val = elt1->val;
+-	 if ( elt1->col == elt2->col && idx2 < len2 )
+-	 {	elt2++;		idx2++;	}
+-	 elt1++;	idx1++;
+-      }
+-      else
+-      {
+-	 elt_out->col = elt2->col;
+-	 elt_out->val = 0.0;
+-	 elt2++;	idx2++;
+-      }
+-      elt_out++;	idx_out++;
+-   }
+-   r_out->len = idx_out;
+-   
+-   return r_out;
+-}
+-
+-/* sprow_mltadd -- sets r_out <- r1 + alpha.r2
+-   -- cannot be in situ
+-   -- only for columns j0, j0+1, ...
+-   -- type must be SPMAT or SPROW depending on
+-      whether r_out is a row of a SPMAT structure
+-      or a SPROW variable
+-   -- returns r_out */
+-SPROW	*sprow_mltadd(r1,r2,alpha,j0,r_out,type)
+-SPROW	*r1, *r2, *r_out;
+-double	alpha;
+-int	j0, type;
+-{
+-   int	idx1, idx2, idx_out, len1, len2, len_out;
+-   row_elt	*elt1, *elt2, *elt_out;
+-   
+-   if ( ! r1 || ! r2 )
+-     error(E_NULL,"sprow_mltadd");
+-   if ( r1 == r_out || r2 == r_out )
+-     error(E_INSITU,"sprow_mltadd");
+-   if ( j0 < 0 )
+-     error(E_BOUNDS,"sprow_mltadd");
+-   if ( ! r_out )
+-     r_out = sprow_get(MINROWLEN);
+-   
+-   /* Initialise */
+-   len1 = r1->len;	len2 = r2->len;	len_out = r_out->maxlen;
+-   /* idx1 = idx2 = idx_out = 0; */
+-   idx1    = sprow_idx(r1,j0);
+-   idx2    = sprow_idx(r2,j0);
+-   idx_out = sprow_idx(r_out,j0);
+-   idx1    = (idx1 < 0) ? -(idx1+2) : idx1;
+-   idx2    = (idx2 < 0) ? -(idx2+2) : idx2;
+-   idx_out = (idx_out < 0) ? -(idx_out+2) : idx_out;
+-   elt1    = &(r1->elt[idx1]);
+-   elt2    = &(r2->elt[idx2]);
+-   elt_out = &(r_out->elt[idx_out]);
+-   
+-   while ( idx1 < len1 || idx2 < len2 )
+-   {
+-      if ( idx_out >= len_out )
+-      {   /* r_out is too small */
+-	 r_out->len = idx_out;
+-	 r_out = sprow_xpd(r_out,0,type);
+-	 len_out = r_out->maxlen;
+-	 elt_out = &(r_out->elt[idx_out]);
+-      }
+-      if ( idx2 >= len2 || (idx1 < len1 && elt1->col <= elt2->col) )
+-      {
+-	 elt_out->col = elt1->col;
+-	 elt_out->val = elt1->val;
+-	 if ( idx2 < len2 && elt1->col == elt2->col )
+-	 {
+-	    elt_out->val += alpha*elt2->val;
+-	    elt2++;		idx2++;
+-	 }
+-	 elt1++;	idx1++;
+-      }
+-      else
+-      {
+-	 elt_out->col = elt2->col;
+-	 elt_out->val = alpha*elt2->val;
+-	 elt2++;	idx2++;
+-      }
+-      elt_out++;	idx_out++;
+-   }
+-   r_out->len = idx_out;
+-   
+-   return r_out;
+-}
+-
+-/* sprow_add -- sets r_out <- r1 + r2
+-   -- cannot be in situ
+-   -- only for columns j0, j0+1, ...
+-   -- type must be SPMAT or SPROW depending on
+-      whether r_out is a row of a SPMAT structure
+-      or a SPROW variable
+-   -- returns r_out */
+-SPROW	*sprow_add(r1,r2,j0,r_out,type)
+-SPROW	*r1, *r2, *r_out;
+-int	j0, type;
+-{
+-   int	idx1, idx2, idx_out, len1, len2, len_out;
+-   row_elt	*elt1, *elt2, *elt_out;
+-   
+-   if ( ! r1 || ! r2 )
+-     error(E_NULL,"sprow_add");
+-   if ( r1 == r_out || r2 == r_out )
+-     error(E_INSITU,"sprow_add");
+-   if ( j0 < 0 )
+-     error(E_BOUNDS,"sprow_add");
+-   if ( ! r_out )
+-     r_out = sprow_get(MINROWLEN);
+-   
+-   /* Initialise */
+-   len1 = r1->len;	len2 = r2->len;	len_out = r_out->maxlen;
+-   /* idx1 = idx2 = idx_out = 0; */
+-   idx1    = sprow_idx(r1,j0);
+-   idx2    = sprow_idx(r2,j0);
+-   idx_out = sprow_idx(r_out,j0);
+-   idx1    = (idx1 < 0) ? -(idx1+2) : idx1;
+-   idx2    = (idx2 < 0) ? -(idx2+2) : idx2;
+-   idx_out = (idx_out < 0) ? -(idx_out+2) : idx_out;
+-   elt1    = &(r1->elt[idx1]);
+-   elt2    = &(r2->elt[idx2]);
+-   elt_out = &(r_out->elt[idx_out]);
+-   
+-   while ( idx1 < len1 || idx2 < len2 )
+-   {
+-      if ( idx_out >= len_out )
+-      {   /* r_out is too small */
+-	 r_out->len = idx_out;
+-	 r_out = sprow_xpd(r_out,0,type);
+-	 len_out = r_out->maxlen;
+-	 elt_out = &(r_out->elt[idx_out]);
+-      }
+-      if ( idx2 >= len2 || (idx1 < len1 && elt1->col <= elt2->col) )
+-      {
+-	 elt_out->col = elt1->col;
+-	 elt_out->val = elt1->val;
+-	 if ( idx2 < len2 && elt1->col == elt2->col )
+-	 {
+-	    elt_out->val += elt2->val;
+-	    elt2++;		idx2++;
+-	 }
+-	 elt1++;	idx1++;
+-      }
+-      else
+-      {
+-	 elt_out->col = elt2->col;
+-	 elt_out->val = elt2->val;
+-	 elt2++;	idx2++;
+-      }
+-      elt_out++;	idx_out++;
+-   }
+-   r_out->len = idx_out;
+-   
+-   return r_out;
+-}
+-
+-/* sprow_sub -- sets r_out <- r1 - r2
+-   -- cannot be in situ
+-   -- only for columns j0, j0+1, ...
+-   -- type must be SPMAT or SPROW depending on
+-      whether r_out is a row of a SPMAT structure
+-      or a SPROW variable
+-   -- returns r_out */
+-SPROW	*sprow_sub(r1,r2,j0,r_out,type)
+-SPROW	*r1, *r2, *r_out;
+-int	j0, type;
+-{
+-   int	idx1, idx2, idx_out, len1, len2, len_out;
+-   row_elt	*elt1, *elt2, *elt_out;
+-   
+-   if ( ! r1 || ! r2 )
+-     error(E_NULL,"sprow_sub");
+-   if ( r1 == r_out || r2 == r_out )
+-     error(E_INSITU,"sprow_sub");
+-   if ( j0 < 0 )
+-     error(E_BOUNDS,"sprow_sub");
+-   if ( ! r_out )
+-     r_out = sprow_get(MINROWLEN);
+-   
+-   /* Initialise */
+-   len1 = r1->len;	len2 = r2->len;	len_out = r_out->maxlen;
+-   /* idx1 = idx2 = idx_out = 0; */
+-   idx1    = sprow_idx(r1,j0);
+-   idx2    = sprow_idx(r2,j0);
+-   idx_out = sprow_idx(r_out,j0);
+-   idx1    = (idx1 < 0) ? -(idx1+2) : idx1;
+-   idx2    = (idx2 < 0) ? -(idx2+2) : idx2;
+-   idx_out = (idx_out < 0) ? -(idx_out+2) : idx_out;
+-   elt1    = &(r1->elt[idx1]);
+-   elt2    = &(r2->elt[idx2]);
+-   elt_out = &(r_out->elt[idx_out]);
+-   
+-   while ( idx1 < len1 || idx2 < len2 )
+-   {
+-      if ( idx_out >= len_out )
+-      {   /* r_out is too small */
+-	 r_out->len = idx_out;
+-	 r_out = sprow_xpd(r_out,0,type);
+-	 len_out = r_out->maxlen;
+-	 elt_out = &(r_out->elt[idx_out]);
+-      }
+-      if ( idx2 >= len2 || (idx1 < len1 && elt1->col <= elt2->col) )
+-      {
+-	 elt_out->col = elt1->col;
+-	 elt_out->val = elt1->val;
+-	 if ( idx2 < len2 && elt1->col == elt2->col )
+-	 {
+-	    elt_out->val -= elt2->val;
+-	    elt2++;		idx2++;
+-	 }
+-	 elt1++;	idx1++;
+-      }
+-      else
+-      {
+-	 elt_out->col = elt2->col;
+-	 elt_out->val = -elt2->val;
+-	 elt2++;	idx2++;
+-      }
+-      elt_out++;	idx_out++;
+-   }
+-   r_out->len = idx_out;
+-   
+-   return r_out;
+-}
+-
+-
+-/* sprow_smlt -- sets r_out <- alpha*r1 
+-   -- can be in situ
+-   -- only for columns j0, j0+1, ...
+-   -- returns r_out */
+-SPROW	*sprow_smlt(r1,alpha,j0,r_out,type)
+-SPROW	*r1, *r_out;
+-double	alpha;
+-int	j0, type;
+-{
+-   int	idx1, idx_out, len1;
+-   row_elt	*elt1, *elt_out;
+-   
+-   if ( ! r1 )
+-     error(E_NULL,"sprow_smlt");
+-   if ( j0 < 0 )
+-     error(E_BOUNDS,"sprow_smlt");
+-   if ( ! r_out )
+-     r_out = sprow_get(MINROWLEN);
+-   
+-   /* Initialise */
+-   len1 = r1->len;
+-   idx1    = sprow_idx(r1,j0);
+-   idx_out = sprow_idx(r_out,j0);
+-   idx1    = (idx1 < 0) ? -(idx1+2) : idx1;
+-   idx_out = (idx_out < 0) ? -(idx_out+2) : idx_out;
+-   elt1    = &(r1->elt[idx1]);
+-
+-   r_out = sprow_resize(r_out,idx_out+len1-idx1,type);  
+-   elt_out = &(r_out->elt[idx_out]);
+-
+-   for ( ; idx1 < len1; elt1++,elt_out++,idx1++,idx_out++ )
+-   {
+-      elt_out->col = elt1->col;
+-      elt_out->val = alpha*elt1->val;
+-   }
+-
+-   r_out->len = idx_out;
+-
+-   return r_out;
+-}
+-
+-  
+-/* sprow_foutput -- print a representation of r on stream fp */
+-void	sprow_foutput(fp,r)
+-FILE	*fp;
+-SPROW	*r;
+-{
+-   int	i, len;
+-   row_elt	*e;
+-   
+-   if ( ! r )
+-   {
+-      fprintf(fp,"SparseRow: **** NULL ****\n");
+-      return;
+-   }
+-   len = r->len;
+-   fprintf(fp,"SparseRow: length: %d\n",len);
+-   for ( i = 0, e = r->elt; i < len; i++, e++ )
+-     fprintf(fp,"Column %d: %g, next row: %d, next index %d\n",
+-	     e->col, e->val, e->nxt_row, e->nxt_idx);
+-}
+-
+-
+-/* sprow_set_val -- sets the j-th column entry of the sparse row r
+-   -- Note: destroys the usual column & row access paths */
+-double  sprow_set_val(r,j,val)
+-SPROW   *r;
+-int     j;
+-double  val;
+-{
+-   int  idx, idx2, new_len;
+-   
+-   if ( ! r )
+-     error(E_NULL,"sprow_set_val");
+-   
+-   idx = sprow_idx(r,j);
+-   if ( idx >= 0 )
+-   {    r->elt[idx].val = val;  return val;     }
+-   /* else */ if ( idx < -1 )
+-   {
+-      /* shift & insert new value */
+-      idx = -(idx+2);   /* this is the intended insertion index */
+-      if ( r->len >= r->maxlen )
+-      {
+-         r->len = r->maxlen;
+-         new_len = max(2*r->maxlen+1,5);
+-         if (mem_info_is_on()) {
+-            mem_bytes(TYPE_SPROW,r->maxlen*sizeof(row_elt),
+-                        new_len*sizeof(row_elt)); 
+-         }
+-         
+-         r->elt = RENEW(r->elt,new_len,row_elt);
+-         if ( ! r->elt )        /* can't allocate */
+-           error(E_MEM,"sprow_set_val");
+-         r->maxlen = 2*r->maxlen+1;
+-      }
+-      for ( idx2 = r->len-1; idx2 >= idx; idx2-- )
+-        MEM_COPY((char *)(&(r->elt[idx2])),
+-                 (char *)(&(r->elt[idx2+1])),sizeof(row_elt));
+-      /************************************************************
+-        if ( idx < r->len )
+-        MEM_COPY((char *)(&(r->elt[idx])),(char *)(&(r->elt[idx+1])),
+-        (r->len-idx)*sizeof(row_elt));
+-        ************************************************************/
+-      r->len++;
+-      r->elt[idx].col = j;
+-      r->elt[idx].nxt_row = -1;
+-      r->elt[idx].nxt_idx = -1;
+-      return r->elt[idx].val = val;
+-   }
+-   /* else -- idx == -1, error in index/matrix! */
+-   return 0.0;
+-}
+-
+-
+//GO.SYSIN DD sprow.c
+echo sparseio.c 1>&2
+sed >sparseio.c <<'//GO.SYSIN DD sparseio.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-	This file has the routines for sparse matrix input/output
+-	It works in conjunction with sparse.c, sparse.h etc
+-*/
+-
+-#include        <stdio.h>
+-#include        "sparse.h"
+-
+-static char rcsid[] = "$Id: m8,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-
+-
+-/* local variables */
+-static char line[MAXLINE];
+-
+-/* sp_foutput -- output sparse matrix A to file/stream fp */
+-void    sp_foutput(fp,A)
+-FILE    *fp;
+-SPMAT  *A;
+-{
+-	int     i, j_idx, m /* , n */;
+-	SPROW  *rows;
+-	row_elt *elts;
+-
+-	fprintf(fp,"SparseMatrix: ");
+-	if ( A == SMNULL )
+-	{
+-		fprintf(fp,"*** NULL ***\n");
+-		error(E_NULL,"sp_foutput");    return;
+-	}
+-	fprintf(fp,"%d by %d\n",A->m,A->n);
+-	m = A->m;       /* n = A->n; */
+-	if ( ! (rows=A->row) )
+-	{
+-		fprintf(fp,"*** NULL rows ***\n");
+-		error(E_NULL,"sp_foutput");    return;
+-	}
+-
+-	for ( i = 0; i < m; i++ )
+-	{
+-		fprintf(fp,"row %d: ",i);
+-		if ( ! (elts=rows[i].elt) )
+-		{
+-			fprintf(fp,"*** NULL element list ***\n");
+-			continue;
+-		}
+-		for ( j_idx = 0; j_idx < rows[i].len; j_idx++ )
+-		{
+-			fprintf(fp,"%d:%-20.15g ",elts[j_idx].col,
+-							elts[j_idx].val);
+-			if ( j_idx % 3 == 2 && j_idx != rows[i].len-1 )
+-				fprintf(fp,"\n     ");
+-		}
+-		fprintf(fp,"\n");
+-	}
+-	fprintf(fp,"#\n");	/* to stop looking beyond for next entry */
+-}
+-
+-/* sp_foutput2 -- print out sparse matrix **as a dense matrix**
+-	-- see output format used in matrix.h etc */
+-/******************************************************************
+-void    sp_foutput2(fp,A)
+-FILE    *fp;
+-SPMAT  *A;
+-{
+-	int     cnt, i, j, j_idx;
+-	SPROW  *r;
+-	row_elt *elt;
+-
+-	if ( A == SMNULL )
+-	{
+-		fprintf(fp,"Matrix: *** NULL ***\n");
+-		return;
+-	}
+-	fprintf(fp,"Matrix: %d by %d\n",A->m,A->n);
+-	for ( i = 0; i < A->m; i++ )
+-	{
+-		fprintf(fp,"row %d:",i);
+-		r = &(A->row[i]);
+-		elt = r->elt;
+-		cnt = j = j_idx = 0;
+-		while ( j_idx < r->len || j < A->n )
+-		{
+-			if ( j_idx >= r->len )
+-				fprintf(fp,"%14.9g ",0.0);
+-			else if ( j < elt[j_idx].col )
+-				fprintf(fp,"%14.9g ",0.0);
+-			else
+-				fprintf(fp,"%14.9g ",elt[j_idx++].val);
+-			if ( cnt++ % 4 == 3 )
+-				fprintf(fp,"\n");
+-			j++;
+-		}
+-		fprintf(fp,"\n");
+-	}
+-}
+-******************************************************************/
+-
+-/* sp_dump -- prints ALL relevant information about the sparse matrix A */
+-void    sp_dump(fp,A)
+-FILE    *fp;
+-SPMAT  *A;
+-{
+-	int     i, j, j_idx;
+-	SPROW  *rows;
+-	row_elt *elts;
+-
+-	fprintf(fp,"SparseMatrix dump:\n");
+-	if ( ! A )
+-	{       fprintf(fp,"*** NULL ***\n");   return; }
+-	fprintf(fp,"Matrix at 0x%lx\n",(long)A);
+-	fprintf(fp,"Dimensions: %d by %d\n",A->m,A->n);
+-	fprintf(fp,"MaxDimensions: %d by %d\n",A->max_m,A->max_n);
+-	fprintf(fp,"flag_col = %d, flag_diag = %d\n",A->flag_col,A->flag_diag);
+-	fprintf(fp,"start_row @ 0x%lx:\n",(long)(A->start_row));
+-	for ( j = 0; j < A->n; j++ )
+-	{
+-		fprintf(fp,"%d ",A->start_row[j]);
+-		if ( j % 10 == 9 )
+-			fprintf(fp,"\n");
+-	}
+-	fprintf(fp,"\n");
+-	fprintf(fp,"start_idx @ 0x%lx:\n",(long)(A->start_idx));
+-	for ( j = 0; j < A->n; j++ )
+-	{
+-		fprintf(fp,"%d ",A->start_idx[j]);
+-		if ( j % 10 == 9 )
+-			fprintf(fp,"\n");
+-	}
+-	fprintf(fp,"\n");
+-	fprintf(fp,"Rows @ 0x%lx:\n",(long)(A->row));
+-	if ( ! A->row )
+-	{       fprintf(fp,"*** NULL row ***\n");       return; }
+-	rows = A->row;
+-	for ( i = 0; i < A->m; i++ )
+-	{
+-		fprintf(fp,"row %d: len = %d, maxlen = %d, diag idx = %d\n",
+-			i,rows[i].len,rows[i].maxlen,rows[i].diag);
+-		fprintf(fp,"element list @ 0x%lx\n",(long)(rows[i].elt));
+-		if ( ! rows[i].elt )
+-		{
+-			fprintf(fp,"*** NULL element list ***\n");
+-			continue;
+-		}
+-		elts = rows[i].elt;
+-		for ( j_idx = 0; j_idx < rows[i].len; j_idx++, elts++ )
+-		    fprintf(fp,"Col: %d, Val: %g, nxt_row = %d, nxt_idx = %d\n",
+-			elts->col,elts->val,elts->nxt_row,elts->nxt_idx);
+-		fprintf(fp,"\n");
+-	}
+-}
+-
+-#define MAXSCRATCH      100
+-
+-/* sp_finput -- input sparse matrix from stream/file fp
+-	-- uses friendly input routine if fp is a tty
+-	-- uses format identical to output format otherwise */
+-SPMAT  *sp_finput(fp)
+-FILE    *fp;
+-{
+-	int     i, len, ret_val;
+-	int     col, curr_col, m, n, tmp, tty;
+-	Real  val;
+-	SPMAT  *A;
+-	SPROW  *rows;
+-
+-	row_elt scratch[MAXSCRATCH];
+-	/* cannot handle >= MAXSCRATCH elements in a row */
+-
+-	for ( i = 0; i < MAXSCRATCH; i++ )
+-		scratch[i].nxt_row = scratch[i].nxt_idx = -1;
+-
+-	tty = isatty(fileno(fp));
+-
+-	if ( tty )
+-	{
+-		fprintf(stderr,"SparseMatrix: ");
+-		do {
+-			fprintf(stderr,"input rows cols: ");
+-			if ( ! fgets(line,MAXLINE,fp) )
+-			    error(E_INPUT,"sp_finput");
+-		} while ( sscanf(line,"%u %u",&m,&n) != 2 );
+-		A = sp_get(m,n,5);
+-		rows = A->row;
+-
+-		for ( i = 0; i < m; i++ )
+-		{
+-		    fprintf(stderr,"Row %d:\n",i);
+-		    fprintf(stderr,"Enter <col> <val> or 'e' to end row\n");
+-		    curr_col = -1;
+-		    for ( len = 0; len < MAXSCRATCH; len++ )
+-		    {
+-			do {
+-			    fprintf(stderr,"Entry %d: ",len);
+-			    if ( ! fgets(line,MAXLINE,fp) )
+-				error(E_INPUT,"sp_finput");
+-			    if ( *line == 'e' || *line == 'E' )
+-				break;
+-#if REAL == DOUBLE
+-			} while ( sscanf(line,"%u %lf",&col,&val) != 2 ||
+-#elif REAL == FLOAT
+-			} while ( sscanf(line,"%u %f",&col,&val) != 2 ||
+-#endif
+-				    col >= n || col <= curr_col );
+-
+-			if ( *line == 'e' || *line == 'E' )
+-			    break;
+-
+-			scratch[len].col = col;
+-			scratch[len].val = val;
+-			curr_col = col;
+-		    }
+-
+-		    /* Note: len = # elements in row */
+-		    if ( len > 5 )
+-		     {
+-			if (mem_info_is_on()) {
+-			   mem_bytes(TYPE_SPMAT,
+-					   A->row[i].maxlen*sizeof(row_elt),
+-					   len*sizeof(row_elt));  
+-			}
+-
+-			rows[i].elt = (row_elt *)realloc((char *)rows[i].elt,
+-							 len*sizeof(row_elt));
+-			rows[i].maxlen = len;
+-		    }
+-		    MEM_COPY(scratch,rows[i].elt,len*sizeof(row_elt));
+-		    rows[i].len  = len;
+-		    rows[i].diag = sprow_idx(&(rows[i]),i);
+-		}
+-	}
+-	else /* not tty */
+-	{
+-	        ret_val = 0;
+-		skipjunk(fp);
+-		fscanf(fp,"SparseMatrix:");
+-		skipjunk(fp);
+-		if ( (ret_val=fscanf(fp,"%u by %u",&m,&n)) != 2 )
+-		    error((ret_val == EOF) ? E_EOF : E_FORMAT,"sp_finput");
+-		A = sp_get(m,n,5);
+-
+-		/* initialise start_row */
+-		for ( i = 0; i < A->n; i++ )
+-			A->start_row[i] = -1;
+-
+-		rows = A->row;
+-		for ( i = 0; i < m; i++ )
+-		{
+-		    /* printf("Reading row # %d\n",i); */
+-		    rows[i].diag = -1;
+-		    skipjunk(fp);
+-		    if ( (ret_val=fscanf(fp,"row %d :",&tmp)) != 1 ||
+-			 tmp != i )
+-			error((ret_val == EOF) ? E_EOF : E_FORMAT,
+-			      "sp_finput");
+-		    curr_col = -1;
+-		    for ( len = 0; len < MAXSCRATCH; len++ )
+-		    {
+-#if REAL == DOUBLE
+-			if ( (ret_val=fscanf(fp,"%u : %lf",&col,&val)) != 2 )
+-#elif REAL == FLOAT
+-			if ( (ret_val=fscanf(fp,"%u : %f",&col,&val)) != 2 )
+-#endif
+-			    break;
+-			if ( col <= curr_col || col >= n )
+-			    error(E_FORMAT,"sp_finput");
+-			scratch[len].col = col;
+-			scratch[len].val = val;
+-		    }
+-		    if ( ret_val == EOF )
+-			error(E_EOF,"sp_finput");
+-
+-		    if ( len > rows[i].maxlen )
+-		    {
+-			rows[i].elt = (row_elt *)realloc((char *)rows[i].elt,
+-							len*sizeof(row_elt));
+-			rows[i].maxlen = len;
+-		    }
+-		    MEM_COPY(scratch,rows[i].elt,len*sizeof(row_elt));
+-		    rows[i].len  = len;
+-		    /* printf("Have read row # %d\n",i); */
+-		    rows[i].diag = sprow_idx(&(rows[i]),i);
+-		    /* printf("Have set diag index for row # %d\n",i); */
+-		}
+-	}
+-
+-	return A;
+-}
+-
+//GO.SYSIN DD sparseio.c
+echo spchfctr.c 1>&2
+sed >spchfctr.c <<'//GO.SYSIN DD spchfctr.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-	Sparse Cholesky factorisation code
+-	To be used with sparse.h, sparse.c etc
+-
+-*/
+-
+-static char	rcsid[] = "$Id: m8,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-#include	<stdio.h>
+-#include        "sparse2.h"
+-#include	<math.h>
+-
+-
+-#ifndef MALLOCDECL
+-#ifndef ANSI_C
+-extern	char	*calloc(), *realloc();
+-#endif
+-#endif
+-
+-
+-
+-/* sprow_ip -- finds the (partial) inner product of a pair of sparse rows
+-	-- uses a "merging" approach & assumes column ordered rows
+-	-- row indices for inner product are all < lim */
+-double	sprow_ip(row1, row2, lim)
+-SPROW	*row1, *row2;
+-int	lim;
+-{
+-	int			idx1, idx2, len1, len2, tmp;
+-	int			sprow_idx();
+-	register row_elt	*elts1, *elts2;
+-	register Real		sum;
+-
+-	elts1 = row1->elt;	elts2 = row2->elt;
+-	len1 = row1->len;	len2 = row2->len;
+-
+-	sum = 0.0;
+-
+-	if ( len1 <= 0 || len2 <= 0 )
+-		return 0.0;
+-	if ( elts1->col >= lim || elts2->col >= lim )
+-		return 0.0;
+-
+-	/* use sprow_idx() to speed up inner product where one row is
+-		much longer than the other */
+-	idx1 = idx2 = 0;
+-	if ( len1 > 2*len2 )
+-	{
+-		idx1 = sprow_idx(row1,elts2->col);
+-		idx1 = (idx1 < 0) ? -(idx1+2) : idx1;
+-		if ( idx1 < 0 )
+-			error(E_UNKNOWN,"sprow_ip");
+-		len1 -= idx1;
+-	}
+-	else if ( len2 > 2*len1 )
+-	{
+-		idx2 = sprow_idx(row2,elts1->col);
+-		idx2 = (idx2 < 0) ? -(idx2+2) : idx2;
+-		if ( idx2 < 0 )
+-			error(E_UNKNOWN,"sprow_ip");
+-		len2 -= idx2;
+-	}
+-	if ( len1 <= 0 || len2 <= 0 )
+-		return 0.0;
+-
+-	elts1 = &(elts1[idx1]);		elts2 = &(elts2[idx2]);
+-
+-
+-	for ( ; ; )	/* forever do... */
+-	{
+-		if ( (tmp=elts1->col-elts2->col) < 0 )
+-		{
+-		    len1--;		elts1++;
+-		    if ( ! len1 || elts1->col >= lim )
+-			break;
+-		}
+-		else if ( tmp > 0 )
+-		{
+-		    len2--;		elts2++;
+-		    if ( ! len2 || elts2->col >= lim )
+-			break;
+-		}
+-		else
+-		{
+-		    sum += elts1->val * elts2->val;
+-		    len1--;		elts1++;
+-		    len2--;		elts2++;
+-		    if ( ! len1 || ! len2 ||
+-				elts1->col >= lim || elts2->col >= lim )
+-			break;
+-		}
+-	}
+-
+-	return sum;
+-}
+-
+-/* sprow_sqr -- returns same as sprow_ip(row, row, lim) */
+-double	sprow_sqr(row, lim)
+-SPROW	*row;
+-int	lim;
+-{
+-	register	row_elt	*elts;
+-	int		idx, len;
+-	register	Real	sum, tmp;
+-
+-	sum = 0.0;
+-	elts = row->elt;	len = row->len;
+-	for ( idx = 0; idx < len; idx++, elts++ )
+-	{
+-		if ( elts->col >= lim )
+-			break;
+-		tmp = elts->val;
+-		sum += tmp*tmp;
+-	}
+-
+-	return sum;
+-}
+-
+-static	int	*scan_row = (int *)NULL, *scan_idx = (int *)NULL,
+-			*col_list = (int *)NULL;
+-static	int	scan_len = 0;
+-
+-/* set_scan -- expand scan_row and scan_idx arrays
+-	-- return new length */
+-int	set_scan(new_len)
+-int	new_len;
+-{
+-	if ( new_len <= scan_len )
+-		return scan_len;
+-	if ( new_len <= scan_len+5 )
+-		new_len += 5;
+-
+-	if ( ! scan_row || ! scan_idx || ! col_list )
+-	{
+-		scan_row = (int *)calloc(new_len,sizeof(int));
+-		scan_idx = (int *)calloc(new_len,sizeof(int));
+-		col_list = (int *)calloc(new_len,sizeof(int));
+-	}
+-	else
+-	{
+-		scan_row = (int *)realloc((char *)scan_row,new_len*sizeof(int));
+-		scan_idx = (int *)realloc((char *)scan_idx,new_len*sizeof(int));
+-		col_list = (int *)realloc((char *)col_list,new_len*sizeof(int));
+-	}
+-
+-	if ( ! scan_row || ! scan_idx || ! col_list )
+-		error(E_MEM,"set_scan");
+-	return new_len;
+-}
+-
+-/* spCHfactor -- sparse Cholesky factorisation
+-	-- only the lower triangular part of A (incl. diagonal) is used */
+-SPMAT	*spCHfactor(A)
+-SPMAT	*A;
+-{
+-	register 	int	i;
+-	int	idx, k, m, minim, n, num_scan, diag_idx, tmp1;
+-	Real	pivot, tmp2;
+-	SPROW	*r_piv, *r_op;
+-	row_elt	*elt_piv, *elt_op, *old_elt;
+-
+-	if ( A == SMNULL )
+-		error(E_NULL,"spCHfactor");
+-	if ( A->m != A->n )
+-		error(E_SQUARE,"spCHfactor");
+-
+-	/* set up access paths if not already done so */
+-	sp_col_access(A);
+-	sp_diag_access(A);
+-
+-	/* printf("spCHfactor() -- checkpoint 1\n"); */
+-	m = A->m;	n = A->n;
+-	for ( k = 0; k < m; k++ )
+-	{
+-		r_piv = &(A->row[k]);
+-		if ( r_piv->len > scan_len )
+-			set_scan(r_piv->len);
+-		elt_piv = r_piv->elt;
+-		diag_idx = sprow_idx2(r_piv,k,r_piv->diag);
+-		if ( diag_idx < 0 )
+-			error(E_POSDEF,"spCHfactor");
+-		old_elt = &(elt_piv[diag_idx]);
+-		for ( i = 0; i < r_piv->len; i++ )
+-		{
+-			if ( elt_piv[i].col > k )
+-				break;
+-			col_list[i] = elt_piv[i].col;
+-			scan_row[i] = elt_piv[i].nxt_row;
+-			scan_idx[i] = elt_piv[i].nxt_idx;
+-		}
+-		/* printf("spCHfactor() -- checkpoint 2\n"); */
+-		num_scan = i;	/* number of actual entries in scan_row etc. */
+-		/* printf("num_scan = %d\n",num_scan); */
+-
+-		/* set diagonal entry of Cholesky factor */
+-		tmp2 = elt_piv[diag_idx].val - sprow_sqr(r_piv,k);
+-		if ( tmp2 <= 0.0 )
+-			error(E_POSDEF,"spCHfactor");
+-		elt_piv[diag_idx].val = pivot = sqrt(tmp2);
+-
+-		/* now set the k-th column of the Cholesky factors */
+-		/* printf("k = %d\n",k); */
+-		for ( ; ; )	/* forever do... */
+-		{
+-		    /* printf("spCHfactor() -- checkpoint 3\n"); */
+-		    /* find next row where something (non-trivial) happens
+-			i.e. find min(scan_row) */
+-		    /* printf("scan_row: "); */
+-		    minim = n;
+-		    for ( i = 0; i < num_scan; i++ )
+-		    {
+-			tmp1 = scan_row[i];
+-			/* printf("%d ",tmp1); */
+-			minim = ( tmp1 >= 0 && tmp1 < minim ) ? tmp1 : minim;
+-		    }
+-		    /* printf("minim = %d\n",minim); */
+-		    /* printf("col_list: "); */
+-/**********************************************************************
+-		    for ( i = 0; i < num_scan; i++ )
+-			printf("%d ",col_list[i]);
+-		    printf("\n");
+-**********************************************************************/
+-
+-		    if ( minim >= n )
+-			break;	/* nothing more to do for this column */
+-		    r_op = &(A->row[minim]);
+-		    elt_op = r_op->elt;
+-
+-		    /* set next entry in column k of Cholesky factors */
+-		    idx = sprow_idx2(r_op,k,scan_idx[num_scan-1]);
+-		    if ( idx < 0 )
+-		    {	/* fill-in */
+-			sp_set_val(A,minim,k,
+-					-sprow_ip(r_piv,r_op,k)/pivot);
+-			/* in case a realloc() has occurred... */
+-			elt_op = r_op->elt;
+-			/* now set up column access path again */
+-			idx = sprow_idx2(r_op,k,-(idx+2));
+-			tmp1 = old_elt->nxt_row;
+-			old_elt->nxt_row = minim;
+-			r_op->elt[idx].nxt_row = tmp1;
+-			tmp1 = old_elt->nxt_idx;
+-			old_elt->nxt_idx = idx;
+-			r_op->elt[idx].nxt_idx = tmp1;
+-		    }
+-		    else
+-		        elt_op[idx].val = (elt_op[idx].val -
+-				sprow_ip(r_piv,r_op,k))/pivot;
+-
+-		    /* printf("spCHfactor() -- checkpoint 4\n"); */
+-
+-		    /* remember current element in column k for column chain */
+-		    idx = sprow_idx2(r_op,k,idx);
+-		    old_elt = &(r_op->elt[idx]);
+-
+-		    /* update scan_row */
+-		    /* printf("spCHfactor() -- checkpoint 5\n"); */
+-		    /* printf("minim = %d\n",minim); */
+-		    for ( i = 0; i < num_scan; i++ )
+-		    {
+-			if ( scan_row[i] != minim )
+-				continue;
+-			idx = sprow_idx2(r_op,col_list[i],scan_idx[i]);
+-			if ( idx < 0 )
+-			{	scan_row[i] = -1;	continue;	}
+-			scan_row[i] = elt_op[idx].nxt_row;
+-			scan_idx[i] = elt_op[idx].nxt_idx;
+-			/* printf("scan_row[%d] = %d\n",i,scan_row[i]); */
+-			/* printf("scan_idx[%d] = %d\n",i,scan_idx[i]); */
+-		    }
+-			
+-		}
+-	    /* printf("spCHfactor() -- checkpoint 6\n"); */
+-	    /* sp_dump(stdout,A); */
+-	    /* printf("\n\n\n"); */
+-	}
+-
+-	return A;
+-}
+-
+-/* spCHsolve -- solve L.L^T.out=b where L is a sparse matrix,
+-	-- out, b dense vectors
+-	-- returns out; operation may be in-situ */
+-VEC	*spCHsolve(L,b,out)
+-SPMAT	*L;
+-VEC	*b, *out;
+-{
+-	int	i, j_idx, n, scan_idx, scan_row;
+-	SPROW	*row;
+-	row_elt	*elt;
+-	Real	diag_val, sum, *out_ve;
+-
+-	if ( L == SMNULL || b == VNULL )
+-		error(E_NULL,"spCHsolve");
+-	if ( L->m != L->n )
+-		error(E_SQUARE,"spCHsolve");
+-	if ( b->dim != L->m )
+-		error(E_SIZES,"spCHsolve");
+-
+-	if ( ! L->flag_col )
+-		sp_col_access(L);
+-	if ( ! L->flag_diag )
+-		sp_diag_access(L);
+-
+-	out = v_copy(b,out);
+-	out_ve = out->ve;
+-
+-	/* forward substitution: solve L.x=b for x */
+-	n = L->n;
+-	for ( i = 0; i < n; i++ )
+-	{
+-		sum = out_ve[i];
+-		row = &(L->row[i]);
+-		elt = row->elt;
+-		for ( j_idx = 0; j_idx < row->len; j_idx++, elt++ )
+-		{
+-		    if ( elt->col >= i )
+-			break;
+-		    sum -= elt->val*out_ve[elt->col];
+-		}
+-		if ( row->diag >= 0 )
+-		    out_ve[i] = sum/(row->elt[row->diag].val);
+-		else
+-		    error(E_SING,"spCHsolve");
+-	}
+-
+-	/* backward substitution: solve L^T.out = x for out */
+-	for ( i = n-1; i >= 0; i-- )
+-	{
+-		sum = out_ve[i];
+-		row = &(L->row[i]);
+-		/* Note that row->diag >= 0 by above loop */
+-		elt = &(row->elt[row->diag]);
+-		diag_val = elt->val;
+-
+-		/* scan down column */
+-		scan_idx = elt->nxt_idx;
+-		scan_row = elt->nxt_row;
+-		while ( scan_row >= 0 /* && scan_idx >= 0 */ )
+-		{
+-		    row = &(L->row[scan_row]);
+-		    elt = &(row->elt[scan_idx]);
+-		    sum -= elt->val*out_ve[scan_row];
+-		    scan_idx = elt->nxt_idx;
+-		    scan_row = elt->nxt_row;
+-		}
+-		out_ve[i] = sum/diag_val;
+-	}
+-
+-	return out;
+-}
+-
+-/* spICHfactor -- sparse Incomplete Cholesky factorisation
+-	-- does a Cholesky factorisation assuming NO FILL-IN
+-	-- as for spCHfactor(), only the lower triangular part of A is used */
+-SPMAT	*spICHfactor(A)
+-SPMAT	*A;
+-{
+-	int	k, m, n, nxt_row, nxt_idx, diag_idx;
+-	Real	pivot, tmp2;
+-	SPROW	*r_piv, *r_op;
+-	row_elt	*elt_piv, *elt_op;
+-
+-	if ( A == SMNULL )
+-		error(E_NULL,"spICHfactor");
+-	if ( A->m != A->n )
+-		error(E_SQUARE,"spICHfactor");
+-
+-	/* set up access paths if not already done so */
+-	if ( ! A->flag_col )
+-		sp_col_access(A);
+-	if ( ! A->flag_diag )
+-		sp_diag_access(A);
+-
+-	m = A->m;	n = A->n;
+-	for ( k = 0; k < m; k++ )
+-	{
+-		r_piv = &(A->row[k]);
+-
+-		diag_idx = r_piv->diag;
+-		if ( diag_idx < 0 )
+-			error(E_POSDEF,"spICHfactor");
+-
+-		elt_piv = r_piv->elt;
+-
+-		/* set diagonal entry of Cholesky factor */
+-		tmp2 = elt_piv[diag_idx].val - sprow_sqr(r_piv,k);
+-		if ( tmp2 <= 0.0 )
+-			error(E_POSDEF,"spICHfactor");
+-		elt_piv[diag_idx].val = pivot = sqrt(tmp2);
+-
+-		/* find next row where something (non-trivial) happens */
+-		nxt_row = elt_piv[diag_idx].nxt_row;
+-		nxt_idx = elt_piv[diag_idx].nxt_idx;
+-
+-		/* now set the k-th column of the Cholesky factors */
+-		while ( nxt_row >= 0 && nxt_idx >= 0 )
+-		{
+-		    /* nxt_row and nxt_idx give next next row (& index)
+-			of the entry to be modified */
+-		    r_op = &(A->row[nxt_row]);
+-		    elt_op = r_op->elt;
+-		    elt_op[nxt_idx].val = (elt_op[nxt_idx].val -
+-				sprow_ip(r_piv,r_op,k))/pivot;
+-
+-		    nxt_row = elt_op[nxt_idx].nxt_row;
+-		    nxt_idx = elt_op[nxt_idx].nxt_idx;
+-		}
+-	}
+-
+-	return A;
+-}
+-
+-
+-/* spCHsymb -- symbolic sparse Cholesky factorisation
+-	-- does NOT do any floating point arithmetic; just sets up the structure
+-	-- only the lower triangular part of A (incl. diagonal) is used */
+-SPMAT	*spCHsymb(A)
+-SPMAT	*A;
+-{
+-	register 	int	i;
+-	int	idx, k, m, minim, n, num_scan, diag_idx, tmp1;
+-	SPROW	*r_piv, *r_op;
+-	row_elt	*elt_piv, *elt_op, *old_elt;
+-
+-	if ( A == SMNULL )
+-		error(E_NULL,"spCHsymb");
+-	if ( A->m != A->n )
+-		error(E_SQUARE,"spCHsymb");
+-
+-	/* set up access paths if not already done so */
+-	if ( ! A->flag_col )
+-		sp_col_access(A);
+-	if ( ! A->flag_diag )
+-		sp_diag_access(A);
+-
+-	/* printf("spCHsymb() -- checkpoint 1\n"); */
+-	m = A->m;	n = A->n;
+-	for ( k = 0; k < m; k++ )
+-	{
+-		r_piv = &(A->row[k]);
+-		if ( r_piv->len > scan_len )
+-			set_scan(r_piv->len);
+-		elt_piv = r_piv->elt;
+-		diag_idx = sprow_idx2(r_piv,k,r_piv->diag);
+-		if ( diag_idx < 0 )
+-			error(E_POSDEF,"spCHsymb");
+-		old_elt = &(elt_piv[diag_idx]);
+-		for ( i = 0; i < r_piv->len; i++ )
+-		{
+-			if ( elt_piv[i].col > k )
+-				break;
+-			col_list[i] = elt_piv[i].col;
+-			scan_row[i] = elt_piv[i].nxt_row;
+-			scan_idx[i] = elt_piv[i].nxt_idx;
+-		}
+-		/* printf("spCHsymb() -- checkpoint 2\n"); */
+-		num_scan = i;	/* number of actual entries in scan_row etc. */
+-		/* printf("num_scan = %d\n",num_scan); */
+-
+-		/* now set the k-th column of the Cholesky factors */
+-		/* printf("k = %d\n",k); */
+-		for ( ; ; )	/* forever do... */
+-		{
+-		    /* printf("spCHsymb() -- checkpoint 3\n"); */
+-		    /* find next row where something (non-trivial) happens
+-			i.e. find min(scan_row) */
+-		    minim = n;
+-		    for ( i = 0; i < num_scan; i++ )
+-		    {
+-			tmp1 = scan_row[i];
+-			/* printf("%d ",tmp1); */
+-			minim = ( tmp1 >= 0 && tmp1 < minim ) ? tmp1 : minim;
+-		    }
+-
+-		    if ( minim >= n )
+-			break;	/* nothing more to do for this column */
+-		    r_op = &(A->row[minim]);
+-		    elt_op = r_op->elt;
+-
+-		    /* set next entry in column k of Cholesky factors */
+-		    idx = sprow_idx2(r_op,k,scan_idx[num_scan-1]);
+-		    if ( idx < 0 )
+-		    {	/* fill-in */
+-			sp_set_val(A,minim,k,0.0);
+-			/* in case a realloc() has occurred... */
+-			elt_op = r_op->elt;
+-			/* now set up column access path again */
+-			idx = sprow_idx2(r_op,k,-(idx+2));
+-			tmp1 = old_elt->nxt_row;
+-			old_elt->nxt_row = minim;
+-			r_op->elt[idx].nxt_row = tmp1;
+-			tmp1 = old_elt->nxt_idx;
+-			old_elt->nxt_idx = idx;
+-			r_op->elt[idx].nxt_idx = tmp1;
+-		    }
+-
+-		    /* printf("spCHsymb() -- checkpoint 4\n"); */
+-
+-		    /* remember current element in column k for column chain */
+-		    idx = sprow_idx2(r_op,k,idx);
+-		    old_elt = &(r_op->elt[idx]);
+-
+-		    /* update scan_row */
+-		    /* printf("spCHsymb() -- checkpoint 5\n"); */
+-		    /* printf("minim = %d\n",minim); */
+-		    for ( i = 0; i < num_scan; i++ )
+-		    {
+-			if ( scan_row[i] != minim )
+-				continue;
+-			idx = sprow_idx2(r_op,col_list[i],scan_idx[i]);
+-			if ( idx < 0 )
+-			{	scan_row[i] = -1;	continue;	}
+-			scan_row[i] = elt_op[idx].nxt_row;
+-			scan_idx[i] = elt_op[idx].nxt_idx;
+-			/* printf("scan_row[%d] = %d\n",i,scan_row[i]); */
+-			/* printf("scan_idx[%d] = %d\n",i,scan_idx[i]); */
+-		    }
+-			
+-		}
+-	    /* printf("spCHsymb() -- checkpoint 6\n"); */
+-	}
+-
+-	return A;
+-}
+-
+-/* comp_AAT -- compute A.A^T where A is a given sparse matrix */
+-SPMAT	*comp_AAT(A)
+-SPMAT	*A;
+-{
+-	SPMAT	*AAT;
+-	SPROW	*r, *r2;
+-	row_elt	*elts, *elts2;
+-	int	i, idx, idx2, j, m, minim, n, num_scan, tmp1;
+-	Real	ip;
+-
+-	if ( ! A )
+-		error(E_NULL,"comp_AAT");
+-	m = A->m;	n = A->n;
+-
+-	/* set up column access paths */
+-	if ( ! A->flag_col )
+-		sp_col_access(A);
+-
+-	AAT = sp_get(m,m,10);
+-
+-	for ( i = 0; i < m; i++ )
+-	{
+-		/* initialisation */
+-		r = &(A->row[i]);
+-		elts = r->elt;
+-
+-		/* set up scan lists for this row */
+-		if ( r->len > scan_len )
+-		    set_scan(r->len);
+-		for ( j = 0; j < r->len; j++ )
+-		{
+-		    col_list[j] = elts[j].col;
+-		    scan_row[j] = elts[j].nxt_row;
+-		    scan_idx[j] = elts[j].nxt_idx;
+-		}
+-		num_scan = r->len;
+-
+-		/* scan down the rows for next non-zero not
+-			associated with a diagonal entry */
+-		for ( ; ; )
+-		{
+-		    minim = m;
+-		    for ( idx = 0; idx < num_scan; idx++ )
+-		    {
+-			tmp1 = scan_row[idx];
+-			minim = ( tmp1 >= 0 && tmp1 < minim ) ? tmp1 : minim;
+-		    }
+-		    if ( minim >= m )
+-		 	break;
+-		    r2 = &(A->row[minim]);
+-		    if ( minim > i )
+-		    {
+-			ip = sprow_ip(r,r2,n);
+-		        sp_set_val(AAT,minim,i,ip);
+-		        sp_set_val(AAT,i,minim,ip);
+-		    }
+-		    /* update scan entries */
+-		    elts2 = r2->elt;
+-		    for ( idx = 0; idx < num_scan; idx++ )
+-		    {
+-			if ( scan_row[idx] != minim || scan_idx[idx] < 0 )
+-			    continue;
+-			idx2 = scan_idx[idx];
+-			scan_row[idx] = elts2[idx2].nxt_row;
+-			scan_idx[idx] = elts2[idx2].nxt_idx;
+-		    }
+-		}
+-
+-		/* set the diagonal entry */
+-		sp_set_val(AAT,i,i,sprow_sqr(r,n));
+-	}
+-
+-	return AAT;
+-}
+-
+//GO.SYSIN DD spchfctr.c
+echo splufctr.c 1>&2
+sed >splufctr.c <<'//GO.SYSIN DD splufctr.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Stewart & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-	Sparse LU factorisation
+-	See also: sparse.[ch] etc for details about sparse matrices
+-*/
+-
+-#include	<stdio.h>
+-#include        "sparse2.h"
+-#include	<math.h>
+-
+-
+-
+-/* Macro for speedup */
+-/* #define	sprow_idx2(r,c,hint)	\
+-   ( ( (hint) >= 0 && (r)->elt[hint].col == (c)) ? hint : sprow_idx((r),(c)) ) */
+-
+-
+-/* spLUfactor -- sparse LU factorisation with pivoting
+-	-- uses partial pivoting and Markowitz criterion
+-			|a[p][k]| >= alpha * max_i |a[i][k]|
+-	-- creates fill-in as needed
+-	-- in situ factorisation */
+-SPMAT	*spLUfactor(A,px,alpha)
+-SPMAT	*A;
+-PERM	*px;
+-double	alpha;
+-{
+-	int	i, best_i, k, idx, len, best_len, m, n;
+-	SPROW	*r, *r_piv, tmp_row;
+-	static	SPROW	*merge = (SPROW *)NULL;
+-	Real	max_val, tmp;
+-	static VEC	*col_vals=VNULL;
+-
+-	if ( ! A || ! px )
+-		error(E_NULL,"spLUfctr");
+-	if ( alpha <= 0.0 || alpha > 1.0 )
+-		error(E_RANGE,"alpha in spLUfctr");
+-	if ( px->size <= A->m )
+-		px = px_resize(px,A->m);
+-	px_ident(px);
+-	col_vals = v_resize(col_vals,A->m);
+-	MEM_STAT_REG(col_vals,TYPE_VEC);
+-
+-	m = A->m;	n = A->n;
+-	if ( ! A->flag_col )
+-		sp_col_access(A);
+-	if ( ! A->flag_diag )
+-		sp_diag_access(A);
+-	A->flag_col = A->flag_diag = FALSE;
+-	if ( ! merge ) {
+-	   merge = sprow_get(20);
+-	   MEM_STAT_REG(merge,TYPE_SPROW);
+-	}
+-
+-	for ( k = 0; k < n; k++ )
+-	{
+-	    /* find pivot row/element for partial pivoting */
+-
+-	    /* get first row with a non-zero entry in the k-th column */
+-	    max_val = 0.0;
+-	    for ( i = k; i < m; i++ )
+-	    {
+-		r = &(A->row[i]);
+-		idx = sprow_idx(r,k);
+-		if ( idx < 0 )
+-		    tmp = 0.0;
+-		else
+-		    tmp = r->elt[idx].val;
+-		if ( fabs(tmp) > max_val )
+-		    max_val = fabs(tmp);
+-		col_vals->ve[i] = tmp;
+-	    }
+-
+-	    if ( max_val == 0.0 )
+-		continue;
+-
+-	    best_len = n+1;	/* only if no possibilities */
+-	    best_i = -1;
+-	    for ( i = k; i < m; i++ )
+-	    {
+-		tmp = fabs(col_vals->ve[i]);
+-		if ( tmp == 0.0 )
+-		    continue;
+-		if ( tmp >= alpha*max_val )
+-		{
+-		    r = &(A->row[i]);
+-		    idx = sprow_idx(r,k);
+-		    len = (r->len) - idx;
+-		    if ( len < best_len )
+-		    {
+-			best_len = len;
+-			best_i = i;
+-		    }
+-		}
+-	    }
+-
+-	    /* swap row #best_i with row #k */
+-	    MEM_COPY(&(A->row[best_i]),&tmp_row,sizeof(SPROW));
+-	    MEM_COPY(&(A->row[k]),&(A->row[best_i]),sizeof(SPROW));
+-	    MEM_COPY(&tmp_row,&(A->row[k]),sizeof(SPROW));
+-	    /* swap col_vals entries */
+-	    tmp = col_vals->ve[best_i];
+-	    col_vals->ve[best_i] = col_vals->ve[k];
+-	    col_vals->ve[k] = tmp;
+-	    px_transp(px,k,best_i);
+-
+-	    r_piv = &(A->row[k]);
+-	    for ( i = k+1; i < n; i++ )
+-	    {
+-		/* compute and set multiplier */
+-		tmp = col_vals->ve[i]/col_vals->ve[k];
+-		if ( tmp != 0.0 )
+-		    sp_set_val(A,i,k,tmp);
+-		else
+-		    continue;
+-
+-		/* perform row operations */
+-		merge->len = 0;
+-		r = &(A->row[i]);
+-		sprow_mltadd(r,r_piv,-tmp,k+1,merge,TYPE_SPROW);
+-		idx = sprow_idx(r,k+1);
+-		if ( idx < 0 )
+-		    idx = -(idx+2);
+-		/* see if r needs expanding */
+-		if ( r->maxlen < idx + merge->len )
+-		    sprow_xpd(r,idx+merge->len,TYPE_SPMAT);
+-		r->len = idx+merge->len;
+-		MEM_COPY((char *)(merge->elt),(char *)&(r->elt[idx]),
+-			merge->len*sizeof(row_elt));
+-	    }
+-	}
+-
+-	return A;
+-}
+-
+-/* spLUsolve -- solve A.x = b using factored matrix A from spLUfactor()
+-	-- returns x
+-	-- may not be in-situ */
+-VEC	*spLUsolve(A,pivot,b,x)
+-SPMAT	*A;
+-PERM	*pivot;
+-VEC	*b, *x;
+-{
+-	int	i, idx, len, lim;
+-	Real	sum, *x_ve;
+-	SPROW	*r;
+-	row_elt	*elt;
+-
+-	if ( ! A || ! b )
+-	    error(E_NULL,"spLUsolve");
+-	if ( (pivot != PNULL && A->m != pivot->size) || A->m != b->dim )
+-	    error(E_SIZES,"spLUsolve");
+-	if ( ! x || x->dim != A->n )
+-	    x = v_resize(x,A->n);
+-
+-	if ( pivot != PNULL )
+-	    x = px_vec(pivot,b,x);
+-	else
+-	    x = v_copy(b,x);
+-
+-	x_ve = x->ve;
+-	lim = min(A->m,A->n);
+-	for ( i = 0; i < lim; i++ )
+-	{
+-	    sum = x_ve[i];
+-	    r = &(A->row[i]);
+-	    len = r->len;
+-	    elt = r->elt;
+-	    for ( idx = 0; idx < len && elt->col < i; idx++, elt++ )
+-		sum -= elt->val*x_ve[elt->col];
+-	    x_ve[i] = sum;
+-	}
+-
+-	for ( i = lim-1; i >= 0; i-- )
+-	{
+-	    sum = x_ve[i];
+-	    r = &(A->row[i]);
+-	    len = r->len;
+-	    elt = &(r->elt[len-1]);
+-	    for ( idx = len-1; idx >= 0 && elt->col > i; idx--, elt-- )
+-		sum -= elt->val*x_ve[elt->col];
+-	    if ( idx < 0 || elt->col != i || elt->val == 0.0 )
+-		error(E_SING,"spLUsolve");
+-	    x_ve[i] = sum/elt->val;
+-	}
+-
+-	return x;
+-}
+-
+-/* spLUTsolve -- solve A.x = b using factored matrix A from spLUfactor()
+-	-- returns x
+-	-- may not be in-situ */
+-VEC	*spLUTsolve(A,pivot,b,x)
+-SPMAT	*A;
+-PERM	*pivot;
+-VEC	*b, *x;
+-{
+-	int	i, idx, lim, rownum;
+-	Real	sum, *tmp_ve;
+-	/* SPROW	*r; */
+-	row_elt	*elt;
+-	static VEC	*tmp=VNULL;
+-
+-	if ( ! A || ! b )
+-	    error(E_NULL,"spLUTsolve");
+-	if ( (pivot != PNULL && A->m != pivot->size) || A->m != b->dim )
+-	    error(E_SIZES,"spLUTsolve");
+-	tmp = v_copy(b,tmp);
+-	MEM_STAT_REG(tmp,TYPE_VEC);
+-
+-	if ( ! A->flag_col )
+-	    sp_col_access(A);
+-	if ( ! A->flag_diag )
+-	    sp_diag_access(A);
+-
+-	lim = min(A->m,A->n);
+-	tmp_ve = tmp->ve;
+-	/* solve U^T.tmp = b */
+-	for ( i = 0; i < lim; i++ )
+-	{
+-	    sum = tmp_ve[i];
+-	    rownum = A->start_row[i];
+-	    idx    = A->start_idx[i];
+-	    if ( rownum < 0 || idx < 0 )
+-		error(E_SING,"spLUTsolve");
+-	    while ( rownum < i && rownum >= 0 && idx >= 0 )
+-	    {
+-		elt = &(A->row[rownum].elt[idx]);
+-		sum -= elt->val*tmp_ve[rownum];
+-		rownum = elt->nxt_row;
+-		idx    = elt->nxt_idx;
+-	    }
+-	    if ( rownum != i )
+-		error(E_SING,"spLUTsolve");
+-	    elt = &(A->row[rownum].elt[idx]);
+-	    if ( elt->val == 0.0 )
+-		error(E_SING,"spLUTsolve");
+-	    tmp_ve[i] = sum/elt->val;
+-	}
+-
+-	/* now solve L^T.tmp = (old) tmp */
+-	for ( i = lim-1; i >= 0; i-- )
+-	{
+-	    sum = tmp_ve[i];
+-	    rownum = i;
+-	    idx    = A->row[rownum].diag;
+-	    if ( idx < 0 )
+-		error(E_NULL,"spLUTsolve");
+-	    elt = &(A->row[rownum].elt[idx]);
+-	    rownum = elt->nxt_row;
+-	    idx    = elt->nxt_idx;
+-	    while ( rownum < lim && rownum >= 0 && idx >= 0 )
+-	    {
+-		elt = &(A->row[rownum].elt[idx]);
+-		sum -= elt->val*tmp_ve[rownum];
+-		rownum = elt->nxt_row;
+-		idx    = elt->nxt_idx;
+-	    }
+-	    tmp_ve[i] = sum;
+-	}
+-
+-	if ( pivot != PNULL )
+-	    x = pxinv_vec(pivot,tmp,x);
+-	else
+-	    x = v_copy(tmp,x);
+-
+-	return x;
+-}
+-
+-/* spILUfactor -- sparse modified incomplete LU factorisation with
+-						no pivoting
+-	-- all pivot entries are ensured to be >= alpha in magnitude
+-	-- setting alpha = 0 gives incomplete LU factorisation
+-	-- no fill-in is generated
+-	-- in situ factorisation */
+-SPMAT	*spILUfactor(A,alpha)
+-SPMAT	*A;
+-double	alpha;
+-{
+-    int		i, k, idx, idx_piv, m, n, old_idx, old_idx_piv;
+-    SPROW	*r, *r_piv;
+-    Real	piv_val, tmp;
+-    
+-    /* printf("spILUfactor: entered\n"); */
+-    if ( ! A )
+-	error(E_NULL,"spILUfactor");
+-    if ( alpha < 0.0 )
+-	error(E_RANGE,"[alpha] in spILUfactor");
+-    
+-    m = A->m;	n = A->n;
+-    sp_diag_access(A);
+-    sp_col_access(A);
+-    
+-    for ( k = 0; k < n; k++ )
+-    {
+-	/* printf("spILUfactor(l.%d): checkpoint A: k = %d\n",__LINE__,k); */
+-	/* printf("spILUfactor(l.%d): A =\n", __LINE__); */
+-	/* sp_output(A); */
+-	r_piv = &(A->row[k]);
+-	idx_piv = r_piv->diag;
+-	if ( idx_piv < 0 )
+-	{
+-	    sprow_set_val(r_piv,k,alpha);
+-	    idx_piv = sprow_idx(r_piv,k);
+-	}
+-	/* printf("spILUfactor: checkpoint B\n"); */
+-	if ( idx_piv < 0 )
+-	    error(E_BOUNDS,"spILUfactor");
+-	old_idx_piv = idx_piv;
+-	piv_val = r_piv->elt[idx_piv].val;
+-	/* printf("spILUfactor: checkpoint C\n"); */
+-	if ( fabs(piv_val) < alpha )
+-	    piv_val = ( piv_val < 0.0 ) ? -alpha : alpha;
+-	if ( piv_val == 0.0 )	/* alpha == 0.0 too! */
+-	    error(E_SING,"spILUfactor");
+-
+-	/* go to next row with a non-zero in this column */
+-	i = r_piv->elt[idx_piv].nxt_row;
+-	old_idx = idx = r_piv->elt[idx_piv].nxt_idx;
+-	while ( i >= k )
+-	{
+-	    /* printf("spILUfactor: checkpoint D: i = %d\n",i); */
+-	    /* perform row operations */
+-	    r = &(A->row[i]);
+-	    /* idx = sprow_idx(r,k); */
+-	    /* printf("spLUfactor(l.%d) i = %d, idx = %d\n",
+-		   __LINE__, i, idx); */
+-	    if ( idx < 0 )
+-	    {
+-		idx = r->elt[old_idx].nxt_idx;
+-		i = r->elt[old_idx].nxt_row;
+-		continue;
+-	    }
+-	    /* printf("spILUfactor: checkpoint E\n"); */
+-	    /* compute and set multiplier */
+-	    r->elt[idx].val = tmp = r->elt[idx].val/piv_val;
+-	    /* printf("spILUfactor: piv_val = %g, multiplier = %g\n",
+-		   piv_val, tmp); */
+-	    /* printf("spLUfactor(l.%d) multiplier = %g\n", __LINE__, tmp); */
+-	    if ( tmp == 0.0 )
+-	    {
+-		idx = r->elt[old_idx].nxt_idx;
+-		i = r->elt[old_idx].nxt_row;
+-		continue;
+-	    }
+-	    /* idx = sprow_idx(r,k+1); */
+-	    /* if ( idx < 0 )
+-		idx = -(idx+2); */
+-	    idx_piv++;	idx++;	/* now look beyond the multiplier entry */
+-	    /* printf("spILUfactor: checkpoint F: idx = %d, idx_piv = %d\n",
+-		   idx, idx_piv); */
+-	    while ( idx_piv < r_piv->len && idx < r->len )
+-	    {
+-		/* printf("spILUfactor: checkpoint G: idx = %d, idx_piv = %d\n",
+-		       idx, idx_piv); */
+-		if ( r_piv->elt[idx_piv].col < r->elt[idx].col )
+-		    idx_piv++;
+-		else if ( r_piv->elt[idx_piv].col > r->elt[idx].col )
+-		    idx++;
+-		else /* column numbers match */
+-		{
+-		    /* printf("spILUfactor(l.%d) subtract %g times the ",
+-			   __LINE__, tmp); */
+-		    /* printf("(%d,%d) entry to the (%d,%d) entry\n",
+-			   k, r_piv->elt[idx_piv].col,
+-			   i, r->elt[idx].col); */
+-		    r->elt[idx].val -= tmp*r_piv->elt[idx_piv].val;
+-		    idx++;	idx_piv++;
+-		}
+-	    }
+-
+-	    /* bump to next row with a non-zero in column k */
+-	    /* printf("spILUfactor(l.%d) column = %d, row[%d] =\n",
+-		   __LINE__, r->elt[old_idx].col, i); */
+-	    /* sprow_foutput(stdout,r); */
+-	    i = r->elt[old_idx].nxt_row;
+-	    old_idx = idx = r->elt[old_idx].nxt_idx;
+-	    /* printf("spILUfactor(l.%d) i = %d, idx = %d\n", __LINE__, i, idx); */
+-	    /* and restore idx_piv to index of pivot entry */
+-	    idx_piv = old_idx_piv;
+-	}
+-    }
+-    /* printf("spILUfactor: exiting\n"); */
+-    return A;
+-}
+//GO.SYSIN DD splufctr.c
+echo spbkp.c 1>&2
+sed >spbkp.c <<'//GO.SYSIN DD spbkp.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-  Sparse matrix Bunch--Kaufman--Parlett factorisation and solve
+-  Radical revision started Thu 05th Nov 1992, 09:36:12 AM
+-  to use Karen George's suggestion of leaving the the row elements unordered
+-  Radical revision completed Mon 07th Dec 1992, 10:59:57 AM
+-*/
+-
+-static	char	rcsid[] = "$Id: m8,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-#include	<stdio.h>
+-#include        "sparse2.h"
+-#include	<math.h>
+-
+-
+-#ifdef MALLOCDECL
+-#include <malloc.h>
+-#endif
+-
+-#define alpha	0.6403882032022076 /* = (1+sqrt(17))/8 */
+-
+-
+-#define	btos(x)	((x) ? "TRUE" : "FALSE")
+-
+-/* assume no use of sqr() uses side-effects */
+-#define	sqr(x)	((x)*(x))
+-
+-/* unord_get_idx -- returns index (encoded if entry not allocated)
+-	of the element of row r with column j
+-	-- uses linear search */
+-int	unord_get_idx(r,j)
+-SPROW	*r;
+-int	j;
+-{
+-    int		idx;
+-    row_elt	*e;
+-
+-    if ( ! r || ! r->elt )
+-	error(E_NULL,"unord_get_idx");
+-    for ( idx = 0, e = r->elt; idx < r->len; idx++, e++ )
+-	if ( e->col == j )
+-	    break;
+-    if ( idx >= r->len )
+-	return -(r->len+2);
+-    else
+-	return idx;
+-}
+-
+-/* unord_get_val -- returns value of the (i,j) entry of A
+-	-- same assumptions as unord_get_idx() */
+-double	unord_get_val(A,i,j)
+-SPMAT	*A;
+-int	i, j;
+-{
+-    SPROW	*r;
+-    int		idx;
+-
+-    if ( ! A )
+-	error(E_NULL,"unord_get_val");
+-    if ( i < 0 || i >= A->m || j < 0 || j >= A->n )
+-	error(E_BOUNDS,"unord_get_val");
+-
+-    r = &(A->row[i]);
+-    idx = unord_get_idx(r,j);
+-    if ( idx < 0 )
+-	return 0.0;
+-    else
+-	return r->elt[idx].val;
+-}
+-
+-	    
+-/* bkp_swap_elt -- swaps the (i,j) with the (k,l) entry of sparse matrix
+-	-- either or both of the entries may be unallocated */
+-static SPMAT	*bkp_swap_elt(A,i1,j1,idx1,i2,j2,idx2)
+-SPMAT	*A;
+-int	i1, j1, idx1, i2, j2, idx2;
+-{
+-    int		tmp_row, tmp_idx;
+-    SPROW	*r1, *r2;
+-    row_elt	*e1, *e2;
+-    Real	tmp;
+-
+-    if ( ! A )
+-	error(E_NULL,"bkp_swap_elt");
+-
+-    if ( i1 < 0 || j1 < 0 || i2 < 0 || j2 < 0 ||
+-	 i1 >= A->m || j1 >= A->n || i2 >= A->m || j2 >= A->n )
+-    {
+-	error(E_BOUNDS,"bkp_swap_elt");
+-    }
+-
+-    if ( i1 == i2 && j1 == j2 )
+-	return A;
+-    if ( idx1 < 0 && idx2 < 0 )	/* neither allocated */
+-	return A;
+-
+-    r1 = &(A->row[i1]);		r2 = &(A->row[i2]);
+-    /* if ( idx1 >= r1->len || idx2 >= r2->len )
+-	error(E_BOUNDS,"bkp_swap_elt"); */
+-    if ( idx1 < 0 )	/* assume not allocated */
+-    {
+-	idx1 = r1->len;
+-	if ( idx1 >= r1->maxlen )
+-	{    tracecatch(sprow_xpd(r1,2*r1->maxlen+1,TYPE_SPMAT),
+-			"bkp_swap_elt");	}
+-	r1->len = idx1+1;
+-	r1->elt[idx1].col = j1;
+-	r1->elt[idx1].val = 0.0;
+-	/* now patch up column access path */
+-	tmp_row = -1;	tmp_idx = j1;
+-	chase_col(A,j1,&tmp_row,&tmp_idx,i1-1);
+-
+-	if ( tmp_row < 0 )
+-	{
+-	    r1->elt[idx1].nxt_row = A->start_row[j1];
+-	    r1->elt[idx1].nxt_idx = A->start_idx[j1];
+-	    A->start_row[j1] = i1;
+-	    A->start_idx[j1] = idx1;
+-	}
+-	else
+-	{
+-	    row_elt	*tmp_e;
+-
+-	    tmp_e = &(A->row[tmp_row].elt[tmp_idx]);
+-	    r1->elt[idx1].nxt_row = tmp_e->nxt_row;
+-	    r1->elt[idx1].nxt_idx = tmp_e->nxt_idx;
+-	    tmp_e->nxt_row = i1;
+-	    tmp_e->nxt_idx = idx1;
+-	}
+-    }
+-    else if ( r1->elt[idx1].col != j1 )
+-	error(E_INTERN,"bkp_swap_elt");
+-    if ( idx2 < 0 )
+-    {
+-	idx2 = r2->len;
+-	if ( idx2 >= r2->maxlen )
+-	{    tracecatch(sprow_xpd(r2,2*r2->maxlen+1,TYPE_SPMAT),
+-			"bkp_swap_elt");	}
+-
+-	r2->len = idx2+1;
+-	r2->elt[idx2].col = j2;
+-	r2->elt[idx2].val = 0.0;
+-	/* now patch up column access path */
+-	tmp_row = -1;	tmp_idx = j2;
+-	chase_col(A,j2,&tmp_row,&tmp_idx,i2-1);
+-	if ( tmp_row < 0 )
+-	{
+-	    r2->elt[idx2].nxt_row = A->start_row[j2];
+-	    r2->elt[idx2].nxt_idx = A->start_idx[j2];
+-	    A->start_row[j2] = i2;
+-	    A->start_idx[j2] = idx2;
+-	}
+-	else
+-	{
+-	    row_elt	*tmp_e;
+-
+-	    tmp_e = &(A->row[tmp_row].elt[tmp_idx]);
+-	    r2->elt[idx2].nxt_row = tmp_e->nxt_row;
+-	    r2->elt[idx2].nxt_idx = tmp_e->nxt_idx;
+bigmail CUT HERE............
+test -w meschach3.shar &&
+test -r 24048P07 &&
+(
+ cat 24048P07 >> meschach3.shar; rm 24048P07
+)

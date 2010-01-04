@@ -1,0 +1,66 @@
+/* rpn udf:  zero
+/* purpose:  find zero of a function
+/* user's function is "fn"
+/* lower limit stored in "a"
+/* upper limit stored in "b"
+/* step size stored in "dx"
+/* desired accuracy is in "dxlim"
+/* call to find zero is "zero"
+/* upon exit, stack contains value of x at which zero occurs
+/*
+/* Michael Borland, 1988
+0 sto a sto b sto dx sto dxlim sto f0 sto fm sto f1 sto xm sto x0 sto x1
+pop
+
+udf
+zero
+dx sto dx1 a sto x0 fn sto f0 pop  a dx1 + sto x1 fn sto f1 pop  loop1
+
+udf
+loop1
+f0 f1 * 0 < pop pop ? loop2 : test_end advance loop1 $
+
+udf
+test_end
+x1 b > pop pop ? stop : $
+
+udf
+advance
+x1 sto x0 dx1 + sto x1 pop   f1 sto f0 pop   x1 fn sto f1 pop
+
+udf
+loop2
+halve_interval  
+fm 0 == pop pop 
+? xm 
+: choose_pair dx1 dxlim < pop pop  ? xm : loop2 $ $
+
+udf
+halve_interval
+dx1 2 / sto dx1 x0 + sto xm fn sto fm pop
+
+udf
+choose_pair
+f0 fm * 0 < pop pop 
+? xm sto x1 pop fm sto f1 pop 
+: xm sto x0 pop fm sto f0 pop $
+
+udf
+fn
+0 Jn
+
+udf
+setup
+1 sto a 5 sto b .01 sto dx 1e-16 sto dxlim
+
+udf
+next
+xm .1 + sto a b 10 + sto b 0.01 sto dx 1e-16 sto dxlim cle zero
+
+10 sto b
+.1 sto dx
+1e-12 sto dxlim
+zero sto x00 cle
+x00
+0 Jn
+

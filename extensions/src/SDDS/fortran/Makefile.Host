@@ -1,0 +1,141 @@
+#
+# $Log: Makefile.Host,v $
+# Revision 1.17  2004/05/03 15:49:25  soliday
+# Updated to work with Epics/Base 3.14 build rules.
+#
+# Revision 1.16  2004/02/05 20:35:39  soliday
+# Updated to work around a link issue.
+#
+# Revision 1.15  2003/07/08 14:26:05  soliday
+# Updated to work with new f77 compiler on Solaris.
+#
+# Revision 1.14  2003/05/06 19:05:26  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.13  2003/04/17 21:29:18  soliday
+# Fixed issue on Linux.
+#
+# Revision 1.12  2002/09/10 15:51:31  soliday
+# Updated for WIN32
+#
+# Revision 1.11  2002/08/29 21:32:23  soliday
+# Fixed some minor problems
+#
+# Revision 1.10  2000/12/07 22:00:10  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.9  2000/08/11 19:37:08  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris when using cc.
+#
+# Revision 1.8  2000/07/06 16:50:35  soliday
+# Added the option of compiling with f90
+#
+# Revision 1.7  2000/04/11 18:57:08  soliday
+# Added mdbcommon library.
+#
+# Revision 1.6  2000/01/20 22:11:33  soliday
+# This now works on WIN32 using Compaq's PowerStation Fortran.
+#
+# Revision 1.5  2000/01/19 22:05:07  soliday
+# Fixed problem with ZLIB flags.
+#
+# Revision 1.4  2000/01/19 19:35:39  soliday
+# Added support for ZLIB.
+#
+# $Log: Makefile.Host,v $
+# Revision 1.17  2004/05/03 15:49:25  soliday
+# Updated to work with Epics/Base 3.14 build rules.
+#
+# Revision 1.16  2004/02/05 20:35:39  soliday
+# Updated to work around a link issue.
+#
+# Revision 1.15  2003/07/08 14:26:05  soliday
+# Updated to work with new f77 compiler on Solaris.
+#
+# Revision 1.14  2003/05/06 19:05:26  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.13  2003/04/17 21:29:18  soliday
+# Fixed issue on Linux.
+#
+# Revision 1.12  2002/09/10 15:51:31  soliday
+# Updated for WIN32
+#
+# Revision 1.11  2002/08/29 21:32:23  soliday
+# Fixed some minor problems
+#
+# Revision 1.10  2000/12/07 22:00:10  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.9  2000/08/11 19:37:08  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris when using cc.
+#
+# Revision 1.8  2000/07/06 16:50:35  soliday
+# Added the option of compiling with f90
+#
+# Revision 1.7  2000/04/11 18:57:08  soliday
+# Added mdbcommon library.
+#
+# Revision 1.6  2000/01/20 22:11:33  soliday
+# This now works on WIN32 using Compaq's PowerStation Fortran.
+#
+# Revision 1.3  1999/11/03 16:23:33  soliday
+# Added some more compiler options
+#
+# Revision 1.2  1999/10/22 20:09:23  soliday
+# This version now works with Linux with g77 installed.
+#
+# Revision 1.1  1999/10/21 18:56:02  soliday
+# First version
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/fortran/Makefile.OAG
+include $(TOP)/config/RULES.Host
+
+ifdef WIN32
+#This is very specific to my own computer but it shouldn't be too difficult for anyone to modify if needed.
+fortranReadExample$(OBJ): ../fortranReadExample.f
+	$(FC) /compile_only /threads /libs:dll /fast c:\\epics\\extensions\\src\\SDDS\\fortran\\fortranReadExample.f
+
+fortranWriteExample$(OBJ): ../fortranWriteExample.f
+	$(FC) /compile_only /threads /libs:dll /fast c:\\epics\\extensions\\src\\SDDS\\fortran\\fortranWriteExample.f
+
+fortranReadExample: fortran_wrapper$(OBJ) fortranReadExample$(OBJ)
+	$(FC) /exe /threads /libs:dll /link /WARN:3 /incremental:no /opt:ref /release \
+	/force:multiple -out:fortranReadExample.exe \
+	c:\\epics\\extensions\\lib\\$(T_A)\\mdbcommon.lib \
+	c:\\epics\\extensions\\lib\\$(T_A)\\SDDS1.lib \
+	c:\\epics\\extensions\\lib\\$(T_A)\\mdbmth.lib \
+	c:\\epics\\extensions\\lib\\$(T_A)\\mdblib.lib \
+	c:\\epics\\extensions\\lib\\$(T_A)\\z.lib \
+	fortran_wrapper$(OBJ) fortranReadExample$(OBJ)
+	$(CP) ../fortranReadExample.sdds .
+
+fortranWriteExample: fortran_wrapper$(OBJ) fortranWriteExample$(OBJ)
+	$(FC) /exe /threads /libs:dll /link /WARN:3 /incremental:no /opt:ref /release \
+	/force:multiple -out:fortranWriteExample.exe \
+	c:\\epics\\extensions\\lib\\$(T_A)\\mdbcommon.lib \
+	c:\\epics\\extensions\\lib\\$(T_A)\\SDDS1.lib \
+	c:\\epics\\extensions\\lib\\$(T_A)\\mdbmth.lib \
+	c:\\epics\\extensions\\lib\\$(T_A)\\mdblib.lib \
+	c:\\epics\\extensions\\lib\\$(T_A)\\z.lib \
+	fortran_wrapper$(OBJ) fortranWriteExample$(OBJ)
+
+else
+fortranReadExample$(OBJ): ../fortranReadExample.f
+	$(FC) $(f77_OPTIONS) -c ../fortranReadExample.f
+
+fortranWriteExample$(OBJ): ../fortranWriteExample.f
+	$(FC) $(f77_OPTIONS) -c ../fortranWriteExample.f
+
+fortranReadExample: fortran_wrapper$(OBJ) fortranReadExample$(OBJ)
+	$(FC) $(f77_OPTIONS) fortran_wrapper$(OBJ) fortranReadExample$(OBJ) -I$(INSTALL_LIB) -L$(EPICS_EXTENSIONS_LIB) -L$(ZLIB_LIB) -lmdbcommon -lSDDS1 -lmdbmth -lmdblib -l$(ZLIB_PROD_LIB) -o fortranReadExample
+	$(CP) ../fortranReadExample.sdds .
+
+fortranWriteExample: fortran_wrapper$(OBJ) fortranWriteExample$(OBJ)
+	$(FC) $(f77_OPTIONS) fortran_wrapper$(OBJ) fortranWriteExample$(OBJ) -I$(INSTALL_LIB) -L$(EPICS_EXTENSIONS_LIB) -L$(ZLIB_LIB) -lmdbcommon -lSDDS1 -lmdbmth -lmdblib -l$(ZLIB_PROD_LIB) -o fortranWriteExample
+
+endif

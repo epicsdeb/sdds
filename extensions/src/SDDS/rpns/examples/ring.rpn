@@ -1,0 +1,37 @@
+/* solve ring-beam problem
+/* r'' = 2IQ/(m.gamma.c.r)*(1-beta)
+
+"fma_ra.rpn/s" @
+
+0 sto tlim sto dt sto x sto x' sto t sto dt 
+100 sto I       
+I 3e9 * sto I cle
+9.11e-28 sto me
+4.8e-10 sto qe 
+1 3e9 * 1e-13 * sto Q
+Q qe / me * sto M
+3e8 sto c
+.2 sto x
+1.187 sto gamma sqr rec 1 - chs sto beta 
+2 I * Q * M / gamma / c / 1 beta - * sto const
+90e-12 sto tlim
+1e-12 sto dt
+cle
+
+udf
+fn
+swap pop rec const * 
+
+udf
+end
+pop tlim - chs abs dt 100 / < 
+
+udf
+go
+solve
+t 1 "t = %le\n" fprf
+x 1 "x = %le\n" fprf
+x' 1 "x' = %le\n" fprf
+3 popn
+cle
+

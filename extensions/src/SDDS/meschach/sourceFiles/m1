@@ -1,0 +1,3424 @@
+#!/bin/sh
+# to unpack, sh this message in an empty directory
+PATH=/bin:/usr/bin
+echo "Anything free comes with no guarantee!"
+cat > meschach0.shar <<'bigmail CUT HERE............'
+# to unbundle, sh this file (in an empty directory)
+echo dmacheps.c 1>&2
+sed >dmacheps.c <<'//GO.SYSIN DD dmacheps.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-#include	<stdio.h>
+-
+-double	dclean(x)
+-double	x;
+-{
+-    static double	y;
+-    y = x;
+-    return y;	/* prevents optimisation */
+-}
+-
+-main()
+-{
+-    static double	deps, deps1, dtmp;
+-
+-    deps = 1.0;
+-    while ( dclean(1.0+deps) > 1.0 )
+-	deps = 0.5*deps;
+-
+-    printf("%g\n", 2.0*deps);
+-}
+//GO.SYSIN DD dmacheps.c
+echo extras.c 1>&2
+sed >extras.c <<'//GO.SYSIN DD extras.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-	Memory port routines: MEM_COPY and MEM_ZERO
+-*/
+-
+-/* For BSD 4.[23] environments: using bcopy() and bzero() */
+-
+-#include "machine.h"
+-
+-#ifndef MEM_COPY
+-void	MEM_COPY(from,to,len)
+-char	*from, *to;
+-int	len;
+-{
+-    int		i;
+-
+-    if ( from < to )
+-    {
+-	for ( i = 0; i < len; i++ )
+-	    *to++ = *from++;
+-    }
+-    else
+-    {
+-	from += len;	to += len;
+-	for ( i = 0; i < len; i++ )
+-	    *(--to) = *(--from);
+-    }
+-}
+-#endif
+-
+-#ifndef MEM_ZERO
+-void	MEM_ZERO(ptr,len)
+-char	*ptr;
+-int	len;
+-{
+-    int		i;
+-
+-    for ( i = 0; i < len; i++ )
+-	*(ptr++) = '\0';
+-}
+-#endif
+-
+-/*
+-	This file contains versions of something approximating the well-known
+-	BLAS routines in C, suitable for Meschach (hence the `m').
+-	These are "vanilla" implementations, at least with some consideration
+-	of the effects of caching and paging, and maybe some loop unrolling
+-	for register-rich machines
+-*/
+-
+-/*
+-	Organisation of matrices: it is assumed that matrices are represented
+-	by Real **'s. To keep flexibility, there is also an "initial
+-	column" parameter j0, so that the actual elements used are
+-		A[0][j0],   A[0][j0+1],   ..., A[0][j0+n-1]
+-		A[1][j0],   A[1][j0+1],   ..., A[1][j0+n-1]
+-		   ..         ..          ...      ..
+-		A[m-1][j0], A[m-1][j0+1], ..., A[m-1][j0+n-1]
+-*/
+-
+-static char	rcsid[] = "$Id: m1,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $";
+-
+-#include	<math.h>
+-
+-#define	REGISTER_RICH	1
+-
+-/* mblar-1 routines */
+-
+-/* Mscale -- sets x <- alpha.x */
+-void	Mscale(len,alpha,x)
+-int	len;
+-double	alpha;
+-Real	*x;
+-{
+-    register int	i;
+-
+-    for ( i = 0; i < len; i++ )
+-	x[i] *= alpha;
+-}
+-
+-/* Mswap -- swaps x and y */
+-void	Mswap(len,x,y)
+-int	len;
+-Real	*x, *y;
+-{
+-    register int	i;
+-    register Real	tmp;
+-
+-    for ( i = 0; i < len; i++ )
+-    {
+-	tmp = x[i];
+-	x[i] = y[i];
+-	y[i] = tmp;
+-    }
+-}
+-
+-/* Mcopy -- copies x to y */
+-void	Mcopy(len,x,y)
+-int	len;
+-Real	*x, *y;
+-{
+-    register int	i;
+-
+-    for ( i = 0; i < len; i++ )
+-	y[i] = x[i];
+-}
+-
+-/* Maxpy -- y <- y + alpha.x */
+-void	Maxpy(len,alpha,x,y)
+-int	len;
+-double	alpha;
+-Real	*x, *y;
+-{
+-    register int	i, len4;
+-
+-    /****************************************
+-    for ( i = 0; i < len; i++ )
+-	y[i] += alpha*x[i];
+-    ****************************************/
+-
+-#ifdef REGISTER_RICH
+-    len4 = len / 4;
+-    len  = len % 4;
+-    for ( i = 0; i < len4; i++ )
+-    {
+-	y[4*i]   += alpha*x[4*i];
+-	y[4*i+1] += alpha*x[4*i+1];
+-	y[4*i+2] += alpha*x[4*i+2];
+-	y[4*i+3] += alpha*x[4*i+3];
+-    }
+-    x += 4*len4;	y += 4*len4;
+-#endif
+-    for ( i = 0; i < len; i++ )
+-	y[i] += alpha*x[i];
+-}
+-
+-/* Mdot -- returns x'.y */
+-double	Mdot(len,x,y)
+-int	len;
+-Real	*x, *y;
+-{
+-    register int	i, len4;
+-    register Real	sum;
+-
+-#ifndef REGISTER_RICH
+-    sum = 0.0;
+-#endif
+-
+-#ifdef REGISTER_RICH
+-    register Real	sum0, sum1, sum2, sum3;
+-    
+-    sum0 = sum1 = sum2 = sum3 = 0.0;
+-    
+-    len4 = len / 4;
+-    len  = len % 4;
+-    
+-    for ( i = 0; i < len4; i++ )
+-    {
+-	sum0 += x[4*i  ]*y[4*i  ];
+-	sum1 += x[4*i+1]*y[4*i+1];
+-	sum2 += x[4*i+2]*y[4*i+2];
+-	sum3 += x[4*i+3]*y[4*i+3];
+-    }
+-    sum = sum0 + sum1 + sum2 + sum3;
+-    x += 4*len4;	y += 4*len4;
+-#endif
+-
+-    for ( i = 0; i < len; i++ )
+-	sum += x[i]*y[i];
+-
+-    return sum;
+-}
+-
+-#ifndef ABS
+-#define	ABS(x)	((x) >= 0 ? (x) : -(x))
+-#endif
+-
+-/* Mnorminf -- returns ||x||_inf */
+-double	Mnorminf(len,x)
+-int	len;
+-Real	*x;
+-{
+-    register int	i;
+-    register Real	tmp, max_val;
+-
+-    max_val = 0.0;
+-    for ( i = 0; i < len; i++ )
+-    {
+-	tmp = ABS(x[i]);
+-	if ( max_val < tmp )
+-	    max_val = tmp;
+-    }
+-
+-    return max_val;
+-}
+-
+-/* Mnorm1 -- returns ||x||_1 */
+-double	Mnorm1(len,x)
+-int	len;
+-Real	*x;
+-{
+-    register int	i;
+-    register Real	sum;
+-
+-    sum = 0.0;
+-    for ( i = 0; i < len; i++ )
+-	sum += ABS(x[i]);
+-
+-    return sum;
+-}
+-
+-/* Mnorm2 -- returns ||x||_2 */
+-double	Mnorm2(len,x)
+-int	len;
+-Real	*x;
+-{
+-    register int	i;
+-    register Real	norm, invnorm, sum, tmp;
+-
+-    norm = Mnorminf(len,x);
+-    if ( norm == 0.0 )
+-	return 0.0;
+-    invnorm = 1.0/norm;
+-    sum = 0.0;
+-    for ( i = 0; i < len; i++ )
+-    {
+-	tmp = x[i]*invnorm;
+-	sum += tmp*tmp;
+-    }
+-
+-    return sum/invnorm;
+-}
+-
+-/* mblar-2 routines */
+-
+-/* Mmv -- y <- alpha.A.x + beta.y */
+-void	Mmv(m,n,alpha,A,j0,x,beta,y)
+-int	m, n, j0;
+-double	alpha, beta;
+-Real	**A, *x, *y;
+-{
+-    register int	i, j, m4, n4;
+-    register Real	sum0, sum1, sum2, sum3, tmp0, tmp1, tmp2, tmp3;
+-    register Real	*dp0, *dp1, *dp2, *dp3;
+-
+-    /****************************************
+-    for ( i = 0; i < m; i++ )
+-	y[i] += alpha*Mdot(n,&(A[i][j0]),x);
+-    ****************************************/
+-
+-    m4 = n4 = 0;
+-
+-#ifdef REGISTER_RICH
+-    m4 = m / 4;
+-    m  = m % 4;
+-    n4 = n / 4;
+-    n  = n % 4;
+-
+-    for ( i = 0; i < m4; i++ )
+-    {
+-	sum0 = sum1 = sum2 = sum3 = 0.0;
+-	dp0 = &(A[4*i  ][j0]);
+-	dp1 = &(A[4*i+1][j0]);
+-	dp2 = &(A[4*i+2][j0]);
+-	dp3 = &(A[4*i+3][j0]);
+-
+-	for ( j = 0; j < n4; j++ )
+-	{
+-	    tmp0 = x[4*j  ];
+-	    tmp1 = x[4*j+1];
+-	    tmp2 = x[4*j+2];
+-	    tmp3 = x[4*j+3];
+-	    sum0 = sum0 + dp0[j]*tmp0 + dp0[j+1]*tmp1 +
+-		dp0[j+2]*tmp2 + dp0[j+3]*tmp3;
+-	    sum1 = sum1 + dp1[j]*tmp0 + dp1[j+1]*tmp1 +
+-		dp1[j+2]*tmp2 + dp1[j+3]*tmp3;
+-	    sum2 = sum2 + dp2[j]*tmp0 + dp2[j+1]*tmp1 +
+-		dp2[j+2]*tmp2 + dp2[j+3]*tmp3;
+-	    sum3 = sum3 + dp3[j]*tmp0 + dp3[j+1]*tmp2 +
+-		dp3[j+2]*tmp2 + dp3[j+3]*tmp3;
+-	}
+-	for ( j = 0; j < n; j++ )
+-	{
+-	    sum0 += dp0[4*n4+j]*x[4*n4+j];
+-	    sum1 += dp1[4*n4+j]*x[4*n4+j];
+-	    sum2 += dp2[4*n4+j]*x[4*n4+j];
+-	    sum3 += dp3[4*n4+j]*x[4*n4+j];
+-	}
+-	y[4*i  ] = beta*y[4*i  ] + alpha*sum0;
+-	y[4*i+1] = beta*y[4*i+1] + alpha*sum1;
+-	y[4*i+2] = beta*y[4*i+2] + alpha*sum2;
+-	y[4*i+3] = beta*y[4*i+3] + alpha*sum3;
+-    }
+-#endif
+-
+-    for ( i = 0; i < m; i++ )
+-	y[4*m4+i] = beta*y[i] + alpha*Mdot(4*n4+n,&(A[4*m4+i][j0]),x);
+-}
+-
+-/* Mvm -- y <- alpha.A^T.x + beta.y */
+-void	Mvm(m,n,alpha,A,j0,x,beta,y)
+-int	m, n, j0;
+-double	alpha, beta;
+-Real	**A, *x, *y;
+-{
+-    register int	i, j, m4, n2;
+-    register Real	*Aref;
+-    register Real 	tmp;
+-
+-#ifdef REGISTER_RICH
+-    register Real	*Aref0, *Aref1;
+-    register Real	tmp0, tmp1;
+-    register Real	yval0, yval1, yval2, yval3;
+-#endif
+-
+-    if ( beta != 1.0 )
+-	Mscale(m,beta,y);
+-    /****************************************
+-    for ( j = 0; j < n; j++ )
+-	Maxpy(m,alpha*x[j],&(A[j][j0]),y);
+-    ****************************************/
+-    m4 = n2 = 0;
+-
+-    m4 = m / 4;
+-    m  = m % 4;
+-#ifdef REGISTER_RICH
+-    n2 = n / 2;
+-    n  = n % 2;
+-
+-    for ( j = 0; j < n2; j++ )
+-    {
+-	tmp0 = alpha*x[2*j];
+-	tmp1 = alpha*x[2*j+1];
+-	Aref0 = &(A[2*j  ][j0]);
+-	Aref1 = &(A[2*j+1][j0]);
+-	for ( i = 0; i < m4; i++ )
+-	{
+-	    yval0 = y[4*i  ] + tmp0*Aref0[4*i  ];
+-	    yval1 = y[4*i+1] + tmp0*Aref0[4*i+1];
+-	    yval2 = y[4*i+2] + tmp0*Aref0[4*i+2];
+-	    yval3 = y[4*i+3] + tmp0*Aref0[4*i+3];
+-	    y[4*i  ] = yval0 + tmp1*Aref1[4*i  ];
+-	    y[4*i+1] = yval1 + tmp1*Aref1[4*i+1];
+-	    y[4*i+2] = yval2 + tmp1*Aref1[4*i+2];
+-	    y[4*i+3] = yval3 + tmp1*Aref1[4*i+3];
+-	}
+-	y += 4*m4;	Aref0 += 4*m4;	Aref1 += 4*m4;
+-	for ( i = 0; i < m; i++ )
+-	    y[i] += tmp0*Aref0[i] + tmp1*Aref1[i];
+-    }
+-#endif
+-
+-    for ( j = 0; j < n; j++ )
+-    {
+-	tmp = alpha*x[2*n2+j];
+-	Aref = &(A[2*n2+j][j0]);
+-	for ( i = 0; i < m4; i++ )
+-	{
+-	    y[4*i  ] += tmp*Aref[4*i  ];
+-	    y[4*i+1] += tmp*Aref[4*i+1];
+-	    y[4*i+2] += tmp*Aref[4*i+2];
+-	    y[4*i+3] += tmp*Aref[4*i+3];
+-	}
+-	y += 4*m4;	Aref += 4*m4;
+-	for ( i = 0; i < m; i++ )
+-	    y[i] += tmp*Aref[i];
+-    }
+-}
+-
+-/* Mupdate -- A <- A + alpha.x.y^T */
+-void	Mupdate(m,n,alpha,x,y,A,j0)
+-int	m, n, j0;
+-double	alpha;
+-Real	**A, *x, *y;
+-{
+-    register int	i, j, n4;
+-    register Real	*Aref;
+-    register Real 	tmp;
+-
+-    /****************************************
+-    for ( i = 0; i < m; i++ )
+-	Maxpy(n,alpha*x[i],y,&(A[i][j0]));
+-    ****************************************/
+-
+-    n4 = n / 4;
+-    n  = n % 4;
+-    for ( i = 0; i < m; i++ )
+-    {
+-	tmp = alpha*x[i];
+-	Aref = &(A[i][j0]);
+-	for ( j = 0; j < n4; j++ )
+-	{
+-	    Aref[4*j  ] += tmp*y[4*j  ];
+-	    Aref[4*j+1] += tmp*y[4*j+1];
+-	    Aref[4*j+2] += tmp*y[4*j+2];
+-	    Aref[4*j+3] += tmp*y[4*j+3];
+-	}
+-	Aref += 4*n4;	y += 4*n4;
+-	for ( j = 0; j < n; j++ )
+-	    Aref[j] += tmp*y[j];
+-    }
+-}
+-
+-/* mblar-3 routines */
+-
+-/* Mmm -- C <- C + alpha.A.B */
+-void	Mmm(m,n,p,alpha,A,Aj0,B,Bj0,C,Cj0)
+-int	m, n, p;	/* C is m x n */
+-double  alpha;
+-Real	**A, **B, **C;
+-int	Aj0, Bj0, Cj0;
+-{
+-    register int	i, j, k;
+-    /* register Real	tmp, sum; */
+-
+-    /****************************************
+-    for ( i = 0; i < m; i++ )
+-	for ( k = 0; k < p; k++ )
+-	    Maxpy(n,alpha*A[i][Aj0+k],&(B[k][Bj0]),&(C[i][Cj0]));
+-    ****************************************/
+-    for ( i = 0; i < m; i++ )
+-	Mvm(p,n,alpha,B,Bj0,&(A[i][Aj0]),1.0,&(C[i][Cj0]));
+-}
+-
+-/* Mmtrm -- C <- C + alpha.A^T.B */
+-void	Mmtrm(m,n,p,alpha,A,Aj0,B,Bj0,C,Cj0)
+-int	m, n, p;	/* C is m x n */
+-double  alpha;
+-Real	**A, **B, **C;
+-int	Aj0, Bj0, Cj0;
+-{
+-    register int	i, j, k;
+-
+-    /****************************************
+-    for ( i = 0; i < m; i++ )
+-	for ( k = 0; k < p; k++ )
+-	    Maxpy(n,alpha*A[k][Aj0+i],&(B[k][Bj0]),&(C[i][Cj0]));
+-    ****************************************/
+-    for ( k = 0; k < p; k++ )
+-	Mupdate(m,n,alpha,&(A[k][Aj0]),&(B[k][Bj0]),C,Cj0);
+-}
+-
+-/* Mmmtr -- C <- C + alpha.A.B^T */
+-void	Mmmtr(m,n,p,alpha,A,Aj0,B,Bj0,C,Cj0)
+-int	m, n, p;	/* C is m x n */
+-double  alpha;
+-Real	**A, **B, **C;
+-int	Aj0, Bj0, Cj0;
+-{
+-    register int	i, j, k;
+-
+-    /****************************************
+-    for ( i = 0; i < m; i++ )
+-	for ( j = 0; j < n; j++ )
+-	    C[i][Cj0+j] += alpha*Mdot(p,&(A[i][Aj0]),&(B[j][Bj0]));
+-    ****************************************/
+-    for ( i = 0; i < m; i++ )
+-	Mmv(n,p,alpha,&(A[i][Aj0]),B,Bj0,&(C[i][Cj0]));
+-}
+-
+-/* Mmtrmtr -- C <- C + alpha.A^T.B^T */
+-void	Mmtrmtr(m,n,p,alpha,A,Aj0,B,Bj0,C,Cj0)
+-int	m, n, p;	/* C is m x n */
+-double  alpha;
+-Real	**A, **B, **C;
+-int	Aj0, Bj0, Cj0;
+-{
+-    register int	i, j, k;
+-
+-    for ( i = 0; i < m; i++ )
+-	for ( j = 0; j < n; j++ )
+-	    for ( k = 0; k < p; k++ )
+-		C[i][Cj0+j] += A[i][Aj0+k]*B[k][Bj0+j];
+-}
+-
+//GO.SYSIN DD extras.c
+echo fmacheps.c 1>&2
+sed >fmacheps.c <<'//GO.SYSIN DD fmacheps.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-#include	<stdio.h>
+-
+-double	fclean(x)
+-double	x;
+-{
+-    static float	y;
+-    y = x;
+-    return y;	/* prevents optimisation */
+-}
+-
+-main()
+-{
+-    static float	feps, feps1, ftmp;
+-
+-    feps = 1.0;
+-    while ( fclean(1.0+feps) > 1.0 )
+-	feps = 0.5*feps;
+-
+-    printf("%g\n", 2.0*feps);
+-}
+//GO.SYSIN DD fmacheps.c
+echo maxint.c 1>&2
+sed >maxint.c <<'//GO.SYSIN DD maxint.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-main()
+-{
+-    int		i, old_i;
+-
+-    i = 1;
+-    while ( i > 0 )
+-    {
+-	old_i = i;
+-	i = (i << 1) | 1;
+-    }
+-    printf("%d\n", old_i);
+-}
+//GO.SYSIN DD maxint.c
+echo makefile.in 1>&2
+sed >makefile.in <<'//GO.SYSIN DD makefile.in' 's/^-//'
+-#
+-# Makefile for Meschach via autoconf
+-#
+-# Copyright (C) David Stewart & Zbigniew Leyk 1993
+-#
+-# $Id: m1,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $
+-#
+-
+-srcdir = @srcdir@
+-VPATH = @srcdir@
+-
+-CC = @CC@
+-
+-DEFS = @DEFS@
+-LIBS = @LIBS@
+-RANLIB = @RANLIB@
+-
+-
+-CFLAGS = -O
+-
+-
+-.c.o:
+-	$(CC) -c $(CFLAGS) $(DEFS) $<
+-
+-SHELL = /bin/sh
+-MES_PAK = mesch12b
+-TAR = tar
+-SHAR = stree -u
+-ZIP = zip -r -l
+-FLIST = FILELIST
+-
+-###############################
+-
+-LIST1 = copy.o err.o matrixio.o memory.o vecop.o matop.o pxop.o \
+-	submat.o init.o otherio.o machine.o matlab.o ivecop.o version.o \
+-	meminfo.o memstat.o
+-LIST2 = lufactor.o bkpfacto.o chfactor.o qrfactor.o solve.o hsehldr.o \
+-	givens.o update.o norm.o hessen.o symmeig.o schur.o svd.o fft.o \
+-	mfunc.o bdfactor.o
+-LIST3 = sparse.o sprow.o sparseio.o spchfctr.o splufctr.o \
+-	spbkp.o spswap.o iter0.o itersym.o iternsym.o
+-ZLIST1 = zmachine.o zcopy.o zmatio.o zmemory.o zvecop.o zmatop.o znorm.o \
+-	 zfunc.o 
+-ZLIST2 = zlufctr.o zsolve.o zmatlab.o zhsehldr.o zqrfctr.o \
+-         zgivens.o  zhessen.o zschur.o
+-
+-# they are no longer supported
+-# if you use them add oldpart to all and sparse
+-OLDLIST = conjgrad.o lanczos.o arnoldi.o
+-
+-ALL_LISTS = $(LIST1) $(LIST2) $(LIST3) $(ZLIST1) $(ZLIST2) $(OLDLIST)
+-
+-HBASE = err.h meminfo.h machine.h matrix.h
+-
+-HLIST = $(HBASE) iter.h matlab.h matrix2.h  oldnames.h sparse.h \
+-	sparse2.h  zmatrix.h zmatrix2.h
+-
+-TORTURE = torture.o sptort.o ztorture.o memtort.o itertort.o \
+-	 mfuntort.o iotort.o
+-
+-OTHERS = dmacheps.c extras.c fmacheps.c maxint.c  makefile.in \
+-	 README configure configure.in machine.h.in copyright \
+-	 tutorial.c tutadv.c rk4.dat ls.dat makefile $(FLIST)
+-
+-
+-# Different configurations
+-# the dependencies **between** the parts are for dmake
+-all: @PROGS@ part1 part2 part3 zpart1 zpart2 
+-part2: part1
+-part3: part2
+-basic: part1 part2
+-sparse: part1 part2 part3 
+-zpart2: zpart1
+-complex: part1 part2 zpart1 zpart2
+-
+-
+-$(LIST1): $(HBASE)
+-part1: $(LIST1)
+-	ar ru meschach.a $(LIST1)
+-	$(RANLIB) meschach.a
+-
+-$(LIST2): $(HBASE) matrix2.h
+-part2: $(LIST2)
+-	ar ru meschach.a $(LIST2)
+-	$(RANLIB) meschach.a
+-
+-$(LIST3): $(HBASE) sparse.h sparse2.h
+-part3: $(LIST3)
+-	ar ru meschach.a $(LIST3)
+-	$(RANLIB) meschach.a
+-
+-$(ZLIST1): $(HBASDE) zmatrix.h
+-zpart1: $(ZLIST1)
+-	ar ru meschach.a $(ZLIST1)
+-	$(RANLIB) meschach.a
+-
+-$(ZLIST2): $(HBASE) zmatrix.h zmatrix2.h 
+-zpart2: $(ZLIST2)
+-	ar ru meschach.a $(ZLIST2)
+-	$(RANLIB) meschach.a
+-
+-$(OLDLIST): $(HBASE) sparse.h sparse2.h 
+-oldpart: $(OLDLIST)
+-	ar ru meschach.a $(OLDLIST)
+-	$(RANLIB) meschach.a
+-
+-
+-
+-#######################################
+-
+-tar:
+-	- /bin/rm -f $(MES_PAK).tar
+-	chmod 644 `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(OTHERS) $(HLIST)  `echo $(TORTURE) | sed -e 's/\.o/.c/g'` 
+-	chmod 755 configure
+-	$(MAKE) list
+-	$(TAR) cvf $(MES_PAK).tar \
+-	 `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(HLIST)  $(OTHERS) \
+-	`echo $(TORTURE) | sed -e 's/\.o/.c/g'` \
+-	MACHINES DOC
+-
+-# use this only for PC machines	
+-msdos-zip:
+-	- /bin/rm -f $(MES_PAK).zip
+-	chmod 644 `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(OTHERS) $(HLIST) `echo $(TORTURE) | sed -e 's/\.o/.c/g'` 
+-	chmod 755 configure
+-	$(MAKE) list
+-	$(ZIP)  $(MES_PAK).zip \
+-	 `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(HLIST)  $(OTHERS) `echo $(TORTURE) | sed -e 's/\.o/.c/g'` \
+-	MACHINES DOC
+-	
+-
+-fullshar:
+-	- /bin/rm -f $(MES_PAK).shar;
+-	chmod 644 `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(OTHERS) $(HLIST) `echo $(TORTURE) | sed -e 's/\.o/.c/g'` 
+-	chmod 755 configure
+-	$(MAKE) list
+-	$(SHAR) `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(HLIST)  $(OTHERS) `echo $(TORTURE) | sed -e 's/\.o/.c/g'` \
+-	MACHINES DOC > $(MES_PAK).shar
+-
+-shar:
+-	- /bin/rm -f meschach1.shar meschach2.shar meschach3.shar \
+-	meschach4.shar oldmeschach.shar meschach0.shar 
+-	chmod 644 `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(OTHERS) $(HLIST) `echo $(TORTURE) | sed -e 's/\.o/.c/g'` 
+-	chmod 755 configure	
+-	$(MAKE) list
+-	$(SHAR) `echo $(LIST1) | sed -e 's/\.o/.c/g'` > meschach1.shar
+-	$(SHAR) `echo $(LIST2) | sed -e 's/\.o/.c/g'` > meschach2.shar
+-	$(SHAR) `echo $(LIST3) | sed -e 's/\.o/.c/g'` > meschach3.shar	
+-	$(SHAR) `echo $(ZLIST1) | sed -e 's/\.o/.c/g'` \
+-	  `echo $(ZLIST2) | sed -e 's/\.o/.c/g'` > meschach4.shar
+-	$(SHAR) `echo $(OLDLIST) | sed -e 's/\.o/.c/g'` > oldmeschach.shar
+-	$(SHAR) $(OTHERS) `echo $(TORTURE) | sed -e 's/\.o/.c/g'` \
+-	  $(HLIST)  DOC MACHINES  > meschach0.shar
+-
+-list:
+-	/bin/rm -f $(FLIST)
+-	ls -lR `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	`echo $(TORTURE) | sed -e 's/\.o/.c/g'` \
+-	$(HLIST) $(OTHERS) MACHINES DOC \
+-	|awk '/^$$/ {print};/^[-d]/ {printf("%s %s   %10d %s %s %s %s\n", \
+-	 $$1,$$2,$$5,$$6,$$7,$$8,$$9)}; /^[^-d]/ {print}' \
+-	> $(FLIST)
+-
+-
+-
+-clean:
+-	/bin/rm -f *.o core asx5213a.mat iotort.dat 
+-
+-cleanup:
+-	/bin/rm -f *.o core asx5213a.mat iotort.dat *.a 
+-
+-realclean:
+-	/bin/rm -f *.o core asx5213a.mat iotort.dat *.a
+-	/bin/rm -f torture sptort ztorture memtort itertort mfuntort iotort
+-	/bin/rm -f makefile machine.h config.status maxint macheps
+- 
+-alltorture: torture sptort ztorture memtort itertort mfuntort iotort
+-
+-torture:torture.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o torture torture.o \
+-	meschach.a $(LIBS)
+-sptort:sptort.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o sptort sptort.o \
+-	meschach.a $(LIBS)
+-memtort: memtort.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o memtort memtort.o \
+-	meschach.a $(LIBS)
+-ztorture:ztorture.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o ztorture ztorture.o \
+-	meschach.a $(LIBS)
+-itertort: itertort.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o itertort itertort.o \
+-	meschach.a $(LIBS)
+-
+-iotort: iotort.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o iotort iotort.o \
+-	meschach.a $(LIBS)
+-mfuntort: mfuntort.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o mfuntort mfuntort.o \
+-	meschach.a $(LIBS)
+-tstmove: tstmove.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o tstmove tstmove.o \
+-	meschach.a $(LIBS)
+-tstpxvec: tstpxvec.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o tstpxvec tstpxvec.o \
+-	meschach.a $(LIBS)
+-
+//GO.SYSIN DD makefile.in
+echo README 1>&2
+sed >README <<'//GO.SYSIN DD README' 's/^-//'
+-
+-
+-				     
+-			     Meschach Library
+-			       Version 1.2b
+-
+-
+-			     David E. Stewart
+-			(david.stewart@anu.edu.au)
+-
+-				    and
+-
+-			       Zbigniew Leyk
+-			(zbigniew.leyk@anu.edu.au)
+-
+-		      School of Mathematical Sciences
+-		      Australian National University
+-			     Canberra ACT 0200
+-				 Australia
+-
+-
+-		      [last revised: 6th April, 1994]
+-
+-
+-			      1. INTRODUCTION
+-
+-   The Meschach Library is a numerical library of C routines for performing
+-calculations on matrices and vectors. It is intended for solving systems of
+-linear equations (dense and sparse), solve least squares problems,
+-computing eigenvalues and eigenvectors, etc. We do not claim that it
+-contains every useful algorithm in numerical linear algebra, but it does
+-provide a basis on which more advanced algorithms can be built. The library
+-is for people who know something about the C programming language,
+-something of how to solve the numerical problem they are faced with but do
+-not want to have the hassle of building all the necessary routines from the
+-scratch. The library is not a loose collection of numerical routines but it
+-comprises a coherent system. The current version is enhanced with many
+-features comparing with previous versions. Since the memory requirements
+-are nontrivial for large problems we have paid more attention to
+-allocation/deallocation of memory.
+-
+-   The source code is available to be perused, used and passed on without
+-cost, while ensuring that the quality of the software is not compromised.
+-The software is copyrighted; however, the copyright agreement follows in
+-the footsteps of the Free Software Foundation in preventing abuse that
+-occurs with totally public domain software.
+-
+-   Detailed instructions for installing Meschach are contained below.
+-
+-   Pronunciation: if in doubt, say "me-shark".  This is close enough.
+-Don't ask us "Why call it that?"  Have a look at the quote at the front of
+-the manual.
+-
+-
+-			      2. AVAILABILITY
+-
+-    The authors make this code openly available to others, in the hope that
+-it will prove to be a useful tool.  We ask only that:
+-
+-* If you publish results obtained using Meschach, please consider
+-  acknowledging the source of the code.
+-
+-* If you discover any errors in the code, please promptly communicate them
+-  to the authors.
+-
+-    We also suggest that you send email to the authors identifying yourself
+-as a user of Meschach; this will enable the authors to notify you of any
+-corrections/improvements in Meschach.
+-
+-
+-
+-			     3. HOW TO GET IT
+-
+-   There are several different forms in which you might receive Meschach.
+-To provide a shorthand for describing collections of files, the Unix
+-convention of putting alternative letters in [...] will be used.  (So,
+-fred[123] means the collection fred1, fred2 and fred3.)  Meschach is
+-available over Internet/AARnet via netlib, or at the anonymous ftp site
+-thrain.anu.edu.au in the directory pub/meschach.  There are five .shar
+-files: meschach[01234].shar (which contain the library itself),
+-meschach0.shar (which contains basic documentation and machine dependent
+-files for a number of machines).  Of the meschach[1234].shar files, only
+-meschach[12].shar are needed for the basic Meschach library; the third
+-.shar file contains the sparse matrix routines, and the the fourth contains
+-the routines for complex numbers, vectors and matrices.  There is also a
+-README file that you should get from meschach0.shar.
+-
+-   If you need the old iterative routines, the file oldmeschach.shar
+-contains the files conjgrad.c, arnoldi.c and lanczos.c.
+-
+-   To get the library from netlib,
+-
+-mail netlib@research.att.com
+-send all from c/meschach
+-
+-   There are a number of other netlib sites which mirror the main netlib
+-sites.  These include netlib@ornl.gov (Oak Ridge, TN, USA), netlib@nac.no
+-(Oslo, Norway), ftp.cs.uow.edu.au (Wollongong, Australia; ftp only),
+-netlib@nchc.edu.tw (Taiwan), elib.zib-berlin.de (Berlin, Germany; ftp
+-only).  (For anonymous ftp sites the directory containing the Meschach
+-.shar files is pub/netlib/c/meschach or similar, possibly depending on the
+-site.)
+-
+-   Meschach is available in other forms on thrain.anu.edu.au by ftp in the
+-directory pub/meschach.  It is available as a .tar file (mesch12a.tar for
+-version 1.2a), or as a collection of .shar files, or as a .zip file.  The
+-.tar and .zip versions each contain the entire contents of the Meschach
+-library.
+-
+-   There is a manual called "Meschach: Matrix Computations in C" which has
+-been published by
+-
+-	Centre for Mathematics and its Applications
+-	School of Mathematical Sciences
+-	Australian National University
+-	Canberra, ACT 0200
+-	Australia
+-
+-and costs A$30 (about US$22) + postage/handling.  You can order it by
+-writing there or you can send email messages to one of us
+-(david.stewart@anu.edu.au or zbigniew.leyk@anu.edu.au) and we can pass it
+-on.
+-
+-   If you don't have any money, as a stop gap you can get the **OLD**
+-manual, although it is out of date, by anonymous ftp from
+-
+-	thrain.anu.edu.au : /pub/meschach/version1.1b/bookdvi.tar [.Z or .gz]
+-
+-In addition, don't forget that the distribution includes a DOC directory
+-which contains tutorial.txt and fnindex.txt which are respectively, the
+-tutorial chapter (text version) and the function index (text version).
+-
+-
+-
+-			      4. INSTALLATION
+-
+-			    a) On Unix machines
+-
+-   To extract the files from the .shar files, put them all into a suitable
+-directory and use
+-
+-  sh <file>.shar
+-
+-to expand the files.  (Use one sh command per file; sh *.shar will not work
+-in general.)
+-
+-   For the .tar file, use
+-
+-  tar xvf mesch12a.tar
+-
+-and for the .zip file use
+-
+-  unzip mesch12a.zip
+-
+-   On a Unix system you can use the configure script to set up the
+-machine-dependent files.  The script takes a number of options which are
+-used for installing different subsets of the full Meschach.  For the basic
+-system, which requires only meschach[012].shar, use
+-
+-  configure
+-  make basic
+-  make clean
+-
+-   For including sparse operations, which requires meschach[0123].shar, use
+-
+-  configure --with-sparse
+-  make sparse
+-  make clean
+-
+-  For including complex operations, which requires meschach[0124].shar, use
+-
+-  configure --with-complex
+-  make complex
+-  make clean
+-
+-   For including everything, which requires meschach[01234].shar, use
+-
+-  configure --with-all
+-  make all
+-  make clean
+-
+-  To compile the complete library in single precision (with Real equivalent
+-to float), add the --with-float option to configure, use
+-
+-  configure --with-all --with-float
+-  make all
+-  make clean
+-
+-
+-   Some Unix-like systems may have some problems with this due to bugs or
+-incompatibilities in various parts of the system.  To check this use make
+-torture and run torture.  In this case use the machine-dependent files from
+-the machines directory.  (This is the case for RS/6000 machines, the -O
+-switch results in failure of a routine in schur.c.  Compiling without the
+--O switch results in correct results.)
+-
+-   If you have problems using configure, or you use a non-Unix system,
+-check the MACHINES directory (generated by meschach0.shar) for your
+-machine, operating system and/or compiler.  Save the machine dependent
+-files makefile, machine.c and machine.h.  Copy those files from the
+-directory for your machine to the directory where the source code is.
+-
+-   To link into a program prog.c, compile it using
+-
+-  cc -o prog_name prog.c ....(source files).... meschach.a -lm
+-
+-
+-   This code has been mostly developed on the University of Queensland,
+-Australia's Pyramid 9810 running BSD4.3.  Initial development was on a
+-Zilog Zeus Z8000 machine running Zeus, a Unix workalike operating system.
+-Versions have also been successfully used on various Unix machines
+-including Sun 3's, IBM RT's, SPARC's and an IBM RS/6000 running AIX.  It
+-has also been compiled on an IBM AT clone using Quick C.  It has been
+-designed to compile under either Kernighan and Richie, (Edition 1) C and
+-under ANSI C.  (And, indeed, it has been compiled in both ANSI C and
+-non-ANSI C environments.)
+-
+-
+-			  b) On non-Unix machines
+-
+-   First look in the machines directory for your system type.  If it is
+-there, then copy the machine dependent files machine.h, makefile (and
+-possibly machine.c) to the Meschach directory.
+-
+-   If your machine type is not there, then you will need to either compile
+-``by hand'', or construct your own makefile and possibly machine.h as well.
+-The machine-dependent files for various systems should be used as a
+-starting point, and the ``vanilla'' version of machine.h should be used.
+-Information on the machine-dependent files follows in the next three
+-subsections.
+-
+-   On an IBM PC clone, the source code would be on a floppy disk. Use
+-
+-  xcopy a:* meschach
+-
+-to copy it to the meschach directory.  Then ``cd meschach'', and then
+-compile the source code.  Different compilers on MSDOS machines will
+-require different installation procedures.  Check the directory meschach
+-for the appropriate ``makefile'' for your compiler.  If your compiler is
+-not listed, then you should try compiling it ``by hand'', modifying the
+-machine-dependent files as necessary.
+-
+-   Worst come to worst, for a given C compiler, execute
+-		<C compiler name> *.c
+-on MS-DOS machines. For example,
+-		tcc *.c
+-for Turbo C, and
+-		msc *.c
+-for Microsoft C, or if you are using Quick C,
+-		qcl *.c
+-and of course
+-		cc *.c
+-for the standard Unix compiler.
+-
+-   Once the object files have been generated, you will need to combine them
+-into a library. Consult your local compiler's manual for details of how to
+-do this.
+-
+-   When compiling programs/routines that use Meschach, you will need to
+-have access the the header files in the INCLUDE directory. The INCLUDE
+-directory's contents can be copied to the directory where the
+-programs/routines are compiled.
+-
+-   The files in the DOC directory form a very brief form of documentation
+-on the the library routines in Meschach. See the printed documentation for
+-more comprehensive documentation of the Meschach routines.  This can be
+-obtained from the authors via email.
+-
+-   The files and directories created by the machines.shar shell archive
+-contain the files machine.c machine.h and makefile for a particular
+-machine/operating system/compiler where they need to be different.  Copy
+-the files in the appropriate directory for your machine/operating
+-system/compiler to the directory with the Meschach source before compiling.
+-
+-
+-
+-			       c)  makefile
+-
+-
+-   This is setup by using the configure script on a Unix system, based on
+-the makefile.in file.  However, if you want to modify how the library is
+-compiled, you are free to change the makefile.
+-
+-   The most likely change that you would want to make to this file is to
+-change the line
+-
+-  CFLAGS = -O
+-
+-to suit your particular compiler.
+-
+-  The code is intended to be compilable by both ANSI and non-ANSI
+-compilers.
+-
+-   To achieve this portability without sacrificing the ANSI function
+-prototypes (which are very useful for avoiding problems with passing
+-parameters) there is a token ANSI_C which must be #define'd in order to
+-take full advantage of ANSI C.  To do this you should do all compilations
+-with
+-
+-  #define ANSI_C 1
+-
+-   This can also be done at the compilation stage with a -DANSI_C flag.
+-Again, you will have to use the -DANSI_C flag or its equivalent whenever
+-you compile, or insert the line
+-
+-  #define ANSI_C 1
+-
+-in machine.h, to make full use of ANSI C with this matrix library.
+-
+-
+-			       d)  machine.h
+-
+-   Like makefile this is normally set up by the configure script on Unix
+-machines.  However, for non-Unix systems, or if you need to set some things
+-``by hand'', change machine.h.
+-
+-   There are a few quantities in here that should be modified to suit your
+-particular compiler.  Firstly, the macros MEM_COPY() and MEM_ZERO() need to
+-be correctly defined here.  The original library was compiled on BSD
+-systems, and so it originally relied on bcopy() and bzero().
+-
+-   In machine.h you will find the definitions for using the standard ANSI C
+-library routines:
+-
+-  /*--------------------ANSI C--------------------*/
+-  #include        <stddef.h>
+-  #include        <string.h>
+-  #define	MEM_COPY(from,to,size)  memmove((to),(from),(size))
+-  #define	MEM_ZERO(where,size)    memset((where),'\0',(size))
+-
+-   Delete or comment out the alternative definitions and it should compile
+-correctly.  The source files containing memmove() and/or memset() are
+-available by anonymous ftp from some ftp sites (try archie to discover 
+-them). The files are usually called memmove.c or memset.c.
+-Some ftp sites which currently (Jan '94) have a version of these files are
+-munnari.oz.au (in Australia), ftp.uu.net, gatekeeper.dec.com (USA), and
+-unix.hensa.ac.uk (in the UK).  The directory in which you will find
+-memmove.c and memset.c typically looks like .../bsd-sources/lib/libc/...
+-
+-   There are two further machine-dependent quantities that should be set.
+-These are machine epsilon or the unit roundoff for double precision
+-arithmetic, and the maximum value produced by the rand() routine, which is
+-used in rand_vec() and rand_mat().
+-
+-
+-   The current definitions of these are
+-
+-  #define	MACHEPS	2.2e-16
+-  #define	MAX_RAND 2.147483648e9
+-
+-   The value of MACHEPS should be correct for all IEEE standard double
+-precision arithmetic.
+-
+-   However, ANSI C's <float.h> contains #define'd quantities DBL_EPSILON
+-and RAND_MAX, so if you have an ANSI C compiler and headers, replace the
+-above two lines of machine.h with
+-
+-  #include <float.h>
+-  /* for Real == float */
+-  #define MACHEPS DBL_EPSILON
+-  #define MAX_RAND RAND_MAX
+-
+-   The default value given for MAX_RAND is 2^31 , as the Pyramid 9810 and
+-the SPARC 2's both have 32 bit words.  There is a program macheps.c which
+-is included in your source files which computes and prints out the value of
+-MACHEPS for your machine.
+-
+-   Some other macros control some aspects of Meschach.  One of these is
+-SEGMENTED which should be #define'd if you are working with a machine or
+-compiler that does not allow large arrays to be allocated.  For example,
+-the most common memory models for MS-DOS compilers do not allow more than
+-64Kbyte to be allocated in one block.  This limits square matrices to be no
+-more than 9090 .  Inserting #define SEGMENTED 1 into machine.h will mean
+-that matrices are allocated a row at a time.
+-
+-
+-
+-			      4. SAMPLE TESTS
+-
+-    There are several programs for checking Meschach called torture
+-(source: torture.c) for the dense routines, sptort (source: sptort.c) for
+-the sparse routines, ztorture (source ztorture.c) for a complex version of
+-torture, memtort (source memtort.c) for memory allocation/deallocation,
+-itertort (source itertort.c) for iterative methods, mfuntort (source
+-mfuntort.c) for computing powers of dense matrices, iotort (source
+-iotort.c) for I/O routines.  These can be compiled using make by "make
+-torture", "make sptort", etc.  The programs are part of meschach0.shar.
+-
+-
+-			     5. OTHER PROBLEMS
+-
+-   Meschach is not a commercial package, so we do not guarantee that
+-everything will be perfect or will install smoothly.  Inevitably there will
+-be unforeseen problems. If you come across any bugs or inconsistencies, please
+-let us know.  If you need to modify the results of the configure script, or
+-need to construct your own machine.h and makefile's, please send them to
+-us.  A number of people sent us the machine dependent files for Meschach 1.1,
+-but with the use of configure, and the new information needed for version
+-1.2, these machine dependent files don't have quite the right information.
+-Hopefully, though, they are redundant.  Non-Unix platforms at present
+-require ``manual'' installation.  Because of the variety of platforms
+-(MS-DOS, Macintosh, VAX/VMS, Prime, Amiga, Atari, ....) this is left up to
+-the users of these platforms.  We hope that you can use the distibutable
+-machine-dependent files as a starting point for this task.
+-
+-   If you have programs or routines written using Meschach v.1.1x, you
+-should put the statement
+-
+-   #include "oldnames.h"
+-
+-at the beginning of your files.  This is because a large number of the
+-names of the routines have been changed (e.g. "get_vec()" has become
+-"v_get()").  This will enable you to use the old names, although all of the
+-error messages etc., will use the new names.  Also note that the new
+-iterative routines have a very different calling sequence.  If you need the
+-old iterative routines, they are in oldmeschach.shar.
+-
+-   If you wish to let us know what you have done, etc., our email
+-addresses are
+-
+-			 david.stewart@anu.edu.au
+-			 zbigniew.leyk@anu.edu.au
+-
+-    Good luck!
+- 
+-
+-			      ACKNOWLEDGMENTS
+-
+-
+-    Many people have helped in various ways with ideas and suggestions.
+-Needless to say, the bugs are all ours!  But these people should be thanked
+-for their encouragement etc.  These include a number of people at
+-University of Queensland: Graeme Chandler, David De Wit, Martin Sharry,
+-Michael Forbes, Phil Kilby, John Holt, Phil Pollett and Tony Watts.  At the
+-Australian National University: Mike Osborne, Steve Roberts, Margaret Kahn
+-and Teresa Leyk.  Karen George of the University of Canberra has been a
+-source of both ideas and encouragement.  Email has become significant part
+-of work, and many people have pointed out bugs, inconsistencies and
+-improvements to Meschach by email.  These people include Ajay Shah of the
+-University of Southern California, Dov Grobgeld of the Weizmann Institute,
+-John Edstrom of the University of Calgary, Eric Grosse, one of the netlib
+-organisers, Ole Saether of Oslo, Norway, Alfred Thiele and Pierre
+-Asselin of Carnegie-Mellon Univeristy, Daniel Polani of the University of
+-Mainz, Marian Slodicka of Slovakia, Kaifu Wu of Pomona, Hidetoshi
+-Shimodaira of the University of Tokyo, Eng Siong of Edinburgh, Hirokawa Rui
+-of the University of Tokyo, Marko Slyz of the University of Michigan, and
+-Brook Milligan of the University of Texas.  This list is only partial, and
+-there are many others who have corresponded with us on details about
+-Meschach and the like.  Finally our thanks go to all those that have had to
+-struggle with compilers and other things to get Meschach to work.
+-
+-				     
+-
+-
+-
+//GO.SYSIN DD README
+echo configure 1>&2
+sed >configure <<'//GO.SYSIN DD configure' 's/^-//'
+-#!/bin/sh
+-# Guess values for system-dependent variables and create Makefiles.
+-# Generated automatically using autoconf.
+-# Copyright (C) 1991, 1992, 1993 Free Software Foundation, Inc.
+-
+-# This program is free software; you can redistribute it and/or modify
+-# it under the terms of the GNU General Public License as published by
+-# the Free Software Foundation; either version 2, or (at your option)
+-# any later version.
+-
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-
+-# You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-
+-# Usage: configure [--srcdir=DIR] [--host=HOST] [--gas] [--nfp] [--no-create]
+-#        [--prefix=PREFIX] [--exec-prefix=PREFIX] [--with-PACKAGE] [TARGET]
+-# Ignores all args except --srcdir, --prefix, --exec-prefix, --no-create, and
+-# --with-PACKAGE unless this script has special code to handle it.
+-
+-
+-for arg
+-do
+-  # Handle --exec-prefix with a space before the argument.
+-  if test x$next_exec_prefix = xyes; then exec_prefix=$arg; next_exec_prefix=
+-  # Handle --host with a space before the argument.
+-  elif test x$next_host = xyes; then next_host=
+-  # Handle --prefix with a space before the argument.
+-  elif test x$next_prefix = xyes; then prefix=$arg; next_prefix=
+-  # Handle --srcdir with a space before the argument.
+-  elif test x$next_srcdir = xyes; then srcdir=$arg; next_srcdir=
+-  else
+-    case $arg in
+-     # For backward compatibility, also recognize exact --exec_prefix.
+-     -exec-prefix=* | --exec_prefix=* | --exec-prefix=* | --exec-prefi=* | --exec-pref=* | --exec-pre=* | --exec-pr=* | --exec-p=* | --exec-=* | --exec=* | --exe=* | --ex=* | --e=*)
+-	exec_prefix=`echo $arg | sed 's/[-a-z_]*=//'` ;;
+-     -exec-prefix | --exec_prefix | --exec-prefix | --exec-prefi | --exec-pref | --exec-pre | --exec-pr | --exec-p | --exec- | --exec | --exe | --ex | --e)
+-	next_exec_prefix=yes ;;
+-
+-     -gas | --gas | --ga | --g) ;;
+-
+-     -host=* | --host=* | --hos=* | --ho=* | --h=*) ;;
+-     -host | --host | --hos | --ho | --h)
+-	next_host=yes ;;
+-
+-     -nfp | --nfp | --nf) ;;
+-
+-     -no-create | --no-create | --no-creat | --no-crea | --no-cre | --no-cr | --no-c | --no- | --no)
+-        no_create=1 ;;
+-
+-     -prefix=* | --prefix=* | --prefi=* | --pref=* | --pre=* | --pr=* | --p=*)
+-	prefix=`echo $arg | sed 's/[-a-z_]*=//'` ;;
+-     -prefix | --prefix | --prefi | --pref | --pre | --pr | --p)
+-	next_prefix=yes ;;
+-
+-     -srcdir=* | --srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=* | --s=*)
+-	srcdir=`echo $arg | sed 's/[-a-z_]*=//'` ;;
+-     -srcdir | --srcdir | --srcdi | --srcd | --src | --sr | --s)
+-	next_srcdir=yes ;;
+-
+-     -with-* | --with-*)
+-       package=`echo $arg|sed 's/-*with-//'`
+-       # Delete all the valid chars; see if any are left.
+-       if test -n "`echo $package|sed 's/[-a-zA-Z0-9_]*//g'`"; then
+-         echo "configure: $package: invalid package name" >&2; exit 1
+-       fi
+-       eval "with_`echo $package|sed s/-/_/g`=1" ;;
+-
+-     -v | -verbose | --verbose | --verbos | --verbo | --verb | --ver | --ve | --v)
+-       verbose=yes ;;
+-
+-     *) ;;
+-    esac
+-  fi
+-done
+-
+-trap 'rm -f conftest* core; exit 1' 1 3 15
+-
+-# Needed for some versions of `tr' so that character classes in `[]' work.
+-if test "${LANG+set}" = "set" ; then
+-   LANG=C
+-fi
+-
+-rm -f conftest*
+-compile='${CC-cc} $CFLAGS $DEFS conftest.c -o conftest $LIBS >/dev/null 2>&1'
+-
+-# A filename unique to this package, relative to the directory that
+-# configure is in, which we can look for to find out if srcdir is correct.
+-unique_file=err.c
+-
+-# Find the source files, if location was not specified.
+-if test -z "$srcdir"; then
+-  srcdirdefaulted=yes
+-  # Try the directory containing this script, then `..'.
+-  prog=$0
+-  confdir=`echo $prog|sed 's%/[^/][^/]*$%%'`
+-  test "X$confdir" = "X$prog" && confdir=.
+-  srcdir=$confdir
+-  if test ! -r $srcdir/$unique_file; then
+-    srcdir=..
+-  fi
+-fi
+-if test ! -r $srcdir/$unique_file; then
+-  if test x$srcdirdefaulted = xyes; then
+-    echo "configure: Can not find sources in \`${confdir}' or \`..'." 1>&2
+-  else
+-    echo "configure: Can not find sources in \`${srcdir}'." 1>&2
+-  fi
+-  exit 1
+-fi
+-# Preserve a srcdir of `.' to avoid automounter screwups with pwd.
+-# But we can't avoid them for `..', to make subdirectories work.
+-case $srcdir in
+-  .|/*|~*) ;;
+-  *) srcdir=`cd $srcdir; pwd` ;; # Make relative path absolute.
+-esac
+-
+-
+-PROGS=""
+-if test -z "$CC"; then
+-  # Extract the first word of `acc', so it can be a program name with args.
+-  set dummy acc; word=$2
+-  echo checking for $word
+-  IFS="${IFS= 	}"; saveifs="$IFS"; IFS="${IFS}:"
+-  for dir in $PATH; do
+-    test -z "$dir" && dir=.
+-    if test -f $dir/$word; then
+-      CC="acc"
+-      break
+-    fi
+-  done
+-  IFS="$saveifs"
+-fi
+-test -z "$CC" && CC=""""
+-test -n "$CC" -a -n "$verbose" && echo "	setting CC to $CC"
+-
+-if test -z "$CC"; then
+-  # Extract the first word of `cc', so it can be a program name with args.
+-  set dummy cc; word=$2
+-  echo checking for $word
+-  IFS="${IFS= 	}"; saveifs="$IFS"; IFS="${IFS}:"
+-  for dir in $PATH; do
+-    test -z "$dir" && dir=.
+-    if test -f $dir/$word; then
+-      CC="cc"
+-      break
+-    fi
+-  done
+-  IFS="$saveifs"
+-fi
+-test -z "$CC" && CC="gcc"
+-test -n "$CC" -a -n "$verbose" && echo "	setting CC to $CC"
+-
+-echo checking how to run the C preprocessor
+-if test -z "$CPP"; then
+-  CPP='${CC-cc} -E'
+-  cat > conftest.c <<EOF
+-#include <stdio.h>
+-EOF
+-err=`eval "($CPP \$DEFS conftest.c >/dev/null) 2>&1"`
+-if test -z "$err"; then
+-  :
+-else
+-  CPP=/lib/cpp
+-fi
+-rm -f conftest*
+-fi
+-
+-echo checking for AIX
+-cat > conftest.c <<EOF
+-#ifdef _AIX
+-  yes
+-#endif
+-
+-EOF
+-eval "$CPP \$DEFS conftest.c > conftest.out 2>&1"
+-if egrep "yes" conftest.out >/dev/null 2>&1; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' _ALL_SOURCE
+-DEFS="$DEFS -D_ALL_SOURCE=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}_ALL_SOURCE\${SEDdB}_ALL_SOURCE\${SEDdC}1\${SEDdD}
+-\${SEDuA}_ALL_SOURCE\${SEDuB}_ALL_SOURCE\${SEDuC}1\${SEDuD}
+-\${SEDeA}_ALL_SOURCE\${SEDeB}_ALL_SOURCE\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-rm -f conftest*
+-
+-
+-echo checking for minix/config.h
+-cat > conftest.c <<EOF
+-#include <minix/config.h>
+-EOF
+-err=`eval "($CPP \$DEFS conftest.c >/dev/null) 2>&1"`
+-if test -z "$err"; then
+-  MINIX=1
+-fi
+-rm -f conftest*
+-
+-# The Minix shell can't assign to the same variable on the same line!
+-if test -n "$MINIX"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' _POSIX_SOURCE
+-DEFS="$DEFS -D_POSIX_SOURCE=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}_POSIX_SOURCE\${SEDdB}_POSIX_SOURCE\${SEDdC}1\${SEDdD}
+-\${SEDuA}_POSIX_SOURCE\${SEDuB}_POSIX_SOURCE\${SEDuC}1\${SEDuD}
+-\${SEDeA}_POSIX_SOURCE\${SEDeB}_POSIX_SOURCE\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-  {
+-test -n "$verbose" && \
+-echo '	defining' _POSIX_1_SOURCE to be '2'
+-DEFS="$DEFS -D_POSIX_1_SOURCE=2"
+-SEDDEFS="${SEDDEFS}\${SEDdA}_POSIX_1_SOURCE\${SEDdB}_POSIX_1_SOURCE\${SEDdC}2\${SEDdD}
+-\${SEDuA}_POSIX_1_SOURCE\${SEDuB}_POSIX_1_SOURCE\${SEDuC}2\${SEDuD}
+-\${SEDeA}_POSIX_1_SOURCE\${SEDeB}_POSIX_1_SOURCE\${SEDeC}2\${SEDeD}
+-"
+-}
+-
+-  {
+-test -n "$verbose" && \
+-echo '	defining' _MINIX
+-DEFS="$DEFS -D_MINIX=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}_MINIX\${SEDdB}_MINIX\${SEDdC}1\${SEDdD}
+-\${SEDuA}_MINIX\${SEDuB}_MINIX\${SEDuC}1\${SEDuD}
+-\${SEDeA}_MINIX\${SEDeB}_MINIX\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-
+-echo checking for POSIXized ISC
+-if test -d /etc/conf/kconfig.d &&
+-  grep _POSIX_VERSION /usr/include/sys/unistd.h >/dev/null 2>&1
+-then
+-  ISC=1 # If later tests want to check for ISC.
+-  {
+-test -n "$verbose" && \
+-echo '	defining' _POSIX_SOURCE
+-DEFS="$DEFS -D_POSIX_SOURCE=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}_POSIX_SOURCE\${SEDdB}_POSIX_SOURCE\${SEDdC}1\${SEDdD}
+-\${SEDuA}_POSIX_SOURCE\${SEDuB}_POSIX_SOURCE\${SEDuC}1\${SEDuD}
+-\${SEDeA}_POSIX_SOURCE\${SEDeB}_POSIX_SOURCE\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-  if test -n "$GCC"; then
+-    CC="$CC -posix"
+-  else
+-    CC="$CC -Xp"
+-  fi
+-fi
+-
+-if test -z "$RANLIB"; then
+-  # Extract the first word of `ranlib', so it can be a program name with args.
+-  set dummy ranlib; word=$2
+-  echo checking for $word
+-  IFS="${IFS= 	}"; saveifs="$IFS"; IFS="${IFS}:"
+-  for dir in $PATH; do
+-    test -z "$dir" && dir=.
+-    if test -f $dir/$word; then
+-      RANLIB="ranlib"
+-      break
+-    fi
+-  done
+-  IFS="$saveifs"
+-fi
+-test -z "$RANLIB" && RANLIB=":"
+-test -n "$RANLIB" -a -n "$verbose" && echo "	setting RANLIB to $RANLIB"
+-
+-for hdr in memory.h
+-do
+-trhdr=HAVE_`echo $hdr | tr '[a-z]./' '[A-Z]__'`
+-echo checking for ${hdr}
+-cat > conftest.c <<EOF
+-#include <${hdr}>
+-EOF
+-err=`eval "($CPP \$DEFS conftest.c >/dev/null) 2>&1"`
+-if test -z "$err"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' ${trhdr}
+-DEFS="$DEFS -D${trhdr}=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}${trhdr}\${SEDdB}${trhdr}\${SEDdC}1\${SEDdD}
+-\${SEDuA}${trhdr}\${SEDuB}${trhdr}\${SEDuC}1\${SEDuD}
+-\${SEDeA}${trhdr}\${SEDeB}${trhdr}\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-rm -f conftest*
+-done
+-
+-echo checking for ANSI C header files
+-cat > conftest.c <<EOF
+-#include <stdlib.h>
+-#include <stdarg.h>
+-#include <string.h>
+-#include <float.h>
+-EOF
+-err=`eval "($CPP \$DEFS conftest.c >/dev/null) 2>&1"`
+-if test -z "$err"; then
+-  # SunOS 4.x string.h does not declare mem*, contrary to ANSI.
+-echo '#include <string.h>' > conftest.c
+-eval "$CPP \$DEFS conftest.c > conftest.out 2>&1"
+-if egrep "memchr" conftest.out >/dev/null 2>&1; then
+-  # SGI's /bin/cc from Irix-4.0.5 gets non-ANSI ctype macros unless using -ansi.
+-cat > conftest.c <<EOF
+-#include <ctype.h>
+-#define ISLOWER(c) ('a' <= (c) && (c) <= 'z')
+-#define TOUPPER(c) (ISLOWER(c) ? 'A' + ((c) - 'a') : (c))
+-#define XOR(e,f) (((e) && !(f)) || (!(e) && (f)))
+-int main () { int i; for (i = 0; i < 256; i++)
+-if (XOR (islower (i), ISLOWER (i)) || toupper (i) != TOUPPER (i)) exit(2);
+-exit (0); }
+-
+-EOF
+-eval $compile
+-if test -s conftest && (./conftest; exit) 2>/dev/null; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' STDC_HEADERS
+-DEFS="$DEFS -DSTDC_HEADERS=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}STDC_HEADERS\${SEDdB}STDC_HEADERS\${SEDdC}1\${SEDdD}
+-\${SEDuA}STDC_HEADERS\${SEDuB}STDC_HEADERS\${SEDuC}1\${SEDuD}
+-\${SEDeA}STDC_HEADERS\${SEDeB}STDC_HEADERS\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-rm -f conftest*
+-fi
+-rm -f conftest*
+-
+-fi
+-rm -f conftest*
+-
+-echo checking for complex.h
+-cat > conftest.c <<EOF
+-#include <complex.h>
+-EOF
+-err=`eval "($CPP \$DEFS conftest.c >/dev/null) 2>&1"`
+-if test -z "$err"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' HAVE_COMPLEX_H
+-DEFS="$DEFS -DHAVE_COMPLEX_H=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}HAVE_COMPLEX_H\${SEDdB}HAVE_COMPLEX_H\${SEDdC}1\${SEDdD}
+-\${SEDuA}HAVE_COMPLEX_H\${SEDuB}HAVE_COMPLEX_H\${SEDuC}1\${SEDuD}
+-\${SEDeA}HAVE_COMPLEX_H\${SEDeB}HAVE_COMPLEX_H\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-rm -f conftest*
+-
+-echo checking for malloc.h
+-cat > conftest.c <<EOF
+-#include <malloc.h>
+-EOF
+-err=`eval "($CPP \$DEFS conftest.c >/dev/null) 2>&1"`
+-if test -z "$err"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' HAVE_MALLOC_H
+-DEFS="$DEFS -DHAVE_MALLOC_H=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}HAVE_MALLOC_H\${SEDdB}HAVE_MALLOC_H\${SEDdC}1\${SEDdD}
+-\${SEDuA}HAVE_MALLOC_H\${SEDuB}HAVE_MALLOC_H\${SEDuC}1\${SEDuD}
+-\${SEDeA}HAVE_MALLOC_H\${SEDeB}HAVE_MALLOC_H\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-rm -f conftest*
+-
+-echo checking for varargs.h
+-cat > conftest.c <<EOF
+-#include <varargs.h>
+-EOF
+-err=`eval "($CPP \$DEFS conftest.c >/dev/null) 2>&1"`
+-if test -z "$err"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' VARARGS
+-DEFS="$DEFS -DVARARGS=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}VARARGS\${SEDdB}VARARGS\${SEDdC}1\${SEDdD}
+-\${SEDuA}VARARGS\${SEDuB}VARARGS\${SEDuC}1\${SEDuD}
+-\${SEDeA}VARARGS\${SEDeB}VARARGS\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-rm -f conftest*
+-
+-{
+-test -n "$verbose" && \
+-echo '	defining' NOT_SEGMENTED
+-DEFS="$DEFS -DNOT_SEGMENTED=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}NOT_SEGMENTED\${SEDdB}NOT_SEGMENTED\${SEDdC}1\${SEDdD}
+-\${SEDuA}NOT_SEGMENTED\${SEDuB}NOT_SEGMENTED\${SEDuC}1\${SEDuD}
+-\${SEDeA}NOT_SEGMENTED\${SEDeB}NOT_SEGMENTED\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-echo checking for size_t in sys/types.h
+-echo '#include <sys/types.h>' > conftest.c
+-eval "$CPP \$DEFS conftest.c > conftest.out 2>&1"
+-if egrep "size_t" conftest.out >/dev/null 2>&1; then
+-  :
+-else
+-  {
+-test -n "$verbose" && \
+-echo '	defining' size_t to be 'unsigned'
+-DEFS="$DEFS -Dsize_t=unsigned"
+-SEDDEFS="${SEDDEFS}\${SEDdA}size_t\${SEDdB}size_t\${SEDdC}unsigned\${SEDdD}
+-\${SEDuA}size_t\${SEDuB}size_t\${SEDuC}unsigned\${SEDuD}
+-\${SEDeA}size_t\${SEDeB}size_t\${SEDeC}unsigned\${SEDeD}
+-"
+-}
+-
+-fi
+-rm -f conftest*
+-
+-prog='/* Ultrix mips cc rejects this.  */
+-typedef int charset[2]; const charset x;
+-/* SunOS 4.1.1 cc rejects this.  */
+-char const *const *ccp;
+-char **p;
+-/* AIX XL C 1.02.0.0 rejects this.
+-   It does not let you subtract one const X* pointer from another in an arm
+-   of an if-expression whose if-part is not a constant expression */
+-const char *g = "string";
+-p = &g + (g ? g-g : 0);
+-/* HPUX 7.0 cc rejects these. */
+-++ccp;
+-p = (char**) ccp;
+-ccp = (char const *const *) p;
+-{ /* SCO 3.2v4 cc rejects this.  */
+-  char *t;
+-  char const *s = 0 ? (char *) 0 : (char const *) 0;
+-
+-  *t++ = 0;
+-}
+-{ /* Someone thinks the Sun supposedly-ANSI compiler will reject this.  */
+-  int x[] = {25,17};
+-  const int *foo = &x[0];
+-  ++foo;
+-}
+-{ /* Sun SC1.0 ANSI compiler rejects this -- but not the above. */
+-  typedef const int *iptr;
+-  iptr p = 0;
+-  ++p;
+-}
+-{ /* AIX XL C 1.02.0.0 rejects this saying
+-     "k.c", line 2.27: 1506-025 (S) Operand must be a modifiable lvalue. */
+-  struct s { int j; const int *ap[3]; };
+-  struct s *b; b->j = 5;
+-}'
+-echo checking for working const
+-cat > conftest.c <<EOF
+-
+-int main() { exit(0); }
+-int t() { $prog }
+-EOF
+-if eval $compile; then
+-  :
+-else
+-  {
+-test -n "$verbose" && \
+-echo '	defining' const to be 'empty'
+-DEFS="$DEFS -Dconst="
+-SEDDEFS="${SEDDEFS}\${SEDdA}const\${SEDdB}const\${SEDdC}\${SEDdD}
+-\${SEDuA}const\${SEDuB}const\${SEDuC}\${SEDuD}
+-\${SEDeA}const\${SEDeB}const\${SEDeC}\${SEDeD}
+-"
+-}
+-
+-fi
+-rm -f conftest*
+-
+-echo checking byte ordering
+-cat > conftest.c <<EOF
+-main () {
+-  /* Are we little or big endian?  From Harbison&Steele.  */
+-  union
+-  {
+-    long l;
+-    char c[sizeof (long)];
+-  } u;
+-  u.l = 1;
+-  exit (u.c[sizeof (long) - 1] == 1);
+-}
+-EOF
+-eval $compile
+-if test -s conftest && (./conftest; exit) 2>/dev/null; then
+-  :
+-else
+-  {
+-test -n "$verbose" && \
+-echo '	defining' WORDS_BIGENDIAN
+-DEFS="$DEFS -DWORDS_BIGENDIAN=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}WORDS_BIGENDIAN\${SEDdB}WORDS_BIGENDIAN\${SEDdC}1\${SEDdD}
+-\${SEDuA}WORDS_BIGENDIAN\${SEDuB}WORDS_BIGENDIAN\${SEDuC}1\${SEDuD}
+-\${SEDeA}WORDS_BIGENDIAN\${SEDeB}WORDS_BIGENDIAN\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-rm -f conftest*
+-
+-# check whether --with-complex was given
+-if test -n "$with_complex"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' COMPLEX
+-DEFS="$DEFS -DCOMPLEX=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}COMPLEX\${SEDdB}COMPLEX\${SEDdC}1\${SEDdD}
+-\${SEDuA}COMPLEX\${SEDuB}COMPLEX\${SEDuC}1\${SEDuD}
+-\${SEDeA}COMPLEX\${SEDeB}COMPLEX\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-
+-# check whether --with-sparse was given
+-if test -n "$with_sparse"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' SPARSE
+-DEFS="$DEFS -DSPARSE=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}SPARSE\${SEDdB}SPARSE\${SEDdC}1\${SEDdD}
+-\${SEDuA}SPARSE\${SEDuB}SPARSE\${SEDuC}1\${SEDuD}
+-\${SEDeA}SPARSE\${SEDeB}SPARSE\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-
+-# check whether --with-all was given
+-if test -n "$with_all"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' COMPLEX
+-DEFS="$DEFS -DCOMPLEX=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}COMPLEX\${SEDdB}COMPLEX\${SEDdC}1\${SEDdD}
+-\${SEDuA}COMPLEX\${SEDuB}COMPLEX\${SEDuC}1\${SEDuD}
+-\${SEDeA}COMPLEX\${SEDeB}COMPLEX\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-
+-# check whether --with-all was given
+-if test -n "$with_all"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' SPARSE
+-DEFS="$DEFS -DSPARSE=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}SPARSE\${SEDdB}SPARSE\${SEDdC}1\${SEDdD}
+-\${SEDuA}SPARSE\${SEDuB}SPARSE\${SEDuC}1\${SEDuD}
+-\${SEDeA}SPARSE\${SEDeB}SPARSE\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-
+-# check whether --with-unroll was given
+-if test -n "$with_unroll"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' VUNROLL
+-DEFS="$DEFS -DVUNROLL=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}VUNROLL\${SEDdB}VUNROLL\${SEDdC}1\${SEDdD}
+-\${SEDuA}VUNROLL\${SEDuB}VUNROLL\${SEDuC}1\${SEDuD}
+-\${SEDeA}VUNROLL\${SEDeB}VUNROLL\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-
+-# check whether --with-munroll was given
+-if test -n "$with_munroll"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' MUNROLL
+-DEFS="$DEFS -DMUNROLL=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}MUNROLL\${SEDdB}MUNROLL\${SEDdC}1\${SEDdD}
+-\${SEDuA}MUNROLL\${SEDuB}MUNROLL\${SEDuC}1\${SEDuD}
+-\${SEDeA}MUNROLL\${SEDeB}MUNROLL\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-
+-# check whether --with-segmem was given
+-if test -n "$with_segmem"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' SEGMENTED
+-DEFS="$DEFS -DSEGMENTED=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}SEGMENTED\${SEDdB}SEGMENTED\${SEDdC}1\${SEDdD}
+-\${SEDuA}SEGMENTED\${SEDuB}SEGMENTED\${SEDuC}1\${SEDuD}
+-\${SEDeA}SEGMENTED\${SEDeB}SEGMENTED\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-
+-# check whether --with-float was given
+-if test -n "$with_float"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' REAL_FLT
+-DEFS="$DEFS -DREAL_FLT=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}REAL_FLT\${SEDdB}REAL_FLT\${SEDdC}1\${SEDdD}
+-\${SEDuA}REAL_FLT\${SEDuB}REAL_FLT\${SEDuC}1\${SEDuD}
+-\${SEDeA}REAL_FLT\${SEDeB}REAL_FLT\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-
+-# check whether --with-double was given
+-if test -n "$with_double"; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' REAL_DBL
+-DEFS="$DEFS -DREAL_DBL=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}REAL_DBL\${SEDdB}REAL_DBL\${SEDdC}1\${SEDdD}
+-\${SEDuA}REAL_DBL\${SEDuB}REAL_DBL\${SEDuC}1\${SEDuD}
+-\${SEDeA}REAL_DBL\${SEDeB}REAL_DBL\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-
+-LIBS="$LIBS -lm"
+-echo checking for u_int
+-cat > conftest.c <<EOF
+-#include <stdio.h>
+-#ifdef __STDC__
+-#include <stdlib.h>
+-#endif
+-int main() { exit(0); }
+-int t() { u_int i; i = 1; }
+-EOF
+-if eval $compile; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' U_INT_DEF
+-DEFS="$DEFS -DU_INT_DEF=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}U_INT_DEF\${SEDdB}U_INT_DEF\${SEDdC}1\${SEDdD}
+-\${SEDuA}U_INT_DEF\${SEDuB}U_INT_DEF\${SEDuC}1\${SEDuD}
+-\${SEDeA}U_INT_DEF\${SEDeB}U_INT_DEF\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-rm -f conftest*
+-
+-echo 'computing machine epsilon(s)'
+-echo $CC -o macheps dmacheps.c
+-$CC -o macheps dmacheps.c
+-{
+-test -n "$verbose" && \
+-echo '	defining' D_MACHEPS to be '`macheps`'
+-DEFS="$DEFS -DD_MACHEPS=`macheps`"
+-SEDDEFS="${SEDDEFS}\${SEDdA}D_MACHEPS\${SEDdB}D_MACHEPS\${SEDdC}`macheps`\${SEDdD}
+-\${SEDuA}D_MACHEPS\${SEDuB}D_MACHEPS\${SEDuC}`macheps`\${SEDuD}
+-\${SEDeA}D_MACHEPS\${SEDeB}D_MACHEPS\${SEDeC}`macheps`\${SEDeD}
+-"
+-}
+-
+-echo $CC -o macheps fmacheps.c
+-$CC -o macheps fmacheps.c
+-{
+-test -n "$verbose" && \
+-echo '	defining' F_MACHEPS to be '`macheps`'
+-DEFS="$DEFS -DF_MACHEPS=`macheps`"
+-SEDDEFS="${SEDDEFS}\${SEDdA}F_MACHEPS\${SEDdB}F_MACHEPS\${SEDdC}`macheps`\${SEDdD}
+-\${SEDuA}F_MACHEPS\${SEDuB}F_MACHEPS\${SEDuC}`macheps`\${SEDuD}
+-\${SEDeA}F_MACHEPS\${SEDeB}F_MACHEPS\${SEDeC}`macheps`\${SEDeD}
+-"
+-}
+-
+-echo computing M_MAX_INT
+-echo $CC -o maxint maxint.c
+-$CC -o maxint maxint.c
+-{
+-test -n "$verbose" && \
+-echo '	defining' M_MAX_INT to be '`maxint`'
+-DEFS="$DEFS -DM_MAX_INT=`maxint`"
+-SEDDEFS="${SEDDEFS}\${SEDdA}M_MAX_INT\${SEDdB}M_MAX_INT\${SEDdC}`maxint`\${SEDdD}
+-\${SEDuA}M_MAX_INT\${SEDuB}M_MAX_INT\${SEDuC}`maxint`\${SEDuD}
+-\${SEDeA}M_MAX_INT\${SEDeB}M_MAX_INT\${SEDeC}`maxint`\${SEDeD}
+-"
+-}
+-
+-echo checking char '\\0' vs. float zeros
+-cat > conftest.c <<EOF
+-main() {
+-    char	*cp = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+-    double	*dp;
+-    dp = (double *)cp;
+-    if ( *dp == 0.0 ) printf("yes\n");  }
+-
+-EOF
+-eval "$CPP \$DEFS conftest.c > conftest.out 2>&1"
+-if egrep "yes" conftest.out >/dev/null 2>&1; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' CHAR0ISDBL0
+-DEFS="$DEFS -DCHAR0ISDBL0=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}CHAR0ISDBL0\${SEDdB}CHAR0ISDBL0\${SEDdC}1\${SEDdD}
+-\${SEDuA}CHAR0ISDBL0\${SEDuB}CHAR0ISDBL0\${SEDuC}1\${SEDuD}
+-\${SEDeA}CHAR0ISDBL0\${SEDeB}CHAR0ISDBL0\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-rm -f conftest*
+-
+-for func in bcopy bzero
+-do
+-trfunc=HAVE_`echo $func | tr '[a-z]' '[A-Z]'`
+-echo checking for ${func}
+-cat > conftest.c <<EOF
+-#include <ctype.h>
+-int main() { exit(0); }
+-int t() { 
+-/* The GNU C library defines this for functions which it implements
+-    to always fail with ENOSYS.  Some functions are actually named
+-    something starting with __ and the normal name is an alias.  */
+-#if defined (__stub_${func}) || defined (__stub___${func})
+-choke me
+-#else
+-/* Override any gcc2 internal prototype to avoid an error.  */
+-extern char ${func}(); ${func}();
+-#endif
+- }
+-EOF
+-if eval $compile; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' ${trfunc}
+-DEFS="$DEFS -D${trfunc}=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}${trfunc}\${SEDdB}${trfunc}\${SEDdC}1\${SEDdD}
+-\${SEDuA}${trfunc}\${SEDuB}${trfunc}\${SEDuC}1\${SEDuD}
+-\${SEDeA}${trfunc}\${SEDeB}${trfunc}\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-rm -f conftest*
+-done
+-
+-echo checking for function prototypes
+-cat > conftest.c <<EOF
+-
+-int main() { exit(0); }
+-int t() { extern int test (int i, double x); }
+-EOF
+-if eval $compile; then
+-  {
+-test -n "$verbose" && \
+-echo '	defining' HAVE_PROTOTYPES
+-DEFS="$DEFS -DHAVE_PROTOTYPES=1"
+-SEDDEFS="${SEDDEFS}\${SEDdA}HAVE_PROTOTYPES\${SEDdB}HAVE_PROTOTYPES\${SEDdC}1\${SEDdD}
+-\${SEDuA}HAVE_PROTOTYPES\${SEDuB}HAVE_PROTOTYPES\${SEDuC}1\${SEDuD}
+-\${SEDeA}HAVE_PROTOTYPES\${SEDeB}HAVE_PROTOTYPES\${SEDeC}1\${SEDeD}
+-"
+-}
+-
+-fi
+-rm -f conftest*
+-
+-if test -n "$prefix"; then
+-  test -z "$exec_prefix" && exec_prefix='${prefix}'
+-  prsub="s%^prefix\\([ 	]*\\)=\\([ 	]*\\).*$%prefix\\1=\\2$prefix%"
+-fi
+-if test -n "$exec_prefix"; then
+-  prsub="$prsub
+-s%^exec_prefix\\([ 	]*\\)=\\([ 	]*\\).*$%\
+-exec_prefix\\1=\\2$exec_prefix%"
+-fi
+-DEFS="`echo \"$DEFS\" | sed 's%[&\\\]%\\\&%g'`"
+-
+-trap 'rm -f config.status; exit 1' 1 3 15
+-echo creating config.status
+-rm -f config.status
+-cat > config.status <<EOF
+-#!/bin/sh
+-# Generated automatically by configure.
+-# Run this file to recreate the current configuration.
+-# This directory was configured as follows,
+-# on host `(hostname || uname -n) 2>/dev/null | sed 1q`:
+-#
+-# $0 $*
+-
+-for arg
+-do
+-  case "\$arg" in
+-    -recheck | --recheck | --rechec | --reche | --rech | --rec | --re | --r)
+-    exec /bin/sh $0 $* ;;
+-    *) echo "Usage: config.status --recheck" 2>&1; exit 1 ;;
+-  esac
+-done
+-
+-trap 'rm -f makefile machine.h conftest*; exit 1' 1 3 15
+-PROGS='$PROGS'
+-CC='$CC'
+-CPP='$CPP'
+-RANLIB='$RANLIB'
+-LIBS='$LIBS'
+-srcdir='$srcdir'
+-prefix='$prefix'
+-exec_prefix='$exec_prefix'
+-prsub='$prsub'
+-EOF
+-cat >> config.status <<\EOF
+-
+-top_srcdir=$srcdir
+-
+-# Allow make-time overrides of the generated file list.
+-test -n "$gen_files" || gen_files="makefile"
+-
+-for file in .. $gen_files; do if [ "x$file" != "x.." ]; then
+-  srcdir=$top_srcdir
+-  # Remove last slash and all that follows it.  Not all systems have dirname.
+-  dir=`echo $file|sed 's%/[^/][^/]*$%%'`
+-  if test "$dir" != "$file"; then
+-    test "$top_srcdir" != . && srcdir=$top_srcdir/$dir
+-    test ! -d $dir && mkdir $dir
+-  fi
+-  echo creating $file
+-  rm -f $file
+-  echo "# Generated automatically from `echo $file|sed 's|.*/||'`.in by configure." > $file
+-  sed -e "
+-$prsub
+-s%@PROGS@%$PROGS%g
+-s%@CC@%$CC%g
+-s%@CPP@%$CPP%g
+-s%@RANLIB@%$RANLIB%g
+-s%@LIBS@%$LIBS%g
+-s%@srcdir@%$srcdir%g
+-s%@DEFS@%-DHAVE_CONFIG_H%" $top_srcdir/${file}.in >> $file
+-fi; done
+-test -n "$gen_config" || gen_config=machine.h
+-echo creating $gen_config
+-# These sed commands are put into SEDDEFS when defining a macro.
+-# They are broken into pieces to make the sed script easier to manage.
+-# They are passed to sed as "A NAME B NAME C VALUE D", where NAME
+-# is the cpp macro being defined and VALUE is the value it is being given.
+-# Each defining turns into a single global substitution command.
+-#
+-# SEDd sets the value in "#define NAME VALUE" lines.
+-SEDdA='s@^\([ 	]*\)#\([ 	]*define[ 	][ 	]*\)'
+-SEDdB='\([ 	][ 	]*\)[^ 	]*@\1#\2'
+-SEDdC='\3'
+-SEDdD='@g'
+-# SEDu turns "#undef NAME" with trailing blanks into "#define NAME VALUE".
+-SEDuA='s@^\([ 	]*\)#\([ 	]*\)undef\([ 	][ 	]*\)'
+-SEDuB='\([ 	]\)@\1#\2define\3'
+-SEDuC=' '
+-SEDuD='\4@g'
+-# SEDe turns "#undef NAME" without trailing blanks into "#define NAME VALUE".
+-SEDeA='s@^\([ 	]*\)#\([ 	]*\)undef\([ 	][ 	]*\)'
+-SEDeB='$@\1#\2define\3'
+-SEDeC=' '
+-SEDeD='@g'
+-rm -f conftest.sed
+-EOF
+-# Turn off quoting long enough to insert the sed commands.
+-rm -f conftest.sh
+-cat > conftest.sh <<EOF
+-$SEDDEFS
+-EOF
+-
+-# Maximum number of lines to put in a single here document.
+-maxshlines=9
+-
+-# Break up $SEDDEFS (now in conftest.sh) because some shells have a limit
+-# on the size of here documents.
+-
+-while :
+-do
+-  lines=`grep -c . conftest.sh`
+-  if test -z "$lines" || test "$lines" -eq 0; then break; fi
+-  rm -f conftest.s1 conftest.s2
+-  sed ${maxshlines}q conftest.sh > conftest.s1 # Like head -20.
+-  sed 1,${maxshlines}d conftest.sh > conftest.s2 # Like tail +21.
+-  # Write a limited-size here document to append to conftest.sed.
+-  echo 'cat >> conftest.sed <<CONFEOF' >> config.status
+-  cat conftest.s1 >> config.status
+-  echo 'CONFEOF' >> config.status
+-  rm -f conftest.s1 conftest.sh
+-  mv conftest.s2 conftest.sh
+-done
+-rm -f conftest.sh
+-
+-# Now back to your regularly scheduled config.status.
+-cat >> config.status <<\EOF
+-# This sed command replaces #undef's with comments.  This is necessary, for
+-# example, in the case of _POSIX_SOURCE, which is predefined and required
+-# on some systems where configure will not decide to define it in
+-# machine.h.
+-cat >> conftest.sed <<\CONFEOF
+-s,^[ 	]*#[ 	]*undef[ 	][ 	]*[a-zA-Z_][a-zA-Z_0-9]*,/* & */,
+-CONFEOF
+-rm -f conftest.h
+-# Break up the sed commands because old seds have small limits.
+-maxsedlines=20
+-cp $top_srcdir/$gen_config.in conftest.h1
+-while :
+-do
+-  lines=`grep -c . conftest.sed`
+-  if test -z "$lines" || test "$lines" -eq 0; then break; fi
+-  rm -f conftest.s1 conftest.s2 conftest.h2
+-  sed ${maxsedlines}q conftest.sed > conftest.s1 # Like head -20.
+-  sed 1,${maxsedlines}d conftest.sed > conftest.s2 # Like tail +21.
+-  sed -f conftest.s1 < conftest.h1 > conftest.h2
+-  rm -f conftest.s1 conftest.h1 conftest.sed
+-  mv conftest.h2 conftest.h1
+-  mv conftest.s2 conftest.sed
+-done
+-rm -f conftest.sed conftest.h
+-echo "/* $gen_config.  Generated automatically by configure.  */" > conftest.h
+-cat conftest.h1 >> conftest.h
+-rm -f conftest.h1
+-if cmp -s $gen_config conftest.h 2>/dev/null; then
+-  # The file exists and we would not be changing it.
+-  rm -f conftest.h
+-else
+-  rm -f $gen_config
+-  mv conftest.h $gen_config
+-fi
+-
+-
+-exit 0
+-EOF
+-chmod +x config.status
+-test -n "$no_create" || ./config.status
+-
+-echo "Extensions to basic version: use configure --with-opt1 --with-opt2"
+-echo "  Option:"
+-echo "    --with-complex     incorporate complex functions"
+-echo "    --with-sparse      incorporate sparse matrix functions"
+-echo "    --with-all         both of the above"
+-echo "    --with-unroll      unroll low level loops on vectors"
+-echo "    --with-munroll     unroll low level loops on matrices"
+-echo "    --with-float       single precision"
+-echo "    --with-double      double precision (default)"
+-echo "Re-run configure with these options if you want them"
+-# configure.in copyright (C) Brook Milligan and David Stewart, 1993
+//GO.SYSIN DD configure
+chmod +x configure
+echo configure.in 1>&2
+sed >configure.in <<'//GO.SYSIN DD configure.in' 's/^-//'
+-dnl Meschach autoconf script
+-dnl Copyright (C) Brook Milligan and David Stewart, 1993
+-dnl $Id: m1,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $
+-dnl
+-dnl Brook Milligan's prototype check
+-dnl Check if $(CC) supports prototypes
+-define(LOCAL_HAVE_PROTOTYPES,
+-[AC_COMPILE_CHECK([function prototypes], ,
+-[extern int test (int i, double x);],
+-AC_DEFINE(HAVE_PROTOTYPES))])dnl
+-dnl
+-dnl Brook Milligan's compiler check
+-dnl Check for the sun ansi c compiler, acc
+-define(LOCAL_PROG_ACC,
+-[AC_BEFORE([$0], [AC_PROG_CPP])AC_PROVIDE([$0])dnl
+-AC_PROGRAM_CHECK(CC, acc, acc, "")])dnl
+-dnl David Stewart's modified compiler check
+-define(LOCAL_PROG_CC,
+-[AC_BEFORE([$0], [AC_PROG_CPP])AC_PROVIDE([$0])dnl
+-AC_PROGRAM_CHECK(CC, acc, acc, cc)])dnl
+-dnl
+-dnl
+-dnl
+-dnl ----------------------------------------------------------------------
+-dnl Start of configure.in proper
+-dnl ----------------------------------------------------------------------
+-AC_INIT(err.c)
+-AC_CONFIG_HEADER(machine.h)
+-PROGS=""
+-AC_SUBST(PROGS)dnl
+-LOCAL_PROG_ACC
+-AC_PROGRAM_CHECK(CC, cc, cc, gcc)
+-dnl AC_PROG_CC
+-AC_PROG_CPP
+-AC_AIX
+-AC_MINIX
+-AC_ISC_POSIX
+-dnl
+-dnl Brook Milligan's prototype check
+-dnl Check if $(CC) supports prototypes in function declarations and structures
+-define(LOCAL_HAVE_PROTOTYPES,
+-[AC_COMPILE_CHECK([function prototypes], ,
+-[extern int test (int i, double x);],
+-AC_DEFINE(HAVE_PROTOTYPES))
+-AC_COMPILE_CHECK([function prototypes in structures], ,
+-[struct s1 {int (*f) (int a);};
+-struct s2 {int (*f) (double a);};],
+-AC_DEFINE(HAVE_PROTOTYPES_IN_STRUCT))])dnl
+-dnl
+-AC_PROG_RANLIB
+-AC_HAVE_HEADERS(memory.h)
+-AC_STDC_HEADERS
+-AC_HEADER_CHECK(complex.h, AC_DEFINE(HAVE_COMPLEX_H),)
+-AC_HEADER_CHECK(malloc.h, AC_DEFINE(HAVE_MALLOC_H),)
+-AC_HEADER_CHECK(varargs.h, AC_DEFINE(VARARGS),)
+-AC_DEFINE(NOT_SEGMENTED)
+-AC_SIZE_T
+-AC_CONST
+-AC_WORDS_BIGENDIAN
+-AC_WITH(complex, AC_DEFINE(COMPLEX))
+-AC_WITH(sparse, AC_DEFINE(SPARSE))
+-AC_WITH(all, AC_DEFINE(COMPLEX))
+-AC_WITH(all, AC_DEFINE(SPARSE))
+-AC_WITH(unroll, AC_DEFINE(VUNROLL))
+-AC_WITH(munroll, AC_DEFINE(MUNROLL))
+-AC_WITH(segmem, AC_DEFINE(SEGMENTED))
+-AC_WITH(float, AC_DEFINE(REAL_FLT))
+-AC_WITH(double, AC_DEFINE(REAL_DBL))
+-LIBS="$LIBS -lm"
+-AC_COMPILE_CHECK([u_int],[#include <stdio.h>
+-#ifdef __STDC__
+-#include <stdlib.h>
+-#endif],[u_int i; i = 1;],AC_DEFINE(U_INT_DEF))
+-echo 'computing machine epsilon(s)'
+-echo $CC -o macheps dmacheps.c
+-$CC -o macheps dmacheps.c
+-AC_DEFINE_UNQUOTED(D_MACHEPS,`macheps`)
+-echo $CC -o macheps fmacheps.c
+-$CC -o macheps fmacheps.c
+-AC_DEFINE_UNQUOTED(F_MACHEPS,`macheps`)
+-echo computing M_MAX_INT
+-echo $CC -o maxint maxint.c
+-$CC -o maxint maxint.c
+-AC_DEFINE_UNQUOTED(M_MAX_INT,`maxint`)
+-echo checking char '\\0' vs. float zeros
+-AC_PROGRAM_EGREP(yes,[main() {
+-    char	*cp = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+-    double	*dp;
+-    dp = (double *)cp;
+-    if ( *dp == 0.0 ) printf("yes\n");  }
+-],AC_DEFINE(CHAR0ISDBL0))
+-AC_HAVE_FUNCS(bcopy bzero)
+-LOCAL_HAVE_PROTOTYPES
+-AC_OUTPUT(makefile)
+-echo "Extensions to basic version: use configure --with-opt1 --with-opt2"
+-echo "  Option:"
+-echo "    --with-complex     incorporate complex functions"
+-echo "    --with-sparse      incorporate sparse matrix functions"
+-echo "    --with-all         both of the above"
+-echo "    --with-unroll      unroll low level loops on vectors"
+-echo "    --with-munroll     unroll low level loops on matrices"
+-echo "    --with-float       single precision"
+-echo "    --with-double      double precision (default)"
+-echo "Re-run configure with these options if you want them"
+-# configure.in copyright (C) Brook Milligan and David Stewart, 1993
+//GO.SYSIN DD configure.in
+echo machine.h.in 1>&2
+sed >machine.h.in <<'//GO.SYSIN DD machine.h.in' 's/^-//'
+-/* Any machine specific stuff goes here */
+-/* Add details necessary for your own installation here! */
+-
+-/* RCS id: $Id: m1,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $ */
+-
+-/* This is for use with "configure" -- if you are not using configure
+-	then use machine.van for the "vanilla" version of machine.h */
+-
+-/* Note special macros: ANSI_C (ANSI C syntax)
+-			SEGMENTED (segmented memory machine e.g. MS-DOS)
+-			MALLOCDECL (declared if malloc() etc have
+-					been declared) */
+-
+-#undef const
+-
+-#undef MALLOCDECL
+-#undef NOT_SEGMENTED
+-#undef HAVE_MEMORY_H
+-#undef HAVE_COMPLEX_H
+-#undef HAVE_MALLOC_H
+-#undef STDC_HEADERS
+-#undef HAVE_BCOPY
+-#undef HAVE_BZERO
+-#undef CHAR0ISDBL0
+-#undef WORDS_BIGENDIAN
+-#undef U_INT_DEF
+-#undef VARARGS
+-#undef HAVE_PROTOTYPES
+-#undef HAVE_PROTOTYPES_IN_STRUCT
+-
+-/* for inclusion into C++ files */
+-#ifdef __cplusplus
+-#define ANSI_C 1
+-#ifndef HAVE_PROTOTYPES 
+-#define HAVE_PROTOTYPES 1
+-#endif
+-#ifndef HAVE_PROTOTYPES_IN_STRUCT
+-#define HAVE_PROTOTYPES_IN_STRUCT 1
+-#endif
+-#endif /* __cplusplus */
+-
+-/* example usage: VEC *PROTO(v_get,(int dim)); */
+-#ifdef HAVE_PROTOTYPES
+-#define	PROTO(name,args)	name args
+-#else
+-#define PROTO(name,args)	name()
+-#endif /* HAVE_PROTOTYPES */
+-#ifdef HAVE_PROTOTYPES_IN_STRUCT
+-/* PROTO_() is to be used instead of PROTO() in struct's and typedef's */
+-#define	PROTO_(name,args)	name args
+-#else
+-#define PROTO_(name,args)	name()
+-#endif /* HAVE_PROTOTYPES_IN_STRUCT */
+-
+-/* for basic or larger versions */
+-#undef COMPLEX
+-#undef SPARSE
+-
+-/* for loop unrolling */
+-#undef VUNROLL
+-#undef MUNROLL
+-
+-/* for segmented memory */
+-#ifndef NOT_SEGMENTED
+-#define	SEGMENTED
+-#endif
+-
+-/* if the system has malloc.h */
+-#ifdef HAVE_MALLOC_H
+-#define	MALLOCDECL	1
+-#include	<malloc.h>
+-#endif
+-
+-/* any compiler should have this header */
+-/* if not, change it */
+-#include        <stdio.h>
+-
+-
+-/* Check for ANSI C memmove and memset */
+-#ifdef STDC_HEADERS
+-
+-/* standard copy & zero functions */
+-#define	MEM_COPY(from,to,size)	memmove((to),(from),(size))
+-#define	MEM_ZERO(where,size)	memset((where),'\0',(size))
+-
+-#ifndef ANSI_C
+-#define ANSI_C 1
+-#endif
+-
+-#endif
+-
+-/* standard headers */
+-#ifdef ANSI_C
+-#include	<stdlib.h>
+-#include	<stddef.h>
+-#include	<string.h>
+-#include	<float.h>
+-#endif
+-
+-
+-/* if have bcopy & bzero and no alternatives yet known, use them */
+-#ifdef HAVE_BCOPY
+-#ifndef MEM_COPY
+-/* nonstandard copy function */
+-#define	MEM_COPY(from,to,size)	bcopy((char *)(from),(char *)(to),(int)(size))
+-#endif
+-#endif
+-
+-#ifdef HAVE_BZERO
+-#ifndef MEM_ZERO
+-/* nonstandard zero function */
+-#define	MEM_ZERO(where,size)	bzero((char *)(where),(int)(size))
+-#endif
+-#endif
+-
+-/* if the system has complex.h */
+-#ifdef HAVE_COMPLEX_H
+-#include	<complex.h>
+-#endif
+-
+-/* If prototypes are available & ANSI_C not yet defined, then define it,
+-	but don't include any header files as the proper ANSI C headers
+-        aren't here */
+-#ifdef HAVE_PROTOTYPES
+-#ifndef ANSI_C
+-#define ANSI_C  1
+-#endif
+-#endif
+-
+-/* floating point precision */
+-
+-/* you can choose single, double or long double (if available) precision */
+-
+-#define FLOAT 		1
+-#define DOUBLE 		2
+-#define LONG_DOUBLE 	3
+-
+-#undef REAL_FLT
+-#undef REAL_DBL
+-
+-/* if nothing is defined, choose double precision */
+-#ifndef REAL_DBL
+-#ifndef REAL_FLT
+-#define REAL_DBL 1
+-#endif
+-#endif
+-
+-/* single precision */
+-#ifdef REAL_FLT
+-#define  Real float
+-#define  LongReal float
+-#define REAL FLOAT
+-#define LONGREAL FLOAT
+-#endif
+-
+-/* double precision */
+-#ifdef REAL_DBL
+-#define Real double
+-#define LongReal double
+-#define REAL DOUBLE
+-#define LONGREAL DOUBLE
+-#endif
+-
+-
+-/* machine epsilon or unit roundoff error */
+-/* This is correct on most IEEE Real precision systems */
+-#ifdef DBL_EPSILON
+-#if REAL == DOUBLE
+-#define	MACHEPS	DBL_EPSILON
+-#elif REAL == FLOAT
+-#define	MACHEPS	FLT_EPSILON
+-#elif REAL == LONGDOUBLE
+-#define MACHEPS LDBL_EPSILON
+-#endif
+-#endif
+-
+-#undef F_MACHEPS
+-#undef D_MACHEPS
+-
+-#ifndef MACHEPS
+-#if REAL == DOUBLE
+-#define	MACHEPS	D_MACHEPS
+-#elif REAL == FLOAT  
+-#define MACHEPS F_MACHEPS
+-#elif REAL == LONGDOUBLE
+-#define MACHEPS D_MACHEPS
+-#endif
+-#endif
+-
+-#undef M_MACHEPS
+-
+-/********************
+-#ifdef DBL_EPSILON
+-#define	MACHEPS	DBL_EPSILON
+-#endif
+-#ifdef M_MACHEPS
+-#ifndef MACHEPS
+-#define MACHEPS	M_MACHEPS
+-#endif
+-#endif
+-********************/
+-
+-#undef	M_MAX_INT
+-#ifdef	M_MAX_INT
+-#ifndef MAX_RAND
+-#define	MAX_RAND ((double)(M_MAX_INT))
+-#endif
+-#endif
+-
+-/* for non-ANSI systems */
+-#ifndef HUGE_VAL
+-#define HUGE_VAL HUGE
+-#else
+-#ifndef HUGE
+-#define HUGE HUGE_VAL
+-#endif
+-#endif
+-
+-
+-#ifdef ANSI_C
+-extern	int	isatty(int);
+-#endif
+-
+//GO.SYSIN DD machine.h.in
+echo copyright 1>&2
+sed >copyright <<'//GO.SYSIN DD copyright' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+//GO.SYSIN DD copyright
+echo tutorial.c 1>&2
+sed >tutorial.c <<'//GO.SYSIN DD tutorial.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-/* tutorial.c 10/12/1993 */
+-
+-/* routines from Chapter 1 of Meschach */
+-
+-static char rcsid[] = "$Id: m1,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $";
+-
+-#include <math.h>
+-#include "matrix.h"
+-
+-/* rk4 -- 4th order Runge--Kutta method */
+-double rk4(f,t,x,h)
+-double t, h;
+-VEC    *(*f)(), *x;
+-{
+-   static VEC *v1=VNULL, *v2=VNULL, *v3=VNULL, *v4=VNULL;
+-   static VEC *temp=VNULL;
+-   
+-   /* do not work with NULL initial vector */
+-   if ( x == VNULL )
+-     error(E_NULL,"rk4");
+-
+-   /* ensure that v1, ..., v4, temp are of the correct size */
+-   v1   = v_resize(v1,x->dim);
+-   v2   = v_resize(v2,x->dim);
+-   v3   = v_resize(v3,x->dim);
+-   v4   = v_resize(v4,x->dim);
+-   temp = v_resize(temp,x->dim);
+-
+-   /* register workspace variables */
+-   MEM_STAT_REG(v1,TYPE_VEC);
+-   MEM_STAT_REG(v2,TYPE_VEC);
+-   MEM_STAT_REG(v3,TYPE_VEC);
+-   MEM_STAT_REG(v4,TYPE_VEC);
+-   MEM_STAT_REG(temp,TYPE_VEC);
+-   /* end of memory allocation */
+-
+-   (*f)(t,x,v1); /* most compilers allow: "f(t,x,v1);" */
+-   v_mltadd(x,v1,0.5*h,temp);    /* temp = x+.5*h*v1 */
+-   (*f)(t+0.5*h,temp,v2);
+-   v_mltadd(x,v2,0.5*h,temp);    /* temp = x+.5*h*v2 */
+-   (*f)(t+0.5*h,temp,v3);
+-   v_mltadd(x,v3,h,temp);        /* temp = x+h*v3 */
+-   (*f)(t+h,temp,v4);
+-   
+-   /* now add: v1+2*v2+2*v3+v4 */
+-   v_copy(v1,temp);              /* temp = v1 */
+-   v_mltadd(temp,v2,2.0,temp);   /* temp = v1+2*v2 */
+-   v_mltadd(temp,v3,2.0,temp);   /* temp = v1+2*v2+2*v3 */
+-   v_add(temp,v4,temp);          /* temp = v1+2*v2+2*v3+v4 */
+-   
+-   /* adjust x */
+-   v_mltadd(x,temp,h/6.0,x);     /* x = x+(h/6)*temp */
+-   
+-   return t+h;                   /* return the new time */
+-}
+-
+-
+-
+-/* rk4 -- 4th order Runge-Kutta method */
+-/* another variant */
+-double rk4_var(f,t,x,h)
+-double t, h;
+-VEC    *(*f)(), *x;
+-{
+-   static VEC *v1, *v2, *v3, *v4, *temp;
+-   
+-   /* do not work with NULL initial vector */
+-   if ( x == VNULL )        error(E_NULL,"rk4");
+-   
+-   /* ensure that v1, ..., v4, temp are of the correct size */
+-   v_resize_vars(x->dim, &v1, &v2, &v3, &v4, &temp, NULL);
+-
+-   /* register workspace variables */
+-   mem_stat_reg_vars(0, TYPE_VEC, &v1, &v2, &v3, &v4, &temp, NULL);
+-   /* end of memory allocation */
+-
+-   (*f)(t,x,v1);             v_mltadd(x,v1,0.5*h,temp);
+-   (*f)(t+0.5*h,temp,v2);    v_mltadd(x,v2,0.5*h,temp);
+-   (*f)(t+0.5*h,temp,v3);    v_mltadd(x,v3,h,temp);
+-   (*f)(t+h,temp,v4);
+-   
+-   /* now add: temp = v1+2*v2+2*v3+v4 */
+-   v_linlist(temp, v1, 1.0, v2, 2.0, v3, 2.0, v4, 1.0, VNULL);
+-   /* adjust x */
+-   v_mltadd(x,temp,h/6.0,x);     /* x = x+(h/6)*temp */
+-   
+-   return t+h;                   /* return the new time */
+-}
+-
+-
+-/* f -- right-hand side of ODE solver */
+-VEC	*f(t,x,out)
+-VEC	*x, *out;
+-double	t;
+-{
+-   if ( x == VNULL || out == VNULL )
+-     error(E_NULL,"f");
+-   if ( x->dim != 2 || out->dim != 2 )
+-     error(E_SIZES,"f");
+-   
+-   out->ve[0] = x->ve[1];
+-   out->ve[1] = - x->ve[0];
+-   
+-   return out;
+-}
+-
+-
+-void tutor_rk4()
+-{
+-   VEC        *x;
+-   VEC        *f();
+-   double     h, t, t_fin;
+-   double     rk4();
+-   
+-   input("Input initial time: ","%lf",&t);
+-   input("Input final time: ",  "%lf",&t_fin);
+-   x = v_get(2);    /* this is the size needed by f() */
+-   prompter("Input initial state:\n");	x = v_input(VNULL);
+-   input("Input step size: ",   "%lf",&h);
+-   
+-   printf("# At time %g, the state is\n",t);
+-   v_output(x);
+-   while (t < t_fin)
+-   {
+-      /* you can use t = rk4_var(f,t,x,min(h,t_fin-t)); */
+-      t = rk4(f,t,x,min(h,t_fin-t));   /* new t is returned */
+-      printf("# At time %g, the state is\n",t);
+-      v_output(x);
+-   }
+-}
+-
+-
+-
+-
+-#include "matrix2.h"
+-
+-void tutor_ls()
+-{
+-   MAT *A, *QR;
+-   VEC *b, *x, *diag;
+-   
+-   /* read in A matrix */
+-   printf("Input A matrix:\n");
+-   
+-   A = m_input(MNULL);     /* A has whatever size is input */
+-   
+-   if ( A->m < A->n )
+-   {
+-      printf("Need m >= n to obtain least squares fit\n");
+-      exit(0);
+-   }
+-   printf("# A =\n");       m_output(A);
+-   diag = v_get(A->m);
+-   /* QR is to be the QR factorisation of A */
+-   QR = m_copy(A,MNULL);
+-   QRfactor(QR,diag);   
+-   /* read in b vector */
+-   printf("Input b vector:\n");
+-   b = v_get(A->m);
+-   b = v_input(b);
+-   printf("# b =\n");       v_output(b);
+-   
+-   /* solve for x */
+-   x = QRsolve(QR,diag,b,VNULL);
+-   printf("Vector of best fit parameters is\n");
+-   v_output(x);
+-   /* ... and work out norm of errors... */
+-   printf("||A*x-b|| = %g\n",
+-	  v_norm2(v_sub(mv_mlt(A,x,VNULL),b,VNULL)));
+-}
+-
+-
+-#include "iter.h"
+-
+-
+-#define N 50
+-#define VEC2MAT(v,m)  vm_move((v),0,(m),0,0,N,N);
+-
+-#define PI 3.141592653589793116
+-#define index(i,j) (N*((i)-1)+(j)-1)
+-
+-/* right hand side function (for generating b) */
+-double f1(x,y)
+-double x,y;
+-{
+-  /* return 2.0*PI*PI*sin(PI*x)*sin(PI*y); */
+-   return exp(x*y);
+-}
+-
+-/* discrete laplacian */
+-SPMAT *laplacian(A)
+-SPMAT *A;
+-{
+-   Real h;
+-   int i,j;
+-   
+-   if (!A)
+-     A = sp_get(N*N,N*N,5);
+-
+-   for ( i = 1; i <= N; i++ )
+-     for ( j = 1; j <= N; j++ )
+-     {
+-        if ( i < N )
+-	  sp_set_val(A,index(i,j),index(i+1,j),-1.0);
+-        if ( i > 1 )
+-	  sp_set_val(A,index(i,j),index(i-1,j),-1.0);
+-        if ( j < N )
+-	  sp_set_val(A,index(i,j),index(i,j+1),-1.0);
+-        if ( j > 1 )
+-	  sp_set_val(A,index(i,j),index(i,j-1),-1.0);
+-        sp_set_val(A,index(i,j),index(i,j),4.0);
+-     }
+-   return A;
+-}
+-
+-/* generating right hand side */
+-VEC *rhs_lap(b)
+-VEC *b;
+-{
+-   Real h,h2,x,y;
+-   int i,j;
+-   
+-   if (!b)
+-     b = v_get(N*N);
+-
+-   h = 1.0/(N+1);      /* for a unit square */
+-   h2 = h*h;
+-   x = 0.0;
+-   for ( i = 1; i <= N; i++ ) {
+-      x += h;
+-      y = 0.0;
+-     for ( j = 1; j <= N; j++ ) {
+-	y += h;
+-	b->ve[index(i,j)] = h2*f1(x,y);
+-     }
+-   }
+-   return b;
+-}
+-   
+-void tut_lap()
+-{
+-   SPMAT *A, *LLT;
+-   VEC *b, *out, *x;
+-   MAT *B;
+-   int num_steps;
+-   FILE *fp;
+-
+-   A = sp_get(N*N,N*N,5);
+-   b = v_get(N*N);
+-
+-   laplacian(A);
+-   LLT = sp_copy(A);
+-   spICHfactor(LLT);
+-
+-   out = v_get(A->m);
+-   x = v_get(A->m);
+-
+-   rhs_lap(b);   /* new rhs */
+-   iter_spcg(A,LLT,b,1e-6,out,1000,&num_steps);
+-   printf("Number of iterations = %d\n",num_steps);
+-
+-   /* save b as a MATLAB matrix */
+-
+-   fp = fopen("laplace.mat","w");  /* b will be saved in laplace.mat */
+-   if (fp == NULL) {
+-      printf("Cannot open %s\n","laplace.mat");
+-      exit(1);
+-   }
+-   
+-   /* b must be transformed to a matrix */
+-   
+-   B = m_get(N,N);
+-   VEC2MAT(out,B);
+-   m_save(fp,B,"sol");  /* sol is an internal name in MATLAB */
+-
+-}
+-
+-
+-void main()
+-{
+-   int i;
+-
+-   input("Choose the problem (1=Runge-Kutta, 2=least squares,3=laplace): ",
+-	 "%d",&i);
+-   switch (i) {
+-    case 1: tutor_rk4(); break;
+-    case 2: tutor_ls(); break;
+-    case 3: tut_lap(); break;
+-    default: 
+-      printf(" Wrong value of i (only 1, 2 or 3)\n\n");
+-      break;
+-   }
+-
+-}
+-
+//GO.SYSIN DD tutorial.c
+echo tutadv.c 1>&2
+sed >tutadv.c <<'//GO.SYSIN DD tutadv.c' 's/^-//'
+-
+-/* routines from the section 8 of tutorial.txt */
+-
+-#include "matrix.h"
+-
+-#define M3D_LIST    3      /* list number */
+-#define TYPE_MAT3D  0      /* the number of a type */
+-
+-/* type for 3 dimensional matrices */
+-typedef struct {
+-	int l,m,n;    /* actual dimensions */
+-	int max_l, max_m, max_n;    /* maximal dimensions */
+-	Real ***me;    /* pointer to matrix elements */
+-	               /* we do not consider segmented memory */
+-        Real *base, **me2d;  /* me and me2d are additional pointers 
+-				to base */
+-} MAT3D;
+-
+-
+-/* function for creating a variable of MAT3D type */
+-
+-MAT3D *m3d_get(l,m,n)
+-int l,m,n;
+-{
+-  MAT3D *mat;
+-  int i,j,k;
+-
+-  /* check if arguments are positive */
+-  if (l <= 0 || m <= 0 || n <= 0)
+-    error(E_NEG,"m3d_get");
+-
+-	/* new structure */
+-  if ((mat = NEW(MAT3D)) == (MAT3D *)NULL)
+-    error(E_MEM,"m3d_get");
+-  else if (mem_info_is_on()) {
+-	/* record how many bytes is allocated */
+-    mem_bytes_list(TYPE_MAT3D,0,sizeof(MAT3D),M3D_LIST);
+-	/* record a new allocated variable */
+-    mem_numvar_list(TYPE_MAT3D,1,M3D_LIST);
+-  }
+-
+-  mat->l = mat->max_l = l;
+-  mat->m = mat->max_m = m;
+-  mat->n = mat->max_n = n;
+-
+-	/* allocate memory for 3D array */
+-  if ((mat->base = NEW_A(l*m*n,Real)) == (Real *)NULL) 
+-    error(E_MEM,"m3d_get");
+-  else if (mem_info_is_on())
+-    mem_bytes_list(TYPE_MAT3D,0,l*m*n*sizeof(Real),M3D_LIST);
+-
+-	/* allocate memory for 2D pointers */
+-  if ((mat->me2d = NEW_A(l*m,Real *)) == (Real **)NULL)
+-    error(E_MEM,"m3d_get");
+-  else if (mem_info_is_on())
+-    mem_bytes_list(TYPE_MAT3D,0,l*m*sizeof(Real *),M3D_LIST);  	
+-
+-	/* allocate  memory for 1D pointers */
+-  if ((mat->me = NEW_A(l,Real **)) == (Real ***)NULL)
+-    error(E_MEM,"m3d_get");
+-  else if (mem_info_is_on())
+-    mem_bytes_list(TYPE_MAT3D,0,l*sizeof(Real **),M3D_LIST);
+-
+-  	/* pointers to 2D matrices */
+-  for (i=0,k=0; i < l; i++)
+-    for (j=0; j < m; j++)
+-      mat->me2d[k++] = &mat->base[(i*m+j)*n];
+-
+-       /* pointers to rows */
+-  for (i=0; i < l; i++)
+-    mat->me[i] = &mat->me2d[i*m];
+-
+-  return mat;
+-}
+-
+-
+-/* deallocate a variable of type MAT3D */
+-
+-int m3d_free(mat)
+-MAT3D *mat;
+-{
+- 	  /* do not try to deallocate the NULL pointer */
+-  if (mat == (MAT3D *)NULL)
+-    return -1;
+-	
+-	  /* first deallocate base */
+-  if (mat->base != (Real *)NULL) {
+-    if (mem_info_is_on())
+-	/* record how many bytes is deallocated */
+-      mem_bytes_list(TYPE_MAT3D,mat->max_l*mat->max_m*mat->max_n*sizeof(Real),
+-		     0,M3D_LIST);
+-    free((char *)mat->base);
+-  }
+-
+- 	/* deallocate array of 2D pointers */
+-  if (mat->me2d != (Real **)NULL) {
+-    if (mem_info_is_on())
+-	/* record how many bytes is deallocated */
+-      mem_bytes_list(TYPE_MAT3D,mat->max_l*mat->max_m*sizeof(Real *),
+-		     0,M3D_LIST);
+-    free((char *)mat->me2d);
+-  }
+-
+- 	/* deallocate array of 1D pointers */
+-  if (mat->me != (Real ***)NULL) {
+-    if (mem_info_is_on())
+-	/* record how many bytes is deallocated */
+-      mem_bytes_list(TYPE_MAT3D,mat->max_l*sizeof(Real **),0,M3D_LIST);
+-    free((char *)mat->me);
+-  }
+-
+-	/* deallocate  MAT3D structure */
+-  if (mem_info_is_on()) {
+-    mem_bytes_list(TYPE_MAT3D,sizeof(MAT3D),0,M3D_LIST);
+-    mem_numvar_list(TYPE_MAT3D,-1,M3D_LIST);
+-  }
+-  free((char *)mat);
+-
+-  return 0;
+-}
+-
+-/*=============================================*/
+-
+-char *m3d_names[] = {
+-  "MAT3D"
+-};
+-
+-
+-#define M3D_NUM  (sizeof(m3d_names)/sizeof(*m3d_names))
+-
+-int (*m3d_free_funcs[M3D_NUM])() = {
+-  m3d_free
+-};
+-
+-static MEM_ARRAY m3d_sum[M3D_NUM];
+-
+-
+-/* test routing for allocating/deallocating static variables */
+-void test_stat(k)
+-int k;
+-{
+-   static MAT3D *work;
+-
+-   if (!work) {
+-      work = m3d_get(10,10,10);
+-      mem_stat_reg_list((void **)&work,TYPE_MAT3D,M3D_LIST);
+-      work->me[9][9][9] = -3.14;
+-   }
+-   
+-   if (k == 9) 
+-     printf(" work[9][9][9] = %g\n",work->me[9][9][9]);
+-}
+-
+-
+-void main()
+-{
+-  MAT3D *M;
+-  int i,j,k;
+-
+-  mem_info_on(TRUE);
+-  /* can be the first command */
+-  mem_attach_list(M3D_LIST,M3D_NUM,m3d_names,m3d_free_funcs,m3d_sum);
+-
+-  M = m3d_get(3,4,5);
+-  mem_info_file(stdout,M3D_LIST);
+-
+-  /* make use of M->me[i][j][k], where i,j,k are non-negative and 
+-	i < 3, j < 4, k < 5 */
+-
+-  mem_stat_mark(1);
+-  for (i=0; i < 3; i++)
+-    for (j=0; j < 4; j++)
+-      for (k=0; k < 5; k++) {
+-	 test_stat(i+j+k);
+-	 M->me[i][j][k] = i+j+k;
+-      }
+-  mem_stat_free_list(1,M3D_LIST);
+-  mem_info_file(stdout,M3D_LIST);
+-
+-  printf(" M[%d][%d][%d] = %g\n",2,3,4,M->me[2][3][4]);
+-
+-  mem_stat_mark(2);
+-  test_stat(9);
+-  mem_stat_free_list(2,M3D_LIST);
+-
+-  m3d_free(M);  /* if M is not necessary */
+-  mem_info_file(stdout,M3D_LIST);
+-
+-}
+-
+-
+-
+//GO.SYSIN DD tutadv.c
+echo rk4.dat 1>&2
+sed >rk4.dat <<'//GO.SYSIN DD rk4.dat' 's/^-//'
+-# No. of a problem
+-1
+-# Initial time
+-0
+-# Final time
+-1
+-# Solution is x(t) = (cos(t),-sin(t))
+-# x(0) =
+-Vector: dim: 2
+-1       0
+-# Step size
+-0.1
+//GO.SYSIN DD rk4.dat
+echo ls.dat 1>&2
+sed >ls.dat <<'//GO.SYSIN DD ls.dat' 's/^-//'
+-# No. of a problem
+-2
+-# A = 
+-Matrix: 5 by 3
+-row 0:              3             -1              2 
+-row 1:              2             -1            1.2 
+-row 2:            2.5              1           -1.5 
+-row 3:              3              1              1 
+-row 4:             -1              1           -2.2 
+-
+-# b =
+-Vector: dim: 5
+-           5            3            2            4            6 
+-
+//GO.SYSIN DD ls.dat
+echo makefile 1>&2
+sed >makefile <<'//GO.SYSIN DD makefile' 's/^-//'
+-# Generated automatically from makefile.in by configure.
+-#
+-# Makefile for Meschach via autoconf
+-#
+-# Copyright (C) David Stewart & Zbigniew Leyk 1993
+-#
+-# $Id: m1,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $
+-#
+-
+-srcdir = .
+-VPATH = .
+-
+-CC = cc
+-
+-DEFS = -DHAVE_CONFIG_H
+-LIBS =  -lm
+-RANLIB = :
+-
+-
+-CFLAGS = -O
+-
+-
+-.c.o:
+-	$(CC) -c $(CFLAGS) $(DEFS) $<
+-
+-SHELL = /bin/sh
+-MES_PAK = mesch12b
+-TAR = tar
+-SHAR = stree -u
+-ZIP = zip -r -l
+-FLIST = FILELIST
+-
+-###############################
+-
+-LIST1 = copy.o err.o matrixio.o memory.o vecop.o matop.o pxop.o \
+-	submat.o init.o otherio.o machine.o matlab.o ivecop.o version.o \
+-	meminfo.o memstat.o
+-LIST2 = lufactor.o bkpfacto.o chfactor.o qrfactor.o solve.o hsehldr.o \
+-	givens.o update.o norm.o hessen.o symmeig.o schur.o svd.o fft.o \
+-	mfunc.o bdfactor.o
+-LIST3 = sparse.o sprow.o sparseio.o spchfctr.o splufctr.o \
+-	spbkp.o spswap.o iter0.o itersym.o iternsym.o
+-ZLIST1 = zmachine.o zcopy.o zmatio.o zmemory.o zvecop.o zmatop.o znorm.o \
+-	 zfunc.o 
+-ZLIST2 = zlufctr.o zsolve.o zmatlab.o zhsehldr.o zqrfctr.o \
+-         zgivens.o  zhessen.o zschur.o
+-
+-# they are no longer supported
+-# if you use them add oldpart to all and sparse
+-OLDLIST = conjgrad.o lanczos.o arnoldi.o
+-
+-ALL_LISTS = $(LIST1) $(LIST2) $(LIST3) $(ZLIST1) $(ZLIST2) $(OLDLIST)
+-
+-HBASE = err.h meminfo.h machine.h matrix.h
+-
+-HLIST = $(HBASE) iter.h matlab.h matrix2.h  oldnames.h sparse.h \
+-	sparse2.h  zmatrix.h zmatrix2.h
+-
+-TORTURE = torture.o sptort.o ztorture.o memtort.o itertort.o \
+-	 mfuntort.o iotort.o
+-
+-OTHERS = dmacheps.c extras.c fmacheps.c maxint.c  makefile.in \
+-	 README configure configure.in machine.h.in copyright \
+-	 tutorial.c tutadv.c rk4.dat ls.dat makefile $(FLIST)
+-
+-
+-# Different configurations
+-# the dependencies **between** the parts are for dmake
+-all:  part1 part2 part3 zpart1 zpart2 
+-part2: part1
+-part3: part2
+-basic: part1 part2
+-sparse: part1 part2 part3 
+-zpart2: zpart1
+-complex: part1 part2 zpart1 zpart2
+-
+-
+-$(LIST1): $(HBASE)
+-part1: $(LIST1)
+-	ar ru meschach.a $(LIST1)
+-	$(RANLIB) meschach.a
+-
+-$(LIST2): $(HBASE) matrix2.h
+-part2: $(LIST2)
+-	ar ru meschach.a $(LIST2)
+-	$(RANLIB) meschach.a
+-
+-$(LIST3): $(HBASE) sparse.h sparse2.h
+-part3: $(LIST3)
+-	ar ru meschach.a $(LIST3)
+-	$(RANLIB) meschach.a
+-
+-$(ZLIST1): $(HBASDE) zmatrix.h
+-zpart1: $(ZLIST1)
+-	ar ru meschach.a $(ZLIST1)
+-	$(RANLIB) meschach.a
+-
+-$(ZLIST2): $(HBASE) zmatrix.h zmatrix2.h 
+-zpart2: $(ZLIST2)
+-	ar ru meschach.a $(ZLIST2)
+-	$(RANLIB) meschach.a
+-
+-$(OLDLIST): $(HBASE) sparse.h sparse2.h 
+-oldpart: $(OLDLIST)
+-	ar ru meschach.a $(OLDLIST)
+-	$(RANLIB) meschach.a
+-
+-
+-
+-#######################################
+-
+-tar:
+-	- /bin/rm -f $(MES_PAK).tar
+-	chmod 644 `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(OTHERS) $(HLIST)  `echo $(TORTURE) | sed -e 's/\.o/.c/g'` 
+-	chmod 755 configure
+-	$(MAKE) list
+-	$(TAR) cvf $(MES_PAK).tar \
+-	 `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(HLIST)  $(OTHERS) \
+-	`echo $(TORTURE) | sed -e 's/\.o/.c/g'` \
+-	MACHINES DOC
+-
+-# use this only for PC machines	
+-msdos-zip:
+-	- /bin/rm -f $(MES_PAK).zip
+-	chmod 644 `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(OTHERS) $(HLIST) `echo $(TORTURE) | sed -e 's/\.o/.c/g'` 
+-	chmod 755 configure
+-	$(MAKE) list
+-	$(ZIP)  $(MES_PAK).zip \
+-	 `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(HLIST)  $(OTHERS) `echo $(TORTURE) | sed -e 's/\.o/.c/g'` \
+-	MACHINES DOC
+-	
+-
+-fullshar:
+-	- /bin/rm -f $(MES_PAK).shar;
+-	chmod 644 `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(OTHERS) $(HLIST) `echo $(TORTURE) | sed -e 's/\.o/.c/g'` 
+-	chmod 755 configure
+-	$(MAKE) list
+-	$(SHAR) `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(HLIST)  $(OTHERS) `echo $(TORTURE) | sed -e 's/\.o/.c/g'` \
+-	MACHINES DOC > $(MES_PAK).shar
+-
+-shar:
+-	- /bin/rm -f meschach1.shar meschach2.shar meschach3.shar \
+-	meschach4.shar oldmeschach.shar meschach0.shar 
+-	chmod 644 `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	$(OTHERS) $(HLIST) `echo $(TORTURE) | sed -e 's/\.o/.c/g'` 
+-	chmod 755 configure	
+-	$(MAKE) list
+-	$(SHAR) `echo $(LIST1) | sed -e 's/\.o/.c/g'` > meschach1.shar
+-	$(SHAR) `echo $(LIST2) | sed -e 's/\.o/.c/g'` > meschach2.shar
+-	$(SHAR) `echo $(LIST3) | sed -e 's/\.o/.c/g'` > meschach3.shar	
+-	$(SHAR) `echo $(ZLIST1) | sed -e 's/\.o/.c/g'` \
+-	  `echo $(ZLIST2) | sed -e 's/\.o/.c/g'` > meschach4.shar
+-	$(SHAR) `echo $(OLDLIST) | sed -e 's/\.o/.c/g'` > oldmeschach.shar
+-	$(SHAR) $(OTHERS) `echo $(TORTURE) | sed -e 's/\.o/.c/g'` \
+-	  $(HLIST)  DOC MACHINES  > meschach0.shar
+-
+-list:
+-	/bin/rm -f $(FLIST)
+-	ls -lR `echo $(ALL_LISTS) | sed -e 's/\.o/.c/g'` \
+-	`echo $(TORTURE) | sed -e 's/\.o/.c/g'` \
+-	$(HLIST) $(OTHERS) MACHINES DOC \
+-	|awk '/^$$/ {print};/^[-d]/ {printf("%s %s   %10d %s %s %s %s\n", \
+-	 $$1,$$2,$$5,$$6,$$7,$$8,$$9)}; /^[^-d]/ {print}' \
+-	> $(FLIST)
+-
+-
+-
+-clean:
+-	/bin/rm -f *.o core asx5213a.mat iotort.dat 
+-
+-cleanup:
+-	/bin/rm -f *.o core asx5213a.mat iotort.dat *.a 
+-
+-realclean:
+-	/bin/rm -f *.o core asx5213a.mat iotort.dat *.a
+-	/bin/rm -f torture sptort ztorture memtort itertort mfuntort iotort
+-	/bin/rm -f makefile machine.h config.status maxint macheps
+- 
+-alltorture: torture sptort ztorture memtort itertort mfuntort iotort
+-
+-torture:torture.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o torture torture.o \
+-	meschach.a $(LIBS)
+-sptort:sptort.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o sptort sptort.o \
+-	meschach.a $(LIBS)
+-memtort: memtort.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o memtort memtort.o \
+-	meschach.a $(LIBS)
+-ztorture:ztorture.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o ztorture ztorture.o \
+-	meschach.a $(LIBS)
+-itertort: itertort.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o itertort itertort.o \
+-	meschach.a $(LIBS)
+-
+-iotort: iotort.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o iotort iotort.o \
+-	meschach.a $(LIBS)
+-mfuntort: mfuntort.o meschach.a
+-	$(CC) $(CFLAGS) $(DEFS) -o mfuntort mfuntort.o \
+-	meschach.a $(LIBS)
+-tstmove: tstmove.o meschach.a
+bigmail CUT HERE............
+test -w meschach0.shar &&
+test -r 24048P00 &&
+test -r 24048P01 &&
+test -r 24048P02 &&
+test -r 24048P03 &&
+(
+ cat 24048P00 >> meschach0.shar; rm 24048P00
+ cat 24048P01 >> meschach0.shar; rm 24048P01
+ cat 24048P02 >> meschach0.shar; rm 24048P02
+ cat 24048P03 >> meschach0.shar; rm 24048P03
+)

@@ -1,0 +1,1325 @@
+#!/bin/sh
+# to unpack, sh this message in an empty directory
+PATH=/bin:/usr/bin
+cat > 24048P09 <<'bigmail CUT HERE............'
+-		/**************************************************
+-		ip = 0.0;
+-		for ( j = j0; j < M->n; j++ )
+-			ip += M->me[i][j]*hh->ve[j];
+-		**************************************************/
+-		scale.re = -beta*ip.re;
+-		scale.im = -beta*ip.im;
+-		/* if ( scale == 0.0 ) */
+-		if ( is_zero(scale) )
+-		    continue;
+-
+-		/* do operation */
+-		__zmltadd__(&(M->me[i][j0]),&(hh->ve[j0]),scale,
+-			    (int)(M->n-j0),Z_CONJ);
+-		/**************************************************
+-		for ( j = j0; j < M->n; j++ )
+-			M->me[i][j] -= scale*hh->ve[j];
+-		**************************************************/
+-	}
+-
+-	return (M);
+-}
+-
+-
+-/* zhhtrcols -- transform a matrix by a Householder vector by columns
+-	starting at row i0 from column j0 -- in-situ */
+-ZMAT	*zhhtrcols(M,i0,j0,hh,beta)
+-ZMAT	*M;
+-int	i0, j0;
+-ZVEC	*hh;
+-double	beta;
+-{
+-	/* Real	ip, scale; */
+-	complex	scale;
+-	int	i /*, k */;
+-	static	ZVEC	*w = ZVNULL;
+-
+-	if ( M==ZMNULL || hh==ZVNULL )
+-		error(E_NULL,"zhhtrcols");
+-	if ( M->m != hh->dim )
+-		error(E_SIZES,"zhhtrcols");
+-	if ( i0 < 0 || i0 > M->m || j0 < 0 || j0 > M->n )
+-		error(E_BOUNDS,"zhhtrcols");
+-
+-	if ( beta == 0.0 )	return (M);
+-
+-	w = zv_resize(w,M->n);
+-	MEM_STAT_REG(w,TYPE_ZVEC);
+-	zv_zero(w);
+-
+-	for ( i = i0; i < M->m; i++ )
+-	    /* if ( hh->ve[i] != 0.0 ) */
+-	    if ( ! is_zero(hh->ve[i]) )
+-		__zmltadd__(&(w->ve[j0]),&(M->me[i][j0]),hh->ve[i],
+-			    (int)(M->n-j0),Z_CONJ);
+-	for ( i = i0; i < M->m; i++ )
+-	    /* if ( hh->ve[i] != 0.0 ) */
+-	    if ( ! is_zero(hh->ve[i]) )
+-	    {
+-		scale.re = -beta*hh->ve[i].re;
+-		scale.im = -beta*hh->ve[i].im;
+-		__zmltadd__(&(M->me[i][j0]),&(w->ve[j0]),scale,
+-			    (int)(M->n-j0),Z_CONJ);
+-	    }
+-	return (M);
+-}
+-
+//GO.SYSIN DD zhsehldr.c
+echo zqrfctr.c 1>&2
+sed >zqrfctr.c <<'//GO.SYSIN DD zqrfctr.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-/*
+-  This file contains the routines needed to perform QR factorisation
+-  of matrices, as well as Householder transformations.
+-  The internal "factored form" of a matrix A is not quite standard.
+-  The diagonal of A is replaced by the diagonal of R -- not by the 1st non-zero
+-  entries of the Householder vectors. The 1st non-zero entries are held in
+-  the diag parameter of QRfactor(). The reason for this non-standard
+-  representation is that it enables direct use of the Usolve() function
+-  rather than requiring that  a seperate function be written just for this case.
+-  See, e.g., QRsolve() below for more details.
+-
+-  Complex version
+-  
+-*/
+-
+-static	char	rcsid[] = "$Id: m11,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-#include	<stdio.h>
+-#include	"zmatrix.h"
+-#include	"zmatrix2.h" 
+-#include	<math.h>
+-
+-
+-#define	is_zero(z)	((z).re == 0.0 && (z).im == 0.0)
+-
+-
+-#define		sign(x)	((x) > 0.0 ? 1 : ((x) < 0.0 ? -1 : 0 ))
+-
+-/* Note: The usual representation of a Householder transformation is taken
+-   to be:
+-   P = I - beta.u.u*
+-   where beta = 2/(u*.u) and u is called the Householder vector
+-   (u* is the conjugate transposed vector of u
+-*/
+-
+-/* zQRfactor -- forms the QR factorisation of A
+-	-- factorisation stored in compact form as described above
+-	(not quite standard format) */
+-ZMAT	*zQRfactor(A,diag)
+-ZMAT	*A;
+-ZVEC	*diag;
+-{
+-    u_int	k,limit;
+-    Real	beta;
+-    static	ZVEC	*tmp1=ZVNULL;
+-    
+-    if ( ! A || ! diag )
+-	error(E_NULL,"zQRfactor");
+-    limit = min(A->m,A->n);
+-    if ( diag->dim < limit )
+-	error(E_SIZES,"zQRfactor");
+-    
+-    tmp1 = zv_resize(tmp1,A->m);
+-    MEM_STAT_REG(tmp1,TYPE_ZVEC);
+-    
+-    for ( k=0; k<limit; k++ )
+-    {
+-	/* get H/holder vector for the k-th column */
+-	zget_col(A,k,tmp1);
+-	/* hhvec(tmp1,k,&beta->ve[k],tmp1,&A->me[k][k]); */
+-	zhhvec(tmp1,k,&beta,tmp1,&A->me[k][k]);
+-	diag->ve[k] = tmp1->ve[k];
+-	
+-	/* apply H/holder vector to remaining columns */
+-	/* hhtrcols(A,k,k+1,tmp1,beta->ve[k]); */
+-	tracecatch(zhhtrcols(A,k,k+1,tmp1,beta),"zQRfactor");
+-    }
+-
+-    return (A);
+-}
+-
+-/* zQRCPfactor -- forms the QR factorisation of A with column pivoting
+-   -- factorisation stored in compact form as described above
+-   ( not quite standard format )				*/
+-ZMAT	*zQRCPfactor(A,diag,px)
+-ZMAT	*A;
+-ZVEC	*diag;
+-PERM	*px;
+-{
+-    u_int	i, i_max, j, k, limit;
+-    static	ZVEC	*tmp1=ZVNULL, *tmp2=ZVNULL;
+-    static	VEC	*gamma=VNULL;
+-    Real 	beta;
+-    Real	maxgamma, sum, tmp;
+-    complex	ztmp;
+-    
+-    if ( ! A || ! diag || ! px )
+-	error(E_NULL,"QRCPfactor");
+-    limit = min(A->m,A->n);
+-    if ( diag->dim < limit || px->size != A->n )
+-	error(E_SIZES,"QRCPfactor");
+-    
+-    tmp1 = zv_resize(tmp1,A->m);
+-    tmp2 = zv_resize(tmp2,A->m);
+-    gamma = v_resize(gamma,A->n);
+-    MEM_STAT_REG(tmp1,TYPE_ZVEC);
+-    MEM_STAT_REG(tmp2,TYPE_ZVEC);
+-    MEM_STAT_REG(gamma,TYPE_VEC);
+-    
+-    /* initialise gamma and px */
+-    for ( j=0; j<A->n; j++ )
+-    {
+-	px->pe[j] = j;
+-	sum = 0.0;
+-	for ( i=0; i<A->m; i++ )
+-	    sum += square(A->me[i][j].re) + square(A->me[i][j].im);
+-	gamma->ve[j] = sum;
+-    }
+-    
+-    for ( k=0; k<limit; k++ )
+-    {
+-	/* find "best" column to use */
+-	i_max = k;	maxgamma = gamma->ve[k];
+-	for ( i=k+1; i<A->n; i++ )
+-	    /* Loop invariant:maxgamma=gamma[i_max]
+-	       >=gamma[l];l=k,...,i-1 */
+-	    if ( gamma->ve[i] > maxgamma )
+-	    {	maxgamma = gamma->ve[i]; i_max = i;	}
+-	
+-	/* swap columns if necessary */
+-	if ( i_max != k )
+-	{
+-	    /* swap gamma values */
+-	    tmp = gamma->ve[k];
+-	    gamma->ve[k] = gamma->ve[i_max];
+-	    gamma->ve[i_max] = tmp;
+-	    
+-	    /* update column permutation */
+-	    px_transp(px,k,i_max);
+-	    
+-	    /* swap columns of A */
+-	    for ( i=0; i<A->m; i++ )
+-	    {
+-		ztmp = A->me[i][k];
+-		A->me[i][k] = A->me[i][i_max];
+-		A->me[i][i_max] = ztmp;
+-	    }
+-	}
+-	
+-	/* get H/holder vector for the k-th column */
+-	zget_col(A,k,tmp1);
+-	/* hhvec(tmp1,k,&beta->ve[k],tmp1,&A->me[k][k]); */
+-	zhhvec(tmp1,k,&beta,tmp1,&A->me[k][k]);
+-	diag->ve[k] = tmp1->ve[k];
+-	
+-	/* apply H/holder vector to remaining columns */
+-	/* hhtrcols(A,k,k+1,tmp1,beta->ve[k]); */
+-	zhhtrcols(A,k,k+1,tmp1,beta);
+-	
+-	/* update gamma values */
+-	for ( j=k+1; j<A->n; j++ )
+-	    gamma->ve[j] -= square(A->me[k][j].re)+square(A->me[k][j].im);
+-    }
+-
+-    return (A);
+-}
+-
+-/* zQsolve -- solves Qx = b, Q is an orthogonal matrix stored in compact
+-	form a la QRfactor()
+-	-- may be in-situ */
+-ZVEC	*_zQsolve(QR,diag,b,x,tmp)
+-ZMAT	*QR;
+-ZVEC	*diag, *b, *x, *tmp;
+-{
+-    u_int	dynamic;
+-    int		k, limit;
+-    Real	beta, r_ii, tmp_val;
+-    
+-    limit = min(QR->m,QR->n);
+-    dynamic = FALSE;
+-    if ( ! QR || ! diag || ! b )
+-	error(E_NULL,"_zQsolve");
+-    if ( diag->dim < limit || b->dim != QR->m )
+-	error(E_SIZES,"_zQsolve");
+-    x = zv_resize(x,QR->m);
+-    if ( tmp == ZVNULL )
+-	dynamic = TRUE;
+-    tmp = zv_resize(tmp,QR->m);
+-    
+-    /* apply H/holder transforms in normal order */
+-    x = zv_copy(b,x);
+-    for ( k = 0 ; k < limit ; k++ )
+-    {
+-	zget_col(QR,k,tmp);
+-	r_ii = zabs(tmp->ve[k]);
+-	tmp->ve[k] = diag->ve[k];
+-	tmp_val = (r_ii*zabs(diag->ve[k]));
+-	beta = ( tmp_val == 0.0 ) ? 0.0 : 1.0/tmp_val;
+-	/* hhtrvec(tmp,beta->ve[k],k,x,x); */
+-	zhhtrvec(tmp,beta,k,x,x);
+-    }
+-    
+-    if ( dynamic )
+-	ZV_FREE(tmp);
+-    
+-    return (x);
+-}
+-
+-/* zmakeQ -- constructs orthogonal matrix from Householder vectors stored in
+-   compact QR form */
+-ZMAT	*zmakeQ(QR,diag,Qout)
+-ZMAT	*QR,*Qout;
+-ZVEC	*diag;
+-{
+-    static	ZVEC	*tmp1=ZVNULL,*tmp2=ZVNULL;
+-    u_int	i, limit;
+-    Real	beta, r_ii, tmp_val;
+-    int	j;
+-
+-    limit = min(QR->m,QR->n);
+-    if ( ! QR || ! diag )
+-	error(E_NULL,"zmakeQ");
+-    if ( diag->dim < limit )
+-	error(E_SIZES,"zmakeQ");
+-    Qout = zm_resize(Qout,QR->m,QR->m);
+-
+-    tmp1 = zv_resize(tmp1,QR->m);	/* contains basis vec & columns of Q */
+-    tmp2 = zv_resize(tmp2,QR->m);	/* contains H/holder vectors */
+-    MEM_STAT_REG(tmp1,TYPE_ZVEC);
+-    MEM_STAT_REG(tmp2,TYPE_ZVEC);
+-
+-    for ( i=0; i<QR->m ; i++ )
+-    {	/* get i-th column of Q */
+-	/* set up tmp1 as i-th basis vector */
+-	for ( j=0; j<QR->m ; j++ )
+-	    tmp1->ve[j].re = tmp1->ve[j].im = 0.0;
+-	tmp1->ve[i].re = 1.0;
+-	
+-	/* apply H/h transforms in reverse order */
+-	for ( j=limit-1; j>=0; j-- )
+-	{
+-	    zget_col(QR,j,tmp2);
+-	    r_ii = zabs(tmp2->ve[j]);
+-	    tmp2->ve[j] = diag->ve[j];
+-	    tmp_val = (r_ii*zabs(diag->ve[j]));
+-	    beta = ( tmp_val == 0.0 ) ? 0.0 : 1.0/tmp_val;
+-	    /* hhtrvec(tmp2,beta->ve[j],j,tmp1,tmp1); */
+-	    zhhtrvec(tmp2,beta,j,tmp1,tmp1);
+-	}
+-	
+-	/* insert into Q */
+-	zset_col(Qout,i,tmp1);
+-    }
+-
+-    return (Qout);
+-}
+-
+-/* zmakeR -- constructs upper triangular matrix from QR (compact form)
+-	-- may be in-situ (all it does is zero the lower 1/2) */
+-ZMAT	*zmakeR(QR,Rout)
+-ZMAT	*QR,*Rout;
+-{
+-    u_int	i,j;
+-    
+-    if ( QR==ZMNULL )
+-	error(E_NULL,"zmakeR");
+-    Rout = zm_copy(QR,Rout);
+-    
+-    for ( i=1; i<QR->m; i++ )
+-	for ( j=0; j<QR->n && j<i; j++ )
+-	    Rout->me[i][j].re = Rout->me[i][j].im = 0.0;
+-    
+-    return (Rout);
+-}
+-
+-/* zQRsolve -- solves the system Q.R.x=b where Q & R are stored in compact form
+-   -- returns x, which is created if necessary */
+-ZVEC	*zQRsolve(QR,diag,b,x)
+-ZMAT	*QR;
+-ZVEC	*diag, *b, *x;
+-{
+-    int	limit;
+-    static	ZVEC	*tmp = ZVNULL;
+-    
+-    if ( ! QR || ! diag || ! b )
+-	error(E_NULL,"zQRsolve");
+-    limit = min(QR->m,QR->n);
+-    if ( diag->dim < limit || b->dim != QR->m )
+-	error(E_SIZES,"zQRsolve");
+-    tmp = zv_resize(tmp,limit);
+-    MEM_STAT_REG(tmp,TYPE_ZVEC);
+-
+-    x = zv_resize(x,QR->n);
+-    _zQsolve(QR,diag,b,x,tmp);
+-    x = zUsolve(QR,x,x,0.0);
+-    x = zv_resize(x,QR->n);
+-
+-    return x;
+-}
+-
+-/* zQRAsolve -- solves the system (Q.R)*.x = b
+-	-- Q & R are stored in compact form
+-	-- returns x, which is created if necessary */
+-ZVEC	*zQRAsolve(QR,diag,b,x)
+-ZMAT	*QR;
+-ZVEC	*diag, *b, *x;
+-{
+-    int		j, limit;
+-    Real	beta, r_ii, tmp_val;
+-    static	ZVEC	*tmp = ZVNULL;
+-    
+-    if ( ! QR || ! diag || ! b )
+-	error(E_NULL,"zQRAsolve");
+-    limit = min(QR->m,QR->n);
+-    if ( diag->dim < limit || b->dim != QR->n )
+-	error(E_SIZES,"zQRAsolve");
+-
+-    x = zv_resize(x,QR->m);
+-    x = zUAsolve(QR,b,x,0.0);
+-    x = zv_resize(x,QR->m);
+-
+-    tmp = zv_resize(tmp,x->dim);
+-    MEM_STAT_REG(tmp,TYPE_ZVEC);
+-    printf("zQRAsolve: tmp->dim = %d, x->dim = %d\n", tmp->dim, x->dim);
+-    
+-    /* apply H/h transforms in reverse order */
+-    for ( j=limit-1; j>=0; j-- )
+-    {
+-	zget_col(QR,j,tmp);
+-	tmp = zv_resize(tmp,QR->m);
+-	r_ii = zabs(tmp->ve[j]);
+-	tmp->ve[j] = diag->ve[j];
+-	tmp_val = (r_ii*zabs(diag->ve[j]));
+-	beta = ( tmp_val == 0.0 ) ? 0.0 : 1.0/tmp_val;
+-	zhhtrvec(tmp,beta,j,x,x);
+-    }
+-
+-
+-    return x;
+-}
+-
+-/* zQRCPsolve -- solves A.x = b where A is factored by QRCPfactor()
+-   -- assumes that A is in the compact factored form */
+-ZVEC	*zQRCPsolve(QR,diag,pivot,b,x)
+-ZMAT	*QR;
+-ZVEC	*diag;
+-PERM	*pivot;
+-ZVEC	*b, *x;
+-{
+-    if ( ! QR || ! diag || ! pivot || ! b )
+-	error(E_NULL,"zQRCPsolve");
+-    if ( (QR->m > diag->dim && QR->n > diag->dim) || QR->n != pivot->size )
+-	error(E_SIZES,"zQRCPsolve");
+-    
+-    x = zQRsolve(QR,diag,b,x);
+-    x = pxinv_zvec(pivot,x,x);
+-
+-    return x;
+-}
+-
+-/* zUmlt -- compute out = upper_triang(U).x
+-	-- may be in situ */
+-ZVEC	*zUmlt(U,x,out)
+-ZMAT	*U;
+-ZVEC	*x, *out;
+-{
+-    int		i, limit;
+-
+-    if ( U == ZMNULL || x == ZVNULL )
+-	error(E_NULL,"zUmlt");
+-    limit = min(U->m,U->n);
+-    if ( limit != x->dim )
+-	error(E_SIZES,"zUmlt");
+-    if ( out == ZVNULL || out->dim < limit )
+-	out = zv_resize(out,limit);
+-
+-    for ( i = 0; i < limit; i++ )
+-	out->ve[i] = __zip__(&(x->ve[i]),&(U->me[i][i]),limit - i,Z_NOCONJ);
+-    return out;
+-}
+-
+-/* zUAmlt -- returns out = upper_triang(U)^T.x */
+-ZVEC	*zUAmlt(U,x,out)
+-ZMAT	*U;
+-ZVEC	*x, *out;
+-{
+-    /* complex	sum; */
+-    complex	tmp;
+-    int		i, limit;
+-
+-    if ( U == ZMNULL || x == ZVNULL )
+-	error(E_NULL,"zUAmlt");
+-    limit = min(U->m,U->n);
+-    if ( out == ZVNULL || out->dim < limit )
+-	out = zv_resize(out,limit);
+-
+-    for ( i = limit-1; i >= 0; i-- )
+-    {
+-	tmp = x->ve[i];
+-	out->ve[i].re = out->ve[i].im = 0.0;
+-	__zmltadd__(&(out->ve[i]),&(U->me[i][i]),tmp,limit-i-1,Z_CONJ);
+-    }
+-
+-    return out;
+-}
+-
+-
+-/* zQRcondest -- returns an estimate of the 2-norm condition number of the
+-		matrix factorised by QRfactor() or QRCPfactor()
+-	-- note that as Q does not affect the 2-norm condition number,
+-		it is not necessary to pass the diag, beta (or pivot) vectors
+-	-- generates a lower bound on the true condition number
+-	-- if the matrix is exactly singular, HUGE is returned
+-	-- note that QRcondest() is likely to be more reliable for
+-		matrices factored using QRCPfactor() */
+-double	zQRcondest(QR)
+-ZMAT	*QR;
+-{
+-    static	ZVEC	*y=ZVNULL;
+-    Real	norm, norm1, norm2, tmp1, tmp2;
+-    complex	sum, tmp;
+-    int		i, j, limit;
+-
+-    if ( QR == ZMNULL )
+-	error(E_NULL,"zQRcondest");
+-
+-    limit = min(QR->m,QR->n);
+-    for ( i = 0; i < limit; i++ )
+-	/* if ( QR->me[i][i] == 0.0 ) */
+-	if ( is_zero(QR->me[i][i]) )
+-	    return HUGE;
+-
+-    y = zv_resize(y,limit);
+-    MEM_STAT_REG(y,TYPE_ZVEC);
+-    /* use the trick for getting a unit vector y with ||R.y||_inf small
+-       from the LU condition estimator */
+-    for ( i = 0; i < limit; i++ )
+-    {
+-	sum.re = sum.im = 0.0;
+-	for ( j = 0; j < i; j++ )
+-	    /* sum -= QR->me[j][i]*y->ve[j]; */
+-	    sum = zsub(sum,zmlt(QR->me[j][i],y->ve[j]));
+-	/* sum -= (sum < 0.0) ? 1.0 : -1.0; */
+-	norm1 = zabs(sum);
+-	if ( norm1 == 0.0 )
+-	    sum.re = 1.0;
+-	else
+-	{
+-	    sum.re += sum.re / norm1;
+-	    sum.im += sum.im / norm1;
+-	}
+-	/* y->ve[i] = sum / QR->me[i][i]; */
+-	y->ve[i] = zdiv(sum,QR->me[i][i]);
+-    }
+-    zUAmlt(QR,y,y);
+-
+-    /* now apply inverse power method to R*.R */
+-    for ( i = 0; i < 3; i++ )
+-    {
+-	tmp1 = zv_norm2(y);
+-	zv_mlt(zmake(1.0/tmp1,0.0),y,y);
+-	zUAsolve(QR,y,y,0.0);
+-	tmp2 = zv_norm2(y);
+-	zv_mlt(zmake(1.0/tmp2,0.0),y,y);
+-	zUsolve(QR,y,y,0.0);
+-    }
+-    /* now compute approximation for ||R^{-1}||_2 */
+-    norm1 = sqrt(tmp1)*sqrt(tmp2);
+-
+-    /* now use complementary approach to compute approximation to ||R||_2 */
+-    for ( i = limit-1; i >= 0; i-- )
+-    {
+-	sum.re = sum.im = 0.0;
+-	for ( j = i+1; j < limit; j++ )
+-	    sum = zadd(sum,zmlt(QR->me[i][j],y->ve[j]));
+-	if ( is_zero(QR->me[i][i]) )
+-	    return HUGE;
+-	tmp = zdiv(sum,QR->me[i][i]);
+-	if ( is_zero(tmp) )
+-	{
+-	    y->ve[i].re = 1.0;
+-	    y->ve[i].im = 0.0;
+-	}
+-	else
+-	{
+-	    norm = zabs(tmp);
+-	    y->ve[i].re = sum.re / norm;
+-	    y->ve[i].im = sum.im / norm;
+-	}
+-	/* y->ve[i] = (sum >= 0.0) ? 1.0 : -1.0; */
+-	/* y->ve[i] = (QR->me[i][i] >= 0.0) ? y->ve[i] : - y->ve[i]; */
+-    }
+-
+-    /* now apply power method to R*.R */
+-    for ( i = 0; i < 3; i++ )
+-    {
+-	tmp1 = zv_norm2(y);
+-	zv_mlt(zmake(1.0/tmp1,0.0),y,y);
+-	zUmlt(QR,y,y);
+-	tmp2 = zv_norm2(y);
+-	zv_mlt(zmake(1.0/tmp2,0.0),y,y);
+-	zUAmlt(QR,y,y);
+-    }
+-    norm2 = sqrt(tmp1)*sqrt(tmp2);
+-
+-    /* printf("QRcondest: norm1 = %g, norm2 = %g\n",norm1,norm2); */
+-
+-    return norm1*norm2;
+-}
+-
+//GO.SYSIN DD zqrfctr.c
+echo zgivens.c 1>&2
+sed >zgivens.c <<'//GO.SYSIN DD zgivens.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-	Givens operations file. Contains routines for calculating and
+-	applying givens rotations for/to vectors and also to matrices by
+-	row and by column.
+-
+-	Complex version.
+-*/
+-
+-static	char	rcsid[] = "$Id: ";
+-
+-#include	<stdio.h>
+-#include	"zmatrix.h"
+-#include        "zmatrix2.h"
+-#include	<math.h>
+-
+-/*
+-	(Complex) Givens rotation matrix:
+-		[ c   -s ]
+-		[ s*   c ]
+-	Note that c is real and s is complex
+-*/
+-
+-/* zgivens -- returns c,s parameters for Givens rotation to
+-		eliminate y in the **column** vector [ x y ] */
+-void	zgivens(x,y,c,s)
+-complex	x,y,*s;
+-Real	*c;
+-{
+-	Real	inv_norm, norm;
+-	complex	tmp;
+-
+-	/* this is a safe way of computing sqrt(|x|^2+|y|^2) */
+-	tmp.re = zabs(x);	tmp.im = zabs(y);
+-	norm = zabs(tmp);
+-
+-	if ( norm == 0.0 )
+-	{	*c = 1.0;	s->re = s->im = 0.0;	} /* identity */
+-	else
+-	{
+-	    inv_norm = 1.0 / tmp.re;	/* inv_norm = 1/|x| */
+-	    x.re *= inv_norm;
+-	    x.im *= inv_norm;		/* normalise x */
+-	    inv_norm = 1.0/norm;		/* inv_norm = 1/||[x,y]||2 */
+-	    *c = tmp.re * inv_norm;
+-	    /* now compute - conj(normalised x).y/||[x,y]||2 */
+-	    s->re = - inv_norm*(x.re*y.re + x.im*y.im);
+-	    s->im =   inv_norm*(x.re*y.im - x.im*y.re);
+-	}
+-}
+-
+-/* rot_zvec -- apply Givens rotation to x's i & k components */
+-ZVEC	*rot_zvec(x,i,k,c,s,out)
+-ZVEC	*x,*out;
+-int	i,k;
+-double	c;
+-complex	s;
+-{
+-
+-	complex	temp1, temp2;
+-
+-	if ( x==ZVNULL )
+-		error(E_NULL,"rot_zvec");
+-	if ( i < 0 || i >= x->dim || k < 0 || k >= x->dim )
+-		error(E_RANGE,"rot_zvec");
+-	if ( x != out )
+-	    out = zv_copy(x,out);
+-
+-	/* temp1 = c*out->ve[i] - s*out->ve[k]; */
+-	temp1.re = c*out->ve[i].re
+-	    - s.re*out->ve[k].re + s.im*out->ve[k].im;
+-	temp1.im = c*out->ve[i].im
+-	    - s.re*out->ve[k].im - s.im*out->ve[k].re;
+-
+-	/* temp2 = c*out->ve[k] + zconj(s)*out->ve[i]; */
+-	temp2.re = c*out->ve[k].re
+-		+ s.re*out->ve[i].re + s.im*out->ve[i].im;
+-	temp2.im = c*out->ve[k].im
+-		+ s.re*out->ve[i].im - s.im*out->ve[i].re;
+-
+-	out->ve[i] = temp1;
+-	out->ve[k] = temp2;
+-
+-	return (out);
+-}
+-
+-/* zrot_rows -- premultiply mat by givens rotation described by c,s */
+-ZMAT	*zrot_rows(mat,i,k,c,s,out)
+-ZMAT	*mat,*out;
+-int	i,k;
+-double	c;
+-complex	s;
+-{
+-	u_int	j;
+-	complex	temp1, temp2;
+-
+-	if ( mat==ZMNULL )
+-		error(E_NULL,"zrot_rows");
+-	if ( i < 0 || i >= mat->m || k < 0 || k >= mat->m )
+-		error(E_RANGE,"zrot_rows");
+-	out = zm_copy(mat,out);
+-
+-	/* temp1 = c*out->me[i][j] - s*out->me[k][j]; */
+-	for ( j=0; j<mat->n; j++ )
+-	{
+-	    /* temp1 = c*out->me[i][j] - s*out->me[k][j]; */
+-	    temp1.re = c*out->me[i][j].re
+-		- s.re*out->me[k][j].re + s.im*out->me[k][j].im;
+-	    temp1.im = c*out->me[i][j].im
+-		- s.re*out->me[k][j].im - s.im*out->me[k][j].re;
+-	    
+-	    /* temp2 = c*out->me[k][j] + conj(s)*out->me[i][j]; */
+-	    temp2.re = c*out->me[k][j].re
+-		+ s.re*out->me[i][j].re + s.im*out->me[i][j].im;
+-	    temp2.im = c*out->me[k][j].im
+-		+ s.re*out->me[i][j].im - s.im*out->me[i][j].re;
+-	    
+-	    out->me[i][j] = temp1;
+-	    out->me[k][j] = temp2;
+-	}
+-
+-	return (out);
+-}
+-
+-/* zrot_cols -- postmultiply mat by adjoint Givens rotation described by c,s */
+-ZMAT	*zrot_cols(mat,i,k,c,s,out)
+-ZMAT	*mat,*out;
+-int	i,k;
+-double	c;
+-complex	s;
+-{
+-	u_int	j;
+-	complex	x, y;
+-
+-	if ( mat==ZMNULL )
+-		error(E_NULL,"zrot_cols");
+-	if ( i < 0 || i >= mat->n || k < 0 || k >= mat->n )
+-		error(E_RANGE,"zrot_cols");
+-	out = zm_copy(mat,out);
+-
+-	for ( j=0; j<mat->m; j++ )
+-	{
+-	    x = out->me[j][i];	y = out->me[j][k];
+-	    /* out->me[j][i] = c*x - conj(s)*y; */
+-	    out->me[j][i].re = c*x.re - s.re*y.re - s.im*y.im;
+-	    out->me[j][i].im = c*x.im - s.re*y.im + s.im*y.re;
+-	    
+-	    /* out->me[j][k] = c*y + s*x; */
+-	    out->me[j][k].re = c*y.re + s.re*x.re - s.im*x.im;
+-	    out->me[j][k].im = c*y.im + s.re*x.im + s.im*x.re;
+-	}
+-
+-	return (out);
+-}
+-
+//GO.SYSIN DD zgivens.c
+echo zhessen.c 1>&2
+sed >zhessen.c <<'//GO.SYSIN DD zhessen.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-
+-/*
+-		File containing routines for determining Hessenberg
+-	factorisations.
+-
+-	Complex version
+-*/
+-
+-static	char	rcsid[] = "$Id: m11,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-
+-#include	<stdio.h>
+-#include	"zmatrix.h"
+-#include        "zmatrix2.h"
+-
+-
+-/* zHfactor -- compute Hessenberg factorisation in compact form.
+-	-- factorisation performed in situ
+-	-- for details of the compact form see zQRfactor.c and zmatrix2.doc */
+-ZMAT	*zHfactor(A, diag)
+-ZMAT	*A;
+-ZVEC	*diag;
+-{
+-	static	ZVEC	*tmp1 = ZVNULL;
+-	Real	beta;
+-	int	k, limit;
+-
+-	if ( ! A || ! diag )
+-		error(E_NULL,"zHfactor");
+-	if ( diag->dim < A->m - 1 )
+-		error(E_SIZES,"zHfactor");
+-	if ( A->m != A->n )
+-		error(E_SQUARE,"zHfactor");
+-	limit = A->m - 1;
+-
+-	tmp1 = zv_resize(tmp1,A->m);
+-	MEM_STAT_REG(tmp1,TYPE_ZVEC);
+-
+-	for ( k = 0; k < limit; k++ )
+-	{
+-	    zget_col(A,k,tmp1);
+-	    zhhvec(tmp1,k+1,&beta,tmp1,&A->me[k+1][k]);
+-	    diag->ve[k] = tmp1->ve[k+1];
+-	    /* printf("zHfactor: k = %d, beta = %g, tmp1 =\n",k,beta);
+-	    zv_output(tmp1); */
+-	    
+-	    zhhtrcols(A,k+1,k+1,tmp1,beta);
+-	    zhhtrrows(A,0  ,k+1,tmp1,beta);
+-	    /* printf("# at stage k = %d, A =\n",k);	zm_output(A); */
+-	}
+-
+-	return (A);
+-}
+-
+-/* zHQunpack -- unpack the compact representation of H and Q of a
+-	Hessenberg factorisation
+-	-- if either H or Q is NULL, then it is not unpacked
+-	-- it can be in situ with HQ == H
+-	-- returns HQ
+-*/
+-ZMAT	*zHQunpack(HQ,diag,Q,H)
+-ZMAT	*HQ, *Q, *H;
+-ZVEC	*diag;
+-{
+-	int	i, j, limit;
+-	Real	beta, r_ii, tmp_val;
+-	static	ZVEC	*tmp1 = ZVNULL, *tmp2 = ZVNULL;
+-
+-	if ( HQ==ZMNULL || diag==ZVNULL )
+-		error(E_NULL,"zHQunpack");
+-	if ( HQ == Q || H == Q )
+-	    error(E_INSITU,"zHQunpack");
+-	limit = HQ->m - 1;
+-	if ( diag->dim < limit )
+-		error(E_SIZES,"zHQunpack");
+-	if ( HQ->m != HQ->n )
+-		error(E_SQUARE,"zHQunpack");
+-
+-
+-	if ( Q != ZMNULL )
+-	{
+-	    Q = zm_resize(Q,HQ->m,HQ->m);
+-	    tmp1 = zv_resize(tmp1,H->m);
+-	    tmp2 = zv_resize(tmp2,H->m);
+-	    MEM_STAT_REG(tmp1,TYPE_ZVEC);
+-	    MEM_STAT_REG(tmp2,TYPE_ZVEC);
+-	    
+-	    for ( i = 0; i < H->m; i++ )
+-	    {
+-		/* tmp1 = i'th basis vector */
+-		for ( j = 0; j < H->m; j++ )
+-		    tmp1->ve[j].re = tmp1->ve[j].im = 0.0;
+-		tmp1->ve[i].re = 1.0;
+-		
+-		/* apply H/h transforms in reverse order */
+-		for ( j = limit-1; j >= 0; j-- )
+-		{
+-		    zget_col(HQ,j,tmp2);
+-		    r_ii = zabs(tmp2->ve[j+1]);
+-		    tmp2->ve[j+1] = diag->ve[j];
+-		    tmp_val = (r_ii*zabs(diag->ve[j]));
+-		    beta = ( tmp_val == 0.0 ) ? 0.0 : 1.0/tmp_val;
+-		    /* printf("zHQunpack: j = %d, beta = %g, tmp2 =\n",
+-			   j,beta);
+-		    zv_output(tmp2); */
+-		    zhhtrvec(tmp2,beta,j+1,tmp1,tmp1);
+-		}
+-		
+-		/* insert into Q */
+-		zset_col(Q,i,tmp1);
+-	    }
+-	}
+-
+-	if ( H != ZMNULL )
+-	{
+-	    H = zm_copy(HQ,H);
+-	    
+-	    limit = H->m;
+-	    for ( i = 1; i < limit; i++ )
+-		for ( j = 0; j < i-1; j++ )
+-		    H->me[i][j].re = H->me[i][j].im = 0.0;
+-	}
+-
+-	return HQ;
+-}
+-
+-
+-
+//GO.SYSIN DD zhessen.c
+echo zschur.c 1>&2
+sed >zschur.c <<'//GO.SYSIN DD zschur.c' 's/^-//'
+-
+-/**************************************************************************
+-**
+-** Copyright (C) 1993 David E. Steward & Zbigniew Leyk, all rights reserved.
+-**
+-**			     Meschach Library
+-** 
+-** This Meschach Library is provided "as is" without any express 
+-** or implied warranty of any kind with respect to this software. 
+-** In particular the authors shall not be liable for any direct, 
+-** indirect, special, incidental or consequential damages arising 
+-** in any way from use of the software.
+-** 
+-** Everyone is granted permission to copy, modify and redistribute this
+-** Meschach Library, provided:
+-**  1.  All copies contain this copyright notice.
+-**  2.  All modified copies shall carry a notice stating who
+-**      made the last modification and the date of such modification.
+-**  3.  No charge is made for this software or works derived from it.  
+-**      This clause shall not be construed as constraining other software
+-**      distributed on the same medium as this software, nor is a
+-**      distribution fee considered a charge.
+-**
+-***************************************************************************/
+-
+-/*	
+-	File containing routines for computing the Schur decomposition
+-	of a complex non-symmetric matrix
+-	See also: hessen.c
+-	Complex version
+-*/
+-
+-
+-#include	<stdio.h>
+-#include	"zmatrix.h"
+-#include        "zmatrix2.h"
+-#include	<math.h>
+-
+-
+-#define	is_zero(z)	((z).re == 0.0 && (z).im == 0.0)
+-#define	b2s(t_or_f)	((t_or_f) ? "TRUE" : "FALSE")
+-
+-
+-/* zschur -- computes the Schur decomposition of the matrix A in situ
+-	-- optionally, gives Q matrix such that Q^*.A.Q is upper triangular
+-	-- returns upper triangular Schur matrix */
+-ZMAT	*zschur(A,Q)
+-ZMAT	*A, *Q;
+-{
+-    int		i, j, iter, k, k_min, k_max, k_tmp, n, split;
+-    Real	c;
+-    complex	det, discrim, lambda, lambda0, lambda1, s, sum, ztmp;
+-    complex	x, y;	/* for chasing algorithm */
+-    complex	**A_me;
+-    static	ZVEC	*diag=ZVNULL;
+-    
+-    if ( ! A )
+-	error(E_NULL,"zschur");
+-    if ( A->m != A->n || ( Q && Q->m != Q->n ) )
+-	error(E_SQUARE,"zschur");
+-    if ( Q != ZMNULL && Q->m != A->m )
+-	error(E_SIZES,"zschur");
+-    n = A->n;
+-    diag = zv_resize(diag,A->n);
+-    MEM_STAT_REG(diag,TYPE_ZVEC);
+-    /* compute Hessenberg form */
+-    zHfactor(A,diag);
+-    
+-    /* save Q if necessary, and make A explicitly Hessenberg */
+-    zHQunpack(A,diag,Q,A);
+-
+-    k_min = 0;	A_me = A->me;
+-
+-    while ( k_min < n )
+-    {
+-	/* find k_max to suit:
+-	   submatrix k_min..k_max should be irreducible */
+-	k_max = n-1;
+-	for ( k = k_min; k < k_max; k++ )
+-	    if ( is_zero(A_me[k+1][k]) )
+-	    {	k_max = k;	break;	}
+-
+-	if ( k_max <= k_min )
+-	{
+-	    k_min = k_max + 1;
+-	    continue;		/* outer loop */
+-	}
+-
+-	/* now have r x r block with r >= 2:
+-	   apply Francis QR step until block splits */
+-	split = FALSE;		iter = 0;
+-	while ( ! split )
+-	{
+-	    complex	a00, a01, a10, a11;
+-	    iter++;
+-	    
+-	    /* set up Wilkinson/Francis complex shift */
+-	    /* use the smallest eigenvalue of the bottom 2 x 2 submatrix */
+-	    k_tmp = k_max - 1;
+-
+-	    a00 = A_me[k_tmp][k_tmp];
+-	    a01 = A_me[k_tmp][k_max];
+-	    a10 = A_me[k_max][k_tmp];
+-	    a11 = A_me[k_max][k_max];
+-	    ztmp.re = 0.5*(a00.re - a11.re);
+-	    ztmp.im = 0.5*(a00.im - a11.im);
+-	    discrim = zsqrt(zadd(zmlt(ztmp,ztmp),zmlt(a01,a10)));
+-	    sum.re  = 0.5*(a00.re + a11.re);
+-	    sum.im  = 0.5*(a00.im + a11.im);
+-	    lambda0 = zadd(sum,discrim);
+-	    lambda1 = zsub(sum,discrim);
+-	    det = zsub(zmlt(a00,a11),zmlt(a01,a10));
+-	    if ( zabs(lambda0) > zabs(lambda1) )
+-		lambda = zdiv(det,lambda0);
+-	    else
+-		lambda = zdiv(det,lambda1);
+-
+-	    /* perturb shift if convergence is slow */
+-	    if ( (iter % 10) == 0 )
+-	    {
+-		lambda.re += iter*0.02;
+-		lambda.im += iter*0.02;
+-	    }
+-
+-	    /* set up Householder transformations */
+-	    k_tmp = k_min + 1;
+-
+-	    x = zsub(A->me[k_min][k_min],lambda);
+-	    y = A->me[k_min+1][k_min];
+-
+-	    /* use Givens' rotations to "chase" off-Hessenberg entry */
+-	    for ( k = k_min; k <= k_max-1; k++ )
+-	    {
+-		zgivens(x,y,&c,&s);
+-		zrot_cols(A,k,k+1,c,s,A);
+-		zrot_rows(A,k,k+1,c,s,A);
+-		if ( Q != ZMNULL )
+-		    zrot_cols(Q,k,k+1,c,s,Q);
+-
+-		/* zero things that should be zero */
+-		if ( k > k_min )
+-		    A->me[k+1][k-1].re = A->me[k+1][k-1].im = 0.0;
+-
+-		/* get next entry to chase along sub-diagonal */
+-		x = A->me[k+1][k];
+-		if ( k <= k_max - 2 )
+-		    y = A->me[k+2][k];
+-		else
+-		    y.re = y.im = 0.0;
+-	    }
+-
+-	    for ( k = k_min; k <= k_max-2; k++ )
+-	    {
+-		/* zero appropriate sub-diagonals */
+-		A->me[k+2][k].re = A->me[k+2][k].im = 0.0;
+-	    }
+-
+-	    /* test to see if matrix should split */
+-	    for ( k = k_min; k < k_max; k++ )
+-		if ( zabs(A_me[k+1][k]) < MACHEPS*
+-		    (zabs(A_me[k][k])+zabs(A_me[k+1][k+1])) )
+-		{
+-		    A_me[k+1][k].re = A_me[k+1][k].im = 0.0;
+-		    split = TRUE;
+-		}
+-
+-	}
+-    }
+-    
+-    /* polish up A by zeroing strictly lower triangular elements
+-       and small sub-diagonal elements */
+-    for ( i = 0; i < A->m; i++ )
+-	for ( j = 0; j < i-1; j++ )
+-	    A_me[i][j].re = A_me[i][j].im = 0.0;
+-    for ( i = 0; i < A->m - 1; i++ )
+-	if ( zabs(A_me[i+1][i]) < MACHEPS*
+-	    (zabs(A_me[i][i])+zabs(A_me[i+1][i+1])) )
+-	    A_me[i+1][i].re = A_me[i+1][i].im = 0.0;
+-
+-    return A;
+-}
+-
+-
+-#if 0
+-/* schur_vecs -- returns eigenvectors computed from the real Schur
+-		decomposition of a matrix
+-	-- T is the block upper triangular Schur matrix
+-	-- Q is the orthognal matrix where A = Q.T.Q^T
+-	-- if Q is null, the eigenvectors of T are returned
+-	-- X_re is the real part of the matrix of eigenvectors,
+-		and X_im is the imaginary part of the matrix.
+-	-- X_re is returned */
+-MAT	*schur_vecs(T,Q,X_re,X_im)
+-MAT	*T, *Q, *X_re, *X_im;
+-{
+-	int	i, j, limit;
+-	Real	t11_re, t11_im, t12, t21, t22_re, t22_im;
+-	Real	l_re, l_im, det_re, det_im, invdet_re, invdet_im,
+-		val1_re, val1_im, val2_re, val2_im,
+-		tmp_val1_re, tmp_val1_im, tmp_val2_re, tmp_val2_im, **T_me;
+-	Real	sum, diff, discrim, magdet, norm, scale;
+-	static VEC	*tmp1_re=VNULL, *tmp1_im=VNULL,
+-			*tmp2_re=VNULL, *tmp2_im=VNULL;
+-
+-	if ( ! T || ! X_re )
+-	    error(E_NULL,"schur_vecs");
+-	if ( T->m != T->n || X_re->m != X_re->n ||
+-		( Q != MNULL && Q->m != Q->n ) ||
+-		( X_im != MNULL && X_im->m != X_im->n ) )
+-	    error(E_SQUARE,"schur_vecs");
+-	if ( T->m != X_re->m ||
+-		( Q != MNULL && T->m != Q->m ) ||
+-		( X_im != MNULL && T->m != X_im->m ) )
+-	    error(E_SIZES,"schur_vecs");
+-
+-	tmp1_re = v_resize(tmp1_re,T->m);
+-	tmp1_im = v_resize(tmp1_im,T->m);
+-	tmp2_re = v_resize(tmp2_re,T->m);
+-	tmp2_im = v_resize(tmp2_im,T->m);
+-	MEM_STAT_REG(tmp1_re,TYPE_VEC);
+-	MEM_STAT_REG(tmp1_im,TYPE_VEC);
+-	MEM_STAT_REG(tmp2_re,TYPE_VEC);
+-	MEM_STAT_REG(tmp2_im,TYPE_VEC);
+-
+-	T_me = T->me;
+-	i = 0;
+-	while ( i < T->m )
+-	{
+-	    if ( i+1 < T->m && T->me[i+1][i] != 0.0 )
+-	    {	/* complex eigenvalue */
+-		sum  = 0.5*(T_me[i][i]+T_me[i+1][i+1]);
+-		diff = 0.5*(T_me[i][i]-T_me[i+1][i+1]);
+-		discrim = diff*diff + T_me[i][i+1]*T_me[i+1][i];
+-		l_re = l_im = 0.0;
+-		if ( discrim < 0.0 )
+-		{	/* yes -- complex e-vals */
+-		    l_re = sum;
+-		    l_im = sqrt(-discrim);
+-		}
+-		else /* not correct Real Schur form */
+-		    error(E_RANGE,"schur_vecs");
+-	    }
+-	    else
+-	    {
+-		l_re = T_me[i][i];
+-		l_im = 0.0;
+-	    }
+-
+-	    v_zero(tmp1_im);
+-	    v_rand(tmp1_re);
+-	    sv_mlt(MACHEPS,tmp1_re,tmp1_re);
+-
+-	    /* solve (T-l.I)x = tmp1 */
+-	    limit = ( l_im != 0.0 ) ? i+1 : i;
+-	    /* printf("limit = %d\n",limit); */
+-	    for ( j = limit+1; j < T->m; j++ )
+-		tmp1_re->ve[j] = 0.0;
+-	    j = limit;
+-	    while ( j >= 0 )
+-	    {
+-		if ( j > 0 && T->me[j][j-1] != 0.0 )
+-		{   /* 2 x 2 diagonal block */
+-		    /* printf("checkpoint A\n"); */
+-		    val1_re = tmp1_re->ve[j-1] -
+-		      __ip__(&(tmp1_re->ve[j+1]),&(T->me[j-1][j+1]),limit-j);
+-		    /* printf("checkpoint B\n"); */
+-		    val1_im = tmp1_im->ve[j-1] -
+-		      __ip__(&(tmp1_im->ve[j+1]),&(T->me[j-1][j+1]),limit-j);
+-		    /* printf("checkpoint C\n"); */
+-		    val2_re = tmp1_re->ve[j] -
+-		      __ip__(&(tmp1_re->ve[j+1]),&(T->me[j][j+1]),limit-j);
+-		    /* printf("checkpoint D\n"); */
+-		    val2_im = tmp1_im->ve[j] -
+-		      __ip__(&(tmp1_im->ve[j+1]),&(T->me[j][j+1]),limit-j);
+-		    /* printf("checkpoint E\n"); */
+-		    
+-		    t11_re = T_me[j-1][j-1] - l_re;
+-		    t11_im = - l_im;
+-		    t22_re = T_me[j][j] - l_re;
+-		    t22_im = - l_im;
+-		    t12 = T_me[j-1][j];
+-		    t21 = T_me[j][j-1];
+-
+-		    scale =  fabs(T_me[j-1][j-1]) + fabs(T_me[j][j]) +
+-			fabs(t12) + fabs(t21) + fabs(l_re) + fabs(l_im);
+-
+-		    det_re = t11_re*t22_re - t11_im*t22_im - t12*t21;
+-		    det_im = t11_re*t22_im + t11_im*t22_re;
+-		    magdet = det_re*det_re+det_im*det_im;
+-		    if ( sqrt(magdet) < MACHEPS*scale )
+-		    {
+-		        det_re = MACHEPS*scale;
+-			magdet = det_re*det_re+det_im*det_im;
+-		    }
+-		    invdet_re =   det_re/magdet;
+-		    invdet_im = - det_im/magdet;
+-		    tmp_val1_re = t22_re*val1_re-t22_im*val1_im-t12*val2_re;
+-		    tmp_val1_im = t22_im*val1_re+t22_re*val1_im-t12*val2_im;
+-		    tmp_val2_re = t11_re*val2_re-t11_im*val2_im-t21*val1_re;
+-		    tmp_val2_im = t11_im*val2_re+t11_re*val2_im-t21*val1_im;
+-		    tmp1_re->ve[j-1] = invdet_re*tmp_val1_re -
+-		    		invdet_im*tmp_val1_im;
+-		    tmp1_im->ve[j-1] = invdet_im*tmp_val1_re +
+-		    		invdet_re*tmp_val1_im;
+-		    tmp1_re->ve[j]   = invdet_re*tmp_val2_re -
+-		    		invdet_im*tmp_val2_im;
+-		    tmp1_im->ve[j]   = invdet_im*tmp_val2_re +
+-		    		invdet_re*tmp_val2_im;
+-		    j -= 2;
+-	        }
+-	        else
+-		{
+-		    t11_re = T_me[j][j] - l_re;
+-		    t11_im = - l_im;
+-		    magdet = t11_re*t11_re + t11_im*t11_im;
+-		    scale = fabs(T_me[j][j]) + fabs(l_re);
+-		    if ( sqrt(magdet) < MACHEPS*scale )
+-		    {
+-		        t11_re = MACHEPS*scale;
+-			magdet = t11_re*t11_re + t11_im*t11_im;
+-		    }
+-		    invdet_re =   t11_re/magdet;
+-		    invdet_im = - t11_im/magdet;
+-		    /* printf("checkpoint F\n"); */
+-		    val1_re = tmp1_re->ve[j] -
+-		      __ip__(&(tmp1_re->ve[j+1]),&(T->me[j][j+1]),limit-j);
+-		    /* printf("checkpoint G\n"); */
+-		    val1_im = tmp1_im->ve[j] -
+-		      __ip__(&(tmp1_im->ve[j+1]),&(T->me[j][j+1]),limit-j);
+-		    /* printf("checkpoint H\n"); */
+-		    tmp1_re->ve[j] = invdet_re*val1_re - invdet_im*val1_im;
+-		    tmp1_im->ve[j] = invdet_im*val1_re + invdet_re*val1_im;
+-		    j -= 1;
+-		}
+-	    }
+-
+-	    norm = v_norm_inf(tmp1_re) + v_norm_inf(tmp1_im);
+-	    sv_mlt(1/norm,tmp1_re,tmp1_re);
+-	    if ( l_im != 0.0 )
+-		sv_mlt(1/norm,tmp1_im,tmp1_im);
+-	    mv_mlt(Q,tmp1_re,tmp2_re);
+-	    if ( l_im != 0.0 )
+-		mv_mlt(Q,tmp1_im,tmp2_im);
+-	    if ( l_im != 0.0 )
+-		norm = sqrt(in_prod(tmp2_re,tmp2_re)+in_prod(tmp2_im,tmp2_im));
+-	    else
+-		norm = v_norm2(tmp2_re);
+-	    sv_mlt(1/norm,tmp2_re,tmp2_re);
+-	    if ( l_im != 0.0 )
+-		sv_mlt(1/norm,tmp2_im,tmp2_im);
+-
+-	    if ( l_im != 0.0 )
+-	    {
+-		if ( ! X_im )
+-		error(E_NULL,"schur_vecs");
+-		set_col(X_re,i,tmp2_re);
+-		set_col(X_im,i,tmp2_im);
+-		sv_mlt(-1.0,tmp2_im,tmp2_im);
+-		set_col(X_re,i+1,tmp2_re);
+-		set_col(X_im,i+1,tmp2_im);
+-		i += 2;
+-	    }
+-	    else
+-	    {
+-		set_col(X_re,i,tmp2_re);
+-		if ( X_im != MNULL )
+-		    set_col(X_im,i,tmp1_im);	/* zero vector */
+-		i += 1;
+-	    }
+-	}
+-
+-	return X_re;
+-}
+-
+-#endif
+//GO.SYSIN DD zschur.c
+bigmail CUT HERE............
+test -w meschach4.shar &&
+test -r 24048P08 &&
+test -r 24048P09 &&
+(
+ cat 24048P08 >> meschach4.shar; rm 24048P08
+ cat 24048P09 >> meschach4.shar; rm 24048P09
+)
+#define END

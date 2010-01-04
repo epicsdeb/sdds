@@ -1,0 +1,24 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile,v $
+# Revision 1.3  2007/10/03 16:47:43  shang
+# recommit
+#
+# Revision 1.1  2007/05/02 16:11:40  shang
+# first version
+#
+#
+#
+
+
+TOP=../../../..
+include $(TOP)/configure/CONFIG
+include $(TOP)/src/SDDS/2d_interpolate/nn/Makefile.OAG
+include $(TOP)/configure/RULES

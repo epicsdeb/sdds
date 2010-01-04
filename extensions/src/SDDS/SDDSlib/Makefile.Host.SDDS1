@@ -1,0 +1,24 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# Makefile for SDDS library
+# $Log: Makefile.Host.SDDS1,v $
+# Revision 1.1  2003/07/23 00:42:08  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/SDDSlib/Makefile.OAG2
+include $(TOP)/config/RULES.Host
+	
+SDDS_rpndummy.c: ../SDDS_rpn.c
+	$(CP) ../SDDS_rpn.c SDDS_rpndummy.c

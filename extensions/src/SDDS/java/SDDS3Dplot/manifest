@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Main-Class: SDDS.java.SDDS3Dplot.Application1
+Class-Path: SDDS.jar visad.jar
+Created-By: 1.6.0 (Sun Microsystems Inc.)
+

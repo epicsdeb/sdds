@@ -1,0 +1,57 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for fftpack
+# $Log: Makefile.Host,v $
+# Revision 1.13  2003/07/23 02:10:12  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+# Revision 1.12  2003/05/06 19:05:22  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.11  2002/08/14 16:41:16  soliday
+# Added Open License
+#
+# Revision 1.10  2002/07/30 08:44:29  soliday
+# Changed the purify lines.
+#
+# Revision 1.9  2002/02/26 03:13:45  borland
+# Added naff.c, which contains NAFF routines from sddsnaff.
+#
+# Revision 1.8  2000/12/07 22:00:10  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.7  2000/08/11 19:28:23  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris when using cc.
+#
+# Revision 1.6  2000/08/10 21:15:38  soliday
+# Added support for gcc on Solaris.
+#
+# Revision 1.5  2000/04/04 05:11:52  soliday
+# Added warning flag for solaris.
+#
+# Revision 1.4  1999/09/14 18:18:33  soliday
+# On WIN32 a dll file is now created
+#
+# Revision 1.3  1999/07/08 22:01:18  soliday
+# Added WIN32 support
+#
+# Revision 1.2  1999/07/01 19:24:53  borland
+# Added some convenience lines.
+#
+# Revision 1.1  1999/04/14 15:14:44  borland
+# First version added to repository (per J. Anderson).
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/fftpack/Makefile.OAG
+include $(TOP)/config/RULES.Host
+

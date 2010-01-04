@@ -1,0 +1,36 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.Vx,v $
+# Revision 1.1  2003/09/17 18:48:18  soliday
+# Added support for vxWorks.
+#
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+
+SRCS.c = ../adler32.c ../compress.c ../crc32.c \
+        ../gzio.c ../uncompr.c ../deflate.c \
+        ../trees.c ../zutil.c ../inflate.c \
+        ../infblock.c ../inftrees.c ../infcodes.c \
+        ../infutil.c ../inffast.c
+LIBOBJS = adler32.o compress.o crc32.o \
+        gzio.o uncompr.o deflate.o \
+        trees.o zutil.o inflate.o \
+        infblock.o inftrees.o infcodes.o \
+        infutil.o inffast.o
+
+LIBNAME = z
+
+INC = zlib.h zconf.h
+
+include $(TOP)/config/RULES.Vx
+

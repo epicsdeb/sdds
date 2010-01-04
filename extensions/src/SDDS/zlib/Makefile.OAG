@@ -1,0 +1,64 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.6  2005/07/29 21:14:31  soliday
+# Updated to build with Blue Gene/L. linux-ppc-bgl-gnu
+#
+# Revision 1.5  2005/01/21 20:30:44  soliday
+# Updated to support purify on Linux
+#
+# Revision 1.4  2004/03/16 16:56:58  soliday
+# Updated purify, quantify, and purecov build rules
+#
+# Revision 1.3  2003/09/17 19:13:57  soliday
+# Added support for vxWorks.
+#
+# Revision 1.2  2003/07/23 15:22:42  soliday
+# Changed to work with WIN32
+#
+# Revision 1.1  2003/07/22 21:31:49  soliday
+# Modified makefiles to work with epics 3.13 and 3.14
+#
+#
+
+CMPLR = ANSI
+
+#RATIONAL = purify
+#RATIONAL = quantify
+#RATIONAL = purecov
+ifdef RATIONAL
+HOST_OPT = NO
+CC := $(RATIONAL) -best-effort $(CC)
+CCC := $(RATIONAL) -best-effort $(CCC)
+endif
+
+
+ifdef WIN32
+FORCE_ZLIB_BUILD=YES
+LIB_SUFFIX=.lib
+endif
+ifeq ($(FORCE_ZLIB_BUILD),YES)
+ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
+LIBRARY = z
+else
+LIBRARY_HOST = z
+endif
+endif
+
+LIBRARY_vxWorks = z
+
+#USR_CFLAGS_solaris += -DHAVE_UNISTD_H
+#USR_CFLAGS_Linux += -DHAVE_UNISTD_H
+
+LIBSRCS = adler32.c compress.c crc32.c gzio.c uncompr.c deflate.c trees.c zutil.c inflate.c infblock.c inftrees.c infcodes.c infutil.c inffast.c
+
+INC = zlib.h zconf.h
+
+SHARED_LIBRARIES = NO

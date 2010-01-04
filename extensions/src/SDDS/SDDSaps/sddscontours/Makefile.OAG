@@ -1,0 +1,220 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.18  2009/04/27 16:03:16  soliday
+# Updated to link to the gsl library.
+#
+# Revision 1.17  2007/11/09 20:32:59  soliday
+# Improved static build.
+#
+# Revision 1.16  2007/04/17 17:48:22  soliday
+# Fixed issue on WIN32.
+#
+# Revision 1.15  2007/04/17 17:24:33  soliday
+# Updated to better detect and use png, gd, and tiff system libraries.
+#
+# Revision 1.14  2006/11/09 20:16:32  soliday
+# Fixed an issue with darwin-ppc
+#
+# Revision 1.13  2006/05/08 21:14:26  soliday
+# Fixed a problem with the last change.
+#
+# Revision 1.12  2006/05/08 20:54:04  soliday
+# Updated to work with various build options on Linux.
+#
+# Revision 1.11  2006/04/17 18:53:18  soliday
+# Changed Xpm_DIR variable value.
+#
+# Revision 1.10  2005/07/22 01:44:58  borland
+# Added Xpm library for linux.
+#
+# Revision 1.9  2005/02/25 23:26:17  soliday
+# Updated so that a static build on solaris will work.
+#
+# Revision 1.8  2005/01/21 20:30:42  soliday
+# Updated to support purify on Linux
+#
+# Revision 1.7  2004/03/16 16:58:02  soliday
+# Updated purify, quantify, and purecov build rules
+#
+# Revision 1.6  2003/11/17 20:54:41  soliday
+# mdbplt is not used with sddsimageconvert
+#
+# Revision 1.5  2003/10/17 16:16:36  soliday
+# Added sddsimageconvert.c
+#
+# Revision 1.4  2003/08/28 22:36:56  soliday
+# Modified so that vxWorks does not try to build this with EPICS 3.14
+#
+# Revision 1.3  2003/07/25 16:17:21  soliday
+# Simplified makefile
+#
+# Revision 1.2  2003/07/23 21:46:33  soliday
+# Fixed issue on Linux
+#
+# Revision 1.1  2003/07/23 20:07:07  soliday
+# Modified makefiles to work with base version 3.13 and 3.14
+#
+#
+#
+
+CMPLR = ANSI
+
+#RATIONAL = purify
+#RATIONAL = quantify
+#RATIONAL = purecov
+ifdef RATIONAL
+HOST_OPT = NO
+CC := $(RATIONAL) -best-effort $(CC)
+CCC := $(RATIONAL) -best-effort $(CCC)
+endif
+
+ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
+PROD = sddscontour sddscongen sddshist2d sddsimageconvert
+else
+PROD_HOST = sddscontour sddscongen sddshist2d sddsimageconvert
+endif
+
+USR_CFLAGS = 	-I../../sddsplots -I../../../include \
+		-DzLib
+
+ifdef KYLIX
+LDFLAGS += -w-dup
+endif
+
+ifeq ($(OS_CLASS),solaris)
+ACC_DEP_CFLAGS += -KPIC -v
+CCC_DEP_CFLAGS += -KPIC -v
+GCC_DEP_CFLAGS += -D__EXTENSIONS__
+endif
+
+GDFOUND = 1
+GD = $(words $(notdir $(wildcard \
+/usr/lib/libgd.a \
+/usr/lib/libgd.so \
+/usr/lib64/libgd.a \
+/usr/lib64/libgd.so \
+/lib/libgd.a \
+/lib/libgd.so \
+/lib64/libgd.a \
+/lib64/libgd.so \
+/sw/lib/libgd.a \
+/sw/lib/libgd.dylib \
+/opt/sfw/lib/libgd.a \
+/opt/sfw/lib/libgd.so \
+/opt/local/lib/libgd.a \
+/opt/local/lib/libgd.so )))
+GDINC = $(words $(notdir $(wildcard \
+/usr/include/gd.h \
+/include/gd.h \
+/sw/include/gd.h \
+/opt/sfw/include/gd.h \
+/opt/local/include/gd.h )))
+
+ifeq ($(GD), 0)
+GDFOUND = 0
+else
+ifeq ($(GDINC), 0)
+GDFOUND = 0
+endif
+endif
+
+ifneq ($(GDFOUND), 0)
+ifeq ($(STATIC_BUILD),YES)
+ifneq ($(words $(notdir $(wildcard /usr/lib/libgd.a \
+                                   /usr/lib64/libgd.a \
+                                   /lib/libgd.a \
+                                   /lib64/libgd.a \
+                                   /sw/lib/libgd.a \
+                                   /opt/sfw/lib/libgd.a \
+                                   /opt/local/lib/libgd.a))), 0)
+SYS_PROD_LIBS += gd png
+else
+OP_SYS_LDLIBS += -lgd -lpng
+endif
+else
+SYS_PROD_LIBS += gd png
+endif
+ifeq ($(OS_CLASS),solaris)
+OP_SYS_INCLUDES += -I/opt/sfw/include -I/opt/local/include
+OP_SYS_LDFLAGS += -L/opt/sfw/lib -L/opt/local/lib -R/opt/sfw/lib -R/opt/local/lib
+endif
+endif
+
+ifeq ($(GDFOUND), 0)
+sddscontour_LIBS += gd png
+sddscongen_LIBS += gd png
+sddshist2d_LIBS += gd png
+sddsimageconvert_LIBS += gd png
+PROD_LIBS_WIN32 += gd png
+gd_DIR = $(INSTALL_LIB)
+png_DIR = $(INSTALL_LIB)
+endif
+
+PROD_LIBS_DEFAULT = mdbcommon fftpack SDDS1c rpnlib gsl mdbmth mdblib
+PROD_LIBS_Darwin = mdbcommon fftpack SDDS1c rpnlib gsl mdbmth mdblib
+PROD_LIBS_Linux = mdbcommon matlib fftpack SDDS1c rpnlib gsl mdbmth mdblib
+PROD_LIBS_WIN32 += mdbcommon fftpack SDDS1c rpnlib gsl mdbmth mdblib fdlibm z
+PROD_LIBS_BORLANDC = mdbcommon fftpack SDDS1c rpnlib gsl mdbmth mdblib fdlibm z
+
+SYS_PROD_LIBS_DEFAULT = z
+SYS_PROD_LIBS_Darwin = z
+SYS_PROD_LIBS_Linux = z ncurses
+SYS_PROD_LIBS_solaris = curses
+SYS_PROD_LIBS_sun4 = z suntool sunwindow pixrect
+SYS_PROD_LIBS_WIN32 = advapi32
+SYS_PROD_LIBS_BORLANDC = -nil-
+ifeq ($(OS_CLASS),solaris)
+OP_SYS_LDLIBS += -lz
+endif
+
+ifeq ($(OS_CLASS),Linux)
+ifeq ($(STATIC_BUILD),YES)
+#OP_SYS_LDLIBS += -Wl,-Bdynamic -lX11 -lXpm -Wl,-Bstatic
+else
+PROD_LIBS_Linux += X11 Xpm
+endif
+ifndef BGL
+ifneq ($(words $(notdir $(wildcard /usr/include/fontconfig/fontconfig.h))), 0)
+ifeq ($(STATIC_BUILD),YES)
+ifneq ($(words $(notdir $(wildcard /usr/lib/libfontconfig.a))), 0)
+SYS_PROD_LIBS_Linux += fontconfig
+else
+#OP_SYS_LDLIBS += -Wl,-Bdynamic -lfontconfig -Wl,-Bstatic
+endif #($(words $(notdir $(wildcard /usr/lib/libfontconfig.a))), 0)
+else
+SYS_PROD_LIBS_Linux += fontconfig
+endif #($(STATIC_BUILD),YES)
+endif #($(words $(notdir $(wildcard /usr/include/fontconfig/fontconfig.h))), 0)
+endif #BGL
+endif
+
+
+sddscontour_LIBS = mdbplt
+sddscongen_LIBS = mdbplt
+sddshist2d_LIBS = mdbplt
+
+fdlibm_DIR = $(INSTALL_LIB)
+SDDS1c_DIR = $(INSTALL_LIB)
+mdbplt_DIR = $(INSTALL_LIB)
+rpnlib_DIR = $(INSTALL_LIB)
+fftpack_DIR = $(INSTALL_LIB)
+mdbmth_DIR = $(INSTALL_LIB)
+mdblib_DIR = $(INSTALL_LIB)
+matlib_DIR = $(INSTALL_LIB)
+mdbcommon_DIR = $(INSTALL_LIB)
+gsl_DIR = $(INSTALL_LIB)
+z_DIR = $(INSTALL_LIB)
+Xpm_DIR = $(X11_LIB)
+X11_DIR = $(X11_LIB)
+sddscontour_CFLAGS = -DRPN_SUPPORT
+
+sddscontour_SRCS += 	sddscontour.c draw_contours.c shade_grid.c \
+				plot_contours.c fft_interp.c

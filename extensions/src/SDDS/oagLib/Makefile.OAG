@@ -1,0 +1,29 @@
+# makefile for oagLib
+# $Log: Makefile.OAG,v $
+# Revision 1.2  2005/02/04 20:29:36  soliday
+# Added the creation of oagLib4. oagLib3 was skipped to avoid confusion with
+# SDDSepics3
+#
+# Revision 1.1  2004/07/29 19:36:39  soliday
+# First version.
+#
+#
+#
+
+LIBRARY = oagLib oagLib2 oagLib4
+
+USR_LIBS = 
+LIB_SYS_LIBS_DEFAULT = z
+LIB_SYS_LIBS_solaris = z curses
+LIB_SYS_LIBS_Linux = z ncurses
+
+OAG_LIBS = mdbcommon SDDSlib matlib fftpack rpns/code mdbmth namelist mdblib meschach zlib png gd fdlibm
+LIBOBJS1 = $(foreach lib,$(OAG_LIBS),$(wildcard ../../$(lib)/O.$(T_A)/*.o))
+LIBOBJS2 = $(subst ../../namelist/O.$(T_A)/namelist_pp.o,,$(LIBOBJS1))
+LIBOBJS3 = $(subst ../../rpns/code/O.$(T_A)/rpn.o,,$(LIBOBJS2))
+LIBOBJS4 = $(subst ../../rpns/code/O.$(T_A)/if2pf.o,,$(LIBOBJS3))
+LIBOBJS5 = $(subst ../../SDDSlib/O.$(T_A)/SDDS_rpn.o,,$(LIBOBJS4))
+oagLib_OBJS = $(subst ../../rpns/code/O.$(T_A)/rpnl.o,,$(LIBOBJS5))
+oagLib2_OBJS = $(oagLib_OBJS)
+oagLib4_OBJS = $(oagLib_OBJS)
+

@@ -1,0 +1,75 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.2  2009/11/20 21:51:39  shang
+# added compilation for cm_test
+#
+# Revision 1.1  2004/05/03 15:24:55  soliday
+# Added support for Epics/Base 3.14 build rules.
+#
+# Revision 1.2  2003/05/06 19:05:04  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.1  2002/11/04 22:01:06  soliday
+# Added per Emery's request.
+#
+#
+
+CMPLR = ANSI
+
+#RATIONAL = purify
+#RATIONAL = quantify
+#RATIONAL = purecov
+ifdef RATIONAL
+HOST_OPT = NO
+ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
+CC = $(RATIONAL) -best-effort $($(ANSI)_$(CMPLR))
+CXX = $(RATIONAL) -best-effort $($(CPLUSPLUS)_$(CXXCMPLR))
+else 
+CC = $(RATIONAL) -best-effort $(SPARCWORKS)/bin/cc
+CCC = $(RATIONAL) -best-effort $(SPARCWORKS)/bin/CC
+endif
+endif
+
+ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
+PROD = cm_test
+else
+PROD_HOST = cm_test
+endif
+
+LIBRARY = cmatlib
+INC = cmatlib.h
+
+USR_CFLAGS = -I../../include -DATEXIT_AVAIL -DIEEE_MATH 
+
+ifeq ($(OS_CLASS),solaris)
+ACC_DEP_CFLAGS += -KPIC -v
+CCC_DEP_CFLAGS += -KPIC -v
+GCC_DEP_CFLAGS += -D__EXTENSIONS__
+endif
+
+LIBSRCS = cm_add.c cm_conjg.c cm_free.c cm_scmul.c cm_zero.c \
+cm_adjoint.c cm_copy.c cm_identity.c cm_show.c \
+cm_alloc.c cm_det.c cm_invert3.c cm_test.c \
+cm_check.c cm_error.c cm_mult.c cm_trans.c cm_assign_me.c
+
+ifdef WIN32
+DLL_LIBS += mdblib
+else
+USR_LIBS = mdblib
+endif
+
+mdblib_DIR = $(INSTALL_LIB)
+mdbmth_DIR = $(INSTALL_LIB)
+
+OP_SYS_LDLIBS += -L/usr/local/oag/lib -lm 
+PROD_LIBS_DEFAULT = mdblib mdbmth cmatlib
+
+cm_test_SRCS = cm_test

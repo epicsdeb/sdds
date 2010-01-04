@@ -1,0 +1,37 @@
+#!/bin/sh  
+# \
+exec tclsh "$0" "$@"
+if [catch {set device $env(SDDS_DEVICE)}] {
+    set device motif
+}
+
+puts stderr "** Define a sequence of 5 pages with 100 points each."
+puts stderr "** Create y = B + H * exp(-(x-mu)/(2*sigma^2)) with B=-1, H=3, mu=1.5, sigma=0.5"
+puts stderr "**   with random numbers added in"
+puts stderr "** Fit a gaussian to each page"
+puts stderr "** Create some label strings"
+exec sddssequence -define=x,type=double -sequence=begin=-3,end=3,number=100 -repeat=5 -pipe=out \
+| sddsbreak -pipe -rowlimit=100 \
+| sddsprocess -pipe -rpndefi=defns.rpn \
+        "-rpnexpr=0.5 sto s 1.5 sto m 3 sto h -1 sto b" \
+        "-define=col,y,x m - s / sqr -2 / exp h * b + grnd 25 / +"  \
+| sddsgfit -pipe -full -col=x,y -limit=eval=1000,pass=10 \
+| sddsprocess -pipe=in g.fit \
+  -print=param,gfitSigmaLabel,%s=%.4g%s,gfitSigma.symbol,gfitSigma,gfitSigma.units, \
+  -print=param,gfitMeanLabel,%s=%.4g%s,gfitMean.symbol,gfitMean,gfitMean.units \
+  -print=param,gfitBaselineLabel,B=%.4g%s,gfitBaseline,gfitBaseline.units \
+  -print=param,gfitHeightLabel,H=%.4g%s,gfitHeight,gfitHeight.units  \
+  "-print=param,gfitLabel,%s %s %s %s,gfitSigmaLabel,gfitMeanLabel,gfitBaselineLabel,gfitHeightLabel"
+
+puts stderr "** query the contents of the fit file"
+puts stderr [exec sddsquery g.fit]
+
+puts stderr "** print the fit results"
+puts stderr [exec sddsprintout \
+    -parameter=(gfitSigma,gfitMean,gfitBaseline,gfitHeight) -width=80 g.fit]
+
+puts stderr "** plot fits and data"
+exec sddsplot -groupby=page,namei -sep=page -split=page \
+ -col=x,y g.fit -graph=sym,scale=0.5,type=1 -col=x,yFit g.fit -graph=line,type=2  -title=@gfitLabel
+
+file delete g.fit

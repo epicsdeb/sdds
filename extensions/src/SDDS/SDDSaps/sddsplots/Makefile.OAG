@@ -1,0 +1,277 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.26  2009/11/17 16:59:04  soliday
+# Fixed issue on linux-x86 when building statically.
+#
+# Revision 1.25  2007/11/09 20:32:37  soliday
+# Improved static build.
+#
+# Revision 1.24  2007/04/17 17:24:33  soliday
+# Updated to better detect and use png, gd, and tiff system libraries.
+#
+# Revision 1.23  2006/11/09 20:15:47  soliday
+# Fixed an issue with darwin-ppc
+#
+# Revision 1.22  2006/05/08 21:14:26  soliday
+# Fixed a problem with the last change.
+#
+# Revision 1.21  2006/05/08 20:54:08  soliday
+# Updated to work with various build options on Linux.
+#
+# Revision 1.20  2006/05/05 21:56:50  soliday
+# Updated to work with all four combinations of SHARED_LIBRARIES and STATIC_BUILD
+# on Linux.
+#
+# Revision 1.19  2006/04/11 15:49:50  soliday
+# Updated to work better under various build settings on Linux.
+#
+# Revision 1.18  2005/11/01 15:54:54  soliday
+# Added missing rt library link for solaris.
+#
+# Revision 1.17  2005/07/29 19:47:26  soliday
+# Changed curses to ncurses because some linux distributions only have
+# ncurses.
+#
+# Revision 1.16  2005/02/25 23:26:25  soliday
+# Updated so that a static build on solaris will work.
+#
+# Revision 1.15  2005/01/21 20:30:42  soliday
+# Updated to support purify on Linux
+#
+# Revision 1.14  2004/08/25 19:13:28  soliday
+# Updated so that if the /opt/X11R6/lib/libz.a is found it will prepend
+# /usr/lib to the link directories list.
+#
+# Revision 1.13  2004/04/06 20:25:56  soliday
+# Fixed linking issue on WIN32 when not using shared libraries.
+#
+# Revision 1.12  2004/03/16 16:57:57  soliday
+# Updated purify, quantify, and purecov build rules
+#
+# Revision 1.11  2003/09/02 20:36:37  soliday
+# Cleaned up for WIN32
+#
+# Revision 1.10  2003/08/28 22:34:32  soliday
+# Modified so that vxWorks does not try to build this with EPICS 3.14
+#
+# Revision 1.9  2003/07/25 17:25:44  soliday
+# Fixed issues with the last change.
+#
+# Revision 1.8  2003/07/25 16:17:21  soliday
+# Simplified makefile
+#
+# Revision 1.7  2003/07/24 21:32:26  soliday
+# Simplified makefile
+#
+# Revision 1.6  2003/07/24 14:38:56  soliday
+# Fixed issue on Linux
+#
+# Revision 1.5  2003/07/23 21:36:42  soliday
+# Fixed issues with shared libraries on solaris.
+#
+# Revision 1.4  2003/07/23 20:50:45  soliday
+# Make changes for Linux.
+#
+# Revision 1.3  2003/07/23 19:34:51  soliday
+# Added changes for solaris.
+#
+# Revision 1.2  2003/07/23 18:50:41  soliday
+# Fixed for WIN32
+#
+# Revision 1.1  2003/07/23 06:55:10  soliday
+# Modified makefiles to work with base 3.13 and 3.14
+#
+#
+#
+
+CMPLR = ANSI
+
+#RATIONAL = purify
+#RATIONAL = quantify
+#RATIONAL = purecov
+ifdef RATIONAL
+HOST_OPT = NO
+CC := $(RATIONAL) -best-effort $(CC)
+CCC := $(RATIONAL) -best-effort $(CCC)
+endif
+
+ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
+PROD_DEFAULT = sddsplot mpl_x11 mpl_x11g mpl_x11c
+PROD_WIN32 = sddsplot
+LIBRARY = mdbplt
+else
+ifdef WIN32
+PROD_HOST = sddsplot
+else
+PROD_HOST = sddsplot mpl_x11 mpl_x11g mpl_x11c
+endif
+LIBRARY_HOST = mdbplt
+endif
+
+SHARED_LIBRARIES = NO
+ifdef WIN32
+LIB_SUFFIX=.lib
+endif
+
+# mit X11
+#ifeq ($(OS_CLASS),solaris)
+#        X11_LIB = /opt/X11R5/lib
+#        X11_INC = /opt/X11R5/include
+#endif
+USR_CFLAGS += 	-I../../../include -I$(X11_INC) -DzLib
+
+ifneq ($(words $(notdir $(wildcard $(X11_LIB)/libz.a $(X11_LIB)/libz.so))), 0)
+ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
+OPT_LDFLAGS += -L/usr/lib
+else
+STATIC_LDFLAGS += -L/usr/lib
+endif
+endif
+
+ifeq ($(OS_CLASS),solaris)
+ACC_DEP_CFLAGS += -KPIC -v
+CCC_DEP_CFLAGS += -KPIC -v
+GCC_DEP_CFLAGS += -D__EXTENSIONS__
+SHRLIB_LDFLAGS = -G -h libmdbplt.so -z nodefs
+endif
+
+GDFOUND = 1
+GD = $(words $(notdir $(wildcard \
+/usr/lib/libgd.a \
+/usr/lib/libgd.so \
+/usr/lib64/libgd.a \
+/usr/lib64/libgd.so \
+/lib/libgd.a \
+/lib/libgd.so \
+/lib64/libgd.a \
+/lib64/libgd.so \
+/sw/lib/libgd.a \
+/sw/lib/libgd.dylib \
+/opt/sfw/lib/libgd.a \
+/opt/sfw/lib/libgd.so \
+/opt/local/lib/libgd.a \
+/opt/local/lib/libgd.so )))
+GDINC = $(words $(notdir $(wildcard \
+/usr/include/gd.h \
+/include/gd.h \
+/sw/include/gd.h \
+/opt/sfw/include/gd.h \
+/opt/local/include/gd.h )))
+
+ifeq ($(GD), 0)
+GDFOUND = 0
+else
+ifeq ($(GDINC), 0)
+GDFOUND = 0
+endif
+endif
+
+ifneq ($(GDFOUND), 0)
+ifeq ($(STATIC_BUILD),YES)
+ifneq ($(words $(notdir $(wildcard /usr/lib/libgd.a \
+                                   /usr/lib64/libgd.a \
+                                   /lib/libgd.a \
+                                   /lib64/libgd.a \
+                                   /sw/lib/libgd.a \
+                                   /opt/sfw/lib/libgd.a \
+                                   /opt/local/lib/libgd.a))), 0)
+SYS_PROD_LIBS += gd png
+else
+sddsplot_LDFLAGS_Linux += -Wl,-Bdynamic -lgd -lpng -Wl,-Bstatic
+sddsplot_LDFLAGS_Default += -lgd -lpng
+endif
+else
+SYS_PROD_LIBS += gd png
+endif
+ifeq ($(OS_CLASS),solaris)
+OP_SYS_INCLUDES += -I/opt/sfw/include -I/opt/local/include
+OP_SYS_LDFLAGS += -L/opt/sfw/lib -L/opt/local/lib -R/opt/sfw/lib -R/opt/local/lib
+endif
+endif
+
+ifeq ($(GDFOUND), 0)
+sddsplot_LIBS += gd png
+gd_DIR = $(INSTALL_LIB)
+png_DIR = $(INSTALL_LIB)
+endif
+
+PROD_LIBS_DEFAULT = mdbplt mdbcommon SDDS1 mdbmth mdblib Xaw Xmu Xt Xext X11
+PROD_LIBS_Darwin = mdbplt mdbcommon SDDS1 mdbmth mdblib Xaw Xmu Xt Xext X11
+PROD_LIBS_solaris = mdbplt mdbcommon SDDS1 mdbmth mdblib Xaw Xmu Xext
+PROD_LIBS_Linux = mdbplt mdbcommon matlib fftpack SDDS1 rpnlib mdbmth mdblib
+
+#
+ifeq ($(OS_CLASS),Linux)
+ifeq ($(STATIC_BUILD),YES)
+STATIC_LDFLAGS_YES += -L$(X11_LIB)
+OP_SYS_LDLIBS = -Wl,-Bdynamic -lXaw -lXmu -lXt -lXext -lX11 -Wl,-Bstatic
+else
+PROD_LIBS_Linux += Xaw Xmu Xt Xext X11
+endif #($(STATIC_BUILD),YES)
+ifndef BGL
+ifneq ($(words $(notdir $(wildcard /usr/include/fontconfig/fontconfig.h))), 0)
+ifeq ($(STATIC_BUILD),YES)
+ifneq ($(words $(notdir $(wildcard /usr/lib/libfontconfig.a))), 0)
+SYS_PROD_LIBS_Linux += fontconfig
+else
+OP_SYS_LDLIBS += -Wl,-Bdynamic -lfontconfig 
+endif #($(words $(notdir $(wildcard /usr/lib/libfontconfig.a))), 0)
+else
+SYS_PROD_LIBS_Linux += fontconfig
+endif #($(STATIC_BUILD),YES)
+endif #($(words $(notdir $(wildcard /usr/include/fontconfig/fontconfig.h))), 0)
+endif #BGL
+endif #($(OS_CLASS),Linux)
+
+PROD_LIBS_WIN32 = mdbplt mdbcommon SDDS1 mdbmth mdblib fdlibm z
+PROD_LIBS_BORLANDC = mdbplt mdbcommon SDDS1 mdbmth mdblib fdlibm z
+SYS_PROD_LIBS_DEFAULT = z
+SYS_PROD_LIBS_Linux += z ncurses rt
+SYS_PROD_LIBS_Darwin += z
+SYS_PROD_LIBS_solaris = curses
+SYS_PROD_LIBS_sun4 = z suntool sunwindow pixrect
+SYS_PROD_LIBS_WIN32 = advapi32
+SYS_PROD_LIBS_BORLANDC = -nil-
+ifeq ($(OS_CLASS),solaris)
+OP_SYS_LDLIBS += -lz -lrt -lXt -lX11
+endif
+
+fdlibm_DIR = $(INSTALL_LIB)
+mdbplt_DIR = $(INSTALL_LIB)
+mdbmth_DIR = $(INSTALL_LIB)
+mdbcommon_DIR = $(INSTALL_LIB)
+SDDS1_DIR = $(INSTALL_LIB)
+namelist_DIR = $(INSTALL_LIB)
+mdblib_DIR = $(INSTALL_LIB)
+matlib_DIR = $(INSTALL_LIB)
+rpnlib_DIR = $(INSTALL_LIB)
+fftpack_DIR = $(INSTALL_LIB)
+Xaw_DIR = $(X11_LIB)
+Xmu_DIR = $(X11_LIB)
+Xt_DIR = $(X11_LIB)
+Xext_DIR = $(X11_LIB)
+X11_DIR = $(X11_LIB)
+
+term_CFLAGS += -DUSE_GD_LIBRARY -I$(EPICS_BASE)/include
+ifeq ($(GDFOUND), 0)
+term_CFLAGS += -I../../../gd
+endif
+
+LIBSRCS = arrows.c plot_data_sets.c make_scales.c graphics.c psymbol.c \
+          term.c multi_plot.c
+
+sddsplot_SRCS = SDDSaps.c put_link_date.c sddsplot.c sddsplotAP.c sddsplotConvert.c \
+          sddsplotFilter.c sddsplotLabels.c sddsplotMapping.c sddsplotRead.c \
+          sddsplotRecord.c sddsplotXfer.c sddsplotGroup.c 
+
+mpl_x11_SRCS = gnuplot_x11.c
+mpl_x11g_SRCS = gnuplot_x11g.c
+mpl_x11c_SRCS = gnuplot_x11c1.c

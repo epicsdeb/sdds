@@ -1,0 +1,204 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.18  2007/11/09 21:31:26  soliday
+# This has to be built with STATIC_BUILD=NO because there is a problem
+# on linux.
+#
+# Revision 1.17  2007/11/09 20:32:18  soliday
+# Improved static build.
+#
+# Revision 1.16  2007/04/17 17:24:33  soliday
+# Updated to better detect and use png, gd, and tiff system libraries.
+#
+# Revision 1.15  2006/11/09 20:16:12  soliday
+# Fixed an issue with darwin-ppc
+#
+# Revision 1.14  2006/05/08 21:14:26  soliday
+# Fixed a problem with the last change.
+#
+# Revision 1.13  2006/05/08 20:54:13  soliday
+# Updated to work with various build options on Linux.
+#
+# Revision 1.12  2006/05/05 21:56:50  soliday
+# Updated to work with all four combinations of SHARED_LIBRARIES and STATIC_BUILD
+# on Linux.
+#
+# Revision 1.11  2006/04/11 15:49:50  soliday
+# Updated to work better under various build settings on Linux.
+#
+# Revision 1.10  2005/06/09 21:50:45  soliday
+# Added the Xpm library to link to on Linux. Apparently this is needed
+# for some computers.
+#
+# Revision 1.9  2005/02/25 23:26:29  soliday
+# Updated so that a static build on solaris will work.
+#
+# Revision 1.8  2005/01/21 20:30:42  soliday
+# Updated to support purify on Linux
+#
+# Revision 1.7  2004/08/25 19:14:22  soliday
+# Updated so that if the /opt/X11R6/lib/libz.a is found it will prepend
+# /usr/lib to the link directories list.
+#
+# Revision 1.6  2004/03/16 16:57:54  soliday
+# Updated purify, quantify, and purecov build rules
+#
+# Revision 1.5  2003/08/28 22:34:45  soliday
+# Modified so that vxWorks does not try to build this with EPICS 3.14
+#
+# Revision 1.4  2003/08/04 14:02:57  soliday
+# Small change for Linux.
+#
+# Revision 1.3  2003/07/30 19:11:27  soliday
+# Added missing definition for X11 lib
+#
+# Revision 1.2  2003/07/25 16:17:21  soliday
+# Simplified makefile
+#
+# Revision 1.1  2003/07/23 19:37:17  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+#
+#
+
+CMPLR=ANSI
+
+#RATIONAL = purify
+#RATIONAL = quantify
+#RATIONAL = purecov
+ifdef RATIONAL
+HOST_OPT = NO
+CC := $(RATIONAL) -best-effort $(CC)
+CCC := $(RATIONAL) -best-effort $(CCC)
+endif
+
+STATIC_BUILD=NO
+
+ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
+PROD = mpl_motif
+else
+PROD_HOST = mpl_motif
+endif
+
+USR_CFLAGS = 	-I../../../../include -I$(MOTIF_INC) \
+		-I$(X11_INC) -DXREL5 -DzLib
+
+ifneq ($(words $(notdir $(wildcard $(X11_LIB)/libz.a $(X11_LIB)/libz.so))), 0)
+ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
+OPT_LDFLAGS += -L/usr/lib
+else
+STATIC_LDFLAGS += -L/usr/lib
+endif
+endif
+
+ifeq ($(OS_CLASS),solaris)
+ACC_DEP_CFLAGS += -KPIC -v
+CCC_DEP_CFLAGS += -KPIC -v
+GCC_DEP_CFLAGS += -D__EXTENSIONS__
+endif
+
+GDFOUND = 1
+GD = $(words $(notdir $(wildcard \
+/usr/lib/libgd.a \
+/usr/lib/libgd.so \
+/usr/lib64/libgd.a \
+/usr/lib64/libgd.so \
+/lib/libgd.a \
+/lib/libgd.so \
+/lib64/libgd.a \
+/lib64/libgd.so \
+/sw/lib/libgd.a \
+/sw/lib/libgd.dylib \
+/opt/sfw/lib/libgd.a \
+/opt/sfw/lib/libgd.so \
+/opt/local/lib/libgd.a \
+/opt/local/lib/libgd.so )))
+GDINC = $(words $(notdir $(wildcard \
+/usr/include/gd.h \
+/include/gd.h \
+/sw/include/gd.h \
+/opt/sfw/include/gd.h \
+/opt/local/include/gd.h )))
+
+ifeq ($(GD), 0)
+GDFOUND = 0
+else
+ifeq ($(GDINC), 0)
+GDFOUND = 0
+endif
+endif
+
+ifneq ($(GDFOUND), 0)
+ifeq ($(STATIC_BUILD),YES)
+ifneq ($(words $(notdir $(wildcard /usr/lib/libgd.a \
+                                   /usr/lib64/libgd.a \
+                                   /lib/libgd.a \
+                                   /lib64/libgd.a \
+                                   /sw/lib/libgd.a \
+                                   /opt/sfw/lib/libgd.a \
+                                   /opt/local/lib/libgd.a))), 0)
+SYS_PROD_LIBS += gd png
+else
+OP_SYS_LDLIBS += -lgd -lpng
+endif
+else
+SYS_PROD_LIBS += gd png
+endif
+ifeq ($(OS_CLASS),solaris)
+OP_SYS_INCLUDES += -I/opt/sfw/include -I/opt/local/include
+OP_SYS_LDFLAGS += -L/opt/sfw/lib -L/opt/local/lib -R/opt/sfw/lib -R/opt/local/lib
+endif
+endif
+
+ifeq ($(GDFOUND), 0)
+mpl_motif_LIBS += gd png
+gd_DIR = $(INSTALL_LIB)
+png_DIR = $(INSTALL_LIB)
+endif
+
+
+PROD_LIBS_DEFAULT = mdbplt SDDS1 mdbmth mdblib Xm Xmu Xt X11
+PROD_LIBS_Darwin = mdbplt SDDS1 mdbmth mdblib Xm Xmu Xt X11
+PROD_LIBS_solaris = mdbplt SDDS1 mdbmth mdblib Xm Xmu Xt X11
+#PROD_LIBS_Linux = mdbplt SDDS1 mdbmth mdblib Xm Xmu Xt X11 Xpm
+PROD_LIBS_Linux = mdbplt SDDS1 mdbmth mdblib
+ifeq ($(OS_CLASS),Linux)
+ifeq ($(STATIC_BUILD),YES)
+STATIC_LDFLAGS_YES += -L$(X11_LIB)
+OP_SYS_LDLIBS = -Wl,-Bdynamic -lXm -lXt -lXmu -lX11 -lXpm -Wl,-Bstatic
+else
+PROD_LIBS_Linux += Xm Xt Xmu X11 Xpm
+endif
+endif
+
+
+SYS_PROD_LIBS_DEFAULT += z
+SYS_PROD_LIBS_Darwin += z
+SYS_PROD_LIBS_Linux += z ncurses
+SYS_PROD_LIBS_solaris += curses
+ifeq ($(OS_CLASS),solaris)
+OP_SYS_LDLIBS += -lz -lXm -lXt -lX11
+endif
+
+Xm_DIR = $(MOTIF_LIB)
+Xmu_DIR = $(X11_LIB)
+Xt_DIR = $(X11_LIB)
+X11_DIR = $(X11_LIB)
+Xpm_DIR = $(X11_LIB)
+mdblib_DIR = $(INSTALL_LIB)
+mdbmth_DIR = $(INSTALL_LIB)
+mdbplt_DIR = $(INSTALL_LIB)
+SDDS1_DIR = $(INSTALL_LIB)
+hclsdds_DIR = $(INSTALL_LIB)
+
+SYS_LIBS_sun4 += suntool sunwindow pixrect
+
+SRCS = mpl_motif.c xwdfunc.c

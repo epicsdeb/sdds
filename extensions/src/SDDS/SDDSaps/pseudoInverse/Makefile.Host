@@ -1,0 +1,80 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for SDDS applications
+# $Log: Makefile.Host,v $
+# Revision 1.21  2003/07/23 19:58:01  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+# Revision 1.20  2003/07/22 20:01:16  soliday
+# Added support for Kylix.
+#
+# Revision 1.19  2003/05/06 19:04:38  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.18  2003/02/19 21:10:21  soliday
+# Fixed compiler issue with windows because -dalign does not exist.
+#
+# Revision 1.17  2002/08/14 17:32:35  soliday
+# Added Open License
+#
+# Revision 1.16  2002/07/29 19:41:58  soliday
+# Fixed a problem with gcc.
+#
+# Revision 1.15  2002/06/27 14:32:27  soliday
+# Added change suggested by Janet Anderson
+#
+# Revision 1.14  2001/10/30 17:18:25  soliday
+# Modified the sunperf flags.
+#
+# Revision 1.13  2001/09/26 21:02:37  soliday
+# Added the ability to use the Sun Performance library on Solaris.
+#
+# Revision 1.12  2001/06/11 20:24:49  soliday
+# Numerical Recipies is now an option.
+#
+# Revision 1.11  2001/06/11 20:19:38  soliday
+# Now works with nr_svd.c if the file is present.
+#
+# Revision 1.10  2000/12/07 22:00:04  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.9  2000/10/11 21:50:31  soliday
+# Changed definition of isinf so that sunmath is no longer needed.
+#
+# Revision 1.8  2000/08/11 19:29:55  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris when using cc.
+#
+# Revision 1.7  2000/08/10 21:18:47  soliday
+# Added support for gcc on Solaris.
+#
+# Revision 1.6  2000/04/11 16:49:04  soliday
+# Added mdbcommon library.
+#
+# Revision 1.5  2000/04/04 05:47:10  soliday
+# Added warning flag for solaris.
+#
+# Revision 1.4  2000/01/18 20:19:23  soliday
+# Added support for ZLIB.
+#
+# Revision 1.3  1999/07/23 15:38:42  soliday
+# Added WIN32 support
+#
+# Revision 1.2  1999/04/15 19:58:28  jba
+# Changed handling of libraries.
+#
+# Revision 1.1  1999/04/14 15:14:43  borland
+# First version added to repository (per J. Anderson).
+#
+#
+
+TOP = ../../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/SDDSaps/pseudoInverse/Makefile.OAG
+include $(TOP)/config/RULES.Host

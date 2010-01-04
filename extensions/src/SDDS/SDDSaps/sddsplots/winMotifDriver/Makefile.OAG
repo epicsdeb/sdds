@@ -1,0 +1,47 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.2  2003/08/28 22:35:46  soliday
+# Modified so that vxWorks does not try to build this with EPICS 3.14
+#
+# Revision 1.1  2003/07/23 19:43:58  soliday
+# Modified makefiles to work with base version 3.13 and 3.14
+#
+#
+#
+
+CMPLR=ANSI
+#HOST_OPT=NO
+
+ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
+PROD = mpl_motif
+else
+PROD_HOST = mpl_motif
+endif
+
+USR_CXXFLAGS = -I../../../../gd -I$(EPICS_BASE)/include
+
+PROD_LIBS = gd png z
+
+SYS_PROD_LIBS_WIN32 += user32 gdi32 comdlg32 vfw32
+
+ifeq ($(findstring orland, $(HOST_ARCH) $(EPICS_HOST_ARCH)), orland)
+USR_LDFLAGS_WIN32 += /aa
+LINKSTARTUP=c0w32.obj
+else
+USR_LDFLAGS_WIN32 += /SUBSYSTEM:WINDOWS
+endif
+
+SRCS = mpl_motif.cc
+RCS = mpl_motif.rc
+
+gd_DIR = $(INSTALL_LIB)
+png_DIR = $(INSTALL_LIB)
+z_DIR = $(INSTALL_LIB)

@@ -1,0 +1,78 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for mdblib
+# $Log: Makefile.Host,v $
+# Revision 1.20  2003/07/22 21:40:43  soliday
+# Modified the makefiles to work with epics 3.13 and 3.14
+#
+# Revision 1.19  2003/06/16 19:50:51  soliday
+# Added support for AIX.
+#
+# Revision 1.18  2003/05/06 19:05:41  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.17  2002/08/14 16:06:03  soliday
+# Added Open License
+#
+# Revision 1.16  2002/07/30 08:35:08  soliday
+# Changed the purify lines.
+#
+# Revision 1.15  2002/07/24 21:29:24  shang
+# added searchPath.c
+#
+# Revision 1.14  2001/09/28 20:35:44  shang
+# added substituteTagValue.c
+#
+# Revision 1.13  2001/02/20 22:02:59  soliday
+# Added curses library for Solaris.
+#
+# Revision 1.12  2000/12/07 22:00:14  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.11  2000/10/04 19:42:04  soliday
+# Added ncurses for Linux
+#
+# Revision 1.10  2000/08/11 19:27:26  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris when using cc.
+#
+# Revision 1.9  2000/08/10 21:14:28  soliday
+# Added support for gcc on Solaris.
+#
+# Revision 1.8  2000/04/17 20:26:46  soliday
+# Added flag to define binaryInsert with Borland C.
+#
+# Revision 1.7  2000/04/11 16:26:12  soliday
+# mdblib no longer requires any SDDS functions to link.
+#
+# Revision 1.6  2000/04/04 04:48:49  soliday
+# Added warnings flag for solaris.
+#
+# Revision 1.5  2000/01/18 20:08:13  soliday
+# Added support for ZLIB.
+#
+# Revision 1.4  1999/09/14 18:09:22  soliday
+# On WIN32 a dll file is now created.
+#
+# Revision 1.3  1999/07/08 20:34:25  soliday
+# Added support for WIN32
+#
+# Revision 1.2  1999/07/01 19:25:57  borland
+# Added some convenience lines.
+#
+# Revision 1.1  1999/04/14 15:14:46  borland
+# First version added to repository (per J. Anderson).
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/mdblib/Makefile.OAG
+include $(TOP)/config/RULES.Host
+

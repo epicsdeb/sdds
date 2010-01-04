@@ -1,0 +1,27 @@
+# makefile for Exceed wrapper DLL
+# $Log: Makefile.Host,v $
+# Revision 1.1  2000/04/17 18:31:41  soliday
+# First version of Makefile.Host.
+#
+#
+#
+
+TOP = ../../../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+
+CMPLR=ANSI
+#HOST_OPT=NO
+
+LIBRARY = hclsdds
+INC = hclsdds.h
+USR_CFLAGS = 	-I../../../../include -I$(MOTIF_INC) \
+		-I$(X11_INC) -DWIN32 -D_WINDOWS \
+		$(EXCEED_CFLAGS)
+
+PROD_LIBS = $(EXCEED_XLIBS)
+
+LIBSRCS += wrapper.c
+
+include $(TOP)/config/RULES.Host
+
+

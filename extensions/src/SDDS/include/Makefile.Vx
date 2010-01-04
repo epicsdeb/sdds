@@ -1,0 +1,32 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for include directory (only installs headers)
+# $Log: Makefile.Vx,v $
+# Revision 1.3  2002/08/14 15:40:12  soliday
+# Added Open License
+#
+# Revision 1.2  2002/05/09 14:52:32  soliday
+# Added matlib.h to the INC line.
+#
+# Revision 1.1  2002/05/09 14:46:43  soliday
+# First version.
+#
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+
+INC = SDDS.h mdb.h scan.h match_string.h SDDStypes.h \
+      constants.h mdbsunos4.h contour.h fftpackC.h matlib.h
+
+include $(TOP)/config/RULES.Vx
+
+

@@ -1,0 +1,125 @@
+# makefile for pythoninterp
+# $Log: Makefile.Host,v $
+# Revision 1.3  2005/06/02 17:35:09  soliday
+# Added OSX support.
+#
+# Revision 1.2  2003/05/06 19:05:58  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.1  2001/01/02 16:54:46  soliday
+# First version.
+#
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+
+CMPLR = ANSI
+CC = $($(ANSI)_$(CMPLR))
+#HOST_OPT = NO
+#CC = purify $($(ANSI)_$(CMPLR))
+ifeq ($(ARCH_CLASS), Darwin)
+GCC_ANSI = $(GCC)
+CXX = g++ -ansi -pedantic -Wtraditional
+endif
+
+SHARED_LIBRARIES = YES
+
+ifdef WIN32
+LIBRARY = sddsdata
+LIBNAME =
+SHRLIBNAME = sddsdata.dll
+PYTHON_PREFIX = $(subst \,\\,$(shell python -c "import sys; print sys.prefix"))
+PYTHON_EXEC_PREFIX = $(subst \,\\,$(shell python -c "import sys; print sys.exec_prefix"))
+#PYTHON_VERSION = $(shell python -c "import sys; print sys.version[:3]")
+PYTHON_INCLUDE = $(PYTHON_PREFIX)/include
+PYTHON_EXEC_INCLUDE = $(PYTHON_EXEC_PREFIX)/include
+PYTHON_INSTALL = $(PYTHON_EXEC_PREFIX)/lib
+PYTHON_INSTALL_DLL = $(PYTHON_EXEC_PREFIX)/DLLs
+else
+LIBRARY = sddsdatamodule
+LIBNAME =
+LIBTARGETS = sddsdatamodule.so
+PYTHON_PREFIX = $(shell python -c "import sys; print sys.prefix")
+PYTHON_EXEC_PREFIX = $(shell python -c "import sys; print sys.exec_prefix")
+PYTHON_VERSION = $(shell python -c "import sys; print sys.version[:3]")
+PYTHON_INCLUDE = $(PYTHON_PREFIX)/include/python$(PYTHON_VERSION)
+PYTHON_EXEC_INCLUDE = $(PYTHON_EXEC_PREFIX)/include/python$(PYTHON_VERSION)
+PYTHON_INSTALL = $(PYTHON_EXEC_PREFIX)/lib/python$(PYTHON_VERSION)/site-packages
+endif
+
+USR_CFLAGS = -I$(EPICS_EXTENSIONS_INCLUDE) -I$(PYTHON_INCLUDE) -I$(PYTHON_EXEC_INCLUDE)
+ifeq ($(ARCH_CLASS), Darwin)
+USR_CFLAGS += -fno-common
+endif
+
+ifeq ($(OS_CLASS),solaris)
+ACC_DEP_CFLAGS += -KPIC -v
+CCC_DEP_CFLAGS += -KPIC -v
+GCC_DEP_CFLAGS += -D__EXTENSIONS__
+endif
+
+PROD_LIBS = SDDS1 mdblib $(ZLIB_PROD_LIB)
+PROD_LIBS_WIN32 = python20
+
+SDDS1_DIR = $(INSTALL_LIB)
+mdblib_DIR = $(INSTALL_LIB)
+python20_DIR = $(PYTHON_EXEC_PREFIX)/libs
+
+LIBSRCS = sddsdatamodule.c
+
+PYTHON_INSTALLSCRIPT = $(PYTHON_EXEC_PREFIX)/lib/python$(PYTHON_VERSION)/config/install-sh -c
+include $(TOP)/config/RULES.Host
+
+$(INSTALL_TCLLIB)/%: %
+	@echo ""
+
+$(INSTALL_LIB)/%.lib: %.lib
+	@echo ""
+
+$(INSTALL_BIN)/%: %
+	@echo ""
+
+ifdef WIN32
+
+sddsdata.dll: sddsdatamodule$(OBJ)
+	$(LINK.shrlib) $(LIBOBJS) $(DLL_LDLIBS) $(LIBNAME_RESS)
+	@echo "Installing library $(PYTHON_INSTALL_DLL)/$@"
+	$(CP) $@ $(PYTHON_INSTALL_DLL)/$@
+	$(CP) ..\\sdds.py sdds.py
+	@python -c "import sys; sys.path.insert(0, '.'); import sdds"
+	@echo "Installing library $(PYTHON_INSTALL)/sdds.py"
+	$(CP) sdds.py $(PYTHON_INSTALL)/sdds.py
+	$(CP) sdds.pyc $(PYTHON_INSTALL)/sdds.pyc
+
+else
+
+ifeq ($(ARCH_CLASS), Darwin)
+
+sddsdatamodule.so: sddsdatamodule$(OBJ)
+	$(CXX) $(LINK.shrlib) -bundle -undefined suppress  -flat_namespace -L$(PYTHON_EXEC_PREFIX) sddsdatamodule$(OBJ) $(DLL_LDLIBS) $(LIBNAME_RESS)
+	@echo "Installing library $(PYTHON_INSTALL)/sddsdatamodule.so"
+	$(PYTHON_INSTALLSCRIPT) -m 555 sddsdatamodule.so $(PYTHON_INSTALL)/sddsdatamodule.so
+	$(CP) ../sdds.py sdds.py
+	@echo "Installing library $(PYTHON_INSTALL)/sdds.py"
+	@python -c "import sys; sys.path.insert(0, '.'); import sdds"
+	@$(PYTHON_INSTALLSCRIPT) -m 644 sdds.py $(PYTHON_INSTALL)/sdds.py
+	@$(PYTHON_INSTALLSCRIPT) -m 644 sdds.pyc $(PYTHON_INSTALL)/sdds.pyc
+
+else
+sddsdatamodule.so: sddsdatamodule$(OBJ)
+	$(LINK.shrlib) sddsdatamodule$(OBJ) $(DLL_LDLIBS) $(LIBNAME_RESS)
+	@echo "Installing library $(PYTHON_INSTALL)/sddsdatamodule.so"
+	$(PYTHON_INSTALLSCRIPT) -m 555 sddsdatamodule.so $(PYTHON_INSTALL)/sddsdatamodule.so
+	$(CP) ../sdds.py sdds.py
+	@echo "Installing library $(PYTHON_INSTALL)/sdds.py"
+	@python -c "import sys; sys.path.insert(0, '.'); import sdds"
+	@$(PYTHON_INSTALLSCRIPT) -m 644 sdds.py $(PYTHON_INSTALL)/sdds.py
+	@$(PYTHON_INSTALLSCRIPT) -m 644 sdds.pyc $(PYTHON_INSTALL)/sdds.pyc
+
+endif
+
+endif
+
+

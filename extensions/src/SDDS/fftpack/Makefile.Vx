@@ -1,0 +1,75 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for fftpack
+# $Log: Makefile.Vx,v $
+# Revision 1.4  2003/08/28 21:39:25  soliday
+# Ordered the source code files.
+#
+# Revision 1.3  2002/08/14 16:41:16  soliday
+# Added Open License
+#
+# Revision 1.2  2002/05/10 14:08:50  soliday
+# Added naff.c to makefile.
+#
+# Revision 1.1  1999/12/15 16:52:40  soliday
+# First version of Makefile.Vx
+#
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+
+USR_CFLAGS += -I../../include
+
+SRCS.c = \
+	../cfftb.c ../cfftb1.c ../cfftf.c \
+	../cfftf1.c ../cffti.c ../cffti1.c \
+	../cosqb.c ../cosqb1.c ../cosqf.c \
+	../cosqf1.c ../cosqi.c ../cost.c \
+	../costi.c ../dfilter.c ../ezfft1.c \
+	../ezfftb.c ../ezfftf.c ../ezffti.c \
+	../fftpackC.c ../naff.c ../passb.c \
+	../passb2.c ../passb3.c ../passb4.c \
+	../passb5.c ../passf.c ../passf2.c \
+	../passf3.c ../passf4.c ../passf5.c \
+	../radb2.c ../radb3.c ../radb4.c \
+	../radb5.c ../radbg.c ../radf2.c \
+	../radf3.c ../radf4.c ../radf5.c \
+	../radfg.c ../rfftb.c ../rfftb1.c \
+	../rfftf.c ../rfftf1.c ../rffti.c \
+	../rffti1.c ../sinqb.c ../sinqf.c \
+	../sinqi.c ../sint.c ../sint1.c \
+	../sinti.c
+
+LIBOBJS = \
+	cfftb.o cfftb1.o cfftf.o \
+	cfftf1.o cffti.o cffti1.o \
+	cosqb.o cosqb1.o cosqf.o \
+	cosqf1.o cosqi.o cost.o \
+	costi.o dfilter.o ezfft1.o \
+	ezfftb.o ezfftf.o ezffti.o \
+	fftpackC.o naff.o passb.o \
+	passb2.o passb3.o passb4.o \
+	passb5.o passf.o passf2.o \
+	passf3.o passf4.o passf5.o \
+	radb2.o radb3.o radb4.o \
+	radb5.o radbg.o radf2.o \
+	radf3.o radf4.o radf5.o \
+	radfg.o rfftb.o rfftb1.o \
+	rfftf.o rfftf1.o rffti.o \
+	rffti1.o sinqb.o sinqf.o \
+	sinqi.o sint.o sint1.o \
+	sinti.o
+
+LIBNAME = fftpack
+
+include $(TOP)/config/RULES.Vx
+

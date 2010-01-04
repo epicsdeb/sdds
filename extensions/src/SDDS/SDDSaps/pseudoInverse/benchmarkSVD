@@ -1,0 +1,133 @@
+#!/bin/sh  
+# \
+exec oagwish "$0" "$@"
+
+set auto_path [linsert $auto_path 0 /usr/local/oag/apps/lib/$env(HOST_ARCH)]
+set auto_path [linsert $auto_path 0 /usr/local/oag/lib_patch/$env(HOST_ARCH)]
+APSDebugPath
+ 
+# $Log: benchmarkSVD,v $
+# Revision 1.8  2005/08/01 21:58:33  soliday
+# No Changes.
+#
+# Revision 1.7  2005/08/01 21:54:49  emery
+# Inserted ${hostname} to the name of executables to run, following
+# script makeAll.
+#
+# Revision 1.6  2005/08/01 21:49:12  emery
+# Makes a second plot with no log scales.
+#
+# Revision 1.5  2005/07/17 04:29:46  emery
+# Fixed typo in last change.
+#
+# Revision 1.4  2005/07/17 04:27:11  emery
+# Added review option.
+#
+# Revision 1.2  2005/07/14 21:00:47  emery
+# Added variable for location of executables.
+# Added to list of possible libraries.
+# Added test of existance of executables.
+#
+
+set noPlots 1
+set outputRoot results
+set review 0
+set args $argv
+APSParseArguments {noPlots outputRoot review}
+
+package require rpn
+
+set possibleArchitectures "linux-x86 solaris-sparc"
+set developmentDir [glob O.*]
+set architecture ""
+foreach dir $developmentDir {
+    foreach arch $possibleArchitectures {
+        if [regexp $arch $dir] {
+            set architecture $arch
+            break
+        }
+    }
+    if [string length $architecture] break
+}
+
+proc CalculateExecutionTime {args} {
+    global architecture
+    set noPlots 1
+    set rows 10
+    set columns 10
+
+    APSParseArguments {rows columns output noPlots}
+
+    set methodList {Meschach NR SunPerf CLAPACK CLAPACKunopt LAPACK LAPACKunopt}
+    set hostname [exec hostname]
+
+    for {set icol 1} {$icol <= $columns} {incr icol} {
+        lappend defOptions "-def=col,Data[format %03ld $icol],rnd 2 * 1 -"
+    }
+
+    set tmpfile /tmp/[APSTmpString]
+    if [catch {eval exec sddssequence -def=Index -pipe=out \
+                 -sequence=beg=1,end=$rows,delta=1 \
+                 | sddsprocess -pipe \
+                 $defOptions \
+                 | sddsconvert -pipe=in $tmpfile.input \
+                 -dele=col,Index  \
+             } result] {
+        puts stderr "CalculateExecutionTime: $result"
+    }
+
+    set fullOptions "-minimumSingularValueRatio=0.1 \
+               -sFile=s \
+               -uMatrix=u \
+               -vMatrix=v "
+
+    set options "-economy"
+
+    # determine repeats based on dimension of matrix.
+    # for matrices greater than 20x20 then only 1 repeat.
+    # the time reutrned is the time per iteration
+    set repeats [rpn expr "80 $rows / int 1 + "]
+    set dataSetOptions ""
+    foreach method $methodList {
+        if ![file exists O.${architecture}/sddspseudoinverse.${hostname}.${method}] {
+            continue
+        }
+        set timeElapsed [lindex [time {eval exec O.${architecture}/sddspseudoinverse.${hostname}.${method} \
+                                       $tmpfile.input $tmpfile.output${method} \
+                                       $options } $repeats ] 0 ]
+        lappend dataSetOptions -parameter=${method}Time,type=double,units=s
+        lappend dataSetOptions -data=[rpn expr "$timeElapsed  1e6 /"]
+        
+    }
+
+    if [catch {eval exec sddsmakedataset $output \
+                 -parameter=Repeats,type=long -data=$repeats \
+                 -parameter=Rows,type=long -data=$rows \
+                 -parameter=Columns,type=long -data=$columns \
+                 $dataSetOptions \
+             } result] {
+        puts stderr "CalculateExecutionTime: $result"
+    }
+}
+
+if !$review {
+    set tmpfile /tmp/[APSTmpString]
+    set fileList ""
+    set columns 400
+    for {set num 200} {$num <= 2000} {incr num 200} {
+        set output ${tmpfile}.results-$num 
+        CalculateExecutionTime -rows $num -columns $columns -output $output
+        lappend fileList $output
+    }
+    eval exec sddscombine $fileList ${outputRoot}.[exec hostname] -overwrite -collapse
+}
+
+exec sddsplot ${outputRoot}.[exec hostname] -leg -filename -uns=y \
+  -col=Rows,*Time -mode=y=log -tick=ylog \
+  -grap=sym,conn=sub,vary=sub,sca=3 \
+  -end \
+  -col=Rows,*Time  \
+  -grap=sym,conn=sub,vary=sub,sca=3 \
+  &
+
+exit

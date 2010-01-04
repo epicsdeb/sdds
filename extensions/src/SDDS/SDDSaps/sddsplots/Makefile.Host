@@ -1,0 +1,117 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for SDDS applications
+# $Log: Makefile.Host,v $
+# Revision 1.31  2003/07/23 18:50:41  soliday
+# Fixed for WIN32
+#
+# Revision 1.30  2003/07/23 06:55:10  soliday
+# Modified makefiles to work with base 3.13 and 3.14
+#
+# Revision 1.29  2003/07/22 20:01:16  soliday
+# Added support for Kylix.
+#
+# Revision 1.28  2003/05/06 19:04:47  soliday
+# Changed CFLAGS on Solaris so that it would use the reentrant flag.
+#
+# Revision 1.27  2003/04/14 16:25:04  shang
+# added system time libary
+#
+# Revision 1.26  2003/04/13 22:52:56  norume
+# No longer need to force flat memory space now that shared libraries are working.
+#
+# Revision 1.25  2003/02/20 16:18:54  soliday
+# Makefiles now work to build static builds on windows.
+#
+# Revision 1.24  2002/08/14 17:24:49  soliday
+# Added Open License
+#
+# Revision 1.23  2002/08/08 17:22:01  soliday
+# Added support for OSX.
+#
+# Revision 1.22  2002/05/29 21:02:06  soliday
+# Added CXX line for purify.
+#
+# Revision 1.21  2002/01/11 03:19:01  borland
+# Recommented purify and no-optimization settings.
+#
+# Revision 1.20  2002/01/11 03:15:45  borland
+# Fixed problems with -thickness option when tick or label otpions where given in
+# one of the plot requests.
+#
+# Revision 1.19  2000/12/07 22:00:06  jba
+# Changes for building with base R3.14.
+#
+# Revision 1.18  2000/10/30 22:56:11  soliday
+# Changed code so that png files replaced gif files.
+#
+# Revision 1.17  2000/10/11 21:50:39  soliday
+# Changed definition of isinf so that sunmath is no longer needed.
+#
+# Revision 1.16  2000/08/22 21:59:56  soliday
+# Added advapi32 sys prod for WIN32. This is needed for reading the registry.
+#
+# Revision 1.15  2000/08/21 18:17:48  soliday
+# Added nil value for WIN32 prod libs
+#
+# Revision 1.14  2000/08/11 19:29:17  soliday
+# Overrode -mt (multithreaded) compile line option on Solaris when using cc.
+#
+# Revision 1.13  2000/08/10 21:17:25  soliday
+# Added support for gcc on Solaris.
+#
+# Revision 1.12  2000/06/29 14:54:28  borland
+# Restored function of -noscales option; however, it still won't work properly
+# for multiple scales.  Fixed usage message for -[xy]scalesgroup options.
+#
+# Revision 1.11  2000/04/17 18:53:58  soliday
+# Removed unused Exceed flags.
+#
+# Revision 1.10  2000/04/11 16:42:29  soliday
+# Added mdbcommon
+#
+# Revision 1.9  2000/04/04 05:41:23  soliday
+# Added warning flag for solaris.
+#
+# Revision 1.8  2000/02/29 16:48:43  evans
+# Changed to be consistent with new WIN32 config.
+#
+# Revision 1.7  2000/01/18 20:19:49  soliday
+# Added support for ZLIB.
+#
+# Revision 1.6  1999/09/14 18:35:57  soliday
+# Made minor changes for WIN32
+#
+# Revision 1.5  1999/07/22 18:34:11  soliday
+# Added WIN32 support
+#
+# Revision 1.4  1999/07/21 18:07:25  borland
+# Eliminated many memory leaks.  Program is now suitable for running with
+# -repeat option, although not all leaks are gone.
+#
+# Revision 1.3  1999/05/04 18:24:23  jba
+# Moved gd from oag.
+#
+# Revision 1.2  1999/04/16 13:45:42  borland
+# sddsplot_SRCS now refers to .c files rather than .o files.
+#
+# Revision 1.1  1999/04/14 15:14:42  borland
+# First version added to repository (per J. Anderson).
+#
+#
+
+TOP = ../../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+include $(TOP)/src/SDDS/SDDSaps/sddsplots/Makefile.OAG
+ifdef WIN32
+LIBNAME = mdbplt.lib
+endif
+include $(TOP)/config/RULES.Host
+

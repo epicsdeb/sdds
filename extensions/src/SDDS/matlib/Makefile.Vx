@@ -1,0 +1,54 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for matlib
+# $Log: Makefile.Vx,v $
+# Revision 1.5  2003/08/28 22:04:01  soliday
+# Ordered the source code files.
+#
+# Revision 1.4  2002/08/14 19:50:44  soliday
+# Fixed typo
+#
+# Revision 1.3  2002/08/14 16:45:20  soliday
+# Added Open License
+#
+# Revision 1.2  2002/08/07 19:43:37  soliday
+# Added fmat.c
+#
+# Revision 1.1  1999/12/15 16:56:56  soliday
+# First version of Makefile.Vx
+#
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+
+USR_CFLAGS += -I../../include
+
+SRCS.c = \
+	../fmat.c ../m_add.c ../m_alloc.c \
+	../m_bench.c ../m_check.c ../m_copy.c \
+	../m_det.c ../m_error.c ../m_free.c \
+	../m_identity.c ../m_invert.c ../m_mult.c \
+	../m_scmul.c ../m_show.c ../m_trans.c \
+	../m_zero.c  
+
+LIBOBJS = \
+	fmat.o m_add.o m_alloc.o \
+	m_bench.o m_check.o m_copy.o \
+	m_det.o m_error.o m_free.o \
+	m_identity.o m_invert.o m_mult.o \
+	m_scmul.o m_show.o m_trans.o \
+	m_zero.o  
+
+LIBNAME = matlib
+
+include $(TOP)/config/RULES.Vx
+

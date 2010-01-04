@@ -1,0 +1,82 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for mdblib
+# $Log: Makefile.Vx,v $
+# Revision 1.7  2003/09/17 19:17:59  soliday
+# Added zlib support
+#
+# Revision 1.6  2003/08/28 20:13:43  soliday
+# Cleaned up the code.
+#
+# Revision 1.5  2002/08/14 16:06:04  soliday
+# Added Open License
+#
+# Revision 1.4  2002/07/25 19:37:26  borland
+# Added searchPath.c
+#
+# Revision 1.3  2001/10/30 17:16:19  soliday
+# Added substituteTagValue
+#
+# Revision 1.2  2000/04/19 18:47:52  soliday
+# Moved scanargs.c to mdbcommon
+#
+# Revision 1.1  1999/12/15 15:45:53  soliday
+# First version of Makefile.Vx
+#
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+
+USR_CFLAGS += -I../../include
+unpack_CFLAGS += -DzLib
+
+SRCS.c = \
+	../array.c ../backspace.c ../binary.c \
+	../binsert.c ../bomb.c ../buffer.c \
+	../clean_filename.c ../compress.c ../cp_str.c \
+	../data_scan.c ../delete_bnd.c ../delete_chars.c \
+	../edit_string.c ../exp_notation.c ../fexists.c \
+	../fill_array.c ../fopen_e.c ../get_token_tq.c \
+	../headers.c ../insert.c ../interpret_escapes.c \
+	../is_blank.c ../linked_list.c ../match_string.c \
+	../pad_with_spaces.c ../query.c ../rawread.c \
+	../rcdelete.c ../replace_chars.c ../replace_string.c \
+	../replacefile.c ../report_stats.c ../rootname.c \
+	../scanitemlist.c ../searchPath.c ../sortfunctions.c \
+	../str_in.c ../str_inn.c ../str_tolower.c \
+	../str_toupper.c ../strslide.c ../substituteTagValue.c \
+	../time.c ../timeconvert.c ../timer.c \
+	../tmpname.c ../trim_spaces.c ../unpack.c \
+	../wild_list.c ../wild_match.c
+LIBOBJS = \
+	array.o backspace.o binary.o \
+	binsert.o bomb.o buffer.o \
+	clean_filename.o compress.o cp_str.o \
+	data_scan.o delete_bnd.o delete_chars.o \
+	edit_string.o exp_notation.o fexists.o \
+	fill_array.o fopen_e.o get_token_tq.o \
+	headers.o insert.o interpret_escapes.o \
+	is_blank.o linked_list.o match_string.o \
+	pad_with_spaces.o query.o rawread.o \
+	rcdelete.o replace_chars.o replace_string.o \
+	replacefile.o report_stats.o rootname.o \
+	scanitemlist.o searchPath.o sortfunctions.o \
+	str_in.o str_inn.o str_tolower.o \
+	str_toupper.o strslide.o substituteTagValue.o \
+	time.o timeconvert.o timer.o \
+	tmpname.o trim_spaces.o unpack.o \
+	wild_list.o wild_match.o
+
+LIBNAME = mdblib
+
+include $(TOP)/config/RULES.Vx
+

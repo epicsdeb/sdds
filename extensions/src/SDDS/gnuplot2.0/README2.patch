@@ -1,0 +1,291 @@
+README2.patch - some notes about gnuplot 2.0 patchlevel 2.
+
+The major additions in this patch are parametric functions,
+X11 Motif support, new bit mapped graphics routines, and new terminal 
+drivers vttek (VT like tektronix emulators), hpljii (HP LaserJet II), 
+kyo (Kyocera Laser Printer), SCO CGI.  
+For a more complete list of the changes, see the MODIFICATIONS
+section below.
+
+
+APPLYING PATCH 2
+----------------
+
+To apply this patch copy the files README2.patch, patch2a, patch2b, 
+patch2c, patch2d, patch2e and patch2f to the gnuplot directory.  
+Change directory to the gnuplot directory, and then apply the patch with 
+the following commands:
+
+    rm term/font5x7.trm
+    rm term/eps60.trm
+    rm term/hpljet.trm
+    rm term/epson.trm
+    mv README.patch1 README1.patch
+    patch -p < patch2a
+    patch -p < patch2b
+    patch -p < patch2c
+    patch -p < patch2d
+    patch -p < patch2e
+    patch -p < patch2f
+
+    Copy the appropriate makefile.* to Makefile, READ THE Makefile
+    and make any necessary changes. Then recompile!
+
+
+MAIL ADDRESSES
+--------------
+
+The mailing list info-gnuplot exists as a forum for discussions about 
+gnuplot.  About the only gnuplot topic not supported by this list is 
+bug reports.  They are handled by a different mail alias, bug-gnuplot.  
+
+To be removed or add someone to the mailing list send mail to:
+
+pixar!info-gnuplot-request@sun.com
+
+
+To report bugs send mail to:
+
+pixar!bug-gnuplot@sun.com
+
+
+To ask a question or discuss gnuplot send mail to:
+
+pixar!info-gnuplot@sun.com
+
+
+pixar is a UUCP site.  sun.com is a UUCP and Internet site.  
+In the above addresses, sun.com can be replaced by ucbvax.berkeley.edu.
+
+
+PARAMETRIC IMPLEMENTATION
+-------------------------
+
+At the request of Bill Schulz, one of our illustrious math profs, I
+was "encouraged" to build parametric plotting capability into gnuplot.
+He not only explained how much more useful parametric plotting was
+compared to the simpler case of function plotting, but he suggested
+the syntax for parametric plots as simply x,y pairs of functions on
+the plot line.  (He also suggested that the changes must be very easy
+to do, but I forgive him for that bit of chicanery.)
+
+Thus armed, I was surprised at the number of other issues I ran into.
+For instance, in addition to inventing a `set parametric' command I
+took a hard look at xrange and yrange and decided I also 
+needed a trange when in parametric mode.  This, happily, led
+to what I believe is the right behavior in all cases I have tested
+for parametric equations.  Indeed, I feel the implementation is
+better than I originally hoped for as you can, in parametric mode,
+control the t range, x range and y range independently.  This gives
+you quite a bit of control over the function being plotted.
+
+If the parametric commentary seems to be too verbose I'm willing to shorten 
+it on command.  (I normally don't write like that--geesh!)  I'm happy to 
+leave it alone, however, if no one finds it offensive.
+Of course, to be complete I needed an autoscale_t variable (such already
+existed for x and y).  The meaning of this variable, however, was a bit
+weak.  Internally it is necessary, but from the user's standpoint,
+it may not make much sense to have a `set autoscale t' command.  All that
+gains the user is a chance to catch an empty trange and expand it if
+necessary.  How an empty trange comes into existence is a mystery
+to me.  (Empty x ranges can occur, I guess, due to a data file or
+being in polar mode.)
+
+The trange, by the way, has an arbitrary default of [-5:5] (whereas
+the xrange default is [-10:10]).  This was a range suggested by Bill
+Schulz when I pinned him down on what would be "reasonable" one day.
+If you can think of any reason for any other range please let me know.
+The current range has the habit, by the way, of plotting over cyclic
+functions defined on [0:2*pi] such that dashed lines don't look good.
+There seems to be no real "solution" other than to avoid the default
+range where it doesn't make any sense.
+
+Plotting, as described in my additions to gnuplot.doc, in parametric
+mode requires pairs of functions.  Consider the following:
+
+plot [-3:3] [0:20] [-10:20] sin(t),t**2,'data.file',t,t**2
+
+which has a trange of [-3:3] an xrange of [0:20] and a yrange of [-10:20].
+The plot consists of 3 curves: sin(t),t**2; the 'data.file' points;
+and the plot of t,t**2.  The last, of course, could be done in 
+non-parametric mode as simply x**2.  In parametric mode, you have to
+be finished defining a parametric pair (an x-function and a y-function)
+before you can put in a `with' or `title' modifier.
+
+Ranges can be set on the plot command or with the `set [xyt]range'
+command.  As an added benefit, when in parametric mode, the xrange
+can be autoscaled.  This is true because, like the yrange, the xrange
+is now a computed entity.
+
+Finally, I decided that the data file, as ordered (x,y) pairs, could affect 
+the xrange but not the trange.  Hence plotting the following:
+
+plot sin(t),cos(t),'data.file'
+
+Where 'data.file' only has points in the positive x range will cause
+the plot of sin(t),cos(t) to take on x values only in the positive
+x range.  Another option was to make 'data.file' x values affect the
+working t range of the parametric function.  This did not seem like
+a good idea, however, and some effort was made to avoid this affect.
+The best plan might have been to ignore the 'data.file' ranges
+all together when in parametric mode.  I hope someone will think
+on this issues and voice an opinion at some point in the future.
+
+
+UNFINISHED ISSUES
+
+There are some unfinished issues that I ran across in doing the parametric 
+implementation.  These are not so much parametric related issues as 
+they are general gnuplot issues that the parametric work brought to the 
+forefront.
+
+First, what is the use of global xmin and xmax changes when a
+data file is plotted?  In other words, why would xmin and xmax
+change for the whole session when the data file was just mentioned
+once on a command line.  It seems that this global behavior is
+unwarranted.  The routine in question, get_data() simply checks 
+against the global xmin,xmax rather than the local x_min, x_max
+that eval_plots() will eventually pass on to do_plot().  The change
+wouldn't be hard to do, and I'm hoping someone will decide it is
+a good idea for a later bug patch.
+
+Also, the default style for each individual plot depends upon the
+line_type and point_type of the plot.  Gnuplot currently increments
+the line_type (and possibly point_type) for each plot that it is
+plotting regardless of the type of plot in question.  For instance,
+plot x,'data.file',x**2 will generate x with line_type of 1 and
+x**2 with line_type of 3 while plot x,x**2,'data.file' will use a
+line_type of 1 and 2 respectively.  This also seemed expedient, but
+not quite right in terms of what would be nicest behavior.  It seems
+to me that line_type's are scarce resources and should be used 
+(incremented) only as needed.  In other words, since the 'data.file'
+plot isn't using a line_type at all, the second line_type should be
+saved for the x**2 plot, and the two plots would look the same
+instead of being different as they are now.
+
+Of course, neither of these issues are critical.  We've been living with
+them comfortably for the whole life of at least the latest gnuplot 2.0
+release.  It seems to me, however, that both these problems are minor
+oversights and could easily be corrected in the near future.  Rather
+than do that here, as part of the parametric work, I decided that would
+be a change to the previous non-parametric behavior and should not be
+"snuck in" without a bit of debate.
+
+John Campbell   jdc@naucse.cse.nau.edu   or CAMPBELL@NAUVAX.bitnet
+
+
+SCO CGI DRIVERS 
+---------------
+copyright 1990 Ronald Florence
+
+The 'cgi' driver added to Gnuplot 2.0 will work with the SCO CGI drivers.
+To use the CGI drivers, you will need to have the CGIPATH and CGIDISP 
+and/or CGIPRNT environmental variables declared.  The CGI output mode 
+can be controlled by setting an ASPECT environmental variable.  The 
+default is to use full-screen/full-page.
+
+Two CGI terminal options are provided.  If you have either CGIDISP or
+CGIPRNT declared, Gnuplot 2.0 will start with terminal set to "cgi".
+If both devices are declared, you can "set terminal hcgi" to select
+the CGIPRNT (hardcopy) device instead of the default CGIDISP device.
+This is useful when you are proofing a graph on the display before
+sending output to a printer or plotter.
+
+The driver has been tested with the SCO vga, ega, cga, hercules, and
+laserjet drivers.  If you are using a monochrome VGA display you may
+need to include "-DVGA_MONO" in your Makefile to work-around the
+broken SCO monochrome VGA display drivers.  The CGI driver includes 
+a built-in pause-for-any-key feature which makes the Gnuplot
+"pause -1 prompt" command redundant.
+
+Permission is hereby granted for unlimited non-commercial use of this
+code, on condition that the copyright notices are left intact and any
+modifications to the source code are noted as such.  No warranty of
+any kind is implied or granted for this material.
+
+Please send suggestions and comments to ron@mlfarm.com.
+
+
+MODIFICATIONS IN PATCH 2.
+-------------------------
+
+Tony McGrath <phs145p@vaxc.cc.monash.edu.au>
+  Fixed replot line length calculation (command.c).
+
+John Engel <jengels@bnandp51.bitnet>
+  vttek terminal driver (term/tek.trm).
+  vms additions for tektronix drivers (term.c).
+  hpljii driver - now uses the same bitmap routines as the epson driver
+   and will work on a PC (term/hpljii.trm).
+  
+Russell Lang <rjl@monu1.cc.monash.edu.au>
+  Created term.c function 'void reopen_binary()' for PC (term.c).
+  Removed HPLJET driver.
+  Added an error check for bad xrange when plotting functions -
+   this came up when an attempt is made to plot an non-existent
+   data file with x autorange, followed on the next command line
+   by an attempt to plot a function (command.c).
+  Added new bit mapped graphics (bitmap.h, bitmap.c, term.c,
+   epson.trm, hpljii.trm).
+  Removed PROPRINTER driver - use epson_lx800 instead.
+  nec_cp6 monochrome drivers also work with epson lq-800.
+
+Rik Harris <edp367s@monu6.cc.monash.edu.au>
+  Fixed 'set dummy' command (command.c).  
+  Previously crashed if dummy variable missing.
+
+Dave Kotz <dfk@cs.duke.edu>
+  added x11 autosense code (term.c).
+  empty gnuplot.doc lines now produce empty lines in .ms
+   or .tex files.  (doc2ms.c, doc2tex.c)
+  check for zero argument in call to x**(-n). (internal.c)
+
+James Dugal <jpd@usl.edu>
+  Fixed messy octal constants (epson.trm).
+
+Jeff Kellem <composer@chem.bu.edu>
+  Fixed ceil and floor to work as per documentation - for complex argument, 
+   return integer ceil/floor of real part (standard.c).
+  Changed gnuplot_x11.c to use default screen (gnuplot_x11.c).
+
+Anthony Thyssen <thyssen@batserver.cs.uq.oz.au>
+  (Ideas by Anthony, code by Russell Lang)
+  Changed 'plot with impulses' to draw impulses to origin (graphics.c).
+  Added 'plot "datafile" using y|xy|yx "scanf string"' (command.c).
+
+Greg Montgomery <greg@turbo.atl.ga.us>
+  Turbo C BGI drivers now use far code, to avoid segment _TEXT 
+   overflow with TC++ (makefile.tc, linkopt.tc, plot.c).
+
+Sebastian Kremer <sk@thp.Uni-Koeln.DE>
+  Kyocera laser printer driver (term/kyo.trm).
+
+John Eaton <jwe@emx.utexas.edu>
+  set [no][xy]zeroaxis  (graphics.c, setshow.c, setshow.h).
+
+John Campbell <jdc@naucse.cse.nau.edu>
+  Parametric plots (command.c, misc.c, setshow.c, setshow.h).
+
+Ronald Florence <ron@mlfarm.com>
+  SCO CGI driver (term.c, term/cgi.trm).
+
+Chip Rosenthal <chip@chinacat.Unicom.COM>
+  Fixes a security problem with ".gnuplot" files (plot.c).
+  Add pipe option for output file on Unix.  Can now say
+  'set output "|more" '.
+
+Ed Kubatis <ejk@uxh.cso.uiuc.edu>
+  Ignore interrupts in gnuplot_x11.c (gnuplot_x11.c).
+  Added X11 Motif support (gnuplot_x11.c).
+  Demo files for 'plot using'.
+  Added ifdef GETCWD for HP-UX (command.c).
+  Fixed RS/6000 AIX 3.1 build problem (misc.c).
+
+Ronald Hartranft <RJH2@NS.CC.Lehigh.EDU>
+  Base work on new bit mapped graphics routines.
+
+Alex Woo <woo@pioneer.arc.nasa.gov>
+  Changed -DGAMMA to -DGAMMA=gamma so that -DGAMMA=lgamma
+  can be used on the NeXT (standard.c, makefiles).
+
+End of README2.patch

@@ -1,0 +1,507 @@
+/* png driver for sddsplot by M. Borland using gd1.2 routines
+ * by Thomas Boutell
+ */
+#include "gd.h"
+#include "sddsplot.h"
+#if defined(_WIN32)
+#include <fcntl.h>
+#include <io.h>
+#if defined(__BORLANDC__)
+#define _setmode(handle, amode) setmode(handle, amode)
+#endif
+#endif
+#define PNG_XMAX 656
+#define PNG_YMAX 506
+
+#define MPNG_XMAX ((long)(PNG_XMAX/0.80))
+#define MPNG_YMAX ((long)(PNG_YMAX/0.80))
+
+#define LPNG_XMAX ((long)(MPNG_XMAX/0.75))
+#define LPNG_YMAX ((long)(MPNG_YMAX/0.75))
+
+#define SPNG_XMAX ((long)(PNG_XMAX*0.80))
+#define SPNG_YMAX ((long)(PNG_YMAX*0.80))
+
+#define TPNG_XMAX ((long)(SPNG_XMAX*0.75))
+#define TPNG_YMAX ((long)(SPNG_YMAX*0.75))
+
+#define PDAPNG_XMAX 230
+#define PDAPNG_YMAX 230
+
+static long png_xlast, png_ylast, png_xmax, png_ymax;
+
+static unsigned long pngFlags;
+#define PNG_ON_WHITE    0x0001
+#define PNG_ON_BLACK    0x0002
+#define PNG_TEMPLATE    0x0004
+#define PNG_ROOTNAME    0x0008
+#define PNG_LINE_TABLE 0x0010
+#define PNG_USEDASHES   0x0020
+
+static gdImagePtr pngImage;
+static int pngBlack, pngWhite;
+#define PNG_LINETYPES 16
+static int pngLinetype[PNG_LINETYPES], png_linetype;
+static int png_line_thickness = 1;
+
+static char *pngTemplate = NULL;
+static long pngGeneration = 1, doPngGenerations = 0;
+static FILE *pngOutfile = NULL;
+
+int png_color_index = 0;
+int png_color_maxindex = 0;
+MotifColor *png_colors = NULL;
+int *png_colorList = NULL;
+
+
+int ncolors_png=101;
+int spectralpng=0;
+int customspectralpng=0;
+unsigned short r0_png=0, g0_png=0, b0_png=0, r1_png=1, g1_png=1, b1_png=1;
+BOOLEAN is_forced_color;
+int png_force_color;
+
+#define PNG_DASHTYPES 10
+static char png_dashes[PNG_DASHTYPES][5] = 
+                         { {0},
+                           {4,2,0},
+			   {2,3,0},
+			   {1,2,0},
+			   {5,2,1,2,0},
+			   {3,3,1,4,0},
+			   {2,5,0},
+			   {4,4,4,1,0},
+			   {8,2,0},
+			   {1,4,0},
+			 };  
+static int png_dashtype = 0 ;
+			 
+char **getDeviceArgv(long *argc);
+
+int PNG_initCommon()
+{
+  char **argv, *pngRootname = NULL;
+  long argc;
+  pngFlags = PNG_ON_WHITE;
+    
+  if ((argv = getDeviceArgv(&argc))) {
+    if (!scanItemList(&pngFlags, argv, &argc, 0,
+                      "rootname", SDDS_STRING, &pngRootname, 1, PNG_ROOTNAME,
+                      "template", SDDS_STRING, &pngTemplate, 1, PNG_TEMPLATE,
+                      "onwhite", -1, NULL, 0, PNG_ON_WHITE,
+                      "onblack", -1, NULL, 0, PNG_ON_BLACK,
+		                "dashes", -1, NULL, 0, PNG_USEDASHES,
+                      "linetypetable", SDDS_STRING, &LineTableFile, 1, PNG_LINE_TABLE,
+		                "linecolortable", SDDS_STRING, &LineTableFile, 1, PNG_LINE_TABLE,   /* for backward compatibility only */
+                      NULL) ||
+        (pngFlags&PNG_ROOTNAME && !pngRootname) || (pngFlags&PNG_TEMPLATE && !pngTemplate) ||
+        (pngFlags&PNG_LINE_TABLE && !LineTableFile)) {
+      bomb("error scanning device arguments for PNG", NULL);
+    }
+    if (pngRootname && pngTemplate) {
+      bomb("give either rootname or template for png device, not both", NULL);
+    }
+    if (pngRootname || pngTemplate) {
+      if (pngRootname) {
+        pngTemplate = (char*)malloc(sizeof(*pngTemplate)*1024);
+        sprintf(pngTemplate, "%s.%%03ld", pngRootname);
+      }
+      doPngGenerations = 1;
+      pngGeneration = 1;
+      pngOutfile = NULL;
+    }
+  }  
+  if (LineTableFile) {
+    long i; 
+    if (!SDDS_ReadLineTypeTable(&lineTypeTable, LineTableFile))
+      bomb("problem reading line-type table", NULL);
+    
+    if (lineTypeTable.typeFlag&LINE_TABLE_DEFINE_COLOR) {	
+       for (i=0; i<lineTypeTable.nEntries; i++) {
+         PNG_add_color(
+                       (unsigned short)256*lineTypeTable.red[i],
+                       (unsigned short)256*lineTypeTable.green[i],
+                       (unsigned short)256*lineTypeTable.blue[i]);
+       }
+    }
+  
+  } else {
+    lineTypeTable.typeFlag = 0x0000;
+    lineTypeTable.nEntries = 0 ;
+  }  
+  
+  return 0;
+}
+
+
+int PNG_init(void)
+{
+  png_xlast = (png_xmax = PNG_XMAX) - 1;
+  png_ylast = (png_ymax = PNG_YMAX) - 1;
+  PNG_initCommon();
+  return 0;
+}
+
+int TPNG_init(void)
+{
+  png_xlast = (png_xmax = TPNG_XMAX) - 1;
+  png_ylast = (png_ymax = TPNG_YMAX) - 1;
+  PNG_initCommon();
+  return 0;
+}
+
+int PDAPNG_init(void)
+{
+  png_xlast = (png_xmax = PDAPNG_XMAX) - 1;
+  png_ylast = (png_ymax = PDAPNG_YMAX) - 1;
+  PNG_initCommon();
+  return 0;
+}
+
+int SPNG_init(void)
+{
+  png_xlast = (png_xmax = SPNG_XMAX) - 1;
+  png_ylast = (png_ymax = SPNG_YMAX) - 1;
+  PNG_initCommon();
+  return 0;
+}
+
+int MPNG_init(void)
+{
+  png_xlast = (png_xmax = MPNG_XMAX) - 1;
+  png_ylast = (png_ymax = MPNG_YMAX) - 1;
+  PNG_initCommon();
+  return 0;
+}
+
+int LPNG_init(void)
+{
+  png_xlast = (png_xmax = LPNG_XMAX) - 1;
+  png_ylast = (png_ymax = LPNG_YMAX) - 1;
+  PNG_initCommon();
+  return 0;
+}
+
+
+int PNG_graphics(void)
+{
+  int i;
+  if (doPngGenerations && outfile==stdout) {
+    char filename[1024];
+    sprintf(filename, pngTemplate, pngGeneration++);
+    if (!(pngOutfile = fopen(filename, FOPEN_WRITE_MODE))) {
+      fprintf(stderr, "error: unable to open PNG output file %s\n",
+              filename);
+      exit(1);
+    }
+  } else {
+#if defined(_WIN32)
+    if (_setmode(_fileno(outfile), _O_BINARY) == -1) {
+      fprintf(stderr, "error: unable to create binary PNG file\n");
+      exit(1);
+    }
+#endif
+    pngOutfile = outfile;
+  }
+  pngImage = gdImageCreateTrueColor(png_xmax, png_ymax);
+  if (pngFlags&PNG_ON_BLACK) {
+    pngBlack = gdImageColorAllocate(pngImage, 0, 0, 0);
+    pngWhite = gdImageColorAllocate(pngImage, 255, 255, 255);
+  } else {
+    pngBlack = gdImageColorAllocate(pngImage, 255, 255, 255);
+    pngWhite = gdImageColorAllocate(pngImage, 0, 0, 0);
+  }
+  pngLinetype[0] = pngWhite;
+  pngLinetype[1] = gdImageColorAllocate(pngImage, 255, 0, 0);
+  pngLinetype[2] = gdImageColorAllocate(pngImage, 0, 191, 255);
+  pngLinetype[3] = gdImageColorAllocate(pngImage, 0, 255, 0);
+  pngLinetype[4] = gdImageColorAllocate(pngImage, 255, 255, 0);
+  pngLinetype[5] = gdImageColorAllocate(pngImage, 0, 255, 255);
+  pngLinetype[6] = gdImageColorAllocate(pngImage, 255, 165, 0);
+  pngLinetype[7] = gdImageColorAllocate(pngImage, 0, 250, 154);
+  pngLinetype[8] = gdImageColorAllocate(pngImage, 255, 215, 0);
+  pngLinetype[9] = gdImageColorAllocate(pngImage, 255, 105, 180);
+  pngLinetype[10] = gdImageColorAllocate(pngImage, 0, 0, 255);
+  pngLinetype[11] = gdImageColorAllocate(pngImage, 50, 205, 50);
+  pngLinetype[12] = gdImageColorAllocate(pngImage, 255, 99, 71);
+  pngLinetype[13] = gdImageColorAllocate(pngImage, 210, 180, 140);
+  pngLinetype[14] = gdImageColorAllocate(pngImage, 255, 0, 255);
+  pngLinetype[15] = gdImageColorAllocate(pngImage, 191, 191, 191);
+  png_linetype = 0;
+  if (png_color_index != 0) {
+    png_colorList = tmalloc(sizeof(*png_colorList)*png_color_index);
+    for (i=0;i<png_color_index;i++) {
+      png_colorList[i] = gdImageColorAllocate(pngImage, png_colors[i].red / 256, png_colors[i].green / 256, png_colors[i].blue / 256);
+    }
+  }
+
+  gdImageFilledRectangle(pngImage, 0, 0, png_xmax - 1, png_ymax - 1, pngBlack);
+  return 0;
+}
+
+int PNG_text(void)
+     /* end current graph page */
+{
+  /*All operating systems will use png instead of png in the future*/
+#if defined(linux) 
+  gdImagePng(pngImage, pngOutfile);
+#else
+  gdImagePng(pngImage, pngOutfile);
+#endif
+  fflush(pngOutfile);
+  if (doPngGenerations && outfile==stdout) {
+    /* using filename passed by device arguments to do generation files */
+    fclose(pngOutfile);
+    pngOutfile = NULL;
+  }
+  gdImageDestroy(pngImage);
+  return 0;
+}
+
+
+int PNG_reset(void)
+     /* end graphing altogether */
+{
+  return 0;
+}
+
+int PNG_linetype(int linetype)
+{
+  if (lineTypeTable.nEntries) {
+     if(linetype >= 1000)
+        linetype-=1000;
+     png_linetype = linetype%lineTypeTable.nEntries;
+  } else if ((png_color_index == 0) || (linetype < 1000)) {
+     png_linetype = linetype%PNG_LINETYPES;
+     if ( pngFlags&PNG_USEDASHES) 
+          png_dashtype = linetype%PNG_DASHTYPES;
+  } else {
+     png_linetype = linetype;
+  }
+  png_line_thickness = 1;
+  is_forced_color = FALSE;
+  return 0;
+}
+
+
+static int png_xposition, png_yposition;
+
+int PNG_move(int x, int y)
+{
+  y = png_ylast - y;
+  png_xposition = x;
+  png_yposition = y;
+  return 0;
+}
+
+int PNG_dot(int x, int y, int number)
+{
+  y = png_ylast - y;
+  if (lineTypeTable.nEntries && png_color_index) {
+    gdImageSetPixel(pngImage, x, y, png_colorList[png_linetype%lineTypeTable.nEntries]);
+  } else if ((png_color_index == 0) || (png_linetype < 1000)) {
+    gdImageSetPixel(pngImage, x, y, pngLinetype[png_linetype]);
+  } else {
+    gdImageSetPixel(pngImage, x, y, png_colorList[(png_linetype - 1000)%png_color_index]);
+  }
+  png_xposition = x;
+  png_yposition = y;
+  return 0;
+}
+
+
+int PNG_vector(int x, int y)
+{
+  gdImagePtr brush;
+  int i, j,n,color, npts=0 ;
+  int *styledash=NULL;
+  int use_line_thickness, use_line_color;
+  char *use_line_dash =NULL;
+  
+    
+  y = png_ylast - y;
+        
+  if (lineTypeTable.nEntries) {
+    if ( lineTypeTable.typeFlag&LINE_TABLE_DEFINE_THICKNESS) 
+       use_line_thickness = (int) lineTypeTable.thickness[png_linetype];
+    else 
+       use_line_thickness =  png_line_thickness;
+    
+          
+    if( (lineTypeTable.typeFlag&LINE_TABLE_DEFINE_COLOR) && png_color_index)
+       use_line_color = png_colorList[png_color_index-lineTypeTable.nEntries+png_linetype];
+    else 
+       use_line_color = pngWhite;   
+                
+    if ( lineTypeTable.typeFlag & LINE_TABLE_DEFINE_DASH ) 
+       use_line_dash = lineTypeTable.dash[png_linetype].dashArray;
+       
+  } else if ((png_color_index == 0) || (png_linetype < 1000)) {
+     use_line_thickness = png_line_thickness;
+     if(is_forced_color)
+        use_line_color = png_force_color;
+     else 
+       use_line_color = pngLinetype[png_linetype];
+     use_line_dash = png_dashes[png_dashtype];
+  } else {
+     use_line_thickness = png_line_thickness;
+     use_line_color = png_colorList[(png_linetype-1000)%png_color_index];
+     if(pngFlags&PNG_USEDASHES)
+        use_line_dash = png_dashes[(png_linetype-1000)%PNG_DASHTYPES];      		   
+  }
+  
+  brush = gdImageCreateTrueColor(use_line_thickness,use_line_thickness);
+  gdImagePaletteCopy(brush, pngImage);
+  
+  gdImageFilledRectangle(brush, 0,0,use_line_thickness-1, use_line_thickness-1, use_line_color);  
+  if ( ((pngFlags&PNG_USEDASHES) && (!lineTypeTable.nEntries)) || (lineTypeTable.typeFlag&LINE_TABLE_DEFINE_DASH) ) {
+       for (i=0; i<5; i++) {
+          n =  ((int) use_line_dash[i])*use_line_thickness;
+	  if ( n == 0 ) {
+	     break;
+	  } else {
+	     npts += n;
+	     if ( !styledash) {
+	        styledash = tmalloc(sizeof(int)*n);
+	        for (j=0; j<n; j++) 
+		   styledash[j] = use_line_color; 
+	     } else {
+	        styledash = trealloc(styledash,sizeof(int)*npts);
+	        if (i%2) 
+		   color = gdTransparent;
+	        else 
+		   color = use_line_color;
+	        for (j=npts-n;j<npts;j++) 
+		   styledash[j] = color;
+	     }      
+          } 
+       }
+    }   
+    
+  if (npts) {
+     gdImageSetThickness(pngImage,use_line_thickness);  
+     gdImageSetStyle(pngImage, styledash, npts);
+     gdImageLine(pngImage, png_xposition, png_yposition, x, y, gdStyled);
+     gdImageSetThickness(pngImage,0);
+     free(styledash);
+  } else {
+     gdImageSetBrush(pngImage, brush);
+     gdImageLine(pngImage, png_xposition, png_yposition, x, y, gdBrushed);
+  }   
+  
+  gdImageDestroy(brush);
+  png_xposition = x;
+  png_yposition = y;
+
+  return 0;
+}
+
+
+int PNG_put_text(int x, int y, char *str)
+{
+  return 0;
+}
+
+
+int PNG_text_angle(int ang)
+{
+  return 0;
+}
+
+
+int PNG_fill_box(int shade, int xl, int xh, int yl, int yh)
+{
+  int n;
+  double r,  g,  b;
+  unsigned short red, green, blue;
+
+  shade = shade%(ncolors_png);
+  if (spectralpng)
+    Spectral_RGB_values(&r,  &g,  &b, ncolors_png > 1 ? shade/(ncolors_png - 1.0) : 0);
+  else if (customspectralpng)
+    Custom_RGB_values(&r, &g, &b, r0_png, g0_png, b0_png, r1_png, g1_png, b1_png, ncolors_png > 1 ? shade/(ncolors_png - 1.0) : 0);
+  else
+    RGB_values(&r,  &g,  &b, ncolors_png > 1 ? shade/(ncolors_png - 1.0) : 0);
+  if (r >= 1) r = .99999;
+  if (g >= 1) g = .99999;
+  if (b >= 1) b = .99999;
+  red = (unsigned short)(65536 * r);
+  green = (unsigned short)(65536 * g);
+  blue = (unsigned short)(65536 * b);
+  PNG_color(red, green, blue);
+  n = xl - xh;
+  if (n >= 0) {
+    while (n >= 0) {
+      gdImageLine(pngImage, xl+n, png_ylast - yl, xl+n, png_ylast - yh, /*png_colorList[png_color_index - 1]*/ png_force_color);
+      n--;
+    }
+  } else {
+    while (n <= 0) {
+      gdImageLine(pngImage, xh+n, png_ylast - yl, xh+n, png_ylast - yh, /*png_colorList[png_color_index - 1]*/ png_force_color);
+      n++;
+    }
+  }
+
+  png_xposition = xl;
+  png_yposition = png_ylast - yh;
+  return 0;
+}
+
+int PNG_add_color(unsigned short red, unsigned short green, unsigned short blue)
+{
+  if (png_color_index >= png_color_maxindex) {
+    png_color_maxindex += 100;
+    if (png_color_index == 0) {
+      png_colors = tmalloc(sizeof(*png_colors)*png_color_maxindex);
+    } else {
+      png_colors = trealloc(png_colors, sizeof(*png_colors)*(++png_color_maxindex));
+    }
+  }
+  png_colors[png_color_index].red = red;
+  png_colors[png_color_index].green = green;
+  png_colors[png_color_index].blue = blue;
+  png_color_index++;
+  return 0;
+}
+
+int PNG_line_thickness(int lt)
+{
+  if (lt < 1)
+    lt = 1;
+  if (lt > 9)
+    lt = 9;
+  png_line_thickness = lt;
+  return 0;
+}
+
+
+int PNG_color(unsigned short red, unsigned short green, unsigned short blue)
+{
+  is_forced_color = TRUE;
+  png_force_color = gdImageColorAllocate(pngImage, red / 256, green / 256, blue / 256);
+  return 0;
+}  
+
+
+
+int PNG_spectral(long num, int spec, unsigned short red0, unsigned short green0, unsigned short blue0, unsigned short red1, unsigned short green1, unsigned short blue1)
+{
+  ncolors_png = num > 101 ? 101 : num;
+  if (spec == 0) {
+    spectralpng = 0;
+    customspectralpng = 1;
+    r0_png = red0;
+    g0_png = green0;
+    b0_png = blue0;
+    r1_png = red1;
+    g1_png = green1;
+    b1_png = blue1;
+  } else if (spec == 1){
+    spectralpng = 1;
+    customspectralpng = 0;
+  } else {
+    spectralpng = 0;
+    customspectralpng = 0;
+  }
+  return 0;
+}

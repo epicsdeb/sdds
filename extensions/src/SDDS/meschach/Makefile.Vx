@@ -1,0 +1,67 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# makefile for mdbmth
+# $Log: Makefile.Vx,v $
+# Revision 1.3  2003/08/28 19:07:23  soliday
+# Fixed some minor issues with vxWorks.
+#
+# Revision 1.2  2002/08/14 15:47:59  soliday
+# Added Open License
+#
+# Revision 1.1  1999/12/15 16:05:21  soliday
+# First version of Makefile.Vx
+#
+#
+#
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+
+ifeq ($(T_A),mv162lc)
+GCC_OPT_YES = -fstrength-reduce
+endif
+
+SRCS.c = \
+	../copy.c ../err.c ../matrixio.c ../memory.c \
+	../vecop.c ../matop.c ../pxop.c ../submat.c \
+	../init.c ../otherio.c ../machine.c ../matlab.c \
+	../ivecop.c ../version.c ../meminfo.c ../memstat.c \
+	../lufactor.c ../bkpfacto.c ../chfactor.c ../qrfactor.c \
+	../solve.c ../hsehldr.c ../givens.c ../update.c \
+	../norm.c ../hessen.c ../symmeig.c ../schur.c \
+	../svd.c ../mfunc.c ../bdfactor.c ../sparse.c \
+	../sprow.c ../sparseio.c ../spchfctr.c ../splufctr.c \
+	../spbkp.c ../spswap.c ../iter0.c ../itersym.c \
+	../iternsym.c ../zmachine.c ../zcopy.c ../zmatio.c \
+	../zmemory.c ../zvecop.c ../zmatop.c ../znorm.c \
+	../zfunc.c ../zlufctr.c ../zsolve.c ../zmatlab.c \
+	../zhsehldr.c ../zqrfctr.c ../zgivens.c ../zhessen.c \
+	../zschur.c ../torture.c
+
+LIBOBJS = \
+	copy.o err.o matrixio.o memory.o \
+	vecop.o matop.o pxop.o submat.o \
+	init.o otherio.o machine.o matlab.o \
+	ivecop.o version.o meminfo.o memstat.o \
+	lufactor.o bkpfacto.o chfactor.o qrfactor.o \
+	solve.o hsehldr.o givens.o update.o \
+	norm.o hessen.o symmeig.o schur.o \
+	svd.o mfunc.o bdfactor.o sparse.o \
+	sprow.o sparseio.o spchfctr.o splufctr.o \
+	spbkp.o spswap.o iter0.o itersym.o \
+	iternsym.o zmachine.o zcopy.o zmatio.o \
+	zmemory.o zvecop.o zmatop.o znorm.o \
+	zfunc.o zlufctr.o zsolve.o zmatlab.o \
+	zhsehldr.o zqrfctr.o zgivens.o zhessen.o \
+	zschur.o torture.o
+
+LIBNAME = meschach
+
+include $(TOP)/config/RULES.Vx

@@ -1,0 +1,39 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+#
+# $Log: Makefile.OAG,v $
+# Revision 1.6  2008/04/14 18:36:22  shang
+# removed SDDSmpi.h
+#
+# Revision 1.5  2007/10/09 19:51:53  shang
+# added SDDSmpi.h
+#
+# Revision 1.4  2006/03/31 15:30:01  soliday
+# Added oagphy.h
+#
+# Revision 1.3  2005/11/16 18:56:24  shang
+# added non_dominated_sort.h
+#
+# Revision 1.2  2003/10/30 19:08:19  soliday
+# Added rpn.h to the makefile.
+#
+# Revision 1.1  2003/07/22 23:18:16  soliday
+# Modified makefiles to work with base versions 3.13 and 3.14
+#
+#
+
+INC = SDDS.h mdb.h scan.h match_string.h SDDStypes.h \
+      constants.h mdbsunos4.h contour.h fftpackC.h \
+      matlib.h namelist.h rpn.h table.h non_dominated_sort.h \
+      oagphy.h
+
+ifdef WIN32
+INC += fdlibm.h
+endif
+

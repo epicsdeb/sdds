@@ -1,0 +1,103 @@
+#!/bin/csh
+set path = (../bin $path)
+
+echo '** Break every 2700s (45 min), then plot as a movie'
+sddsbreak data/par.bpm -pipe=out -change=Time,amount=2700  \
+| sddsprocess -pipe=in par.bpm -process=Time,min,TimeStart \
+ -process=Time,max,TimeEnd \
+ -print=parameter,TimeLabel,"Time: [%.2f\, %.2f] %s",TimeStart,TimeEnd,TimeStart.units
+sddsplot -split=pages -separate=namei -groupby=page,namei -layout=2,2 \
+ -column=P1P1x,'PTB:PH[2345]x' -graph=dot par.bpm \
+ -topline=@TimeLabel -labelsize=0.025
+
+echo '**'
+echo '** plot instead by color coding with a color change every 45 minutes ( 2700 s)'
+sddsplot -split=page,columnbin=Time,width=2700 -graph=dot,vary \
+        -separate=namei -topline="Color changes at 45 min intervals" \
+        -layout=2,2 -column=P1P1x,'PTB:PH[2345]x' -graph=dot,vary data/par.bpm \
+        -labelsize=0.025 
+
+\rm par.bpm*
+
+echo '**'
+echo '** Find correlations of all x readings with each other,'
+echo '** pick out those with 0.01 significance level or less, '
+echo '** sort into increasing order by correlation coefficient,'
+echo '** and collect into groups of 20 for display'
+sddscorrelate data/par.bpm -pipe=out -column='*x'  \
+| sddsprocess -pipe -filter=column,CorrelationSignificance,0,0.01 \
+| sddssort -pipe -column=CorrelationCoefficient \
+| sddsbreak -pipe=in par.corr -rowLimit=20
+sddsplot -split=page -separate=page -graph=symbol,connect=3,scale=2,subtype=1 \
+  -pspace=0.25,0.95,0,0 \
+  -column=CorrelatePair,CorrelationCoefficient \
+  -swap  par.corr
+\rm par.corr
+
+echo '**'
+echo '** Break into pages at gaps in time data, eliminate pages'
+echo '** with fewer than 50 rows, then FFT all PTB x values '
+echo '** and smooth prior to plotting.'
+echo '** Unfortunately, this data is boring in frequency space.'
+sddsbreak data/par.bpm -pipe=out -gapin=Time,factor=1.5 \
+| sddsprocess -pipe -test=parameter,'n_rows 50 >'  \
+ -process=Time,min,TimeStart -process=Time,max,TimeEnd \
+ -print=parameter,TimeLabel,"Time: [%.2f\, %.2f] %s",TimeStart,TimeEnd,TimeStart.units \
+| tee par.bpm1 \
+| sddsfft -pipe -column=Time,'PTB*x' \
+| sddssmooth -pipe  -columns='FFT*' -passes=5 \
+| sddsxref -pipe=in par.bpm1 par.fft -leave='*' -transfer=param,TimeLabel 
+
+sddsplot -split=page -sep=page -groupby=page \
+ -column=f,'FFT*' par.fft -mode=y=log -graph=line,vary \
+ -legend=edit='%/FFT //%/x//' \
+ -ylabel=edit='z(i/FFT x ' -sameScale \
+ -title=@TimeLabel
+\rm par.fft par.bpm*
+
+
+echo '**'
+echo '** Make histograms of PTB offset data on a common range'
+echo '** 1. process the data for median of each column'
+echo '** 2. subtract off the median and find the resulting ranges'
+sddsprocess data/par.bpm par.bpm  \
+        -process='PTB:PH*x',median,%sMedian 
+set nameList = `sddsquery -column par.bpm | grep PTB:PH | grep x`
+foreach name ($nameList) 
+  sddsprocess par.bpm -redefine=column,$name,"$name ${name}Median -" \
+        -process=$name,min,${name}Min -process=$name,max,${name}Max  \
+        -nowarnings
+  end
+
+echo '** 3. process to find min and max of all offset columns '
+sddscollapse par.bpm -pipe=out \
+| sddsconvert -pipe -retain=column,'PTB:PH*x*' -delete=column,'PTB:PH*xMedian' \
+ -dele=column,TimeStamp \
+| sddstranspose -pipe -root=Trajectory \
+| sddsprocess -pipe=in par.bpm.range \
+ -process=Trajectory,min,TrajectoryMin \
+ -process=Trajectory,max,TrajectoryMax 
+set min = `sdds2stream -parameter=TrajectoryMin par.bpm.range `
+set max = `sdds2stream -parameter=TrajectoryMax par.bpm.range `
+
+echo '** 4. histogram each column and combine the histograms '
+set first = 1
+foreach name ($nameList) 
+  sddshist par.bpm -pipe=out -data=$name \
+     -lower=$min -upper=$max -bins=50 -sides \
+  | sddsconvert -pipe=in par.his$name \
+        -rename=column,frequency=Freq${name},${name}=x
+  if ($first == "1") then
+    mv  par.his$name  par.his
+    set first = 0
+  else
+    sddsxref par.his par.his$name -take='*'  -nowarn
+    \rm par.his$name
+    endif
+  end
+
+echo '** 5. plot the results'
+sddsplot -column=x,'Freq*' par.his -legend=yname,edit=%/Freq// \
+ -graph=line,vary -title="Histograms of offset position readings"
+
+\rm par.bpm* par.his*
