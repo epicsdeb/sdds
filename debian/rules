@@ -37,21 +37,23 @@ DEB_MAKE_BUILD_TARGET = all
 DEB_MAKE_INSTALL_TARGET = all INSTALL_LOCATION=$(CURDIR)/debian/tmp/usr/epics/base
 DEB_MAKE_CHECK_TARGET =
 
-# Basic EDM libraries
-edmlibs += EdmBase
-edmlibs += cfcaa62e-8199-11d3-a77f-00104b8742df
-edmlibs += 114135a4-6f6c-11d3-95bc-00104b8742df
-# PV Plugins
-#  Note: Epics must be listed first
-edmpvplug += Epics Calc Loc Log
-# Widget Plugins
-#  EdmBase is linked and loaded at runtime...
-edmplug += EdmBase
-edmplug += 57d79238-2924-420b-ba67-dfbecdf03fcd
-edmplug += 7e1b4e6f-239d-4650-95e6-a040d41ba633
-edmplug += cf322683-513e-4570-a44b-7cdd7cae0de5
-edmplug += EdmDiamond EdmTriumf Indicator
-edmplug += MultSegRamp PV TwoDProfileMonitor
+# Basic SDDS libraries
+sddslibs += csa
+sddslibs += fftpack
+sddslibs += gd
+sddslibs += gsl
+sddslibs += levmar
+sddslibs += matlib
+sddslibs += mdbcommon
+sddslibs += mdblib
+sddslibs += mdbmth
+sddslibs += mdbplt
+sddslibs += meschach
+sddslibs += namelist
+sddslibs += nnetwork
+sddslibs += rpnlib
+sddslibs += SDDS1
+sddslibs += SDDS1c
 
 # Build Rules
 
@@ -60,29 +62,8 @@ libbuild=$(CURDIR)/lib/$(EPICS_HOST_ARCH)
 
 common-build-arch:: build-obj-stamp
 
-build-obj-stamp:
-	rm -f edmPvObjects
-	for pv in $(edmpvplug); do \
-echo $$pv; \
-EDMPVOBJECTS=$(CURDIR) EDMOBJECTS=$(CURDIR) \
-LD_LIBRARY_PATH=$(libbuild):$$LD_LIBRARY_PATH $(binbuild)/edm -addpv $(libbuild)/lib$$pv.so.$(SOV); \
-done
-
-	rm -f edmObjects
-	for obj in $(edmplug); do \
-echo $$obj; \
-EDMPVOBJECTS=$(CURDIR) EDMOBJECTS=$(CURDIR) \
-LD_LIBRARY_PATH=$(libbuild):$$LD_LIBRARY_PATH $(binbuild)/edm -add $(libbuild)/lib$$obj.so.$(SOV); \
-done
-
-	sed -i -e "s|$(libbuild)|/usr/lib/edm|" edmObjects edmPvObjects
-	sed -i -e "s|edm/libEdmBase|libEdmBase|" edmObjects
-
-	touch $@
-
 clean::
 	rm -f build-obj-stamp configure
-	rm -f edmPvObjects edmObjects
 	rm -rf bin include lib/$(EPICS_HOST_ARCH)
 	find . -name 'O.*' -type d|xargs rm -rf
 
@@ -92,56 +73,27 @@ instroot=$(CURDIR)/debian/tmp
 bindir=$(instroot)/usr/bin
 libdir=$(instroot)/usr/lib
 confdir=$(instroot)/etc
-datadir=$(instroot)/usr/share/edm
-docdir=$(instroot)/usr/share/doc/edm
+datadir=$(instroot)/usr/share/sdds
+docdir=$(instroot)/usr/share/doc/sdds
 
 epicsroot=$(instroot)/usr/epics/base
 epicslibs=$(epicsroot)/lib/$(EPICS_HOST_ARCH)
 epicsbins=$(epicsroot)/bin/$(EPICS_HOST_ARCH)
 epicsincl=$(epicsroot)/include
 
-install/edm::
+install/sdds::
 	install -d $(bindir)
-	install -d $(libdir)/edm
+	install -d $(libdir)/sdds
 	install -d $(datadir)
-	install -d $(confdir)/edm
+	install -d $(confdir)/sdds
 
 	install -m 755 -t $(bindir) $(epicsbins)/*
 	rm -rf $(epicsbins)
 
 	# Basic libraries go in /usr/lib
-	for ff in $(edmlibs);do \
+	for ff in $(sddslibs);do \
 		mv $(epicslibs)/lib$$ff.so.$(SOV) $(libdir); \
 		rm -f $(epicslibs)/lib$$ff.so; \
 		ln -s ../../../../lib/lib$$ff.so.$(SOV) $(epicslibs)/lib$$ff.so; \
 	done
 
-	# Plugins go in /usr/lib/edm
-	for ff in $(edmpvplug) $(edmplug);do \
-		mv $(epicslibs)/lib$$ff.so.$(SOV) $(libdir)/edm; \
-		rm -f $(epicslibs)/lib$$ff.so; \
-		ln -s ../../../../lib/edm/lib$$ff.so.$(SOV) $(epicslibs)/lib$$ff.so; \
-	done
-
-	install -m 644 -t $(confdir)/edm edmPvObjects edmObjects
-
-	cp -r $(CURDIR)/helpFiles $(datadir)/
-	find $(datadir)/helpFiles -type f -exec chmod -x {} \;
-
-	install -m 644 -t $(confdir)/edm edmMain/fonts.list
-	install -m 644 -t $(confdir)/edm edmMain/edmPrintDef
-
-install/edm-color-default::
-	install -d debian/tmp/etc/edm
-	install -m 644 edmMain/colors.list debian/tmp/etc/edm/
-
-install/edm-doc::
-	install -d debian/tmp/usr/share/doc/edm/contrib
-
-	cp -r $(CURDIR)/doc debian/tmp/usr/share/doc/edm/html/
-	find debian/tmp/usr/share/doc/edm/html -type f -exec chmod -x {} \;
-
-	install -m 644 edmMain/colors.list edmMain/fonts.list edmMain/edmPrintDef \
-debian/tmp/usr/share/doc/edm
-
-	install -m 755 contrib/fontparse.py debian/tmp/usr/share/doc/edm/contrib/
