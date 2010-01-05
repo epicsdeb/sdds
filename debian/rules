@@ -81,7 +81,7 @@ install/sdds-util::
 	install -d $(libdir)/sdds
 	install -d $(datadir)
 	install -d $(confdir)/sdds
-	mv -t $(bindir) $(epicsbins) 
+	install -d $(epicsbins)
 	install -m 644 defns.rpn $(confdir)/sdds/defns.rpn
 
 	# Basic libraries go in /usr/bin
