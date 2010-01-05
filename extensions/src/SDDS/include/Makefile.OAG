@@ -31,7 +31,7 @@
 INC = SDDS.h mdb.h scan.h match_string.h SDDStypes.h \
       constants.h mdbsunos4.h contour.h fftpackC.h \
       matlib.h namelist.h rpn.h table.h non_dominated_sort.h \
-      oagphy.h
+      oagphy.h mdbsun.h sort.h f2c.h
 
 ifdef WIN32
 INC += fdlibm.h
