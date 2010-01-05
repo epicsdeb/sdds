@@ -27,7 +27,7 @@ Package: sdds-dev
 Section: contrib/devel
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
-         sdds (= ${binary:Version}),
+         sdds-util (= ${binary:Version}),
 Description: The Self Describing Data Sets
  The Self Describing Data Sets (SDDS) is for an accelerator simulation, beam commissioning, physics
  study, and operation. A file protocol is the basis for a powerful and expanding toolkit of generic 
@@ -40,7 +40,6 @@ Package: libsdds2.7
 Section: contrib/devel
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
-         sdds (= ${binary:Version}),
          epics-dev (>= 3.14.10-10), epics-dev (<< 3.14.11),
          epics-extensions-dev,
          libpng-dev, zlib1g-dev, libmotif-dev,
