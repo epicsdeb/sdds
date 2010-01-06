@@ -45,6 +45,8 @@ endif
 
 LIBRARY = meschach
 
+INC = matrix2.h matrix.h machine.h meminfo.h
+
 ifdef WIN32
 LIB_SUFFIX=.lib
 SHARED_LIBRARIES = NO
