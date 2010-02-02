@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 7), cdbs,
                epics-extensions-dev (>= 20091204),
                libpng-dev, zlib1g, zlib1g-dev, libmotif3, libmotif-dev,
                libxaw7-dev, libx11-dev, libxp-dev,  libxt-dev,
-               liblapack-dev, libgfortran3, libtiff-dev,
+               liblapack-dev, gfortran, libgfortran3, libtiff-dev,
                libxmu-headers, libxmu-dev, libxtst-dev, libgd2-xpm-dev,
                x11proto-print-dev, tk (>=8.4),
 Standards-Version: 3.8.0
