@@ -1,8 +1,8 @@
-sdds (2.7-2) UNRELEASED; urgency=low
+sdds (2.7-2) unstable; urgency=low
 
   * Use Base in /usr/lib/epics
 
- -- Michael Davidsaver <mdavidsaver@bnl.gov>  Mon, 30 Aug 2010 11:12:21 -0400
+ -- Michael Davidsaver <mdavidsaver@bnl.gov>  Mon, 30 Aug 2010 11:42:03 -0400
 
 sdds (2.7-1) unstable; urgency=low
 
