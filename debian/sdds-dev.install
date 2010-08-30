@@ -1,2 +1,2 @@
-usr/epics/base/include
-usr/epics/base/lib/linux-*
+usr/lib/epics/include
+usr/lib/epics/lib/linux-*
