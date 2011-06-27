@@ -1,3 +1,9 @@
+sdds (2.9-1) unstable; urgency=low
+
+  * new upstream version
+
+ -- Guobao Shen <shengb@bnl.gov>  Mon, 27 Jun 2011 14:57:08 -0400
+
 sdds (2.7-2) unstable; urgency=low
 
   * Use Base in /usr/lib/epics

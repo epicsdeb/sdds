@@ -5,7 +5,7 @@ Maintainer: Guobao Shen <shengb@bnl.gov>
 Build-Depends: debhelper (>= 7), cdbs,
                epics-dev (>= 3.14.11-2),
                epics-extensions-dev (>= 20091204.1),
-               libpng-dev, zlib1g, zlib1g-dev, libmotif3, libmotif-dev,
+               libpng-dev, zlib1g, zlib1g-dev, libmotif-dev,
                libxaw7-dev, libx11-dev, libxp-dev,  libxt-dev,
                liblapack-dev, gfortran, libgfortran3, libtiff-dev,
                libxmu-headers, libxmu-dev, libxtst-dev, libgd2-xpm-dev,
