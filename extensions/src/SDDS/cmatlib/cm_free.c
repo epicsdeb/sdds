@@ -18,11 +18,15 @@ void cm_free(CMATRIX **A)
 
   n = (*A)->n;
   for (i=0; i<n; i++) {
-    free((*A)->a[i]);
-    (*A)->a[i] = NULL;
+    free((*A)->ar[i]);
+    (*A)->ar[i] = NULL;
+    free((*A)->ai[i]);
+    (*A)->ai[i] = NULL;
   }
-  free((*A)->a);
-  (*A)->a = NULL;
+  free((*A)->ar);
+  (*A)->ar = NULL;
+  free((*A)->ai);
+  (*A)->ai = NULL;
   free(*A);
   *A = NULL;
 }

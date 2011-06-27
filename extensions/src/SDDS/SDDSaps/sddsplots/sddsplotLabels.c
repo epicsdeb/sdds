@@ -13,6 +13,11 @@
  *
  * Michael Borland, 1994.
  $Log: sddsplotLabels.c,v $
+ Revision 1.25  2011/01/11 22:51:03  soliday
+ Changed all the strcpy commands to strcpy_ss because of problems with
+ RedHat Enterprise 6. If a strcpy copies the result to the same memory
+ space you will get unexpected results.
+
  Revision 1.24  2009/07/28 14:01:16  borland
  Added scroll feature to -replicate option.  Greatly improved memory management for
  split and replicated datasets.  Added -nocolorbar option.
@@ -216,7 +221,7 @@ void determine_panel_labels(PLOT_SPEC *plspec, long panel_index)
       }
       if (editCommand) {
         /* Edit the label per user request. */
-        strcpy(buffer, newLabel);
+        strcpy_ss(buffer, newLabel);
         free(newLabel);
         edit_string(buffer, editCommand);
         if (plspec->scaleLabelInfo[plane][group].label)
@@ -251,7 +256,7 @@ void determine_panel_labels(PLOT_SPEC *plspec, long panel_index)
         SDDS_CopyString(plspec->panel[panel_index].title+j, "");
     }
     if ((editCommand=plspec->panel[panel_index].titleSpec[j].edit_command)) {
-      strcpy(buffer, plspec->panel[panel_index].title[j]);
+      strcpy_ss(buffer, plspec->panel[panel_index].title[j]);
       edit_string(buffer, editCommand);
       free(plspec->panel[panel_index].title[j]);
       SDDS_CopyString(plspec->panel[panel_index].title+j, buffer);
@@ -268,7 +273,7 @@ void determine_panel_labels(PLOT_SPEC *plspec, long panel_index)
       file = plspec->panel[panel_index].dataset[i]->file_index;
       filename[i] = plspec->plot_request[request].filename[file];
       if (plspec->plot_request[request].filenamesOnToplineEditCmd) {
-        strcpy(buffer, filename[i]);
+        strcpy_ss(buffer, filename[i]);
         edit_string(buffer, plspec->plot_request[request].filenamesOnToplineEditCmd);
         SDDS_CopyString(&filename[i], buffer);
       }

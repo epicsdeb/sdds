@@ -13,6 +13,9 @@
  * Michael Borland, 1994
  * based on mpl-format fft program
  $Log: sddsfft.c,v $
+ Revision 1.36  2010/06/11 17:10:06  borland
+ Added more window types.
+
  Revision 1.35  2008/09/15 14:42:00  shang
  updated usage message, and added warning messages for inverse option
 
@@ -159,9 +162,6 @@ char *option[N_OPTIONS] = {
     "nowarnings", "complexinput", "inverse",
     };
 
-#define FL_HANNINGWINDOW   0x0001
-#define FL_WELCHWINDOW     0x0002
-#define FL_PARZENWINDOW    0x0004
 #define FL_TRUNCATE        0x0008
 #define FL_PADWITHZEROES   0x0010
 #define FL_NORMALIZE       0x0020
@@ -179,21 +179,19 @@ char *option[N_OPTIONS] = {
 #define WINDOW_HANNING 0
 #define WINDOW_WELCH 1
 #define WINDOW_PARZEN 2
-#define N_WINDOW_TYPES 3
+#define WINDOW_HAMMING 3
+#define WINDOW_FLATTOP 4
+#define WINDOW_GAUSSIAN 5
+#define N_WINDOW_TYPES 6
 char *window_type[N_WINDOW_TYPES] = {
-    "hanning", "welch", "parzen",
+    "hanning", "welch", "parzen", "hamming", "flattop", "gaussian",
     } ;
-unsigned long window_bits[N_WINDOW_TYPES] = {
-    FL_HANNINGWINDOW,  FL_WELCHWINDOW,
-    FL_PARZENWINDOW, 
-    } ;
-
 
 static char *USAGE1="sddsfft [<inputfile>] [<outputfile>]\n\
 [-pipe=[input][,output]]\n\
 [-columns=<indep-variable>[,<depen-quantity>[,...]]] \n\
 [-complexInput[=unfolded|folded]] [-exclude=<depen-quantity>[,...]]\n\
-[-window[={hanning|welch|parzen}[,correct]]] \n\
+[-window[={hanning|welch|parzen|hamming|flattop|gaussian}[,correct]]] \n\
 [-sampleInterval=<number>] [-normalize] [-fullOutput[=unfolded|folded]]\n\
 [-psdOutput[=plain][,{integrated|rintegrated}]] [-inverse]\n\
 [-padwithzeroes[=exponent] | -truncate] [-suppressaverage] [-noWarnings]\n\n\
@@ -247,7 +245,7 @@ Program by Michael Borland.  (This is version 10, January 2002.)\n";
 long greatestProductOfSmallPrimes(long rows);
 long process_data(SDDS_DATASET *SDDSout, SDDS_DATASET *SDDSin, double *tdata, long rows, long rowsToUse,
                   char *depenQuantity, char *depenQuantity2, 
-                  unsigned long flags, long sampleInterval,
+                  unsigned long flags, long windowType, long sampleInterval,
                   long correctWindowEffects, long inverse);
 long create_fft_frequency_column(SDDS_DATASET *SDDSout, SDDS_DATASET *SDDSin, char *timeName,
 				 char *freqUnits, long inverse);
@@ -272,6 +270,7 @@ int main(int argc, char **argv)
   char *input, *output;
   long sampleInterval, i, rows, readCode, rowsToUse, noWarnings, complexInput, inverse, spectrumFoldParExist=0, spectrumFolded=0, page=0;
   unsigned long flags, pipeFlags, complexInputFlags=0, fullOutputFlags=0;
+  long windowType = -1;
   SCANNED_ARG *scanned;
   SDDS_DATASET SDDSin, SDDSout;
   double *tdata;
@@ -303,7 +302,7 @@ int main(int argc, char **argv)
 	if (scanned[iArg].n_items!=1) {
 	  if ((i=match_string(scanned[iArg].list[1], window_type, N_WINDOW_TYPES, 0))<0)
 	    SDDS_Bomb("unknown window type");
-	  flags |= window_bits[i];
+	  windowType = i;
           if (scanned[iArg].n_items>2) {
             if (strncmp(scanned[iArg].list[2], "correct", strlen(scanned[iArg].list[2]))==0)
               correctWindowEffects = 1;
@@ -312,7 +311,7 @@ int main(int argc, char **argv)
           }
 	}
 	else
-	  flags |= FL_HANNINGWINDOW;
+	  windowType = 0;
 	break;
       case SET_PADWITHZEROES:
 	flags |= FL_PADWITHZEROES; 
@@ -546,7 +545,7 @@ int main(int argc, char **argv)
 	if (!process_data(&SDDSout, &SDDSin, tdata, rows, rowsToUse, 
                           complexInput?realQuan[i]:depenQuantity[i], 
                           complexInput?imagQuan[i]:NULL,
-			  flags|(i==0?FL_MAKEFREQDATA:0), sampleInterval,
+			  flags|(i==0?FL_MAKEFREQDATA:0), windowType, sampleInterval,
                           correctWindowEffects, inverse)) {
 	  SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
 	  exit(1);
@@ -578,7 +577,7 @@ static long psdOffset, argOffset, realOffset, imagOffset, fftOffset = -1, psdInt
 long process_data(SDDS_DATASET *SDDSout, SDDS_DATASET *SDDSin, double *tdata, long rows,
                   long rowsToUse,  char *depenQuantity, 
                   char *imagQuantity, 
-                  unsigned long flags, long sampleInterval,
+                  unsigned long flags, long windowType, long sampleInterval,
                   long correctWindowEffects, long inverse)
 {
   long n_freq, i, offset, index, fftrows=0, unfold=0;
@@ -629,9 +628,10 @@ long process_data(SDDS_DATASET *SDDSout, SDDS_DATASET *SDDSin, double *tdata, lo
         imagData[i] -= r;
     }
   }
-  
-  /* do windowing, if requested */
-  if (flags&FL_HANNINGWINDOW) {
+
+  windowCorrectionFactor = 1;
+  switch (windowType) {
+  case WINDOW_HANNING:
     r = PIx2/(rows-1);
     for (i=0; i<rows; i++) {
       factor = (1 - cos(i*r))/2;
@@ -641,19 +641,19 @@ long process_data(SDDS_DATASET *SDDSout, SDDS_DATASET *SDDSin, double *tdata, lo
     if (imagData)
       for (i=0; i<rows; i++)
         imagData[i] *= (1 - cos(i*r))/2;
-  }
-  else if (flags&FL_PARZENWINDOW) {
-    r = (rows-1)/2.0;
+    break;
+  case WINDOW_HAMMING:
+    r = PIx2/(rows-1);
     for (i=0; i<rows; i++) {
-      factor = 1-FABS((i-r)/r);
+      factor = 0.54 - 0.46*cos(i*r);
       data[i] *= factor;
       windowCorrectionFactor += sqr(factor);
     }
     if (imagData)
       for (i=0; i<rows; i++)
-        imagData[i] *= 1-FABS((i-r)/r);
-  }
-  else if (flags&FL_WELCHWINDOW) {
+        imagData[i] *= (1 - cos(i*r))/2;
+    break;
+  case WINDOW_WELCH:
     r1 = (rows-1)/2.0;
     r2 = sqr((rows+1)/2.0);
     for (i=0; i<rows; i++) {
@@ -664,9 +664,45 @@ long process_data(SDDS_DATASET *SDDSout, SDDS_DATASET *SDDSin, double *tdata, lo
     if (imagData)
       for (i=0; i<rows; i++)
         imagData[i] *= 1 - sqr(i-r1)/r2;
+    break;
+  case WINDOW_PARZEN:
+    r = (rows-1)/2.0;
+    for (i=0; i<rows; i++) {
+      factor = 1-FABS((i-r)/r);
+      data[i] *= factor;
+      windowCorrectionFactor += sqr(factor);
+    }
+    if (imagData)
+      for (i=0; i<rows; i++)
+        imagData[i] *= 1-FABS((i-r)/r);
+    break;
+  case WINDOW_FLATTOP:
+    for (i=0; i<rows; i++) {
+      r = i*PIx2/(rows-1);
+      factor = 1 - 1.93*cos(r) + 1.29*cos(2*r) - 0.388*cos(3*r) + 0.032*cos(4*r);
+      data[i] *= factor;
+      windowCorrectionFactor += sqr(factor);
+    }
+    if (imagData)
+      for (i=0; i<rows; i++)
+        imagData[i] *= 1-FABS((i-r)/r);
+    break;
+  case WINDOW_GAUSSIAN:
+    for (i=0; i<rows; i++) {
+      r = sqr((i-(rows-1)/2.)/(0.4*(rows-1)/2.))/2;
+      factor = exp(-r);
+      data[i] *= factor;
+      windowCorrectionFactor += sqr(factor);
+    }
+    if (imagData)
+      for (i=0; i<rows; i++)
+        imagData[i] *= 1-FABS((i-r)/r);
+    break;
+  default:
+    break;
   }
-  else 
-    windowCorrectionFactor = 1;
+  
+
 
   if (correctWindowEffects) {
     /* Add correction factor to make the integrated PSD come out right. */

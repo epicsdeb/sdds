@@ -9,6 +9,9 @@
 
 /*
  $Log: fftpackC.h,v $
+ Revision 1.11  2010/02/04 23:42:34  soliday
+ Updated so that it can be used by c++
+
  Revision 1.10  2006/10/19 17:55:40  soliday
  Updated to work with linux-x86_64.
 
@@ -39,6 +42,10 @@
  First test release of the SDDS1.5 package.
 
 */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if !defined(FFTPACKC_INCLUDE)
 #define FFTPACKC_INCLUDE 1
@@ -100,4 +107,7 @@ epicsShareFuncFFTPACK double adjustFrequencyHalfPlane(double frequency,
 
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 

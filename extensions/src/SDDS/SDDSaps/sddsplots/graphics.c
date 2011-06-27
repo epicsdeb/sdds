@@ -12,6 +12,23 @@
  *
  * Michael Borland, 1991.
  $Log: graphics.c,v $
+ Revision 1.47  2011/01/11 22:51:02  soliday
+ Changed all the strcpy commands to strcpy_ss because of problems with
+ RedHat Enterprise 6. If a strcpy copies the result to the same memory
+ space you will get unexpected results.
+
+ Revision 1.46  2010/09/02 15:50:21  soliday
+ PS files loose the line type information after plotting dots. This will
+ change will reset the line type after plotting dots.
+
+ Revision 1.45  2010/01/11 22:25:56  soliday
+ Updated the intensitybar option so that the units label is moved up
+ as it gets better so that it does not overlap the bar itself.
+
+ Revision 1.44  2010/01/05 20:06:45  soliday
+ Added the -intensityBar option which can be used to move the intensity bar
+ and to resize the label text to the left and the unit text above.
+
  Revision 1.43  2008/11/03 16:36:00  soliday
  I don't know why but solaris-x86 requires a sleep statement at the end
  of the shade_box function. Without it, it segfaults.
@@ -850,6 +867,7 @@ void plot_dots(double *xd, double *yd, long n, int dot_type, int dot_subtype)
       (*t->dot)(x,y,-1);
     }
   }
+  mpl_force_linetype = 1;
   set_linetype(dot_type);
 }
 
@@ -1624,13 +1642,13 @@ int translate_hershey_codes(char *s)
     if (*ptr=='$') {
       if (*ptr==*(ptr+1))
         /* literal dollar sign ($$) */
-        strcpy(ptr, ptr+1);
+        strcpy_ss(ptr, ptr+1);
       else if (ptr!=s && *(ptr-1)=='\\')
         /* escaped dollar sign */
-        strcpy(ptr-1, ptr);
+        strcpy_ss(ptr-1, ptr);
       else if (isalpha(ptr[1])) {
         ptr[1] = code[tolower(ptr[1])-'a'];
-        strcpy(ptr, ptr+1);
+        strcpy_ss(ptr, ptr+1);
         has_hershey = 1;
       }
     }
@@ -1945,7 +1963,7 @@ void check_scales(char *caller)
         fprintf(stderr, "\7\7please record this printout and email to soliday@aps.anl.gov\n");
         exit(1);
         }
-    strcpy(last_caller, caller);
+    strcpy_ss(last_caller, caller);
     }
 
 void shade_box(long shade, double xl, double xh, double yl, double yh)
@@ -2173,8 +2191,11 @@ long SDDS_ReadLineTypeTable(LINE_TYPE_TABLE *LTT, char *filename)
 }
 
 
-void make_intensity_bar(long n_shades, long shadeOffset, long reverse, double min_value, double max_value,
-                        double hue0, double hue1, char *colorSymbol, char *colorUnits, long tickLabelThickness)
+void make_intensity_bar(long n_shades, long shadeOffset, long reverse, 
+                        double min_value, double max_value,
+                        double hue0, double hue1, char *colorSymbol, 
+                        char *colorUnits, long tickLabelThickness, 
+                        double labelsize, double unitsize, double xadjust)
 {
   long i, shade, pen;
   double xmin, xmax, ymin, ymax, allowedSpace;
@@ -2185,14 +2206,14 @@ void make_intensity_bar(long n_shades, long shadeOffset, long reverse, double mi
   get_mapping(&xmin, &xmax, &ymin, &ymax);
   if (!(yrange=ymax-ymin))
     bomb("y range is zero (make_intensity_bar)", NULL);
-  yrange *= 0.8;
+  yrange *= .8;
   yave = (ymin+ymax)/2;
   ymin = yave - yrange/2;
   ymax = yave + yrange/2;
   if (!(xrange=xmax-xmin))
     bomb("x range is zero (make_intensity_bar)", NULL);
-  xl = xmin + xrange*1.055;
-  xh = xmin + xrange*1.095;
+  xl = xmin + xrange*(1.055 + xadjust / 1000);
+  xh = xmin + xrange*(1.095 + xadjust / 1000);
   allowedSpace = 2*(xh-xl);
   yl = ymin;
   yh = ymax;
@@ -2211,11 +2232,11 @@ void make_intensity_bar(long n_shades, long shadeOffset, long reverse, double mi
       double hsize,vsize;
       get_char_size(&hsize, &vsize, 1);
       sprintf(units,"(%s)",colorUnits);
-      plotStringInBox(units,(xh+xl)/2.0,yh+(yh-yl)*0.05,allowedSpace*0.5,(yh-yl)*0.03,0);
-      plotStringInBox(colorSymbol,(xh+xl)/2.0,yh+(yh-yl)*0.05+vsize*1.5,allowedSpace*0.9,(yh-yl)*0.03,0);
+      plotStringInBox(units,(xh+xl)/2.0,yh+(yh-yl)*0.05+((yh-yl)*0.03*(unitsize - 1)),allowedSpace*unitsize*0.5,(yh-yl)*0.03*unitsize,0);
+      plotStringInBox(colorSymbol,(xh+xl)/2.0,yh+(yh-yl)*0.05+((yh-yl)*0.03*(unitsize - 1))+vsize*1.5,allowedSpace*unitsize*0.9,(yh-yl)*0.03*unitsize,0);
+    } else {
+      plotStringInBox(colorSymbol,(xh+xl)/2.0,yh+(yh-yl)*0.05+((yh-yl)*0.03*(unitsize - 1)),allowedSpace*unitsize*0.9,(yh-yl)*0.03*unitsize,0);
     }
-    else
-      plotStringInBox(colorSymbol,(xh+xl)/2.0,yh+(yh-yl)*0.05,allowedSpace*0.9,(yh-yl)*0.03,0);
     set_linethickness(0);
   } 
   for (i=0; i<=n_shades; i++) {
@@ -2251,7 +2272,7 @@ void make_intensity_bar(long n_shades, long shadeOffset, long reverse, double mi
 	     0,  /* don't invert scale */
 	     max_value-(max_value-min_value)/(yh-yl)*yh, /* offset */ 
 	     0, /* modulus */
-	     1.0, /* label frac */
+	     1.0*labelsize, /* label frac */
 	     0, /* subticks */
 	     0.0,
 	     0, /* subtick linetype */
@@ -2260,7 +2281,7 @@ void make_intensity_bar(long n_shades, long shadeOffset, long reverse, double mi
 	     yl, /* range min */
 	     yh, /* range max */
 	     xl, /* position */
-	     allowedSpace,  /* space for labels */
+	     allowedSpace*labelsize,  /* space for labels */
 	     0, /* adjust for ticks */
 	     NULL, 1, 0, 0, 0/* label */, 
              1 /* no subtick label for log scale*/
@@ -2287,7 +2308,7 @@ void make_intensity_bar(long n_shades, long shadeOffset, long reverse, double mi
 	     yl, /* range min */
 	     yh, /* range max */
 	     xl, /* position */
-	     allowedSpace,  /* space for labels */
+	     allowedSpace*labelsize,  /* space for labels */
 	     0, /* adjust for ticks */
 	     NULL, 1, 0, 0, 0 /* label */, 
              1 /* no subtick label for log scale */

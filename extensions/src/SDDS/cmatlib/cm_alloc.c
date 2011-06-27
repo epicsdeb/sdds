@@ -17,13 +17,15 @@ void cm_alloc(CMATRIX **A, int n, int m)
   if (n<=0)
     bomb("error in cm_alloc: 0xn array requested", NULL);
   if (*A = (CMATRIX*)tmalloc(sizeof(**A))) {
-    if (((*A)->a = (double complex**)tmalloc(sizeof(double complex*)*n))) {
+    if ( ((*A)->ar = (double**)tmalloc(sizeof(double*)*n)) && ((*A)->ai = (double**)tmalloc(sizeof(double*)*n))) {
       (*A)->n = n;
       (*A)->m = m;
       if (m!=0) {
         /* m==0 means only row pointers were wanted */
         for (i=0; i<n; i++) {
-          if (!((*A)->a[i] = (double complex*)tmalloc(m*sizeof(double complex))))
+          if (!((*A)->ar[i] = (double*)tmalloc(m*sizeof(double))))
+            break;
+          if (!((*A)->ai[i] = (double*)tmalloc(m*sizeof(double))))
             break;
         }
         if (i==n) {

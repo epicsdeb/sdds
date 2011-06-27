@@ -23,7 +23,7 @@ void cm_show(
     fputs(label, fp);
   for (i=0; i<A->n; i++) {
     for (j=0; j<A->m; j++)
-      fprintf(fp, format, creal(A->a[i][j]), cimag(A->a[i][j]));
+      fprintf(fp, format, A->ar[i][j], A->ai[i][j]);
     fputc('\n', fp);
   }
 }

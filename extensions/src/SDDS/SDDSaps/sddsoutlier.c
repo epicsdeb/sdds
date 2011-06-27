@@ -12,6 +12,9 @@
  *
  * Michael Borland, 1995
  $Log: sddsoutlier.c,v $
+ Revision 1.19  2010/10/07 14:44:28  shang
+ made the noWarnings option work as expected.
+
  Revision 1.18  2006/12/14 22:21:59  soliday
  Updated a bunch of programs because SDDS_SaveLayout is now called by
  SDDS_WriteLayout and it is no longer required to be called directly.
@@ -343,7 +346,8 @@ int main(int argc, char **argv)
     if (outlierControl.flags&OUTLIER_VERBOSE_GIVEN)
       fprintf(stderr, "%ld rows in page %ld\n", rows, readCode);
     if ((rows = removeOutliers(&SDDSout, rows, column, columns, &outlierControl, isOutlier))==0) {
-      fprintf(stderr, "  no rows left after outlier control--skipping page\n");
+      if (!noWarnings)
+        fprintf(stderr, "  no rows left after outlier control--skipping page\n");
       continue;
     }
     if (outlierControl.flags&OUTLIER_VERBOSE_GIVEN)

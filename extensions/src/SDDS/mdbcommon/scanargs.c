@@ -24,6 +24,9 @@
  *
  * Michael Borland, 1986, 1990, 1994, 1995
  $Log: scanargs.c,v $
+ Revision 1.10  2011/01/10 17:35:29  borland
+ Fixed problem on RH6 by switching from strcpy to strcpy_ss.
+
  Revision 1.9  2003/09/02 18:06:10  soliday
  Cleaned up code for Linux.
 
@@ -381,7 +384,7 @@ int parseList(char ***list, char *string)
         ptr = items[i];
         while (*ptr) {
             if (*ptr=='\\' && (*(ptr+1)==',' || *(ptr+1)=='"' || *(ptr+1)=='(' || *(ptr+1)==')'))
-                strcpy(ptr, ptr+1);
+                strcpy_ss(ptr, ptr+1);
             ptr++;
             }
         *(*list+i) = tmalloc((unsigned)strlen(items[i])+1);

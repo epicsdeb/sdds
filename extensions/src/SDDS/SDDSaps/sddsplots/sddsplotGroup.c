@@ -13,6 +13,10 @@
  *
  * Michael Borland, 1994.
  $Log: sddsplotGroup.c,v $
+ Revision 1.21  2010/07/08 21:26:47  borland
+ Added "first" qualifier to -omnipresent option.  When given, omnipresent datasets
+ are plotted first.  The default is to plot them last.
+
  Revision 1.20  2009/07/28 14:01:16  borland
  Added scroll feature to -replicate option.  Greatly improved memory management for
  split and replicated datasets.  Added -nocolorbar option.
@@ -153,7 +157,7 @@ void swapRanks(long rank, long code, GROUPBY_SETTINGS *settings)
 
 void determine_panel_assignments(PLOT_SPEC *plspec)
 {
-  long iset, ireq, panel, i, omnis, newpanel, newpanelPending, startCount;
+  long iset, ireq, panel, i, omnis, nLast, nFirst, newpanel, newpanelPending, startCount;
   PLOT_REQUEST *plreq;
   PLOT_DATA *dataset;
 
@@ -281,31 +285,56 @@ void determine_panel_assignments(PLOT_SPEC *plspec)
     fprintf(stderr, "panel %ld:  datasets=%ld   dataset=%ux\n", i, plspec->panel[i].datasets,
             plspec->panel[i].dataset);
 #endif
-  omnis = 0;
+  omnis = nFirst = nLast = 0;
   for (iset=0; iset<plspec->datasets; iset++) {
     ireq = plspec->dataset[iset].request_index;
     if (plspec->plot_request[ireq].flags&PLREQ_OMNIPRESENT) {
       omnis++;
+      if (plspec->plot_request[ireq].flags&PLREQ_OMNIFIRST)
+	nFirst++;
+      else
+	nLast++;
       plspec->dataset[iset].plotpanel = -1;
     }
   }
+#if defined(DEBUG)
+  fprintf(stderr, "omnis=%ld, nFirst=%ld, nLast=%ld\n", omnis, nFirst, nLast);
+#endif
   if (omnis) {
+    long iFirst, iLast;
     for (panel=0; panel<plspec->panels; panel++) {
       plspec->panel[panel].dataset = 
         trealloc(plspec->panel[panel].dataset,
                  sizeof(*plspec->panel[panel].dataset)*(plspec->panel[panel].datasets+omnis));
-      for (iset=i=0; iset<plspec->datasets; iset++) {
+      if (nFirst) {
+	for (iset=plspec->panel[panel].datasets-1; iset>=0; iset--) {
+#if defined(DEBUG)
+	  fprintf(stderr, "Moving dataset from slot %ld to %ld\n",
+		  iset, iset+nFirst);
+#endif
+	  plspec->panel[panel].dataset[iset+nFirst] = plspec->panel[panel].dataset[iset];
+	}
+      }
+      for (iset=iFirst=iLast=0; iset<plspec->datasets; iset++) {
         ireq = plspec->dataset[iset].request_index;
         if (plspec->plot_request[ireq].flags&PLREQ_OMNIPRESENT) {
-          plspec->panel[panel].dataset[plspec->panel[panel].datasets+i] =
-            tmalloc(sizeof(*plspec->panel[panel].dataset[plspec->panel[panel].datasets+i]));
-          memcpy(plspec->panel[panel].dataset[plspec->panel[panel].datasets+i],
-                 plspec->dataset+iset, 
-                 sizeof(*plspec->panel[panel].dataset[plspec->panel[panel].datasets+i]));
-          plspec->panel[panel].dataset[plspec->panel[panel].datasets+i]->plotpanel = panel;
-          plspec->panel[panel].dataset[plspec->panel[panel].datasets+i]->fromOmni = 1;
-          plspec->panel[panel].dataset[plspec->panel[panel].datasets+i]->omniSourceDataset = iset;
-          i++;
+	  if (plspec->plot_request[ireq].flags&PLREQ_OMNIFIRST) {
+	    i = iFirst;
+	    iFirst ++;
+	  } else {
+	    i = iLast + plspec->panel[panel].datasets + nFirst;
+	    iLast ++;
+	  }
+#if defined(DEBUG)
+	  fprintf(stderr, "Placing omni dataset in slot %ld\n", i);
+#endif
+	  plspec->panel[panel].dataset[i] = tmalloc(sizeof(*plspec->panel[panel].dataset[i]));
+	  memcpy(plspec->panel[panel].dataset[i],
+		 plspec->dataset+iset, 
+		 sizeof(*plspec->panel[panel].dataset[i]));
+	  plspec->panel[panel].dataset[i]->plotpanel = panel;
+	  plspec->panel[panel].dataset[i]->fromOmni = 1;
+	  plspec->panel[panel].dataset[i]->omniSourceDataset = iset;
         }
       }
       plspec->panel[panel].datasets += omnis;

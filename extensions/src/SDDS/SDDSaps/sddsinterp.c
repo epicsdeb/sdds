@@ -13,6 +13,9 @@
  * Michael Borland, 1995
  * based on mpl-format interpolation program
  $Log: sddsinterp.c,v $
+ Revision 1.28  2011/01/28 16:39:37  shang
+ added interp_short option to interpolate short values.
+
  Revision 1.27  2006/12/14 22:21:59  soliday
  Updated a bunch of programs because SDDS_SaveLayout is now called by
  SDDS_WriteLayout and it is no longer required to be called directly.
@@ -122,13 +125,14 @@
 #define CLO_FORCEMONOTONIC 12
 #define CLO_FILLIN 13
 #define CLO_EQUISPACED 14
-#define CLO_OPTIONS 15
+#define CLO_INTERP_SHORT 15
+#define CLO_OPTIONS 16
 
 char *option[CLO_OPTIONS] = {
   "order", "atvalues", "sequence", "columns", 
   "printout", "filevalues", "combineduplicates", 
   "branch", "belowrange", "aboverange", "pipe",
-  "exclude", "forcemonotonic", "fillin", "equispaced",
+  "exclude", "forcemonotonic", "fillin", "equispaced", "interpShort"
 };
 
 static char *USAGE = "sddsinterp [<inputfile>] [<outputfile>] [-pipe=[input][,output]]\n\
@@ -139,6 +143,7 @@ static char *USAGE = "sddsinterp [<inputfile>] [<outputfile>] [-pipe=[input][,ou
    -equispaced=<spacing>[,<start>,<end>] \n\
    -fillIn | \n\
    -fileValues=<valuesfile>[,column=<column-name>][,parallelPages]}] \n\
+ [-interpShort=-1|-2] \n\
  [-order=<number>] [-printout[=bare][,stdout]]\n\
  [-forceMonotonic[={increasing|decreasing}]] \n\
  [-belowRange={value=<value>|skip|saturate|extrapolate|wrap}[,{abort|warn}]]\n\
@@ -168,7 +173,7 @@ int main(int argc, char **argv)
   char *indepQuantity, **depenQuantity, *fileValuesQuantity, *fileValuesFile, **exclude;
   long depenQuantities, monotonicity, excludes;
   char *input, *output;
-  long i, j, rows, readCode, order, valuesReadCode, fillIn;
+  long i, j, rows, readCode, order, valuesReadCode, fillIn, row;
   long sequencePoints, combineDuplicates, branch;
   int32_t *rowFlag;
   double sequenceStart, sequenceEnd;
@@ -182,6 +187,8 @@ int main(int argc, char **argv)
   double *indepValue, **depenValue, *interpPoint, **outputData;
   unsigned long pipeFlags;
   FILE *fpPrint;
+  short interpShort, interpShortOrder=-1, *shortValue=NULL;
+  long nextPos;
 
   SDDS_RegisterProgramName(argv[0]);
   argc = scanargs(&scanned, argc, argv); 
@@ -223,6 +230,13 @@ int main(int argc, char **argv)
         for (i=0; i<atValues; i++)
           if (sscanf(scanned[iArg].list[i+1], "%lf", &atValue[i])!=1)
             SDDS_Bomb("invalid -atValues value");
+        break;
+      case CLO_INTERP_SHORT:
+        if (scanned[iArg].n_items==2) {
+          if (sscanf(scanned[iArg].list[1], "%hd", &interpShortOrder)!=1)
+            SDDS_Bomb("invalid -interpShort value");
+        }
+        interpShort = 1;
         break;
       case CLO_SEQUENCE:
         if ((scanned[iArg].n_items!=2 && scanned[iArg].n_items!=4) ||
@@ -509,10 +523,23 @@ int main(int argc, char **argv)
       rows = combineDuplicatePoints(indepValue, depenValue, depenQuantities, rows, 0.0);
     if ((monotonicity=checkMonotonicity(indepValue, rows))==0)
       SDDS_Bomb("independent data values do not change monotonically");
+    if (interpShort)
+      shortValue = malloc(sizeof(*shortValue)*rows);
+    
     for (i=0; i<depenQuantities; i++) {
+      if (interpShort) {
+        for (row=0; row<rows; row++) {
+          shortValue[row] = (short)depenValue[i][row];
+        }
+      }
       for (j=0; j<interpPoints; j++) {
-        outputData[i][j] = interpolate(depenValue[i], indepValue, rows, interpPoint[j], &belowRange,
-                                       &aboveRange, order, &interpCode, monotonicity);
+        if (!interpShort) {
+          outputData[i][j] = interpolate(depenValue[i], indepValue, rows, interpPoint[j], &belowRange,
+                                         &aboveRange, order, &interpCode, monotonicity);
+        } else {
+          outputData[i][j] = (double)interp_short(shortValue, indepValue, rows, interpPoint[j], 0, -1,
+                                                  &interpCode, &nextPos);
+        }
         if (interpCode) {
           if (interpCode&OUTRANGE_ABORT) {
             fprintf(stderr, "error: value %e is out of range for column %s\n",
@@ -527,7 +554,8 @@ int main(int argc, char **argv)
         }
       }
     }
-    
+    if (interpShort)
+      free(shortValue);
     if (!SDDS_StartPage(&SDDSout, interpPoints) || 
         !SDDS_SetColumnFromDoubles(&SDDSout, SDDS_SET_BY_NAME, interpPoint, interpPoints, indepQuantity))
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);

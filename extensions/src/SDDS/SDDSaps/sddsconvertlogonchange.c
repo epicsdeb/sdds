@@ -66,12 +66,12 @@ int main(int argc, char **argv) {
   double epochtime;
 
   long readbackNameIndex=-1, controlNameIndex=-1;
-  long timeIndex=-1, valueIndex=-1, controlNameIndexIndex=-1;
-  double *timeData=NULL, *valueData=NULL;
+  long timeIndex=-1, valueIndex=-1, controlNameIndexIndex=-1, previousRowIndex=-1;
+  double *timeData=NULL, *valueData=NULL, *previousRowData=NULL;
   int32_t *controlNameIndexData=NULL;
   SDDS_ARRAY *readbackNameArray=NULL;
   SDDS_ARRAY *readbackNameArray2=NULL;
-  long page=0, row, rows, outrow;
+  long page=0, row, rows, outrow, initRow=0;
   double *rowdata=NULL;
   long *origToNewIndex=NULL;
   double minimumInterval=-1;
@@ -207,6 +207,7 @@ int main(int argc, char **argv) {
     
   readbackNameIndex = SDDS_VerifyArrayExists(&SDDS_input, FIND_SPECIFIED_TYPE, SDDS_STRING, "ReadbackName");
   controlNameIndex = SDDS_VerifyArrayExists(&SDDS_input, FIND_SPECIFIED_TYPE, SDDS_STRING, "ControlName");
+  previousRowIndex = SDDS_VerifyColumnExists(&SDDS_input, FIND_NUMERIC_TYPE, "PreviousRow");
   timeIndex = SDDS_VerifyColumnExists(&SDDS_input, FIND_NUMERIC_TYPE, "Time");
   valueIndex = SDDS_VerifyColumnExists(&SDDS_input, FIND_NUMERIC_TYPE, "Value");
   controlNameIndexIndex = SDDS_VerifyColumnExists(&SDDS_input, FIND_INTEGER_TYPE, "ControlNameIndex");
@@ -348,14 +349,40 @@ int main(int argc, char **argv) {
         }
       }
     }
+    if (previousRowIndex != -1) {
+      if ((previousRowData = SDDS_GetColumnInDoubles(&SDDS_input, "PreviousRow")) == NULL) {
+        SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
+        exit(1);
+      }
+      for (row = rows - 1; row >= 0; row--) {
+        if (previousRowData[row] == -2) {
+          if (origToNewIndex[controlNameIndexData[row]] == -1) {
+            continue;
+          }
+          initRow = row;
+          break;
+        }
+      }
+      free(previousRowData);
+    }
+
     if (minimumInterval > 0) {
       previousTime = timeData[0] - minimumInterval - 1;
     }
     for (row = 0 ; row < rows ; row++) {
+      if ((readbackNameArray->elements < controlNameIndexData[row]) || (controlNameIndexData[row] < 0)) {
+        /*sometimes there is invalid data in the original file*/
+        continue;
+      }
       if (origToNewIndex[controlNameIndexData[row]] == -1) {
         continue;
       }
-      rowdata[origToNewIndex[controlNameIndexData[row]]] = valueData[row]; 
+      rowdata[origToNewIndex[controlNameIndexData[row]]] = valueData[row];
+      if (previousRowIndex != -1) {
+        if (row < initRow) {
+           continue;
+        }
+      }
       if (((snapshot==0) && (filterTime==0)) || 
           ((snapshot==1) && (row == snapshotrow)) || 
           ((filterTime==1) && (row >= startTimeRow) && (row <= endTimeRow))) {
@@ -520,7 +547,7 @@ long SDDS_SetRowValuesMod(SDDS_DATASET *SDDS_dataset, long mode, long row, ...)
       if (mode&SDDS_PASS_BY_VALUE)
         *(((float*)SDDS_dataset->data[index])+row) = (float)va_arg(argptr, double);
       else
-        *(((float*)SDDS_dataset->data[index])+row) = *(va_arg(argptr, float *));
+        *(((float*)SDDS_dataset->data[index])+row) = *(va_arg(argptr, double *));
       break;
     case SDDS_DOUBLE:
       if (mode&SDDS_PASS_BY_VALUE)

@@ -1,0 +1,36 @@
+/Makefile/1.12/Mon Apr 14 18:27:26 2008//
+/Makefile.Host/1.26/Wed Jul 23 00:42:07 2003//
+/Makefile.Host.SDDS1/1.1/Wed Jul 23 00:42:08 2003//
+/Makefile.OAG/1.21/Wed Jan 12 01:47:45 2011//
+/Makefile.OAG2/1.7/Fri Jan 21 20:30:43 2005//
+/Makefile.SDDS1/1.1/Wed Jul 23 02:01:55 2003//
+/Makefile.Vx/1.4/Wed Sep 17 19:21:20 2003//
+/SDDS_MPI_binary.c/1.13/Tue Jul  7 15:13:32 2009//
+/SDDS_ascii.c/1.33/Tue Dec 12 17:32:00 2006//
+/SDDS_binary.c/1.57/Wed Sep  3 15:57:24 2008//
+/SDDS_copy.c/1.37/Tue May  2 16:53:22 2006//
+/SDDS_data.c/1.7/Thu Aug 31 15:08:01 2006//
+/SDDS_dataprep.c/1.26/Thu Feb 18 02:16:29 2010//
+/SDDS_extract.c/1.43/Thu Sep 18 20:15:51 2008//
+/SDDS_info.c/1.6/Fri Nov  4 22:46:52 2005//
+/SDDS_input.c/1.58/Wed Aug 12 22:34:31 2009//
+/SDDS_internal.h/1.21/Mon Apr 14 18:28:05 2008//
+/SDDS_mplsupport.c/1.7/Fri Nov  4 22:46:52 2005//
+/SDDS_output.c/1.59/Mon Jun  1 20:56:26 2009//
+/SDDS_process.c/1.11/Tue Apr  8 14:32:14 2008//
+/SDDS_rpn.c/1.14/Tue Jul  1 14:37:17 2008//
+/SDDS_transfer.c/1.11/Fri Nov  4 22:46:53 2005//
+/SDDS_utils.c/1.69/Fri Aug 27 16:31:32 2010//
+/SDDS_write.c/1.13/Fri Nov  4 22:46:53 2005//
+/SDDSmpi_input.c/1.8/Fri Jan  7 16:44:48 2011//
+/SDDSmpi_output.c/1.8/Mon Jun  1 14:39:28 2009//
+/SDDSnl.h/1.5/Wed Aug 14 16:34:50 2002//
+/SDDSnl.nl/1.4/Wed Aug 14 16:34:50 2002//
+/aptest.c/1.6/Wed Aug 14 16:34:51 2002//
+/atest.c/1.4/Wed Aug 14 16:34:51 2002//
+/notes.SDDSlib/1.4/Wed Aug  7 14:51:42 1996//
+/setrow.c/1.4/Wed Aug 14 16:34:51 2002//
+/testout.c/1.4/Wed Aug 14 16:34:51 2002//
+/testout1.c/1.4/Wed Aug 14 16:34:51 2002//
+D/doc////
+D/mpi_examples////

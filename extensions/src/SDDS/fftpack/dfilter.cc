@@ -7,7 +7,7 @@
 * in the file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* file    : dfilter.c
+/* file    : dfilter.cc
  * contents: digitalFilter()
  *           copy_dp_array()
  *           dp_pad_with_zeroes()
@@ -15,7 +15,10 @@
  *           fft_derivative()
  *
  * Michael Borland, 1990-5
- $Log: dfilter.c,v $
+ $Log: dfilter.cc,v $
+ Revision 1.1  2010/02/04 23:43:51  soliday
+ Converted to c++ so that std::complex can be used.
+
  Revision 1.7  2009/12/02 22:22:34  soliday
  Added complex number support for non C99 compilers.
 
@@ -35,10 +38,8 @@
  First test release of the SDDS1.5 package.
 
  */
+#include <complex>
 #include "mdb.h"
-#if defined(__USE_ISOC99) || defined(__USE_ISOC94)
-#include <complex.h>
-#endif
 #include "fftpackC.h"
 
 void copy_dp_array(double **c, double *o, long n);
@@ -60,7 +61,7 @@ void digitalFilter(
  
     n_pts = n_pts0;
     if (n_pts<=1)
-        bomb("Too few data points.", NULL);
+      bomb((char*)"Too few data points.", NULL);
     if (largest_prime_factor(n_pts)>100)
         puts("Warning: number of points has large prime factors.\nThis could take a very long time.\nConsider padding or truncating to 2^n points.");
 
@@ -83,7 +84,7 @@ void digitalFilter(
             y[i] *= 1 - sqr(i-r1)/r2;
         }
 
-    real_imag = tmalloc(sizeof(double)*(n_pts+2));
+    real_imag = (double*)tmalloc(sizeof(double)*(n_pts+2));
     realFFT2(real_imag, y, n_pts, 0);
 
     /* calculate factor for converting k to f or omega*/
@@ -162,54 +163,32 @@ void digitalFilter(
         }
     /* apply filter function */
     if (filter && filter_points>=2) {
-#if defined(__USE_ISOC99) || defined(__USE_ISOC94)
-      double complex filter_value, product;
-      filter_value = 0;
+      std::complex <double> filter_value(0,0), product;
       for (i=0; i<n_freq; i++) {
-	freq = i*factor;
-	if (freq<=filter[0][filter_points-1] && freq>=filter[0][0]) {
-	  filter_value = interp(filter[1], filter[0], filter_points, freq, 0, 1, &code);
-	  if (filter[2])
-	    filter_value += I*interp(filter[2], filter[0], filter_points, freq, 0, 1, &code);
-	  product = filter_value*(real_imag[2*i] + I*real_imag[2*i+1]);
-	  real_imag[2*i  ] = creal(product);
-	  real_imag[2*i+1] = cimag(product);
+        freq = i*factor;
+        if (freq<=filter[0][filter_points-1] && freq>=filter[0][0]) {
+          filter_value = interp(filter[1], filter[0], filter_points, freq, 0, 1, &code);
+          if (filter[2])
+	    filter_value += std::complex<double>(0,1)*interp(filter[2], filter[0], filter_points, freq, 0, 1, &code);
+	  product = filter_value*(real_imag[2*i] + std::complex<double>(0,1)*real_imag[2*i+1]);
+	  real_imag[2*i  ] = product.real();
+	  real_imag[2*i+1] = product.imag();
 	}
       }
-#else
-      doublecomplex_sdds filter_value, product;
-      filter_value.r = 0;
-      filter_value.i = 0;
-      for (i=0; i<n_freq; i++) {
-	freq = i*factor;
-	if (freq<=filter[0][filter_points-1] && freq>=filter[0][0]) {
-	  filter_value.r = interp(filter[1], filter[0], filter_points, freq, 0, 1, &code);
-          filter_value.i = 0;
-	  if (filter[2])
-	    filter_value.i = interp(filter[2], filter[0], filter_points, freq, 0, 1, &code);
-
-	  product.r = (filter_value.r * real_imag[2*i] - filter_value.i * real_imag[2*i+1]);
-	  product.i = (filter_value.i * real_imag[2*i] + filter_value.r * real_imag[2*i+1]);
-
-	  real_imag[2*i  ] = product.r;
-	  real_imag[2*i+1] = product.i;
-	}
-      }
-#endif
     }
     
     factor = 1;
     if (zp_spectrum>1) {
-        /* pad the spectrum */
-        real_imag = trealloc(real_imag, sizeof(double)*2*(zp_spectrum*n_pts));
-        for (i=2*n_pts; i<2*zp_spectrum*n_pts; i++)
-            real_imag[i] = 0;
-        n_freq *= zp_spectrum;
-        n_pts  *= zp_spectrum;
-        dt /= zp_spectrum;
-        factor = zp_spectrum;
-        }
-
+      /* pad the spectrum */
+      real_imag = (double*)trealloc(real_imag, sizeof(double)*2*(zp_spectrum*n_pts));
+      for (i=2*n_pts; i<2*zp_spectrum*n_pts; i++)
+        real_imag[i] = 0;
+      n_freq *= zp_spectrum;
+      n_pts  *= zp_spectrum;
+      dt /= zp_spectrum;
+      factor = zp_spectrum;
+    }
+    
     /* compute IFFT */
     realFFT2(real_imag, real_imag, n_pts, INVERSE_FFT);
 
@@ -217,16 +196,16 @@ void digitalFilter(
     if (!*T_out || !*Y_out) {
         /* at least on array is not allocated */
         if (!(!*T_out && !*Y_out))
-            bomb("calling routine supplied only one of two output arrays (dp_digital_filter)", NULL);
+            bomb((char*)"calling routine supplied only one of two output arrays (dp_digital_filter)", NULL);
         *n_out = n_pts;
-        *T_out = tmalloc(sizeof(**T_out)*n_pts);
-        *Y_out = tmalloc(sizeof(**Y_out)*n_pts);
+        *T_out = (double*)tmalloc(sizeof(**T_out)*n_pts);
+        *Y_out = (double*)tmalloc(sizeof(**Y_out)*n_pts);
         }
     else {
         /* both arrays are allocated--may need to lengthen, however */
         if (n_pts>n_pts0) {
-            *T_out = trealloc(*T_out, sizeof(**T_out)*n_pts);
-            *Y_out = trealloc(*Y_out, sizeof(**Y_out)*n_pts);
+            *T_out = (double*)trealloc(*T_out, sizeof(**T_out)*n_pts);
+            *Y_out = (double*)trealloc(*Y_out, sizeof(**Y_out)*n_pts);
             }
         }
 
@@ -256,8 +235,8 @@ long dp_pad_with_zeroes(double **t, double **f, long n)
     double dt;
 
     np2 = ipow(2., (long)(log((double)n)/log(2.0F)+1.) );
-    *t  = trealloc(*t, sizeof(**t)*np2);
-    *f  = trealloc(*f, sizeof(**f)*np2);
+    *t  = (double*)trealloc(*t, sizeof(**t)*np2);
+    *f  = (double*)trealloc(*f, sizeof(**f)*np2);
     dt  = ((*t)[n-1] - (*t)[0])/(n-1);
     for (i=n; i<np2; i++) {
         (*t)[i] = (*t)[n-1] + (i-n+1)*dt;
@@ -268,7 +247,7 @@ long dp_pad_with_zeroes(double **t, double **f, long n)
 
 void copy_dp_array(double **c, double *o, long n)
 {
-    *c = tmalloc(sizeof(**c)*n);
+    *c = (double*)tmalloc(sizeof(**c)*n);
     while (n--)
         (*c)[n] = o[n];
     }
@@ -286,7 +265,7 @@ void FFTderivative(
 
     n_pts = n_pts0;
     if (n_pts<=1)
-        bomb("Too few data points.", NULL);
+      bomb((char*)"Too few data points.", NULL);
     copy_dp_array(&t, T, n_pts);
     copy_dp_array(&y, Y, n_pts);
     if (!power_of_2(n_pts)) {
@@ -298,7 +277,7 @@ void FFTderivative(
         }
     n_freq = n_pts/2+1;
 
-    real_imag = tmalloc(sizeof(double)*(n_pts+2));
+    real_imag = (double*)tmalloc(sizeof(double)*(n_pts+2));
     realFFT2(real_imag, y, n_pts, 0);
 
     /* calculate factor for converting k to f or omega*/
@@ -315,7 +294,7 @@ void FFTderivative(
     factor = 1;
     if (zp_spectrum>1) {
         /* pad the spectrum */
-        real_imag = trealloc(real_imag, sizeof(double)*2*(zp_spectrum*n_pts));
+        real_imag = (double*)trealloc(real_imag, sizeof(double)*2*(zp_spectrum*n_pts));
         for (i=2*n_pts; i<2*zp_spectrum*n_pts; i++)
             real_imag[i] = 0;
         n_freq *= zp_spectrum;
@@ -331,16 +310,16 @@ void FFTderivative(
     if (!*T_out || !*Y_out) {
         /* at least on array is not allocated */
         if (!(!*T_out && !*Y_out))
-            bomb("calling routine supplied only one of two output arrays (dp_digital_filter)", NULL);
+          bomb((char*)"calling routine supplied only one of two output arrays (dp_digital_filter)", NULL);
         *n_out = n_pts;
-        *T_out = tmalloc(sizeof(**T_out)*n_pts);
-        *Y_out = tmalloc(sizeof(**Y_out)*n_pts);
+        *T_out = (double*)tmalloc(sizeof(**T_out)*n_pts);
+        *Y_out = (double*)tmalloc(sizeof(**Y_out)*n_pts);
         }
     else {
         /* both arrays are allocated--may need to lengthen, however */
         if (n_pts>n_pts0) {
-            *T_out = trealloc(*T_out, sizeof(**T_out)*n_pts);
-            *Y_out = trealloc(*Y_out, sizeof(**Y_out)*n_pts);
+            *T_out = (double*)trealloc(*T_out, sizeof(**T_out)*n_pts);
+            *Y_out = (double*)trealloc(*Y_out, sizeof(**Y_out)*n_pts);
             }
         }
     for (i=0; i<n_pts; i++) {

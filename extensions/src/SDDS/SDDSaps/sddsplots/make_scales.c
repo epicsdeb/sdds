@@ -13,6 +13,21 @@
  *
  * Michael Borland, 1991.
  $Log: make_scales.c,v $
+ Revision 1.41  2011/01/11 22:59:40  soliday
+ Removed debugging statement
+
+ Revision 1.40  2011/01/11 22:51:02  soliday
+ Changed all the strcpy commands to strcpy_ss because of problems with
+ RedHat Enterprise 6. If a strcpy copies the result to the same memory
+ space you will get unexpected results.
+
+ Revision 1.39  2010/09/02 15:49:28  soliday
+ Removed last change.
+
+ Revision 1.38  2010/09/01 01:08:24  borland
+ Changed the order of some calls to fix a bug that showed up when using linetype
+ tables and thickness controls.
+
  Revision 1.37  2005/08/29 21:31:25  shang
  added linetype to xlabel, ylabel, topline and title options
 
@@ -212,6 +227,7 @@ void make_scales_with_label(
              1, plane?yl:xl, plane?yh:xh, plane?xh:yh,
              plane?(wpmax-pmax)*(xh-xl)/(pmax-pmin):(wqmax-qmax)*(yh-yl)/(qmax-qmin),
 	     0, NULL, 1, 0, 0, 0, 1);
+
 }
 
 void find_tick_interval(double *start, double *delta, int *number,
@@ -965,7 +981,7 @@ void makeTimeScales(
     if (timeRange<HSECOND)
       tickStart += ((long)(1000*(timeStart-tickStart)))/1000.0;
     labelMode = LABEL_HSECOND;
-    strcpy(labelSample, "9.999s");
+    strcpy_ss(labelSample, "9.999s");
   }
   else if (spacing<=TSECOND) {
     tickStart = (long)timeStart +
@@ -973,48 +989,48 @@ void makeTimeScales(
     if (timeRange<TSECOND) {
       tickStart += ((long)(100*(timeStart-tickStart)))/100.0;
       labelMode = LABEL_HSECOND;
-      strcpy(labelSample, "9.999s");
+      strcpy_ss(labelSample, "9.999s");
     } else {
       labelMode = LABEL_TSECOND;
-      strcpy(labelSample, "9.99s");
+      strcpy_ss(labelSample, "9.99s");
     }
   }
   else if (spacing<=SECOND) {
     tickStart = (long)timeStart;
     tickStart += ((long)(10*(timeStart-tickStart)))/10.0;
     labelMode = LABEL_SECOND;
-    strcpy(labelSample, "9.9s");
+    strcpy_ss(labelSample, "9.9s");
   }
   else if (spacing<MINUTE) {
     tickStart = (long)(timeStart+0.5);
     labelMode = LABEL_MINUTESECOND;
-    strcpy(labelSample, "60m60s");
+    strcpy_ss(labelSample, "60m60s");
   }
   else if (spacing<60*MINUTE) {
     tickStart = (long)(timeStart/MINUTE+0.5)*60;
     labelMode = LABEL_HOURMINUTE;
     timeValue = tickStart;
-    strcpy(labelSample, "24h60m");
+    strcpy_ss(labelSample, "24h60m");
   }
   else if (spacing<24*HOUR) {
     tickStart = (long)(timeStart/HOUR+0.5)*HOUR;
     labelMode = LABEL_DAYHOUR;
-    strcpy(labelSample, "30d24h");
+    strcpy_ss(labelSample, "30d24h");
   }
   else if (spacing<30*DAY) {
     tickStart = (long)(timeStart/DAY+0.5)*DAY;
     labelMode = LABEL_MONTHDAY;
-    strcpy(labelSample, "12/30");
+    strcpy_ss(labelSample, "12/30");
   }
   else if (spacing<11*MONTH) {
     tickStart = (long)(timeStart/MONTH+0.5)*MONTH;
     labelMode = LABEL_YEARMONTH;
-    strcpy(labelSample, "12/1998");
+    strcpy_ss(labelSample, "12/1998");
   }
   else {
     tickStart = (long)(timeStart/YEAR+0.5)*YEAR;
     labelMode = LABEL_YEAR;
-    strcpy(labelSample, "9999");
+    strcpy_ss(labelSample, "9999");
   }
   
   if (doY) {
@@ -1307,7 +1323,7 @@ void makeTickLabel(char *label, char *format, double value,
         mantissa = SIGN(value)*
           pow(10.0, log10(FABS(value))-(exponent=floor(log10(FABS(value)))));
         sprintf(label, format, mantissa, exponent);
-      } 
+     } 
     }
     else
       sprintf(label, format, value);

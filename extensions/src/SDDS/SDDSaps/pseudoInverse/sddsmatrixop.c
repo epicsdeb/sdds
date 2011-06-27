@@ -10,6 +10,9 @@
  * purpose: a general matrix operation sdds tool using LAPACK or CLAPACK routines
  *
  * $Log: sddsmatrixop.c,v $
+ * Revision 1.4  2010/08/12 22:13:19  shang
+ * now non-LAPACK routine can also compute the determinant if requested.
+ *
  * Revision 1.3  2009/01/22 21:06:22  shang
  * modified to be able to work with files that contain string columns
  *
@@ -460,11 +463,11 @@ int main(int argc, char **argv)
   }
   if( !SDDS_InitializeOutput(&outputPage,SDDS_BINARY, 1,NULL, NULL, outputFile))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
-#if defined(LAPACK) || defined(CLAPACK)
+
   if (do_determinant && !SDDS_DefineSimpleParameter(&outputPage, "Determinant", NULL, 
                                                     SDDS_DOUBLE))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
-#endif
+
   if (givenColumnNames) {
     SDDS_FreeStringArray(doubleColumnName, doubleColumns);
     free(doubleColumnName);
@@ -511,12 +514,10 @@ int main(int argc, char **argv)
     if (!SDDS_StartPage(&outputPage,temp[j]->m))
       SDDS_PrintErrors(stdout, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
     if (do_determinant) {
-#if defined(LAPACK) || defined(CLAPACK)
       det = matrix_det(temp[j]);
       if (!SDDS_SetParameters(&outputPage, SDDS_SET_BY_NAME|SDDS_PASS_BY_VALUE,
                               "Determinant", det, NULL))
         SDDS_PrintErrors(stdout, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
-#endif
     }
     for (i=0;i<temp[j]->n;i++) {
       if (i<outputColumns && 

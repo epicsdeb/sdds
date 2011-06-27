@@ -7,26 +7,14 @@
 #ifndef _CMATLIB_
 #define _CMATLIB_
 
-#include </usr/include/complex.h>
-#include <stdio.h>
+#include "SDDScomplex.h"
 
-typedef struct {
-  double complex **a;
-  int n, m;
-} CMATRIX;
-
-typedef struct {
-  float complex **a;
-  int n, m;
-} FCMATRIX;
-
-double complex cassign_me(CMATRIX *A, int row, int col);
+COMPLEX cassign_me(CMATRIX *A, int row, int col);
 void cm_error(char *message);
 int cm_add(CMATRIX *C, CMATRIX *A, CMATRIX *B);
-int cm_substract(CMATRIX *C, CMATRIX *A, CMATRIX *B);
 void cm_alloc(CMATRIX **A, int n, int m);
 int cm_copy(CMATRIX *A, CMATRIX *B);
-double complex cm_det(CMATRIX *D);
+COMPLEX cm_det(CMATRIX *D);
 void cm_free(CMATRIX **A);
 int cm_invert(CMATRIX *A, CMATRIX *B);
 int cm_mult(CMATRIX *C, CMATRIX *A, CMATRIX *B);

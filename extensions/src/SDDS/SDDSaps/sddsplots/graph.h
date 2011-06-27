@@ -13,6 +13,10 @@
  *
  * Michael Borland, 1991.
  $Log: graph.h,v $
+ Revision 1.31  2010/01/05 20:06:45  soliday
+ Added the -intensityBar option which can be used to move the intensity bar
+ and to resize the label text to the left and the unit text above.
+
  Revision 1.30  2007/05/17 19:40:32  soliday
  Modified to allow changing the thickness for the intensity bar labels.
 
@@ -342,10 +346,11 @@ float psymbol1(int x, int y, char *ktext, float size, float aspect,
 
 void shade_box(long shade, double xl, double xh, double yl, double yh);
 int X11_fill_box(int shade, int xl, int xh, int yl, int yh);
-void make_intensity_bar(long n_shades, long shadeOffset, long reverse, double min_value, 
-                        double max_value,
-                        double hue0, double hue1, char *colorSymbol, char *colorUnits,
-			long tickLabelThickness);
+void make_intensity_bar(long n_shades, long shadeOffset, long reverse, 
+                        double min_value, double max_value, double hue0, 
+                        double hue1, char *colorSymbol, char *colorUnits,
+			long tickLabelThickness, 
+                        double labelsize, double unitsize, double xadjust);
 
 void RGB_values(double *r, double *g, double *b, double hue);
 void Spectral_RGB_values(double *r, double *g, double *b, double hue);

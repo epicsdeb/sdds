@@ -63,34 +63,6 @@ integer i_dnnt(doublereal *x)
 return (integer)(*x >= 0. ? floor(*x + .5) : -floor(.5 - *x));
 }
 
-#if defined(__USE_ISOC99) || defined(__USE_ISOC94)
-double complex complexErf(double complex z, long *flag)
-{
-  double xi, yi;
-  double u, v;
-  logical lflag;
-  xi = creal(z);
-  yi = cimag(z);
-  wofz(&xi, &yi, &u, &v, &lflag);
-  *flag = lflag;
-  return u + I*v;
-}
-#else
-doublecomplex_sdds complexErf(doublecomplex_sdds z, long *flag)
-{
-  double xi, yi;
-  double u, v;
-  doublecomplex_sdds result;
-  logical lflag;
-  xi = z.r;
-  yi = z.i;
-  wofz(&xi, &yi, &u, &v, &lflag);
-  *flag = lflag;
-  result.r = u;
-  result.i = v;
-  return result;
-}
-#endif
 
 /*      ALGORITHM 680, COLLECTED ALGORITHMS FROM ACM. */
 /*      THIS WORK PUBLISHED IN TRANSACTIONS ON MATHEMATICAL SOFTWARE, */

@@ -25,6 +25,9 @@
    added sdds input and output so that the output can be plotted by sddscontour
    
    $Log: sdds2dinterpolate.c,v $
+   Revision 1.7  2010/01/14 16:20:15  shang
+   fixed bugs in interpolating multiple page data without merge.
+
    Revision 1.6  2008/03/11 21:44:20  shang
    corrected the error message for -independent option
 
@@ -165,7 +168,7 @@ int main(int argc, char* argv[])
 {
   SDDS_DATASET SDDS_out, SDDS_points;
   char *inputFile, *outputFile, *xCol="x", *yCol="y", *zCol="z", *stdCol="StdError", *pointsFile=NULL;
-  long i, j, i_arg, algorithm, scale, *rows, pages, merge=0, point_pages, page;
+  long i, j, i_arg, algorithm, scale, *rows, pages, merge=0, point_pages=0, page;
   unsigned long dummyFlags=0, pipeFlags=0;
   SCANNED_ARG *s_arg;
   double **x=NULL, **y=NULL, **z=NULL, xmin, xmax, ymin, ymax, **std=NULL, *std_all = NULL;
@@ -492,8 +495,8 @@ int main(int argc, char* argv[])
         }
         if (!spec->nointerp)
           WriteOutputPage(&SDDS_out, xCol, yCol, zCol, spec, nout, pout);
-        free(pout);
-        pout = NULL;
+        /* free(pout);
+           pout = NULL; */
       }
       free(pin);
       pin = NULL;
@@ -510,6 +513,13 @@ int main(int argc, char* argv[])
   }
   if (!spec->nointerp && !SDDS_Terminate(&SDDS_out))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+  if (point_pages && out_point) {
+    for (i=0; i<point_pages; i++) {
+      free(out_point[i].pout);
+    }
+    free(out_point);
+  }
+  if (pout) free(pout);
   free(spec);
   free(rows);
   free_scanargs(&s_arg, argc);
@@ -775,9 +785,9 @@ int interpolate_output_points(int nin, point *pin, double *std, char *xCol, char
       do_csa_2d_interpolate(spec, nin, pin, &nout, &pout, std);
     if (!spec->nointerp)
       WriteOutputPage(SDDS_out, xCol, yCol, zCol, spec, nout, pout);
-    free(pout);
+    /*  free(pout);*/
   }
-  free(out_point);
-  out_point = NULL;
+  /* free(out_point);
+     out_point = NULL; */
   return 1;
 }

@@ -10,6 +10,18 @@
 /* file: rpn.h
  * Michael Borland, 1988
  $Log: rpn.h,v $
+ Revision 1.34  2010/12/03 02:48:57  borland
+ Added prototypes for isort and dsort functions.
+
+ Revision 1.33  2010/02/24 23:59:38  borland
+ Added InvFq function to RPN.
+
+ Revision 1.32  2010/02/05 16:35:41  soliday
+ Fixed an issue with creating sharied libraries.
+
+ Revision 1.31  2010/02/04 23:42:34  soliday
+ Updated so that it can be used by c++
+
  Revision 1.30  2009/03/10 14:11:28  shang
  added strlen function
 
@@ -128,6 +140,10 @@ typedef unsigned __int32 uint32_t;
 #define rpn_default "/etc/sdds/defns.rpn"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #undef epicsShareFuncRPNLIB
 #if (defined(_WIN32) && !defined(__CYGWIN32__)) || (defined(__BORLANDC__) && defined(__linux__))
 #if defined(EXPORT_RPNLIB)
@@ -210,6 +226,7 @@ void rpn_subtract(void);
 void rpn_multiply(void);
 void rpn_divide(void);
 void rpn_sqrt(void);
+void rpn_inverseFq(void);
 void rpn_square(void);
 void rpn_power(void);
 void rpn_sin(void);
@@ -238,6 +255,8 @@ void rpn_atan2(void);
 void rpn_isnan(void);
 void rpn_poissonSL(void);
 void rpn_simpson(void);
+void rpn_isort_stack(void);
+void rpn_dsort_stack(void);
 
 /* prototypes for code in file memory.c */
 epicsShareFuncRPNLIB long rpn_create_mem(char *name, short is_string);
@@ -325,7 +344,7 @@ void rpn_draw(void);
 /* prototypes for code in file rpn_error.c */
 void rpn_set_error(void);
 epicsShareFuncRPNLIB long rpn_check_error(void);
-void rpn_clear_error(void);
+epicsShareFuncRPNLIB void rpn_clear_error(void);
 
 /* prototypes for code in file infixtopostfix.c */
 #define IFPF_BUF_SIZE    1024
@@ -335,3 +354,6 @@ epicsShareFuncRPNLIB int if2pf(char *pfix, char *ifix, size_t size_of_pfix);
 epicsShareExtern long dstackptr;
 epicsShareExtern long sstackptr;
 
+#ifdef __cplusplus
+}
+#endif

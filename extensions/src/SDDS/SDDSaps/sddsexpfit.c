@@ -11,6 +11,9 @@
  * purpose: do an exponential fit:  y(n) = a0 + a1*exp(a2*x(n))
  * M. Borland, 1995
  $Log: sddsexpfit.c,v $
+ Revision 1.33  2010/04/12 22:54:06  lemery
+ Untabified.
+
  Revision 1.32  2006/12/14 22:21:58  soliday
  Updated a bunch of programs because SDDS_SaveLayout is now called by
  SDDS_WriteLayout and it is no longer required to be called directly.
@@ -327,7 +330,7 @@ int main(int argc, char **argv)
 
     for (i=0; i<3; i++) {
       if ((guessFlags>>3)&(1<<i)) {
-	disable[i] = 1;
+        disable[i] = 1;
       }
     }
 
@@ -346,79 +349,79 @@ int main(int argc, char **argv)
       fitData = residualData = NULL;
       xData = yData = syData = NULL;
       if (!(xData = SDDS_GetColumnInDoubles(&InputTable, xName)) ||
-	  !(yData = SDDS_GetColumnInDoubles(&InputTable, yName)) ||
-	  (syName && !(syData = SDDS_GetColumnInDoubles(&InputTable, syName))))
-	SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+          !(yData = SDDS_GetColumnInDoubles(&InputTable, yName)) ||
+          (syName && !(syData = SDDS_GetColumnInDoubles(&InputTable, syName))))
+        SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
       if ((nData = SDDS_CountRowsOfInterest(&InputTable))<4)
-	continue;
+        continue;
 
       if (xData[0]>xData[nData-1])
-	fputs("warning: data reverse-ordered\7\7", stderr);
+        fputs("warning: data reverse-ordered\7\7", stderr);
       
       find_min_max(&yMin, &yMax, yData, nData);
       find_min_max(&xMin, &xMax, xData, nData);
       for (i=0; i<nData; i++)
-	xData[i] -= xMin;
+        xData[i] -= xMin;
 
       fill_double_array(alo, 3, -DBL_MAX/2);
       fill_double_array(ahi, 3,  DBL_MAX/2);
 
       if (!guessGiven) {
-	if (clue==CLUE_GROWS) {
-	  a[0] = 0.9*yData[0];
-	  a[1] = yData[nData-1] - yData[0];
-	  a[2] = 1/(xData[nData-1]-xData[0]);
-	  alo[2] = 0;
-	  if (a[1]>0)
-	    alo[1] = 0;
-	  else 
-	    ahi[1] = 0;
-	}
-	else if (clue==CLUE_DECAYS) {
-	  a[0] = 0.9*yData[nData-1];
-	  a[1] = yData[0] - yData[nData-1];
-	  a[2] = 0;
-	  ahi[2] = 0;
-	  if (a[1]>0)
-	    alo[1] = 0;
-	  else 
-	    ahi[1] = 0;
-	}
-	else {
-	  a[0] = yMin*0.9;
-	  a[1] = yMax-yMin;
-	  a[2] = 0;
-	}
+        if (clue==CLUE_GROWS) {
+          a[0] = 0.9*yData[0];
+          a[1] = yData[nData-1] - yData[0];
+          a[2] = 1/(xData[nData-1]-xData[0]);
+          alo[2] = 0;
+          if (a[1]>0)
+            alo[1] = 0;
+          else 
+            ahi[1] = 0;
+        }
+        else if (clue==CLUE_DECAYS) {
+          a[0] = 0.9*yData[nData-1];
+          a[1] = yData[0] - yData[nData-1];
+          a[2] = 0;
+          ahi[2] = 0;
+          if (a[1]>0)
+            alo[1] = 0;
+          else 
+            ahi[1] = 0;
+        }
+        else {
+          a[0] = yMin*0.9;
+          a[1] = yMax-yMin;
+          a[2] = 0;
+        }
       }
       else {
-	a[0] = guess[0];
-	a[1] = guess[1];
-	a[2] = guess[2];
+        a[0] = guess[0];
+        a[1] = guess[1];
+        a[2] = guess[2];
       }
 
       if (guessFlags&(START_CONSTANT_GIVEN+FIX_CONSTANT_GIVEN))
-	a[0] = constantStart;
+        a[0] = constantStart;
       if (guessFlags&(START_FACTOR_GIVEN+FIX_FACTOR_GIVEN))
-	a[1] = factorStart;
+        a[1] = factorStart;
       if (guessFlags&(START_RATE_GIVEN+FIX_RATE_GIVEN))
-	a[2] = rateStart;
+        a[2] = rateStart;
 
       da[0] = a[0]*0.05;
       da[1] = a[1]*0.05;
       da[2] = 0.1/(xData[nData-1]-xData[0]);
       if (verbosity>3) 
-	fprintf(stderr, "starting guess: %e, %e, %e\n", 
-		a[0], a[1], a[2]);
-        
+        fprintf(stderr, "starting guess: %e, %e, %e\n", 
+                a[0], a[1], a[2]);
+      
       nEval = simplexMin(&result, a, da, alo, ahi, disable, n_dimen, -DBL_MAX, tolerance, fitFunction, 
-			 (verbosity>0?report:NULL), nEvalMax, nPassMax, 12, 3, 1.0, 0);
-        
+                         (verbosity>0?report:NULL), nEvalMax, nPassMax, 12, 3, 1.0, 0);
+      
       da[0] = a[0]/10;
       da[1] = a[1]/10;
       da[2] = a[2]/10;
       nEval = simplexMin(&result, a, da, alo, ahi, disable, n_dimen, -DBL_MAX, tolerance, fitFunction, 
-			 (verbosity>0?report:NULL), nEvalMax, nPassMax, 12, 3, 1.0, 0);
-        
+                         (verbosity>0?report:NULL), nEvalMax, nPassMax, 12, 3, 1.0, 0);
+      
       if (!autoOffset) {
         /* user wants the coefficients with the offset removed */
         a[1] *= exp(-a[2]*xMin);
@@ -429,45 +432,45 @@ int main(int argc, char **argv)
       fitData = trealloc(fitData, sizeof(*fitData)*nData);
       residualData = trealloc(residualData, sizeof(*residualData)*nData);
       for (i=result=0; i<nData; i++)
-	result += sqr(residualData[i] = yData[i]-(fitData[i]=a[0]+a[1]*exp(a[2]*xData[i])));
+        result += sqr(residualData[i] = yData[i]-(fitData[i]=a[0]+a[1]*exp(a[2]*xData[i])));
       rmsResidual = sqrt(result/nData);
       if (syData) {
-	for (i=chiSqr=0; i<nData; i++)
-	  chiSqr += sqr(residualData[i]/syData[i]);
+        for (i=chiSqr=0; i<nData; i++)
+          chiSqr += sqr(residualData[i]/syData[i]);
       }
       else {
-	double sy2;
-	sy2 = result/(nData-3);
-	for (i=chiSqr=0; i<nData; i++)
-	  chiSqr += sqr(residualData[i])/sy2;
+        double sy2;
+        sy2 = result/(nData-3);
+        for (i=chiSqr=0; i<nData; i++)
+          chiSqr += sqr(residualData[i])/sy2;
       }
       sigLevel = ChiSqrSigLevel(chiSqr, nData-3);
       if (verbosity>1) {
-	fprintf(stderr, "RMS deviation: %.15e\n", rmsResidual);
-	fprintf(stderr, "(RMS deviation)/(largest value): %.15e\n", rmsResidual/MAX(fabs(yMin), fabs(yMax)));
-	if (syData)
-	  fprintf(stderr, "Significance level: %.5e\n", sigLevel);
+        fprintf(stderr, "RMS deviation: %.15e\n", rmsResidual);
+        fprintf(stderr, "(RMS deviation)/(largest value): %.15e\n", rmsResidual/MAX(fabs(yMin), fabs(yMax)));
+        if (syData)
+          fprintf(stderr, "Significance level: %.5e\n", sigLevel);
       }
       if (verbosity>0) {
-	fprintf(stderr, "coefficients of fit to the form y = a0 + a1*exp(a2*x), a = \n");
-	for (i=0; i<3; i++)
-	  fprintf(stderr, "%.8e ", a[i]);
-	fprintf(stderr, "\n");
+        fprintf(stderr, "coefficients of fit to the form y = a0 + a1*exp(a2*x), a = \n");
+        for (i=0; i<3; i++)
+          fprintf(stderr, "%.8e ", a[i]);
+        fprintf(stderr, "\n");
       }
 
       if (!SDDS_StartPage(&OutputTable, nData) ||
-	  !SDDS_CopyParameters(&OutputTable, &InputTable) ||
-	  !SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, xData, nData, xIndex) ||
-	  !SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, fitData, nData, fitIndex) ||
-	  !SDDS_SetParameters(&OutputTable, SDDS_PASS_BY_VALUE|SDDS_SET_BY_NAME,
-			      "expfitConstant", a[0], "expfitFactor", a[1], "expfitRate", a[2], 
-			      "expfitRmsResidual", rmsResidual, 
-			      "expfitSigLevel", sigLevel, NULL) ||
-	  (fullOutput && 
-	   (!SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, yData, nData, yIndex) ||
-	    !SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, residualData, nData, residualIndex) )) ||
-	  !SDDS_WritePage(&OutputTable))
-	SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+          !SDDS_CopyParameters(&OutputTable, &InputTable) ||
+          !SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, xData, nData, xIndex) ||
+          !SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, fitData, nData, fitIndex) ||
+          !SDDS_SetParameters(&OutputTable, SDDS_PASS_BY_VALUE|SDDS_SET_BY_NAME,
+                              "expfitConstant", a[0], "expfitFactor", a[1], "expfitRate", a[2], 
+                              "expfitRmsResidual", rmsResidual, 
+                              "expfitSigLevel", sigLevel, NULL) ||
+          (fullOutput && 
+           (!SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, yData, nData, yIndex) ||
+            !SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, residualData, nData, residualIndex) )) ||
+          !SDDS_WritePage(&OutputTable))
+        SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
       if (xData) free(xData);
       if (yData) free(yData);
       if (syData) free(syData);

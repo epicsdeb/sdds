@@ -1,0 +1,54 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution. 
+#*************************************************************************
+CMPLR = ANSI
+OP_SYS_CFLAGS = 
+
+#RATIONAL = purify
+#RATIONAL = quantify
+#RATIONAL = purecov
+ifdef RATIONAL
+HOST_OPT = NO
+CC := $(RATIONAL) -best-effort $(CC)
+CCC := $(RATIONAL) -best-effort $(CCC)
+endif
+
+LIBRARY = pgapack
+SHARED_LIBRARIES = NO
+
+
+ifdef WIN32
+LIB_SUFFIX=.lib
+endif
+
+ifdef WIN32
+    CC := $(CC) $(USER_MPI_FLAGS)
+    CCC := $(CCC) $(USER_MPI_FLAGS)
+else
+MPI_PATH = $(wildcard /usr/local/software/mvapich2-gcc/bin/ /share/mpich2_smpd_nemesis/bin/ /act/mvapich2/gnu/bin/)
+ifeq ($(HOST_ARCH),linux-ppc-bgp-ibm)
+    CC += $(USER_MPI_FLAGS)
+    CCC += $(USER_MPI_FLAGS)
+else
+    CC = $(MPI_PATH)mpicc   $(USER_MPI_FLAGS)
+    CCC = $(MPI_PATH)mpicxx  $(USER_MPI_FLAGS)
+endif
+endif
+
+USR_CFLAGS += -DWL=32 -DFORTRANUNDERSCORE -DOPTIMIZE 
+USR_CFLAGS_WIN32 = -Ic:/MPICH2/include
+USR_CPPFLAGS_WIN32 = -Ic:/MPICH2/include
+USR_LIBS += mpi
+mpi_DIR = c:/MPICH2/lib
+
+INC = pgapack.h
+LIBSRCS = binary.c   cross.c     f2c.c      integer.c   pga.c     report.c \
+	system.c char.c     debug.c     fitness.c   pop.c \
+	restart.c  user.c cmdline.c  duplcate.c  hamming.c  mutation.c \
+	random.c  select.c   utility.c    create.c   evaluate.c  heap.c  \
+	parallel.c  real.c    stop.c

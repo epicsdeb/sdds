@@ -12,6 +12,22 @@
  * 
  * M. Borland, 1993.
  $Log: SDDSaps.c,v $
+ Revision 1.70  2010/12/10 18:18:49  soliday
+ Added support for algebraic mode when getting an equation from a parameter.
+
+ Revision 1.69  2010/12/09 16:13:26  borland
+ The ifnot and ifis options now respect the -nowarnings request.
+
+ Revision 1.68  2010/12/07 17:11:38  borland
+ Removed debugging statement from sddsprocess (related to @parameter equations).
+ Added test to ensure that @parameter equation isn't used for algebraic mode.
+
+ Revision 1.67  2010/12/02 22:51:28  borland
+ Added signedlargest and signedsmallest processing modes.
+
+ Revision 1.66  2010/06/11 17:11:37  borland
+ Allow lower limit to equal upper limit in filtering for -process.
+
  Revision 1.65  2009/07/10 21:03:20  shang
  modified the filter option to accept string as parameter name for defining lower and upper limit of the filter
 
@@ -303,6 +319,8 @@ static PROCESS_COLUMN_DATA process_column_data[N_PROCESS_COLUMN_MODES] = {
 { "integral", "integral of", PROCMODE_NORMAL|PROCMODE_FUNCOF_REQUIRED|PROCMODE_YtX_UNITS},
 { "product", "product of ", PROCMODE_NORMAL|PROCMODE_WEIGHT_OK},
 { "prange", "percentile range", PROCMODE_NORMAL|PROCMODE_Y_UNITS },
+{ "signedsmallest", "signed smallest of ", PROCMODE_NORMAL|PROCMODE_Y_UNITS|PROCMODE_POSITION_OK|PROCMODE_STRINGPOS_OK},
+{ "signedlargest", "signed largest of ", PROCMODE_NORMAL|PROCMODE_Y_UNITS|PROCMODE_POSITION_OK|PROCMODE_STRINGPOS_OK},
 } ;
 
 
@@ -353,7 +371,7 @@ void add_ifitem(IFITEM_LIST *ifitem, char **name, long names)
   ifitem->items += names-1;
 }
 
-long check_ifitems(SDDS_DATASET *SDDS_dataset, IFITEM_LIST *ifitem, long desired)
+long check_ifitems(SDDS_DATASET *SDDS_dataset, IFITEM_LIST *ifitem, long desired, long announce)
 {
   long i, index;
   for (i=0; i<ifitem->items; i++) {
@@ -374,12 +392,14 @@ long check_ifitems(SDDS_DATASET *SDDS_dataset, IFITEM_LIST *ifitem, long desired
     }
     if ((index>=0)!=desired) {
       if (desired) {
-        fprintf(stderr, "%s %s does not exist--aborting\n",
-                data_class_keyword[ifitem->type[i]], ifitem->name[i]);
+	if (announce)
+	  fprintf(stderr, "%s %s does not exist--aborting\n",
+		  data_class_keyword[ifitem->type[i]], ifitem->name[i]);
         return 0;
       }
-      fprintf(stderr, "%s %s exists--aborting\n",
-              data_class_keyword[ifitem->type[i]], ifitem->name[i]);
+      if (announce)
+	fprintf(stderr, "%s %s exists--aborting\n",
+		data_class_keyword[ifitem->type[i]], ifitem->name[i]);
       return 0;
     }
   }
@@ -777,13 +797,19 @@ EQUATION_DEFINITION *process_new_equation_definition(char **argument, long argum
   defi->argc = 0;
 
   if (algebraic) {
-    ptr = addOuterParentheses(argument[2]);
-    if2pf(pfix, ptr, sizeof pfix);
-    free(ptr);
-    
-    if (!SDDS_CopyString(&equation, pfix)) {
-      fprintf(stderr, "error: problem copying argument string\n");
-      return NULL;
+    if (argument[2][0]=='@') {
+      /*Add second @ symbol to signify that the parameter contains algebraic notation*/
+      equation = malloc(sizeof(char) * strlen(argument[2]) + 1);
+      sprintf(equation, "@%s", argument[2]);
+    } else {
+      ptr = addOuterParentheses(argument[2]);
+      if2pf(pfix, ptr, sizeof pfix);
+      free(ptr);
+      
+      if (!SDDS_CopyString(&equation, pfix)) {
+        fprintf(stderr, "error: problem copying argument string\n");
+        return NULL;
+      }
     }
     if (arguments>4) {
       defi->argv = tmalloc(sizeof(*defi->argv)*(arguments-3));
@@ -1718,6 +1744,36 @@ long process_column(SDDS_DATASET *Dataset, PROCESSING_DEFINITION *processing_ptr
     else
       *result = meanAbsoluteDeviation(data, n_data);
     break;
+  case PROCESS_COLUMN_SIGNEDSMALLEST:
+    imin = 0;
+    for (i=1; i<n_data; i++)
+      if (fabs(data[imin])>fabs(data[i]))
+        imin = i;
+    *result = data[imin];
+    if (processing_ptr->flags&PROCESSING_POSITION_GIVEN) {
+      if (indepData)
+        *result = indepData[imin];
+      if (stringData) {
+        *stringResult = stringData[imin];
+        stringData[imin] = NULL;
+      }
+    }
+    break;
+  case PROCESS_COLUMN_SIGNEDLARGEST:
+    imax = 0;
+    for (i=1; i<n_data; i++)
+      if (fabs(data[imax])<fabs(data[i]))
+        imax = i;
+    *result = data[imax];
+    if (processing_ptr->flags&PROCESSING_POSITION_GIVEN) {
+      if (indepData)
+        *result = indepData[imax];
+      if (stringData) {
+        *stringResult = stringData[imax];
+        stringData[imax] = NULL;
+      }
+    }
+    break;
   case PROCESS_COLUMN_SMALLEST:
   case PROCESS_COLUMN_LARGEST:
     for (i=0; i<n_data; i++)
@@ -2195,10 +2251,10 @@ PROCESSING_DEFINITION *record_processing_definition(char **argument, long argume
       SDDS_Bomb("invalid -process syntax---position option not permitted for given mode");
   }
   if (pd->flags&PROCESSING_LOLIM_GIVEN && pd->flags&PROCESSING_UPLIM_GIVEN &&
-      pd->lowerLimit>=pd->upperLimit)
-    SDDS_Bomb("invalid -process syntax---lowerLimit>=upperLimit");
-  if (pd->flags&PROCESSING_TOPLIM_GIVEN && pd->flags&PROCESSING_BOTLIM_GIVEN && pd->topLimit<=pd->bottomLimit)
-    SDDS_Bomb("invalid -process syntax---bottomLimit>=topLimit");
+      pd->lowerLimit>pd->upperLimit)
+    SDDS_Bomb("invalid -process syntax---lowerLimit>upperLimit");
+  if (pd->flags&PROCESSING_TOPLIM_GIVEN && pd->flags&PROCESSING_BOTLIM_GIVEN && pd->topLimit<pd->bottomLimit)
+    SDDS_Bomb("invalid -process syntax---bottomLimit>topLimit");
   if (pd->flags&PROCESSING_HEAD_GIVEN && pd->head==0)
     SDDS_Bomb("invalid -process syntax---head=0");
   if (pd->flags&PROCESSING_FHEAD_GIVEN && pd->fhead==0)

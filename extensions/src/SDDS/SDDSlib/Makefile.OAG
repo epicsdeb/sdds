@@ -8,6 +8,27 @@
 #*************************************************************************
 #
 # $Log: Makefile.OAG,v $
+# Revision 1.21  2011/01/12 01:47:45  ywang25
+# The bug related with the MASTER_READTITLE_ONLY flag has been fixed, so we can turn it on by default.
+#
+# Revision 1.20  2011/01/02 17:12:40  ywang25
+# We still need resolve some issue for certain input file before we can set the Master_ReadTitle flag as default
+#
+# Revision 1.19  2010/11/03 17:19:03  ywang25
+# Enabled MASTER_READTITLE_ONLY flag as default configuration to avoid performance issue on certain system.
+#
+# Revision 1.18  2010/08/23 20:07:50  ywang25
+# Updated to compile with IBM compilers on Bluegene/p
+#
+# Revision 1.17  2010/08/05 20:04:25  soliday
+# Backed out of last change until we are ready to make the switch.
+#
+# Revision 1.16  2010/07/28 20:40:53  soliday
+# Updated to use tightly integrated mvapich2 on our linux cluster.
+#
+# Revision 1.15  2010/03/18 17:28:02  borland
+# Added flag to allow disabling file locking.  Useful for PVFS filesystem.
+#
 # Revision 1.14  2009/10/27 21:03:02  soliday
 # Added location of mvapich2 compiler on our linux cluster.
 #
@@ -54,7 +75,7 @@
 
 CMPLR = ANSI
 # turn off the -g option
-OP_SYS_CFLAGS = 
+OP_SYS_CFLAGS =
 #RATIONAL = purify
 #RATIONAL = quantify
 #RATIONAL = purecov
@@ -64,12 +85,15 @@ CC := $(RATIONAL) -best-effort $(CC)
 CCC := $(RATIONAL) -best-effort $(CCC)
 endif
 
+ALLOW_FILE_LOCKING = 0
 MPI = 0
+
+USR_CFLAGS += -DALLOW_FILE_LOCKING=$(ALLOW_FILE_LOCKING)
 
 ifeq ($(MPI),1)
   LIBRARY = SDDSmpi
   USER_MPI_FLAGS += -DUSE_MPI=1 # 1 for parallel elegant, 0 for serial elegant  
-  USER_MPI_FLAGS += -DSDDS_MPI_IO=1
+  USER_MPI_FLAGS += -DSDDS_MPI_IO=1 
 ifdef WIN32
     CC := $(CC) $(USER_MPI_FLAGS)
     CCC := $(CCC) $(USER_MPI_FLAGS)
@@ -77,7 +101,7 @@ ifdef WIN32
     USR_LIBS += mpi
     mpi_DIR = c:/MPICH2/lib
 else
-    #USER_MPI_FLAGS += -DMASTER_READTITLE_ONLY 
+    USER_MPI_FLAGS += -DMASTER_READTITLE_ONLY 
     #only master processor read the layout, total_rows, parameters and arrays, 
     #and then broadcast to others
     #OP_SYS_LDLIBS += -lmpe -llmpe        # visualize the performance of the parallel elegant 
@@ -87,10 +111,13 @@ else
     #USER_MPI_FLAGS+= -DCHECKFLAGS=1      # if defined, check balance only at the beginning
                                         # or the particle number is changed
     MPI_PATH = $(wildcard /usr/local/software/mvapich2-gcc/bin/ /share/mpich2_smpd_nemesis/bin/ /act/mvapich2/gnu/bin/)
-    #MPI_PATH = /share/mpich2_mpd_sock/bin/
-    #MPI_PATH = /share/mpich/ch_p4/bin/
-    CC = $(MPI_PATH)mpicc  $(USER_MPI_FLAGS)   
+ifeq ($(HOST_ARCH),linux-ppc-bgp-ibm)
+    CC += $(USER_MPI_FLAGS)
+    CCC += $(USER_MPI_FLAGS)
+else
+    CC = $(MPI_PATH)mpicc   $(USER_MPI_FLAGS)
     CCC = $(MPI_PATH)mpicxx  $(USER_MPI_FLAGS)
+endif
 endif
 else
   LIBRARY = SDDS1c

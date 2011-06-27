@@ -13,6 +13,11 @@
  *
  * Michael Borland, 1994.
  $Log: sddsplotFilter.c,v $
+ Revision 1.13  2011/01/11 22:51:03  soliday
+ Changed all the strcpy commands to strcpy_ss because of problems with
+ RedHat Enterprise 6. If a strcpy copies the result to the same memory
+ space you will get unexpected results.
+
  Revision 1.12  2005/11/04 22:46:46  soliday
  Updated code to be compiled by a 64 bit processor.
 
@@ -291,7 +296,7 @@ long perform_sddsplot_matching(SDDS_TABLE *table, MATCH_DEFINITION **match, long
         if (pardefptr->type==SDDS_STRING) {
           char **ppc;
           ppc = SDDS_GetParameter(table, match_term[j].name, NULL);
-          strcpy(s, *ppc);
+          strcpy_ss(s, *ppc);
         }
         else {
           char *pc;

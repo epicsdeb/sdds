@@ -8,7 +8,10 @@
 \*************************************************************************/
 
 /*
- $Log: complex.c,v $
+ $Log: complex.cc,v $
+ Revision 1.1  2010/02/04 23:45:48  soliday
+ Converted to c++ so that std::complex can be used.
+
  Revision 1.10  2009/12/02 22:20:41  soliday
  Added complex number support for non C99 compilers.
 
@@ -46,33 +49,33 @@
  * Redone using structure returns instead of pointers, 11/92
  */
 
+#include <complex>
 #include "mdb.h"
 
-#if defined(__USE_ISOC99) || defined(__USE_ISOC94)
-double complex cexpi(double p)
+std::complex <double> complexErf(std::complex <double> z, long *flag)
 {
-  double complex a;
-  a = cos(p) + I*sin(p);
-  return(a);
+  double xi, yi;
+  double u, v;
+  long lflag;
+  xi = z.real();
+  yi = z.imag();
+  wofz(&xi, &yi, &u, &v, &lflag);
+  *flag = lflag;
+  return std::complex <double> (u , v);
 }
-#else
-doublecomplex_sdds cexpi(double p)
-{
-  doublecomplex_sdds a;
-  a.r = cos(p);
-  a.i = sin(p);
-  return(a);
-}
-#endif
 
-#if defined(__USE_ISOC99) || defined(__USE_ISOC94)
-double complex cipowr(double complex a, int n)
+std::complex <double> cexpi(double p)
+{
+  std::complex <double> a;
+  a = cos(p) + std::complex<double>(0,1)*sin(p);
+  return(a);
+}
+
+std::complex <double> cipowr(std::complex <double> a, int n)
 {
   int i;
-  double complex p;
-  
-  p = 1;
-  
+  std::complex <double> p(1,0);
+    
   if (n>=0) {
     for (i=0; i<n; i++)
       p = p*a;
@@ -81,31 +84,6 @@ double complex cipowr(double complex a, int n)
   a = p/a;
   return(cipowr(a, -n));
 }
-#else
-doublecomplex_sdds cipowr(doublecomplex_sdds a, int n)
-{
-  int i;
-  doublecomplex_sdds p, tmp;
-  
-  p.r = 1;
-  p.i = 0;
-  
-  if (n>=0) {
-    for (i=0; i<n; i++) {
-      tmp.r = (p.r * a.r - p.i * a.i);
-      tmp.i = (p.i * a.r + p.r * a.i);
-      p.r = tmp.r;
-      p.i = tmp.i;
-    }
-    return(p);
-  }
-  tmp.r = (p.r * a.r + p.i * a.i)/(a.r * a.r + a.i * a.i);
-  tmp.i = (p.i * a.r - p.r * a.i)/(a.r * a.r + a.i * a.i);
-  a.r = tmp.r;
-  a.i = tmp.i;
-  return(cipowr(a, -n));
-}
-#endif
 
 /* These routines are obsolete, really, but some code uses them. */
 

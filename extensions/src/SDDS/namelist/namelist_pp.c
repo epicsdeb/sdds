@@ -9,6 +9,10 @@
 
 /*
  $Log: namelist_pp.c,v $
+ Revision 1.7  2010/02/08 16:43:05  soliday
+ Added (char*) in front of quoted strings because c++ on solaris prints
+ a bunch of warning messages if it has to convert literal strings into char*
+
  Revision 1.6  2007/08/07 16:15:29  ywang25
  Replace strcpy with stcpy_ss to avoid potential memory problems.
 
@@ -241,7 +245,7 @@ char **argv;
         fprintf(fpo, "\n%s ITEM %s_item_list[%ld] = {\n",
                 definition_prefix, namelist_name[n_namelists], n_variables);
         for (i=0; i<n_variables; i++) {
-            fprintf(fpo, "    { \"%s\", TYPE_%s, %ld, ",
+            fprintf(fpo, "    { (char*)\"%s\", TYPE_%s, %ld, ",
                     variable_name[i], type_name[i], n_subscripts[i]);
             if (n_subscripts[i]==0)
                 fprintf(fpo, "NULL, ");
@@ -272,7 +276,7 @@ char **argv;
         fprintf(fpo, "    } ;\n\n");
         fprintf(fpo, "%s NAMELIST %s = {\n    %s_item_list, \n",
                 definition_prefix, namelist_name[n_namelists], namelist_name[n_namelists]);
-        fprintf(fpo, "    %ld,\n    \"%s\"\n    };\n\n",
+        fprintf(fpo, "    %ld,\n    (char*)\"%s\"\n    };\n\n",
                 n_variables, namelist_name[n_namelists]);
         n_namelists++;
         }
@@ -284,8 +288,8 @@ char **argv;
         fprintf(fpo, "    &%s\n    } ;\n\n", namelist_name[i]);
         fprintf(fpo, "%s char *namelist_name[%ld] = {\n", definition_prefix, n_namelists);
         for (i=0; i<n_namelists-1; i++)
-            fprintf(fpo, "    \"%s\",\n", namelist_name[i]);
-        fprintf(fpo, "    \"%s\"\n    } ;\n", namelist_name[i]);
+            fprintf(fpo, "    (char*)\"%s\",\n", namelist_name[i]);
+        fprintf(fpo, "    (char*)\"%s\"\n    } ;\n", namelist_name[i]);
         fprintf(fpo, "\n%s NAMELIST_TEXT namelist_text;\n", definition_prefix);
         for (i=0; i<n_namelists; i++) {
             strcpy_ss(s, namelist_name[i]);

@@ -12,6 +12,12 @@
  * 
  * M. Borland, 1993.
    $Log: SDDSaps.h,v $
+   Revision 1.38  2010/12/09 16:13:26  borland
+   The ifnot and ifis options now respect the -nowarnings request.
+
+   Revision 1.37  2010/12/02 22:51:28  borland
+   Added signedlargest and signedsmallest processing modes.
+
    Revision 1.36  2009/07/10 21:03:21  shang
    modified the filter option to accept string as parameter name for defining lower and upper limit of the filter
 
@@ -385,7 +391,9 @@ typedef struct {
 #define PROCESS_COLUMN_INTEGRAL 33
 #define PROCESS_COLUMN_PRODUCT  34
 #define PROCESS_COLUMN_PRANGE 35
-#define N_PROCESS_COLUMN_MODES 36
+#define PROCESS_COLUMN_SIGNEDSMALLEST 36
+#define PROCESS_COLUMN_SIGNEDLARGEST  37
+#define N_PROCESS_COLUMN_MODES 38
 #if 0
 extern char *process_column_mode[N_PROCESS_COLUMN_MODES];
 extern char *process_column_name[N_PROCESS_COLUMN_MODES];
@@ -451,7 +459,7 @@ extern long cast_column_value(SDDS_DATASET *SDDS_dataset, CAST_DEFINITION *cast)
 extern long cast_parameter_value(SDDS_DATASET *SDDS_dataset, CAST_DEFINITION *cast);
 
 void add_definition(DEFINITION **definition, long *definitions, void *structure, long type);
-long check_ifitems(SDDS_DATASET *SDDS_dataset, IFITEM_LIST *ifitem, long desired);
+long check_ifitems(SDDS_DATASET *SDDS_dataset, IFITEM_LIST *ifitem, long desired, long announce);
 long complete_cast_definition(SDDS_DATASET *SDDSout, CAST_DEFINITION *defi,
                               SDDS_DATASET *SDDSin);
 long edit_parameter_value(SDDS_DATASET *SDDS_dataset, char *target, char *source, char *edit_command);

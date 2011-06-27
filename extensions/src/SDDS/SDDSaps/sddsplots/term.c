@@ -29,6 +29,14 @@
  *
  
  $Log: term.c,v $
+ Revision 1.27  2011/01/11 22:51:04  soliday
+ Changed all the strcpy commands to strcpy_ss because of problems with
+ RedHat Enterprise 6. If a strcpy copies the result to the same memory
+ space you will get unexpected results.
+
+ Revision 1.26  2010/07/29 22:09:10  borland
+ Added "hpng" device type (huge PNG, twice as large as lpng).
+
  Revision 1.25  2008/06/11 16:09:50  soliday
  Reindented code.
 
@@ -1576,6 +1584,13 @@ struct termentry term_tbl[] = {
      NULL_scale, PNG_graphics, PNG_move, PNG_vector, 
      PNG_linetype, PNG_put_text, PNG_text_angle, 
      NULL_justify_text, PNG_dot, do_arrow, PNG_fill_box, PNG_line_thickness,  PNG_color, PNG_add_color,NULL_sendCoordinates,PNG_spectral}
+  , {"hpng",  "Huge PNG Format\n\tPNG devices accept dashes, rootname, template, onwhite, onblack, \n\tand linetypetable device arguments.",
+     HPNG_XMAX, HPNG_YMAX, 0, 0, (HPNG_YMAX/100), (HPNG_YMAX/100), 
+     TERM_HARDCOPY|TERM_POLYFILL|TERM_NOPROMPT, 
+     HPNG_init, PNG_reset, PNG_text, 
+     NULL_scale, PNG_graphics, PNG_move, PNG_vector, 
+     PNG_linetype, PNG_put_text, PNG_text_angle, 
+     NULL_justify_text, PNG_dot, do_arrow, PNG_fill_box, PNG_line_thickness,  PNG_color, PNG_add_color,NULL_sendCoordinates,PNG_spectral}
   , {"gif",  "(No longer suppored, png used instead)",
      PNG_XMAX, PNG_YMAX, 0, 0, (PNG_YMAX/100.0), (PNG_YMAX/100), 
      TERM_HARDCOPY|TERM_POLYFILL|TERM_NOPROMPT, 
@@ -1731,7 +1746,7 @@ int reopen_binary(void)
 
   if (strcmp(outstr, "STDOUT")) {
     (void) fclose(outfile);
-    (void) strcpy(filename, outstr+1);       /* remove quotes */
+    (void) strcpy_ss(filename, outstr+1);       /* remove quotes */
     filename[strlen(filename)-1] = '\0';
     if ( (outfile = fopen(filename, "wb")) == (FILE *)NULL ) {
       if ( (outfile = fopen(filename, "w")) == (FILE *)NULL ) {
@@ -1899,7 +1914,7 @@ int reopen_binary(void)
       if (stat_buf.st_fab_rfm != FAB$C_FIX) {
         /* modify only if not already done */
         (void) fclose(outfile);
-        (void) strcpy(filename, outstr+1);   /* remove quotes */
+        (void) strcpy_ss(filename, outstr+1);   /* remove quotes */
         filename[strlen(filename)-1] = '\0';
         (void) delete(filename);
         if ((outfile = fopen(filename, "wb", "rfm=fix", "bls=512", "mrs=512"))

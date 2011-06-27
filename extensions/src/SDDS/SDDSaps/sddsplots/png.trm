@@ -19,6 +19,9 @@
 #define LPNG_XMAX ((long)(MPNG_XMAX/0.75))
 #define LPNG_YMAX ((long)(MPNG_YMAX/0.75))
 
+#define HPNG_XMAX ((long)(LPNG_XMAX*2))
+#define HPNG_YMAX ((long)(LPNG_YMAX*2))
+
 #define SPNG_XMAX ((long)(PNG_XMAX*0.80))
 #define SPNG_YMAX ((long)(PNG_YMAX*0.80))
 
@@ -113,9 +116,10 @@ int PNG_initCommon()
   }  
   if (LineTableFile) {
     long i; 
-    if (!SDDS_ReadLineTypeTable(&lineTypeTable, LineTableFile))
+    if (!SDDS_ReadLineTypeTable(&lineTypeTable, LineTableFile)) {
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
       bomb("problem reading line-type table", NULL);
-    
+    }
     if (lineTypeTable.typeFlag&LINE_TABLE_DEFINE_COLOR) {	
        for (i=0; i<lineTypeTable.nEntries; i++) {
          PNG_add_color(
@@ -178,6 +182,14 @@ int LPNG_init(void)
 {
   png_xlast = (png_xmax = LPNG_XMAX) - 1;
   png_ylast = (png_ymax = LPNG_YMAX) - 1;
+  PNG_initCommon();
+  return 0;
+}
+
+int HPNG_init(void)
+{
+  png_xlast = (png_xmax = HPNG_XMAX) - 1;
+  png_ylast = (png_ymax = HPNG_YMAX) - 1;
   PNG_initCommon();
   return 0;
 }

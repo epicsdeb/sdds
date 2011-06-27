@@ -9,6 +9,13 @@
 
 /*
  $Log: math.c,v $
+ Revision 1.27  2010/12/03 02:48:33  borland
+ Added isort and dsort functions.
+
+ Revision 1.26  2010/02/24 23:50:41  borland
+ Added InvFq, which returns q solving F(q)=2*(sqrt(q^2-1)-acos(1/q)).
+ See Wiedemann, Particle Accelerator Physics I, 8.2.2
+
  Revision 1.25  2009/04/27 15:58:55  soliday
  Updated to use the gsl header files.
 
@@ -848,5 +855,102 @@ void rpn_simpson(void)
     }
   }
   push_num(sum*dx/3);
+}
+
+
+/* See H. Wiedemann, Particle Accelerator Physics I, 8.2.2 */
+double rpn_forwardFq(double q) 
+{
+  return 2*(sqrt(q*q-1)-acos(1/q));
+}
+
+
+void rpn_inverseFq(void)
+{
+  double q, F;
+  
+  if (stackptr<1) {
+    fputs("too few items on stack (rpn_inverseFq)\n", stderr);
+    stop();
+    rpn_set_error();
+    return;
+  }
+  F = pop_num();
+  if (F<=0) {
+    fputs("error: F<=0 in rpn_inverseFq\n", stderr);
+    stop();
+    rpn_set_error();
+    return;
+  }
+  q = (F + 2)/2;
+  q = zeroNewton(rpn_forwardFq, F, q, 1e-6, 1000, 1e-12);
+  push_num(q);
+}
+
+
+/* Sort top <n> items on stack into increasing order */
+void rpn_isort_stack(void) 
+{
+  long i, n;
+  double *data;
+  
+  if (stackptr<1 || (n = pop_num())<=0) {
+    fputs("error: isort requires number of items to sort as top item on stack\n", stderr);
+    stop();
+    rpn_set_error();
+    return;
+  }
+  if (stackptr<n) {
+    fprintf(stderr, "error: isort invoked for %ld items, but only %ld items on stack\n",
+            n, stackptr);
+    stop();
+    rpn_set_error();
+    return;
+  }
+  if (!(data=malloc(sizeof(double)*n))) {
+    fputs("error: memory allocation failure (isort)\n", stderr);
+    stop();
+    rpn_set_error();
+    return;
+  }
+  for (i=0; i<n; i++)
+    data[i] = pop_num();
+  qsort((void*)data, n, sizeof(*data), double_cmpdes);
+  for (i=0; i<n; i++)
+    push_num(data[i]);
+  free(data);
+}
+
+/* Sort top <n> items on stack into decreasing order */
+void rpn_dsort_stack(void) 
+{
+  long i, n;
+  double *data;
+  
+  if (stackptr<1 || (n = pop_num())<=0) {
+    fputs("error: isort requires number of items to sort as top item on stack\n", stderr);
+    stop();
+    rpn_set_error();
+    return;
+  }
+  if (stackptr<n) {
+    fprintf(stderr, "error: isort invoked for %ld items, but only %ld items on stack\n",
+            n, stackptr);
+    stop();
+    rpn_set_error();
+    return;
+  }
+  if (!(data=malloc(sizeof(double)*n))) {
+    fputs("error: memory allocation failure (isort)\n", stderr);
+    stop();
+    rpn_set_error();
+    return;
+  }
+  for (i=0; i<n; i++)
+    data[i] = pop_num();
+  qsort((void*)data, n, sizeof(*data), double_cmpasc);
+  for (i=0; i<n; i++)
+    push_num(data[i]);
+  free(data);
 }
 

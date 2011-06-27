@@ -8,8 +8,9 @@
 #*************************************************************************
 #
 # $Log: Makefile.OAG,v $
-# Revision 1.2  2009/11/20 21:51:39  shang
-# added compilation for cm_test
+# Revision 1.4  2010/05/19 15:18:51  soliday
+# Reverted to pre C99 changes because as far as I can tell, this library is only
+# used by ceispack and clinchor which are not written with C99.
 #
 # Revision 1.1  2004/05/03 15:24:55  soliday
 # Added support for Epics/Base 3.14 build rules.
@@ -29,25 +30,15 @@ CMPLR = ANSI
 #RATIONAL = purecov
 ifdef RATIONAL
 HOST_OPT = NO
-ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
-CC = $(RATIONAL) -best-effort $($(ANSI)_$(CMPLR))
-CXX = $(RATIONAL) -best-effort $($(CPLUSPLUS)_$(CXXCMPLR))
-else 
-CC = $(RATIONAL) -best-effort $(SPARCWORKS)/bin/cc
-CCC = $(RATIONAL) -best-effort $(SPARCWORKS)/bin/CC
-endif
-endif
-
-ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
-PROD = cm_test
-else
-PROD_HOST = cm_test
+STATIC_BUILD=NO
+CC := $(RATIONAL) -best-effort $(CC)
+CCC := $(RATIONAL) -best-effort $(CCC)
 endif
 
 LIBRARY = cmatlib
 INC = cmatlib.h
 
-USR_CFLAGS = -I../../include -DATEXIT_AVAIL -DIEEE_MATH 
+USR_CFLAGS = -I../../include -DATEXIT_AVAIL -DIEEE_MATH
 
 ifeq ($(OS_CLASS),solaris)
 ACC_DEP_CFLAGS += -KPIC -v
@@ -61,15 +52,11 @@ cm_alloc.c cm_det.c cm_invert3.c cm_test.c \
 cm_check.c cm_error.c cm_mult.c cm_trans.c cm_assign_me.c
 
 ifdef WIN32
-DLL_LIBS += mdblib
+DLL_LIBS += mdblib mdbmth
 else
-USR_LIBS = mdblib
+USR_LIBS = mdblib mdbmth
 endif
 
 mdblib_DIR = $(INSTALL_LIB)
 mdbmth_DIR = $(INSTALL_LIB)
 
-OP_SYS_LDLIBS += -L/usr/local/oag/lib -lm 
-PROD_LIBS_DEFAULT = mdblib mdbmth cmatlib
-
-cm_test_SRCS = cm_test

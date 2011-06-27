@@ -11,6 +11,10 @@
  * purpose: read an SDDS file and convert it to be read by a spreadsheet program
  * Kenneth Evans, 1994 (based on sddsquery and sdds2stream by Michael Borland)
  $Log: sdds2spreadsheet.c,v $
+ Revision 1.16  2010/11/23 20:21:44  soliday
+ Updated to fix a truncation issue with double and float values when they are
+ printed. The full percision was being lost before.
+
  Revision 1.15  2005/11/07 21:48:10  soliday
  Updated to remove Linux compiler warnings.
 
@@ -351,8 +355,10 @@ int main(int argc, char **argv)
 	    }
 	    switch(coldef->type) {
 	    case SDDS_DOUBLE:
+              fprintf(outfile, "%.*g", DBL_DIG, *((double*)data));
+	      break;
 	    case SDDS_FLOAT:
-	      SDDS_PrintTypedValue(data, 0, coldef->type, "%g", outfile, 0);
+              fprintf(outfile, "%.*g", FLT_DIG, *((float*)data));
 	      break;
 	    default:
 	      SDDS_PrintTypedValue(data, 0, coldef->type, NULL, outfile, 0);

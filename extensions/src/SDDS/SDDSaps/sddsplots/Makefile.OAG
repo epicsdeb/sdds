@@ -8,6 +8,26 @@
 #*************************************************************************
 #
 # $Log: Makefile.OAG,v $
+# Revision 1.32  2010/05/10 19:22:56  soliday
+# Updated again because it turns out that statifier creates a bad
+# executable on RHEL4 unless STATIC_BUILD=NO
+#
+# Revision 1.31  2010/04/26 19:46:27  soliday
+# Updated to build as much of a static sddsplot on RHEL4 as possible.
+#
+# Revision 1.30  2010/04/13 21:56:34  soliday
+# Added -L option for X11 libraries on linux.
+#
+# Revision 1.29  2010/04/08 20:49:18  soliday
+# Updated to create real static version of sddsplot on linux systems
+# that have X11.a installed.
+#
+# Revision 1.28  2010/03/22 15:43:23  soliday
+# Fixed an issue that popped up on CentOS5.4
+#
+# Revision 1.27  2010/03/10 18:16:48  soliday
+# Updated so that linux-x86_64 is not built statically.
+#
 # Revision 1.26  2009/11/17 16:59:04  soliday
 # Fixed issue on linux-x86 when building statically.
 #
@@ -128,11 +148,13 @@ endif
 #endif
 USR_CFLAGS += 	-I../../../include -I$(X11_INC) -DzLib
 
+ifeq ($(OS_CLASS),solaris)
 ifneq ($(words $(notdir $(wildcard $(X11_LIB)/libz.a $(X11_LIB)/libz.so))), 0)
 ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
 OPT_LDFLAGS += -L/usr/lib
 else
 STATIC_LDFLAGS += -L/usr/lib
+endif
 endif
 endif
 
@@ -174,6 +196,28 @@ GDFOUND = 0
 endif
 endif
 
+ifeq ($(OS_CLASS),Linux)
+ifeq ($(STATIC_BUILD),YES)
+#These static libraries usually are only available if you rebuild the
+#SRPMs and modify the .spec files to enable the static libraries.
+ifeq ($(words $(notdir $(wildcard $(X11_LIB)/libX11.a))), 0)
+STATIC_BUILD=NO
+endif
+endif
+endif
+
+ifeq ($(OS_CLASS),Linux)
+ifeq ($(STATIC_BUILD),YES)
+#RHEL4 will not build libXaw.a so make an exception for this library
+ifeq ($(words $(notdir $(wildcard $(X11_LIB)/libXaw.a))), 0)
+#RHEL4_STATIC_BUILD=YES
+STATIC_BUILD=NO
+endif
+endif
+endif
+
+
+
 ifneq ($(GDFOUND), 0)
 ifeq ($(STATIC_BUILD),YES)
 ifneq ($(words $(notdir $(wildcard /usr/lib/libgd.a \
@@ -212,17 +256,22 @@ PROD_LIBS_Linux = mdbplt mdbcommon matlib fftpack SDDS1 rpnlib mdbmth mdblib
 ifeq ($(OS_CLASS),Linux)
 ifeq ($(STATIC_BUILD),YES)
 STATIC_LDFLAGS_YES += -L$(X11_LIB)
-OP_SYS_LDLIBS = -Wl,-Bdynamic -lXaw -lXmu -lXt -lXext -lX11 -Wl,-Bstatic
+#OP_SYS_LDLIBS = -Wl,-Bdynamic -lXaw -lXmu -lXt -lXext -lX11 -Wl,-Bstatic
+ifeq ($(RHEL4_STATIC_BUILD),YES)
+OP_SYS_LDLIBS = -Wl,-Bdynamic -lXaw -Wl,-Bstatic -lXpm -lXmu -lXt -lSM -lICE -lXext -lX11 -lXdmcp -lXau -ldl
 else
-PROD_LIBS_Linux += Xaw Xmu Xt Xext X11
+OP_SYS_LDLIBS = -lXaw -lXpm -lXmu -lXt -lSM -lICE -lXext -lX11 -lXdmcp -lXau -ldl
+endif
+else
+OP_SYS_LDLIBS += -L$(X11_LIB) -lXaw -lXmu -lXt -lXext -lX11
 endif #($(STATIC_BUILD),YES)
 ifndef BGL
 ifneq ($(words $(notdir $(wildcard /usr/include/fontconfig/fontconfig.h))), 0)
 ifeq ($(STATIC_BUILD),YES)
-ifneq ($(words $(notdir $(wildcard /usr/lib/libfontconfig.a))), 0)
+ifneq ($(words $(notdir $(wildcard /usr/lib/libfontconfig.a /usr/lib64/libfontconfig.a))), 0)
 SYS_PROD_LIBS_Linux += fontconfig
 else
-OP_SYS_LDLIBS += -Wl,-Bdynamic -lfontconfig 
+OP_SYS_LDLIBS += -Wl,-Bdynamic -lfontconfig -Wl,-Bstatic 
 endif #($(words $(notdir $(wildcard /usr/lib/libfontconfig.a))), 0)
 else
 SYS_PROD_LIBS_Linux += fontconfig

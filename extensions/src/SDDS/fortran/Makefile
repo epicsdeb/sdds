@@ -1,7 +1,10 @@
 #
-# $Id: Makefile,v 1.3 2009/09/01 20:39:40 soliday Exp $
+# $Id: Makefile,v 1.4 2010/10/31 19:42:46 soliday Exp $
 #
 # $Log: Makefile,v $
+# Revision 1.4  2010/10/31 19:42:46  soliday
+# Added 64bit support.
+#
 # Revision 1.3  2009/09/01 20:39:40  soliday
 # Fixed support for Windows using Intel Visual Fortran and added support
 # for cygwin-x86.
@@ -29,6 +32,13 @@ LINKDIR =/$(EPICS_EXTENSIONS_LIB)
 FC = gfortran
 else
 LINKDIR =$(EPICS_EXTENSIONS_LIB)
+endif
+
+ifeq ($(T_A),linux-x86)
+f77_OPTIONS += -m32
+endif
+ifeq ($(T_A),linux-x86_64)
+f77_OPTIONS += -m64
 endif
 
 ifdef WIN32

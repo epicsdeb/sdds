@@ -12,6 +12,9 @@
  *
  * Hairong Shang, 2003
  $Log: sddssortcolumn.c,v $
+ Revision 1.4  2010/04/15 16:41:10  soliday
+ Fixed some warning messages.
+
  Revision 1.3  2009/04/06 18:27:14  shang
  fixed a bug sorting columns by provided order in a file.
 
@@ -65,7 +68,8 @@ rearrange the columns of an SDDS input file in specified order. \n\n\
 Program by Hairong Shang\n";
 
 static char **ColumnName;
-static long columns,increasing,bpmOrder;
+static long increasing,bpmOrder;
+static int32_t columns;
 
 long getBPMSubOrder(char *bpmName)
 {
@@ -116,7 +120,7 @@ long CompareStrings(const void *vindex1, const void *vindex2)
 #endif
 {
   static long index1, index2;
-  long comparison,sector1,sector2,subsector1,subsector2,type1,type2;
+  long comparison,sector1,sector2,subsector1,subsector2;
   /*type: 0: A:P, 1 B:P, 2 BM, 3 ID bpm */
   index1 = *(long*)vindex1;
   index2 = *(long*)vindex2;
@@ -156,9 +160,10 @@ int main(int argc, char **argv)
   char *input, *output;
   char **sortList, **parameterName;
   char *sortFile, *sortColumn, **sortedColumn;
-  long i_arg, retval,pages=0, sortLists=0,i,*sort_column_index, index,count,rows;
+  long i_arg, sortLists=0,i,*sort_column_index, index,count,rows;
   SCANNED_ARG *s_arg;
-  long tmpfile_used, tmpfileForInternalPipe, parameters=0;
+  long tmpfile_used, tmpfileForInternalPipe;
+  int32_t parameters=0;
   unsigned long pipeFlags,dummyflags;
   
   SDDS_RegisterProgramName(argv[0]);

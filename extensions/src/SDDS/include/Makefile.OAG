@@ -8,6 +8,15 @@
 #*************************************************************************
 #
 # $Log: Makefile.OAG,v $
+# Revision 1.9  2011/01/12 20:38:50  xiaoam
+# Added the gsl_poly.h to the GSL lib.
+#
+# Revision 1.8  2010/10/19 14:07:47  ywang25
+# Added the header file for the GSL lib.
+#
+# Revision 1.7  2010/06/15 18:59:23  ywang25
+# Added pgapack.h for parallel genetic optimization
+#
 # Revision 1.6  2008/04/14 18:36:22  shang
 # removed SDDSmpi.h
 #
@@ -31,7 +40,8 @@
 INC = SDDS.h mdb.h scan.h match_string.h SDDStypes.h \
       constants.h mdbsunos4.h contour.h fftpackC.h \
       matlib.h namelist.h rpn.h table.h non_dominated_sort.h \
-      oagphy.h mdbsun.h sort.h f2c.h
+      oagphy.h pgapack.h gsl_vector.h gsl_matrix.h gsl_poly.h \
+      mdbsun.h sort.h f2c.h
 
 ifdef WIN32
 INC += fdlibm.h

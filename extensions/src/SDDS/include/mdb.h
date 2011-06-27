@@ -12,6 +12,35 @@
  *
  * Michael Borland, 1988
  $Log: mdb.h,v $
+ Revision 1.130  2011/01/11 16:47:17  soliday
+ The double_cmpdes function is now exported corretly with DLLs.
+
+ Revision 1.129  2010/12/20 14:39:45  ywang25
+  Added restartHaltonSequence and restartModHaltonSequence functions to reinitialize (optimized) Halton sequence.
+
+ Revision 1.128  2010/10/19 14:29:09  ywang25
+ Added the enforceVariableLimits function declaration for parallel swarm optimization.
+
+ Revision 1.127  2010/06/23 18:48:29  shang
+ added interp_short routine
+
+ Revision 1.126  2010/06/11 14:25:05  borland
+ Added prototype for index_min_max_long().
+
+ Revision 1.125  2010/03/31 18:33:48  soliday
+ Updated so that cpu_load and page_faults are exported properly for
+ shared libraries.
+
+ Revision 1.124  2010/02/04 23:42:53  soliday
+ Updated so that functions that use complex variables can
+ only be seen from c++
+
+ Revision 1.123  2010/01/14 20:01:38  shang
+ added modified halton sequence routines
+
+ Revision 1.122  2009/12/18 21:12:14  shang
+ moved definition of  czarray_2d(), free_czarray_2d(), and resize_czarray_2d() routines from elegant/track.h
+
  Revision 1.121  2009/12/07 18:32:00  soliday
  Added C99 support for Apple.
 
@@ -568,6 +597,9 @@ epicsShareFuncMDBLIB void **zarray_2d(long size, long n1, long n2);
 epicsShareFuncMDBLIB void **resize_zarray_2d(long size, long old_n1, long old_n2,
             void **array, long n1, long n2);
 epicsShareFuncMDBLIB int free_zarray_2d(void **array, long n1, long n2);
+epicsShareFuncMDBLIB void **czarray_2d(long size, long n1, long n2);
+epicsShareFuncMDBLIB int free_czarray_2d(void **array, long n1, long n2);
+epicsShareFuncMDBLIB void **resize_czarray_2d(void **data, long size, long n1, long n2);
 epicsShareFuncMDBLIB void zero_memory(void *memory, long n_bytes);
 epicsShareFuncMDBLIB int tfree(void *ptr);
 epicsShareFuncMDBLIB void keep_alloc_record(char *filename);
@@ -698,7 +730,7 @@ epicsShareFuncMDBLIB extern long *sort_and_return_index(void *data, long type, l
 
 /* sort routines (previously sort.h) */
 epicsShareFuncMDBLIB extern int double_cmpasc(const void *a, const void *b);
-extern int double_cmpdes(const void *a, const void *b);
+epicsShareFuncMDBLIB extern int double_cmpdes(const void *a, const void *b);
 extern void double_copy(void *a, void *b);
 extern int float_cmpasc(const void *a, const void *b);
 extern int float_cmpdes(const void *a, const void *b);
@@ -804,6 +836,8 @@ epicsShareFuncMDBLIB extern void init_stats(void);
 epicsShareFuncMDBLIB extern void report_stats(FILE *fp, char *label);
 epicsShareFuncMDBLIB extern double delapsed_time();
 epicsShareFuncMDBLIB extern long memory_count(void);
+epicsShareFuncMDBLIB extern long cpu_time(void);
+epicsShareFuncMDBLIB extern long page_faults(void);
 
 /* terminal IO routines: */
 epicsShareFuncMDBLIB extern int tt_attach(void);
@@ -889,6 +923,10 @@ epicsShareFuncMDBMTH extern double gauss_rn_lim_oag(double mean, double sigma, d
 epicsShareFuncMDBMTH extern long randomizeOrder(char *ptr, long size, long length, long iseed, double (*urandom)(long iseed1));
 epicsShareFuncMDBMTH extern double nextHaltonSequencePoint(long ID);
 epicsShareFuncMDBMTH extern int32_t startHaltonSequence(int32_t *radix, double value);
+epicsShareFuncMDBMTH extern int32_t restartHaltonSequence(long ID, double value);
+epicsShareFuncMDBMTH extern double nextModHaltonSequencePoint(long ID);
+epicsShareFuncMDBMTH extern int32_t startModHaltonSequence(int32_t *radix, double value);
+epicsShareFuncMDBMTH extern int32_t restartModHaltonSequence(long ID, double tiny);
 epicsShareFuncMDBMTH extern long convertSequenceToGaussianDistribution(double *data, long points, double limit);
 epicsShareFuncMDBMTH extern double KS_Qfunction(double lambda);
 extern double twoVariableKStest(double *d1, long n1, double *d2, long n2, double *MaxCDFerror);
@@ -1154,6 +1192,7 @@ epicsShareFuncMDBMTH long simplexMinimization(double **simplexVector, double *fV
                          double target, double tolerance, long tolerance_mode,
                          double (*function)(double *x, long *invalid), long maxEvaluations, 
                          long *evaluations, unsigned long flags);
+epicsShareFuncMDBMTH void enforceVariableLimits(double *x, double *xlo, double *xhi, long n);
 #define ONEDSCANOPTIMIZE_REFRESH 0x0001U
 epicsShareFuncMDBMTH long OneDScanOptimize (double *yReturn, double *xGuess,double *dxGuess,
                  double *xLowerLimit, double *xUpperLimit,short *disable,
@@ -1239,6 +1278,7 @@ epicsShareFuncMDBMTH extern double weightedStDev(double *y, double *w, long n);
 
 epicsShareFuncMDBMTH extern int find_min_max(double *min, double *max, double *list, long n);
 epicsShareFuncMDBMTH extern int index_min_max(long *imin, long *imax, double *list, long n);
+epicsShareFuncMDBMTH extern int index_min_max_long(long *imin, long *imax, long *list, long n);
 extern int assign_min_max(double *min, double *max, double val);
 extern int find_min_max_2d(double *min, double *max, double **value,
             long n1, long n2);
@@ -1270,9 +1310,12 @@ int interpolate_minimum(double *fmin, double *zmin, double *value, double z_lo,
     double z_hi, long n);
 epicsShareFuncMDBMTH double LagrangeInterp(double *x, double *f, long order, double x0, long *returnCode);
 
+
 epicsShareFuncMDBLIB extern void substituteTagValue(char *input, long buflen, 
                         char **macroTag, char **macroValue, long macros); 
 
+epicsShareFuncMDBMTH short interp_short(short *f, double *x, long n, double xo, long warnings,
+                                        short order, long *returnCode, long *next_start_pos);
 #define iceil(x) ((int)ceil(x))
 #define round(x) ( x < 0.0 ? ((int)((x)-.5)) : ((int)((x)+.5)) )
 
@@ -1308,40 +1351,12 @@ epicsShareFuncMDBLIB extern void substituteTagValue(char *input, long buflen,
 
 #endif  /* _MDB_MTH_ */
 
-  /* Our Solaris cc uses C94 */
-#if defined(__STDC_VERSION__)
-#if __STDC_VERSION__ - 0 >= 199409L
-#define __USE_ISOC94
-#endif
-#endif
 
-/* Presume all APPLE compilers have C99 support */
-#if __APPLE__
-#define __USE_ISOC99
-#endif
-
-#ifndef __cplusplus
-  /* __USE_ISOC99 is defined for gcc if -D_ISOC99_SOURCE is in the compiler flags */
-#if defined(__USE_ISOC99) || defined(__USE_ISOC94)
-#include <complex.h>
-#else
-  typedef struct {
-    double r, i;
-  } doublecomplex_sdds;
-  typedef struct {
-    float r, i;
-  } floatcomplex_sdds;
-#endif
-
-#if defined(__USE_ISOC99) || defined(__USE_ISOC94)
-epicsShareFuncMDBMTH double complex complexErf(double complex z, long *flag);
-epicsShareFuncMDBMTH double complex cexpi(double p);
-epicsShareFuncMDBMTH double complex cipowr(double complex a, int n);
-#else
-epicsShareFuncMDBMTH doublecomplex_sdds complexErf(doublecomplex_sdds z, long *flag);
-epicsShareFuncMDBMTH doublecomplex_sdds cexpi(double p);
-epicsShareFuncMDBMTH doublecomplex_sdds cipowr(doublecomplex_sdds a, int n);
-#endif
+#ifdef __cplusplus
+#include <complex>
+epicsShareFuncMDBMTH std::complex <double> complexErf(std::complex <double> z, long *flag);
+epicsShareFuncMDBMTH std::complex <double> cexpi(double p);
+epicsShareFuncMDBMTH std::complex <double> cipowr(std::complex <double> a, int n);
 #endif
 
 epicsShareFuncMDBMTH void complex_multiply(

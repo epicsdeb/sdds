@@ -13,6 +13,26 @@
  *
  * Michael Borland, 1994.
  $Log: sddsplot.c,v $
+ Revision 1.148  2011/01/11 22:51:03  soliday
+ Changed all the strcpy commands to strcpy_ss because of problems with
+ RedHat Enterprise 6. If a strcpy copies the result to the same memory
+ space you will get unexpected results.
+
+ Revision 1.147  2010/09/14 16:20:11  soliday
+ Added the rspectral order for the colors. This is the reverse of the spectral
+ order.
+
+ Revision 1.146  2010/07/08 21:26:47  borland
+ Added "first" qualifier to -omnipresent option.  When given, omnipresent datasets
+ are plotted first.  The default is to plot them last.
+
+ Revision 1.145  2010/06/03 16:33:43  borland
+ Added fixForRequest qualifier to -graphic option.
+
+ Revision 1.144  2010/01/05 20:06:45  soliday
+ Added the -intensityBar option which can be used to move the intensity bar
+ and to resize the label text to the left and the unit text above.
+
  Revision 1.143  2009/07/28 14:01:16  borland
  Added scroll feature to -replicate option.  Greatly improved memory management for
  split and replicated datasets.  Added -nocolorbar option.
@@ -612,7 +632,7 @@ char *USAGE1 = "sddsplot \n\
   -sameScale[={x|y}][,global]\n\
   -sever[={xGap=<value>|yGap=<value>}]\n\
   -separate[=[<number-to-group>][,groupsOf=<number>][,fileIndex][,fileString][,nameIndex][,nameString][,page][,request][,tag][,subpage]\n\
-  -omnipresent\n\
+  -omnipresent[=first]\n\
   -replicate={number=<integer>|match={pages|requests|files|names}}[,scroll]\n\
   -groupBy=[=request][,tag][,fileIndex][,nameIndex][,page][subpage][,fileString][,nameString]\n";
 
@@ -655,7 +675,8 @@ char *USAGE5 = "  -offset=[{xy}Change={value>][,{xy}Parameter=<name>][,{xy}Inver
   -match={column|parameter},<match-test>[,<match-test>[,<logic-operation>...]\n\
   -filter={column|parameter},<range-spec>[,<range-spec>[,<logic-operation>...]\n\
   -timeFilter={column|parameter},<name>[,before=YYYY/MM/DD@HH:MM:SS][,after=YYYY/MM/DD@HH:MM:SS][,invert]\n\
-  -orderColors={spectral|start=(<red>,<green>,<blue>){[,finish=(<red>,<green>,<blue>)]|[,increment=(<red>,<green>,<blue>)]}}\n\
+  -intensityBar=[labelsize=<value>][,unitsize=<value>][,xadjust=<value>]\n\
+  -orderColors={spectral|rspectral|start=(<red>,<green>,<blue>){[,finish=(<red>,<green>,<blue>)]|[,increment=(<red>,<green>,<blue>)]}}\n\
   All colors range from 0 to 65535.\n\
   -device={motif|png|postscript}[,dashes,linetypetable=<lineDefineFile>]\n\
   for motif device arguments, use '-dashes 1 -linetype lineDefineFile' \n\n\
@@ -690,7 +711,7 @@ static char *main_keyword[] = {
     "ticksettings", "labelsize", "enumeratedscales", "arrowsettings", "groupby", "tagrequest", 
     "endpanel", "listdevices", "factor", "limit", "_echo", "offset", "ytopline", "multicommand", 
     "range", "namescan", "presparse", "pointlabel", "replicate", "xscalesgroup", "yscalesgroup", 
-    "alignzero", "repeat", "ordercolors", "nextpage", "rowlimit", "thickness","xExclude","yExclude","toPage","fromPage", "dither",
+    "alignzero", "repeat", "ordercolors", "nextpage", "rowlimit", "thickness","xExclude","yExclude","toPage","fromPage", "dither", "intensityBar",
     NULL,
     } ;
 
@@ -777,7 +798,8 @@ extern long aspectratio_AP(PLOT_SPEC *plotspec, char **item, long items),
  toPage_AP(PLOT_SPEC *plotspec, char **item,long items),
  fromPage_AP(PLOT_SPEC *plotspec, char **item,long items),
  parseCommandlineToMotif(int argc,char ** argv),
- dither_AP(PLOT_SPEC *plotspec, char **item, long items);
+ dither_AP(PLOT_SPEC *plotspec, char **item, long items),
+ intensityBar_AP(PLOT_SPEC *plotspec, char **item, long items);
 
 static long (*main_parser[])(PLOT_SPEC *plotspec, char **item, long items) = {
   aspectratio_AP, device_AP, graphic_AP, lspace_AP, mplfiles_AP, outputfile_AP,
@@ -793,7 +815,7 @@ static long (*main_parser[])(PLOT_SPEC *plotspec, char **item, long items) = {
   multicommand_AP, range_AP, namescan_AP, presparse_AP, pointlabel_AP, replicate_AP,
   xScalesGroup_AP, yScalesGroup_AP, alignzero_AP, repeatMode_AP, orderColors_AP, 
   nextpage_AP, rowlimit_AP, thickness_AP, xexclude_columnnames_AP, yexclude_columnnames_AP,
-  toPage_AP, fromPage_AP, dither_AP, NULL,
+  toPage_AP, fromPage_AP, dither_AP, intensityBar_AP, NULL,
 } ;
 
 static long argEcho = 0;
@@ -1196,7 +1218,7 @@ void determine_graphic_assignments(PLOT_SPEC *plspec)
   long filenames = 0;
   GRAPHIC_SPEC **referenceGraphic = NULL;
   GRAPHIC_SPEC **referenceGraphicFN = NULL;
-  
+
   lastpanel = lastreq = -1;
   for (set=0; set<plspec->datasets; set++) {
     panel = plspec->dataset[set].plotpanel;
@@ -1268,7 +1290,8 @@ void determine_graphic_assignments(PLOT_SPEC *plspec)
         referenceGraphic[yNames] = &plspec->dataset[set].graphic;
         yNames++;
       }
-    } if (plspec->plot_request[request].graphic.vary &&
+    } 
+    if (plspec->plot_request[request].graphic.vary &&
           plspec->plot_request[request].graphic.flags&GRAPHIC_VARY_FIXFORFILE) {
       if ((request != lastreq) && (plspec->plot_request[request].graphic.flags&GRAPHIC_VARY_EACHREQUEST)) {
         filenames = 0;
@@ -1310,12 +1333,17 @@ void determine_graphic_assignments(PLOT_SPEC *plspec)
                   plspec->plot_request[request].graphic.element==plspec->plot_request[lastreq].graphic.element)) &&
                 (plspec->dataset[set].file_index==plspec->dataset[set-1].file_index ||
                  !(plspec->plot_request[request].graphic.flags&GRAPHIC_VARY_EACHFILE)))) {
-      if (plspec->plot_request[request].graphic.flags&GRAPHIC_VARY_TYPE) {
-        plspec->dataset[set].graphic.type = plspec->dataset[set-1].graphic.type + 1;
-      } 
-      if (plspec->plot_request[request].graphic.flags&GRAPHIC_VARY_SUBTYPE) {
-        plspec->dataset[set].graphic.subtype = plspec->dataset[set-1].graphic.subtype + 1;
-      } 
+      if (request==lastreq && plspec->plot_request[request].graphic.flags&GRAPHIC_VARY_FIXFORREQUEST) {
+	plspec->dataset[set].graphic.type = plspec->dataset[set-1].graphic.type;
+	plspec->dataset[set].graphic.subtype = plspec->dataset[set-1].graphic.subtype;
+      } else {
+	if (plspec->plot_request[request].graphic.flags&GRAPHIC_VARY_TYPE) {
+	  plspec->dataset[set].graphic.type = plspec->dataset[set-1].graphic.type + 1;
+	} 
+	if (plspec->plot_request[request].graphic.flags&GRAPHIC_VARY_SUBTYPE) {
+	  plspec->dataset[set].graphic.subtype = plspec->dataset[set-1].graphic.subtype + 1;
+	} 
+      }
       if ((!plspec->plot_request[request].graphic.flags&GRAPHIC_VARY_TYPE) && (!plspec->plot_request[request].graphic.flags&GRAPHIC_VARY_SUBTYPE))
         bomb("invalid vary mode encountered determining graphic assignments", NULL);
       if (plspec->dataset[set].graphic.element==PLOT_ARROW) 
@@ -1499,6 +1527,43 @@ void plot_sddsplot_data(PLOT_SPEC *plspec, short initializeDevice)
 				     (unsigned short)(65535));
 	}
 	k = (i+1)*plreq->color_settings.increment[0];
+      }
+      
+      plreq->color_settings.flags |= COLORSET_USERDEFINED;
+    } else if (plreq->color_settings.flags&COLORSET_RSPECTRAL) {
+      if(j!=(ncolor_max+1-ncolor_min))
+          j = ncolor_max+1-ncolor_min;
+      if (j < 1)
+        j = 1;
+      if (j == 1) {
+	plreq->color_settings.increment[0] = 0;
+      } else {
+	plreq->color_settings.increment[0] = 327680.0 / (j-1);
+      }
+      k = 327680;
+      for (i=j-1;i>=0;i--) {
+	if (k < 65536) {
+	  (term_tbl[term].add_color)((unsigned short)(65535),
+				     (unsigned short)(k),
+				     (unsigned short)(0));
+	} else if ((k >= 65536) && (k < 131072)) {
+	  (term_tbl[term].add_color)((unsigned short)(k==65536 ? 131071.99999-k : 131072-k),
+				     (unsigned short)(65535),
+				     (unsigned short)(0));
+	} else if ((k >= 131072) && (k < 196608)) {
+	  (term_tbl[term].add_color)((unsigned short)(0),
+				     (unsigned short)(65535),
+				     (unsigned short)(k-131072));
+	} else if ((k >= 196608) && (k < 262144)) {
+	  (term_tbl[term].add_color)((unsigned short)(0),
+				     (unsigned short)(k==196608 ? 262143.99999-k : 262144-k),
+				     (unsigned short)(65535));
+	} else {
+	  (term_tbl[term].add_color)((unsigned short)(k-262144.00001),
+				     (unsigned short)(0),
+				     (unsigned short)(65535));
+	}
+	k = (i-1)*plreq->color_settings.increment[0];
       }
       
       plreq->color_settings.flags |= COLORSET_USERDEFINED;
@@ -2064,7 +2129,7 @@ void plot_sddsplot_data(PLOT_SPEC *plspec, short initializeDevice)
         min_level=limit[2];
       if (max_level==-DBL_MAX)
         max_level=limit[3];
-      if (plreq->color_settings.flags&COLORSET_SPECTRAL) {
+      if (plreq->color_settings.flags&COLORSET_SPECTRAL || plreq->color_settings.flags&COLORSET_RSPECTRAL) {
         alloc_spectrum(numcolors2,1,0,0,0,0,0,0);
       } else if (plreq->color_settings.flags&COLORSET_START) {
         alloc_spectrum(numcolors2,0,plreq->color_settings.red[0],plreq->color_settings.green[0],plreq->color_settings.blue[0],plreq->color_settings.red[1],plreq->color_settings.green[1],plreq->color_settings.blue[1]);
@@ -2078,7 +2143,10 @@ void plot_sddsplot_data(PLOT_SPEC *plspec, short initializeDevice)
                          1, 
                          plreq->split.symbol, 
                          plreq->split.units,
-			 linethickness_default);
+			 linethickness_default,
+                         plreq->intensityBar_settings.flags&INTENSITYBAR_LABELSIZE_GIVEN ? plreq->intensityBar_settings.labelsize : 1.0, 
+                         plreq->intensityBar_settings.flags&INTENSITYBAR_UNITSIZE_GIVEN ? plreq->intensityBar_settings.unitsize : 1.0, 
+                         plreq->intensityBar_settings.flags&INTENSITYBAR_XADJUST_GIVEN ? plreq->intensityBar_settings.xadjust : 0.0);
       set_linetype(linetype_default);
     }
     
@@ -2633,9 +2701,9 @@ void shorten_filename(char *s)
   char *ptr;
 
   if ((ptr = strchr(s, ']'))) 
-    strcpy(s, ptr+1);
+    strcpy_ss(s, ptr+1);
   else if ((ptr=strchr(s, '>')))
-    strcpy(s, ptr+1);
+    strcpy_ss(s, ptr+1);
 #ifdef VAX_VMS
   str_tolower(s);
 #endif
@@ -2653,14 +2721,14 @@ void cleanup_label(char *s)
   ptr = s;
   while (isspace(*ptr))
     ptr++;
-  strcpy(s, ptr);
+  strcpy_ss(s, ptr);
 
   ptr = s+strlen(s)-1;
   while (ptr>=s && isspace(*ptr))
     *ptr-- = 0;
 
   if ((long)strlen(s)>132)
-    strcpy(s+132-4, "...");
+    strcpy_ss(s+132-4, "...");
 }
 
 #if defined(COMPILE_AS_SUBROUTINE)
@@ -3322,7 +3390,7 @@ void make_legend(char **legend, GRAPHIC_SPEC **graphic, long n, double legendSca
     y[0] = ymin + lqmax*(ymax-ymin) - (3*legendNumber+1)*vSize;
     if (((long)strlen(legend[i])+1)>bufferSize)
       buffer = trealloc(buffer, sizeof(*buffer)*(bufferSize=strlen(legend[i])+1));
-    strcpy(buffer, legend[i]);
+    strcpy_ss(buffer, legend[i]);
     set_linethickness(legendThickness);
     cplot_string(x, y, buffer);
     y[0] = y[1] = ymin + lqmax*(ymax-ymin) - (3*legendNumber+2)*vSize;

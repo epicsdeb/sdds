@@ -1,0 +1,42 @@
+#*************************************************************************
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# National Laboratory.
+# Copyright (c) 2002 The Regents of the University of California, as
+# Operator of Los Alamos National Laboratory.
+# This file is distributed subject to a Software License Agreement found
+# in the file LICENSE that is included with this distribution.
+#*************************************************************************
+
+#RATIONAL = purify
+#RATIONAL = quantify
+#RATIONAL = purecov
+ifdef RATIONAL
+HOST_OPT = NO
+CC := $(RATIONAL) -best-effort $(CC)
+CCC := $(RATIONAL) -best-effort $(CCC)
+endif
+
+PROD_HOST = daq2sdds
+
+daq2sdds_SRCS = ttf2_daq_user.cc user_test.cc
+
+USR_CPPFLAGS = -I$(DOOCSROOT)/$(DOOCSARCH)/lib/include
+USR_CPPFLAGS_Darwin = -DMACOSX
+USR_CPPFLAGS_Linux = -DLINUX
+
+PROD_LDFLAGS_Darwin = -framework CoreServices
+
+PROD_LIBS = DAQsvrutil DAQReader TTF2XML lzo2 TTF2evutl xerces-c SDDS1 mdblib
+SYS_PROD_LIBS = z
+
+SDDS1_DIR = $(INSTALL_LIB)
+mdblib_DIR = $(INSTALL_LIB)
+
+DAQsvrutil_DIR = $(DOOCSROOT)/$(DOOCSARCH)/lib
+DAQReader_DIR = $(DOOCSROOT)/$(DOOCSARCH)/lib
+TTF2XML_DIR = $(DOOCSROOT)/$(DOOCSARCH)/lib
+lzo2_DIR = $(DOOCSROOT)/$(DOOCSARCH)/lib
+TTF2evutl_DIR = $(DOOCSROOT)/$(DOOCSARCH)/lib
+
+xerces-c_DIR = $(DOOCSROOT)/../xerces-c-src_2_8_0/lib
+

@@ -12,6 +12,11 @@
  * 
  * M. Borland, 1993.
  $Log: SDDSaps.c,v $
+ Revision 1.13  2011/01/11 22:51:02  soliday
+ Changed all the strcpy commands to strcpy_ss because of problems with
+ RedHat Enterprise 6. If a strcpy copies the result to the same memory
+ space you will get unexpected results.
+
  Revision 1.12  2005/11/07 22:20:55  soliday
  Updated to remove compiler warnings on Linux.
 
@@ -686,7 +691,7 @@ long edit_column_value(SDDS_DATASET *SDDS_dataset, char *target, char *source, c
         if (!source_value[i])
             s[0] = 0;
         else
-            strcpy(s, source_value[i]);
+            strcpy_ss(s, source_value[i]);
         if (!edit_string(s, edit_command)) {
             fprintf(stderr, "error: unable to edit source string \"%s\" to make %s\n", source_value[i], target);
             return(0);
@@ -729,7 +734,7 @@ long edit_parameter_value(SDDS_DATASET *SDDS_dataset, char *target, char *source
     if (!(source_value = *ptr))
         s[0] = 0;
     else
-        strcpy(s, source_value);
+        strcpy_ss(s, source_value);
     if (!edit_string(s, edit_command)) {
         fprintf(stderr, "error: unable to edit source string \"%s\" to make %s\n", source_value, target);
         return(0);
@@ -1976,7 +1981,7 @@ long print_parameter_value(SDDS_DATASET *SDDS_dataset, char *target, char **sour
     fptr1 = format;
     s[0] = 0;
     if (sources==0)
-        strcpy(s, format);
+        strcpy_ss(s, format);
     for (i=0; i<sources; i++) {
         print_pos = s+strlen(s);
         use_info = 0;
@@ -2093,7 +2098,7 @@ long print_column_value(SDDS_DATASET *SDDS_dataset, char *target, char **source,
         fptr1 = format;
         s[0] = 0;
         if (sources==0)
-            strcpy(s, format);
+            strcpy_ss(s, format);
         for (i=0; i<sources; i++) {
             print_pos = s+strlen(s);
             if ((source_index=SDDS_GetColumnIndex(SDDS_dataset, source[i]))<0 ||

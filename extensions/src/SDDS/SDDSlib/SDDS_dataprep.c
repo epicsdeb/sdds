@@ -12,6 +12,11 @@
  *
  * M. Borland, November 1993
  $Log: SDDS_dataprep.c,v $
+ Revision 1.26  2010/02/18 02:16:29  borland
+ Added SDDS_SetError0() and modified SDDS_PrintErrors() to allow more easily composing
+ multi-part error messages.  One side-effect is that stack traces come out in reverse
+ order to previously.  Also modified SDDS_SetColumn() to use the new feature.
+
  Revision 1.25  2008/09/18 20:16:40  soliday
  Added SDDS_SetColumnFromDoubles
 
@@ -1046,7 +1051,9 @@ int32_t SDDS_SetColumn(SDDS_DATASET *SDDS_dataset, int32_t mode, void *data, int
   else {
     name = va_arg(argptr, char *);
     if ((index=SDDS_GetColumnIndex(SDDS_dataset, name))<0) {
-      SDDS_SetError("Unable to set column values--name not recognized (SDDS_SetColumn)");
+      SDDS_SetError0("Unable to set column values--name ");
+      SDDS_SetError0(name);
+      SDDS_SetError(" not recognized (SDDS_SetColumn)");
       retval = 0;
     }
   }

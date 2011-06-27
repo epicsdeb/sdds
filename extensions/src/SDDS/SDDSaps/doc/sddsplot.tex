@@ -1,4 +1,10 @@
 % $Log: sddsplot.tex,v $
+% Revision 1.19  2010/06/22 15:52:02  soliday
+% Fixed a problem with the -replicate option description.
+%
+% Revision 1.18  2010/06/03 16:37:27  borland
+% Added documentation for -graph fixForFile, fixForName, and fixForRequest.
+%
 % Revision 1.17  2009/07/16 17:42:24  borland
 % Added documentation of the fractionalDeviation qualifer to -mode.
 % Added documentation of -replicate.
@@ -268,7 +274,8 @@ local switches.
 
   \item {\tt -graphic={\em element}[,type={\em integer}][,fill][,subtype=\{{\em integer} | type\}]}
         {\tt [,connect[=\{{\em linetype} | type | subtype\}]][,vary[=\{type | subtype\}]]}
-        {\tt [,scale={\em factor}][,\{eachFile | eachPage | eachRequest | fixByName\}]}---
+        {\tt [,scale={\em factor}][,\{eachFile | eachPage | eachRequest | fixForName | ]}
+	{\tt fixForFile | fixForRequest\}]} ---
         Specifies the type of graphic element to use for data in the present plot request.  
 
 {\em element} may be one of {\tt line}, {\tt symbol}, {\tt errorBar}, {\tt impulse}, {\tt yimpulse}, {\tt
@@ -294,14 +301,18 @@ By default, the line type used is 0.
 If one desires automatic variation of the line color, symbol type, and
 so on, one may obtain this using the \verb|vary| qualifier.  By
 default, the type is varied.  The \verb|eachFile|, \verb|eachPage|,
-\verb|eachRequest|, or \verb|fixByName| may be given to specify how to
+\verb|eachRequest|, \verb|fixForName|, \verb|fixForFile|, and \verb|fixForRequest|
+qualifiers may be given to specify how to
 assign type or subtype.  For \verb|eachFile|, variation is done
 separately for data from different files.  For \verb|eachPage|,
 variation is done separately for data from different pages (hence,
 items from different pages would have the same line or symbol).  For
 \verb|eachRequest|, variation is done separately for each request.
-The \verb|fixByName| qualifier in constrast assigns fixed graphic
-attributes to items according to the y name.
+The \verb|fixForName| qualifier in constrast assigns fixed graphic
+attributes to items according to the y name.  The \verb|fixForFile|
+qualifier assigns fixed graphic attributes for items according to which
+data file they are from.  The \verb|fixForRequest| qualifier assigns fixed
+graphic attributes according to the request in which the data originates.
 
   \item {\tt -arrowSettings=[,autoScale][scale={\em factor}][,linetype={\em integer}]}
 {\tt [,centered][,singleBarb][,barbLength={\em value}][,barbAngle={\em value}]}
@@ -762,7 +773,7 @@ indicator). This would be accomplished using {\tt -split=pages,columnBin={\em na
   \item {\tt -omniPresent}---Specifies that the data sets from the current request will appear on all
 plot panels.
 
-  \item {\tt -replicate=\{number={\em integer} | match=\{names | pages | requests| files\}\}\[,scroll\]} --- Specifies replication of a dataset so that it can be plotted several times. This is similar to -{\tt omniPresent}, but more flexible.  When a dataset is replicated,
+  \item {\tt -replicate=\{number={\em integer} | match=\{names | pages | requests| files\}\}\{,scroll\}} --- Specifies replication of a dataset so that it can be plotted several times. This is similar to -{\tt omniPresent}, but more flexible.  When a dataset is replicated,
  each replicant appears to have come from a different page of the original file.  The number of replications is controlled by
  the first option: a specific number of replications can be requested, or it can be asked to replicate a number of times 
  equal to the maximum number of pages in any file, data names in any request, plot requests, or files in any request.  

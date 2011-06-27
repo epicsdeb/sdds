@@ -13,6 +13,15 @@
  * 
  * Michael Borland, 1995
  $Log: sddsenvelope.c,v $
+ Revision 1.24  2010/11/05 04:05:49  borland
+ For PMAXIMUM and PMINIMUM, the functionOf name is now part of the output column name.
+
+ Revision 1.23  2010/11/05 04:05:10  borland
+ Fixed problem with putting functionOf column name into symbol name.
+
+ Revision 1.22  2010/10/23 22:01:23  borland
+ Added pminimum and pmaximum processing.
+
  Revision 1.21  2006/12/14 22:21:58  soliday
  Updated a bunch of programs because SDDS_SaveLayout is now called by
  SDDS_WriteLayout and it is no longer required to be called directly.
@@ -107,19 +116,21 @@
 #define SET_LARGEST 18
 #define SET_PERCENTILE 19
 #define SET_SIGNEDLARGEST 20
-#define N_OPTIONS 21
+#define SET_PMAXIMA 21
+#define SET_PMINIMA 22
+#define N_OPTIONS 23
 
 char *option[N_OPTIONS] = {
   "copy", "maximum", "minimum", "mean", "standarddeviations", "rms", "sum",
   "slope", "intercept", "pipe", "sigmas", "median", "decilerange","wmean",
   "wstandarddeviations",
   "wrms","wsigma","nowarnings", "largest", "percentile", 
-  "signedlargest",
+  "signedlargest", "pmaximum", "pminimum"
   } ;
 char *optionSuffix[N_OPTIONS] = {
   "", "Max", "Min", "Mean", "StDev", "Rms", "Sum", "Slope", "Intercept", "",
   "Sigma", "Median", "DRange","WMean","WStDev","WRms","WSigma","", "Largest",
-  "Percentile", "SignedLargest",
+  "Percentile", "SignedLargest", "PMaximum", "PMinimum",
   } ;
 
 /* this structure stores a command-line request for statistics computation */
@@ -137,7 +148,7 @@ typedef struct {
  * for computing a statistic
  */
 typedef struct {
-  char *sourceColumn, *weightColumn,*resultColumn, *functionOf;
+  char *sourceColumn, *weightColumn, *resultColumn, *functionOf;
   long optionCode, resultIndex, sumPower;
   double percentile;
   char *percentileString;
@@ -160,14 +171,15 @@ long setupOutputFile(SDDS_DATASET *outTable, char *output, SDDS_DATASET *inTable
 static char *USAGE="sddsenvelope [<input>] [<output>] [-copy=<column-names>] \n\
   [-pipe=[input][,output]] [-nowarnings]\n\
   [-maximum=<column-names>] [-minimum=<column-names>] \n\
+  [-pmaximum=<indep-parameter>,<column-names>] [-pminimum=<indep-parameter>,<column-names>] \n\
   [-largest=<column-names>] [-signedLargest=<column-names>] \n\
   [-mean=<column-names>] [-sum=<power>,<column-names>] \n\
   [-median=<column-names>] [-decilerange=<column-names>] \n\
   [-percentile=<percentage>,<column-names>] \n\
   [-standarddeviation=<column-names>] [-rms=<column-names>] \n\
   [-sigma=<column-names>] \n\
-  [-slope=<indep-variable>,<column-names>]\n\
-  [-intercept=<indep-variable>,<column-names>] \n\
+  [-slope=<indep-parameter>,<column-names>]\n\
+  [-intercept=<indep-parameter>,<column-names>] \n\
   [-wmean=<weightColumn>,<columnNames>] \n\
   [-wstandarddeviation=<weightColumn>,<columnNames>] \n\
   [-wrms=<weightColumn>,<columnNames>] \n\
@@ -175,7 +187,7 @@ static char *USAGE="sddsenvelope [<input>] [<output>] [-copy=<column-names>] \n\
   Processes pages from <input> to produce <output> with\n\
   one page containing the specified quantities across pages\n\
   for each row of the specified columns.\n\
-  Program by Michael Borland. (This is version 8, November 2002, M. Borland.)";
+  Program by Michael Borland. (This is version 9, October 2010, M. Borland.)";
 
 
 int main(int argc, char **argv)
@@ -272,6 +284,8 @@ int main(int argc, char **argv)
         break;
       case SET_SLOPE:
       case SET_INTERCEPT:
+      case SET_PMINIMA:
+      case SET_PMAXIMA:
         if (scanned[i_arg].n_items<3) {
           fprintf(stderr, "error: invalid -%s syntax\n", option[code]);
           exit(1);
@@ -445,6 +459,42 @@ int main(int argc, char **argv)
           for (i=0; i<rows; i++)
             stat[iStat].value1[i] += ipow(inputData[i], stat[iStat].sumPower);
         break;
+      case SET_PMINIMA:
+        if (!SDDS_GetParameterAsDouble(&inTable, stat[iStat].functionOf, &indepData)) {
+          fprintf(stderr, "error:  unable to get value of parameter %s\n", stat[iStat].functionOf);
+          SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+        }
+        if (code==1) 
+          for (i=0; i<rows; i++) {
+            stat[iStat].value2[i] = inputData[i];
+            stat[iStat].value1[i] = indepData;
+          }
+        else 
+          for (i=0; i<rows; i++) {
+            if (stat[iStat].value2[i]>inputData[i]) {
+              stat[iStat].value2[i] = inputData[i];
+              stat[iStat].value1[i] = indepData;
+            }
+          }
+        break;
+      case SET_PMAXIMA:
+        if (!SDDS_GetParameterAsDouble(&inTable, stat[iStat].functionOf, &indepData)) {
+          fprintf(stderr, "error:  unable to get value of parameter %s\n", stat[iStat].functionOf);
+          SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+        }
+        if (code==1) 
+          for (i=0; i<rows; i++) {
+            stat[iStat].value2[i] = inputData[i];
+            stat[iStat].value1[i] = indepData;
+          }
+        else 
+          for (i=0; i<rows; i++) {
+            if (stat[iStat].value2[i]<inputData[i]) {
+              stat[iStat].value2[i] = inputData[i];
+              stat[iStat].value1[i] = indepData;
+            }
+          }
+        break;
       case SET_SLOPE:
       case SET_INTERCEPT:
         if (!SDDS_GetParameterAsDouble(&inTable, stat[iStat].functionOf, &indepData)) {
@@ -501,6 +551,8 @@ int main(int argc, char **argv)
     case SET_COPY:
     case SET_MINIMA:
     case SET_MAXIMA:
+    case SET_PMINIMA:
+    case SET_PMAXIMA:
     case SET_LARGEST:
     case SET_SIGNEDLARGEST:
     case SET_SUMS:
@@ -810,6 +862,10 @@ STAT_DEFINITION *compileStatDefinitions(SDDS_DATASET *inTable, long *stats,
       sprintf(s, "%s%s%s", stat[iStat].sourceColumn, stat[iStat].percentileString,
               optionSuffix[stat[iStat].optionCode]);
       break;
+    case SET_PMAXIMA:
+    case SET_PMINIMA:
+      sprintf(s, "%s%s%s", stat[iStat].sourceColumn, stat[iStat].functionOf, optionSuffix[stat[iStat].optionCode]);
+      break;
     default:
       sprintf(s, "%s%s", stat[iStat].sourceColumn, optionSuffix[stat[iStat].optionCode]);
       break;
@@ -824,7 +880,7 @@ long setupOutputFile(SDDS_DATASET *outTable, char *output, SDDS_DATASET *inTable
                      STAT_DEFINITION *stat, long stats, long rows)
 {
   long column;
-  char s[SDDS_MAXLINE], *symbol, *symbol1;
+  char s[SDDS_MAXLINE], *symbol, *symbol1, *units1;
 
   if (!SDDS_InitializeOutput(outTable, SDDS_BINARY, 0, NULL, "sddsenvelope output", output))
     return 0;
@@ -832,7 +888,8 @@ long setupOutputFile(SDDS_DATASET *outTable, char *output, SDDS_DATASET *inTable
     stat[column].value1 = calloc(sizeof(*stat[column].value1),rows);
     stat[column].value2 = stat[column].value3 = stat[column].value4 = NULL;
     if (stat[column].optionCode==SET_SDS || stat[column].optionCode==SET_SIGMAS ||
-        stat[column].optionCode==SET_WSDS || stat[column].optionCode==SET_WSIGMAS)
+        stat[column].optionCode==SET_WSDS || stat[column].optionCode==SET_WSIGMAS ||
+        stat[column].optionCode==SET_PMINIMA || stat[column].optionCode==SET_PMAXIMA)
       stat[column].value2 = calloc(sizeof(*stat[column].value2),rows);
     if (stat[column].optionCode==SET_INTERCEPT || stat[column].optionCode==SET_SLOPE) {
       stat[column].value2 = malloc(sizeof(*stat[column].value2)*rows);
@@ -875,10 +932,28 @@ long setupOutputFile(SDDS_DATASET *outTable, char *output, SDDS_DATASET *inTable
       sprintf(s, "%s[%s,%g]", optionSuffix[stat[column].optionCode], symbol,
               stat[column].percentile);
       break;
+    case SET_PMINIMA:
+    case SET_PMAXIMA:
+      if (SDDS_GetParameterInformation(inTable, "symbol", &symbol1, SDDS_BY_NAME,
+                                       stat[column].functionOf)!=SDDS_STRING ||
+	  !symbol1 || !strlen(symbol1)) 
+        symbol1 = stat[column].functionOf; 
+      sprintf(s, "%s[%s:%s]", optionSuffix[stat[column].optionCode], symbol, symbol1);
+      if (SDDS_GetParameterInformation(inTable, "units", &units1, SDDS_BY_NAME,
+                                       stat[column].functionOf)!=SDDS_STRING)
+        return 0;
+      if ((units1 &&
+          !SDDS_ChangeColumnInformation(outTable, "units", units1, SDDS_BY_NAME,
+                                        stat[column].resultColumn)) ||
+          !SDDS_ChangeColumnInformation(outTable, "units", "", SDDS_BY_NAME,
+                                        stat[column].resultColumn))
+        return 0;
+      break;
     case SET_INTERCEPT:
     case SET_SLOPE:
-      if (SDDS_GetParameterInformation(outTable, "symbol", &symbol1, SDDS_BY_NAME,
-                                       stat[column].functionOf)!=SDDS_STRING)
+      if (SDDS_GetParameterInformation(inTable, "symbol", &symbol1, SDDS_BY_NAME,
+                                       stat[column].functionOf)!=SDDS_STRING ||
+	  !symbol1 || !strlen(symbol1))
         symbol1 = stat[column].functionOf;
       sprintf(s, "%s[%s:%s]", optionSuffix[stat[column].optionCode], symbol, symbol1);
       break;
