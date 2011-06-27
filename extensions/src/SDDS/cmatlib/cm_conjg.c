@@ -11,15 +11,19 @@
 int cm_conjg(CMATRIX *A, CMATRIX *B)
 {
   register int i, j, a_m, a_n;
-  register double complex *a_i, *b_i;
+  register double *a_i, *b_i;
   
   if ((a_n=A->n)!=B->n || (a_m=A->m)!=B->m) 
     return(0);
   for (i=0; i<a_n; i++) {
-    a_i = A->a[i];
-    b_i = B->a[i];
-    for (j=0; j<a_m; j++) 
-      a_i[j] = conj(b_i[j]);
+    a_i = (A->ar)[i];
+    b_i = (B->ar)[i];
+    for (j=0; j<a_m; j++)
+      a_i[j] = b_i[j];
+    a_i = (A->ai)[i];
+    b_i = (B->ai)[i];
+    for (j=0; j<a_m; j++)
+      a_i[j] = -b_i[j];
   }
   return(1);
 }

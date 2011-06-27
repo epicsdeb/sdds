@@ -43,7 +43,7 @@ int get_path(void)
 {
    path= getenv("BGI");
    if (path==NULL) {
-      (void) strcpy(path_s, _argv[0]);
+      (void) strcpy_ss(path_s, _argv[0]);
       pathp=strrchr(path_s, '\\');
       *pathp=0x00;
       path=path_s;
@@ -427,7 +427,7 @@ EGALIB_vector(int x, int y)
 
 int EGALIB_put_text(int x, int y, char *str)
 {
-        strcpy((char far *)buf, str);
+        strcpy_ss((char far *)buf, str);
         GotoXY((int)(x/EGALIB_HCHAR), 
                    (int)((EGALIB_YMAX-y-(EGALIB_VCHAR/2))/EGALIB_VCHAR));
         gprintf(buf);
@@ -835,7 +835,7 @@ int VGA_linetype(int linetype)
 
 int VGA_put_text(int x, int y, char *str)
 {
-        strcpy((char far *)buf, str);
+        strcpy_ss((char far *)buf, str);
         outtextxy(x, VGA_YLAST-y, buf);
 }
 
@@ -900,7 +900,7 @@ int MCGA_graphics(void)
 
 int MCGA_put_text(int x, int y, char *str)
 {
-        strcpy((char far *)buf, str);
+        strcpy_ss((char far *)buf, str);
         outtextxy(x, MCGA_YLAST-y, buf);
 }
 
@@ -994,7 +994,7 @@ EGALIB_vector(int x, int y)
 
 int EGALIB_put_text(int x, int y, char *str)
 {
-        strcpy((char far *)buf, str);
+        strcpy_ss((char far *)buf, str);
         outtextxy(x, EGALIB_YLAST-y, buf);
 }
 
@@ -1072,7 +1072,7 @@ CGA_vector(int x, int y)
 
 int CGA_put_text(int x, int y, char *str)
 {
-        strcpy((char far *)buf, str);
+        strcpy_ss((char far *)buf, str);
         outtextxy(x, CGA_YLAST-y, buf);
 }
 
@@ -1167,7 +1167,7 @@ HERC_vector(int x, int y)
 
 int HERC_put_text(int x, int y, char *str)
 {
-        strcpy((char far *)buf, str);
+        strcpy_ss((char far *)buf, str);
         outtextxy(x, HERC_YLAST-y, buf);
 }
 
@@ -1264,7 +1264,7 @@ ATT_vector(int x, int y)
 
 int ATT_put_text(int x, int y, char *str)
 {
-        strcpy((char far *)buf, str);
+        strcpy_ss((char far *)buf, str);
         outtextxy(x, ATT_YLAST-y, buf);
 }
 #endif /* ifdef ATT6300 */

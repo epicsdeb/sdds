@@ -8,6 +8,9 @@
 #*************************************************************************
 #
 # $Log: Makefile.OAG,v $
+# Revision 1.13  2010/02/04 23:44:57  soliday
+# Updated because complex.cc replaces complex.c
+#
 # Revision 1.12  2009/12/02 22:19:51  soliday
 # Added the -D_ISOC99_SOURCE flag.
 #
@@ -59,14 +62,15 @@ endif
 
 LIBRARY = mdbmth
 
-USR_CFLAGS += -I../../include -DEXPORT_MDBMTH -D_ISOC99_SOURCE
+USR_CFLAGS += -I../../include -DEXPORT_MDBMTH
+USR_CPPFLAGS += -I../../include -DEXPORT_MDBMTH
 ifeq ($(OS_CLASS),solaris)
 ACC_DEP_CFLAGS += -KPIC -v
 CCC_DEP_CFLAGS += -KPIC -v
 GCC_DEP_CFLAGS += -D__EXTENSIONS__
 endif
 
-LIBSRCS = 	betai.c bsODEp.c complex.c \
+LIBSRCS = 	betai.c bsODEp.c complex.cc \
 		counter.c dbessel.c diffeqResDescrip.c \
 		dlaran.c drand.c elliptic.c \
 		factorial.c factorize.c findMinMax.c \

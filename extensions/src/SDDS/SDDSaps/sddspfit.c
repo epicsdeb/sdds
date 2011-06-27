@@ -13,6 +13,9 @@
  * Michael Borland, 1995.
  * Based on mpl program 'lsf'.
  $Log: sddspfit.c,v $
+ Revision 1.31  2010/05/18 02:13:24  borland
+ Added Coefficient%02ldSigma parameters.
+
  Revision 1.30  2009/10/29 19:12:53  borland
  Added parameters for each fit coefficient.
 
@@ -247,7 +250,7 @@ char *sigmas_options[N_SIGMAS_OPTIONS] = {"absolute", "fractional"};
 static long iIntercept = -1, iInterceptSigma = -1;
 static long iSlope = -1, iSlopeSigma = -1;
 static long iCurvature = -1, iCurvatureSigma = -1;
-static long *iTerm = NULL;
+static long *iTerm = NULL, *iTermSig = NULL;
 static long iOffset = -1, iFactor = -1;
 static long iChiSq = -1, iRmsResidual = -1, iSigLevel = -1;
 static long iFitIsValid = -1, iFitLabel = -1, iTerms = -1;
@@ -547,6 +550,7 @@ int main(int argc, char **argv)
   coef = tmalloc(sizeof(*coef)*terms);
   coefSigma = tmalloc(sizeof(*coefSigma)*terms);
   iTerm = tmalloc(sizeof(*iTerm)*terms);
+  iTermSig = tmalloc(sizeof(*iTermSig)*terms);
 
   if (!SDDS_InitializeInput(&SDDSin, input))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
@@ -822,13 +826,17 @@ int main(int argc, char **argv)
         termIndex = coefficient_index(order, terms, i);
       if (termIndex==-1) {
         if (!SDDS_SetParameters(&SDDSout, SDDS_SET_BY_INDEX|SDDS_PASS_BY_VALUE,
-                                iTerm[i], nNum,  -1))
+                                iTerm[i], nNum,  iTermSig[i], nNum, -1))
           SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
       }
       else {
         if (!SDDS_SetParameters(&SDDSout, SDDS_SET_BY_INDEX|SDDS_PASS_BY_VALUE,
                                 iTerm[i], coef[termIndex], -1))
           SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+        if (iTermSig[i]!=-1)
+          if (!SDDS_SetParameters(&SDDSout, SDDS_SET_BY_INDEX|SDDS_PASS_BY_VALUE,
+                                  iTermSig[i], coefSigma[termIndex], -1))
+            SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
       }
     }
     if (copyParameters && !SDDS_CopyParameters(&SDDSout, &SDDSin))
@@ -1134,10 +1142,20 @@ char **initializeOutputFile(SDDS_DATASET *SDDSout, char *output, SDDS_DATASET *S
     }
     for (i=0; i<terms; i++) {
       char s[100];
-      sprintf(s, "Coefficient%02ld", order[i]);
+      sprintf(s, "Coefficient%02ld", (long)order[i]);
       iTerm[i] = SDDS_DefineParameter(SDDSout, s, s, coefUnits[i], NULL, NULL, SDDS_DOUBLE, NULL);
     }
+    for (i=0; i<terms; i++) {
+      char s[100];
+      if (sigmasValid) {
+        sprintf(s, "Coefficient%02ldSigma", (long)order[i]);
+        iTermSig[i] = SDDS_DefineParameter(SDDSout, s, s, coefUnits[i], NULL, NULL, SDDS_DOUBLE, NULL);
+      } else {
+        iTermSig[i] = -1;
+      }
+    }
     
+
     if (SDDS_NumberOfErrors()) 
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   }

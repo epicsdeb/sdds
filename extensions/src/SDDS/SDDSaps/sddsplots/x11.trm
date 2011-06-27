@@ -61,7 +61,7 @@ int X11_args(int argc, char **argv)
   /*char *getenv();*/
 
   if ((ptr=getenv("MPL_GEOMETRY")))
-    strcpy(X11_geom,  ptr);
+    strcpy_ss(X11_geom,  ptr);
 
   strcat(X11_command,  X11_geom);
 
@@ -143,7 +143,7 @@ int X11_init(void)
 { 
   char *devarg;
   if (!X11_pipe) {
-    strcpy(X11_name,  "mpl_x11 -name mpl ");
+    strcpy_ss(X11_name,  "mpl_x11 -name mpl ");
     strcat(X11_name,  X11_command);
     if ((devarg=gs_device_arguments(NULL,  1))) {
       strcat(X11_name,  " ");
@@ -158,7 +158,7 @@ int X11g_init(void)
 { 
   char *devarg;
   if (!X11_pipe) {
-    strcpy(X11_name,  "mpl_x11g -name mpl ");
+    strcpy_ss(X11_name,  "mpl_x11g -name mpl ");
     strcat(X11_name,  X11_command);
     if ((devarg=gs_device_arguments(NULL,  1))) {
       strcat(X11_name,  " ");
@@ -173,7 +173,7 @@ int X11c_init(void)
 { 
   char *devarg;
   if (!X11_pipe) {
-    strcpy(X11_name,  "mpl_x11c -name mpl ");
+    strcpy_ss(X11_name,  "mpl_x11c -name mpl ");
     strcat(X11_name,  X11_command);
     if ((devarg=gs_device_arguments(NULL,  1))) {
       strcat(X11_name,  " ");
@@ -262,10 +262,10 @@ int X11motif_init(void)
       exit(1);
     }
     GetShortPathName(buffer, buffer2, size);
-    strcpy(X11_name,  buffer2);
+    strcpy_ss(X11_name,  buffer2);
     strcat(X11_name,  " ");
 #else
-    strcpy(X11_name,  "mpl_motif ");
+    strcpy_ss(X11_name,  "mpl_motif ");
 #endif
     strcat(X11_name,  X11_command);
     if ((devarg=gs_device_arguments(NULL,  1))) {
@@ -364,10 +364,10 @@ int X11bmotif_init(void)
       exit(1);
     }
     GetShortPathName(buffer, buffer2, size);
-    strcpy(X11_name,  buffer2);
+    strcpy_ss(X11_name,  buffer2);
     strcat(X11_name,  " ");
 #else
-    strcpy(X11_name,  "mpl_motif ");
+    strcpy_ss(X11_name,  "mpl_motif ");
 #endif
     strcat(X11_name,  X11_command);
     if ((devarg=gs_device_arguments(NULL,  1))) {

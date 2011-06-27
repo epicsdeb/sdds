@@ -12,6 +12,9 @@
  *
  * Michael Borland, 1989
  $Log: matlib.h,v $
+ Revision 1.11  2010/02/04 23:42:34  soliday
+ Updated so that it can be used by c++
+
  Revision 1.10  2008/01/05 03:35:32  borland
  Adde m_subtract().
 
@@ -40,6 +43,10 @@
  *
  */
 #include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef MATLIB 
 
@@ -176,4 +183,8 @@ epicsShareFuncMATLIB extern int fmat_check(FMATRIX *A);
 #define fm_check(A) fmat_check(A)
 
 #define MATLIB 1
+#endif
+
+#ifdef __cplusplus
+}
 #endif

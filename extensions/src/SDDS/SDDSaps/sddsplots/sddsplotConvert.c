@@ -13,6 +13,9 @@
  *
  * Michael Borland, 1994.
  $Log: sddsplotConvert.c,v $
+ Revision 1.50  2010/10/08 22:07:40  borland
+ When the -factor option is given, now scales the error bar values as well.
+
  Revision 1.49  2009/07/28 14:01:16  borland
  Added scroll feature to -replicate option.  Greatly improved memory management for
  split and replicated datasets.  Added -nocolorbar option.
@@ -727,6 +730,9 @@ void perform_dataset_conversions(PLOT_SPEC *plspec)
         SWAP_DOUBLE(plreq->limit.cxmax, plreq->limit.cxmin);
       for (i=dataset->pointsStored-1; i>=0; i--)
         dataset->x[i] *= dataset->factor[0];
+      if (dataset->x1)
+	for (i=dataset->pointsStored-1; i>=0; i--)
+	  dataset->x1[i] *= dataset->factor[0];
     }
     if (plspec->plot_request[request].factor_flags&FACTOR_YPARAMETER_GIVEN) {
       plreq->limit.cymin *= dataset->factor[1];
@@ -735,6 +741,9 @@ void perform_dataset_conversions(PLOT_SPEC *plspec)
         SWAP_DOUBLE(plreq->limit.cymax, plreq->limit.cymin);
       for (i=dataset->pointsStored-1; i>=0; i--)
         dataset->y[i] *= dataset->factor[1];
+      if (dataset->y1)
+	for (i=dataset->pointsStored-1; i>=0; i--)
+	  dataset->y1[i] *= dataset->factor[1];
     }
     if (plspec->plot_request[request].factor_flags&FACTOR_XMULT_GIVEN) {
       plreq->limit.cxmin *= plspec->plot_request[request].factor[0];
@@ -743,6 +752,9 @@ void perform_dataset_conversions(PLOT_SPEC *plspec)
         SWAP_DOUBLE(plreq->limit.cxmax, plreq->limit.cxmin);
       for (i=dataset->pointsStored-1; i>=0; i--)
         dataset->x[i] *= plspec->plot_request[request].factor[0];
+      if (dataset->x1)
+	for (i=dataset->pointsStored-1; i>=0; i--)
+	  dataset->x1[i] *= plspec->plot_request[request].factor[0];
     }
     if (plspec->plot_request[request].factor_flags&FACTOR_YMULT_GIVEN) {
       plreq->limit.cymin *= plspec->plot_request[request].factor[1];
@@ -751,6 +763,9 @@ void perform_dataset_conversions(PLOT_SPEC *plspec)
         SWAP_DOUBLE(plreq->limit.cymax, plreq->limit.cymin);
       for (i=dataset->pointsStored-1; i>=0; i--)
         dataset->y[i] *= plspec->plot_request[request].factor[1];
+      if (dataset->y1)
+	for (i=dataset->pointsStored-1; i>=0; i--)
+	  dataset->y1[i] *= plspec->plot_request[request].factor[1];
     } 
     if (plreq->dither[0]) {
       double range, min, max;

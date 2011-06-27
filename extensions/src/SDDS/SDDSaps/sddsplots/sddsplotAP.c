@@ -13,6 +13,26 @@
  *
  * Michael Borland, 1994.
  $Log: sddsplotAP.c,v $
+ Revision 1.93  2011/01/11 22:51:03  soliday
+ Changed all the strcpy commands to strcpy_ss because of problems with
+ RedHat Enterprise 6. If a strcpy copies the result to the same memory
+ space you will get unexpected results.
+
+ Revision 1.92  2010/09/14 16:20:11  soliday
+ Added the rspectral order for the colors. This is the reverse of the spectral
+ order.
+
+ Revision 1.91  2010/07/08 21:26:47  borland
+ Added "first" qualifier to -omnipresent option.  When given, omnipresent datasets
+ are plotted first.  The default is to plot them last.
+
+ Revision 1.90  2010/06/03 16:33:45  borland
+ Added fixForRequest qualifier to -graphic option.
+
+ Revision 1.89  2010/01/05 20:06:46  soliday
+ Added the -intensityBar option which can be used to move the intensity bar
+ and to resize the label text to the left and the unit text above.
+
  Revision 1.88  2009/07/28 14:01:16  borland
  Added scroll feature to -replicate option.  Greatly improved memory management for
  split and replicated datasets.  Added -nocolorbar option.
@@ -435,7 +455,7 @@ unsigned long translate_to_plotcode(GRAPHIC_SPEC graphic)
     return(plotcode);
     }
 
-static char *graphic_usage = "-graphic=<element>[,type=<type>][,fill][,subtype={<type> | type}][,thickness=<integer>][,connect[={<linetype> | type | subtype}]][,vary=type][,vary=subtype][,scale=<factor>][,modulus=<integer>][,eachfile][,eachpage][,eachrequest][,fixForName][,fixForFile]]\n\
+static char *graphic_usage = "-graphic=<element>[,type=<type>][,fill][,subtype={<type> | type}][,thickness=<integer>][,connect[={<linetype> | type | subtype}]][,vary=type][,vary=subtype][,scale=<factor>][,modulus=<integer>][,eachfile][,eachpage][,eachrequest][,fixForName][,fixForFile][,fixfForRequest]\n\
 <element> is one of continue, line, symbol, errorbar, impulse, yimpulse, dot, bar, or ybar.\n";
 
 long graphic_AP(PLOT_SPEC *plotspec, char **item, long items)
@@ -494,10 +514,11 @@ long graphic_AP(PLOT_SPEC *plotspec, char **item, long items)
 #define GRAPHIC_KW_THICKNESS 10
 #define GRAPHIC_KW_FILL 11
 #define GRAPHIC_KW_FIXFORFILE 12
-#define GRAPHIC_KWS 13
+#define GRAPHIC_KW_FIXFORREQUEST 13
+#define GRAPHIC_KWS 14
 static char *graphic_kw[GRAPHIC_KWS] = {
     "type", "scale", "connect", "vary", "eachpage", "eachfile", "eachrequest", "subtype", "modulus",
-    "fixforname", "thickness","fill", "fixforfile",
+    "fixforname", "thickness","fill", "fixforfile", "fixforrequest",
     } ;
 
 #define CONNECT_KW_SUBTYPE 0
@@ -606,6 +627,9 @@ long graphic_AP1(GRAPHIC_SPEC *graphic_spec, long element, char **item, long ite
             break;
           case GRAPHIC_KW_FIXFORFILE:
             graphic_spec->flags |= GRAPHIC_VARY_FIXFORFILE;
+            break;
+          case GRAPHIC_KW_FIXFORREQUEST:
+            graphic_spec->flags |= GRAPHIC_VARY_FIXFORREQUEST;
             break;
           case GRAPHIC_KW_MODULUS:
             if (!eqptr || SDDS_StringIsBlank(eqptr+1) || sscanf(eqptr+1, "%ld", &graphic_spec->modulus)!=1 ||
@@ -1067,7 +1091,7 @@ long string_AP(PLOT_SPEC *plotspec, char **item, long items)
     for (i=0; i<2; i++) {
       if (sspec->flags&(LABEL_X_GIVEN<<i)) {
         if (sspec->positionParameter[i][0]=='@') {
-          strcpy(sspec->positionParameter[i], sspec->positionParameter[i]+1);
+          strcpy_ss(sspec->positionParameter[i], sspec->positionParameter[i]+1);
           sspec->flags |= (LABEL_XPARAM_GIVEN<<i);
         }
         else {
@@ -1464,11 +1488,18 @@ long nextpage_AP(PLOT_SPEC *plotspec, char **item, long items)
     return 1;
     }
 
+static char *omnipresent_usage = "-omnipresent[=first]" ;
+
 long omnipresent_AP(PLOT_SPEC *plotspec, char **item, long items)
 {
     if (plotspec->plot_requests<2)
         return bombre(NO_REQUESTS_MESSAGE, "-parameterNames, -columnNames or -mplfiles must be given prior to -omnipresent", 0);
-    plotspec->plot_request[plotspec->plot_requests-1].flags |= PLREQ_OMNIPRESENT;
+    if (items==0)
+      plotspec->plot_request[plotspec->plot_requests-1].flags |= PLREQ_OMNIPRESENT;
+    else if (items==1 && strncmp(item[0], "first", strlen(item[0]))==0) 
+      plotspec->plot_request[plotspec->plot_requests-1].flags |= PLREQ_OMNIPRESENT+PLREQ_OMNIFIRST;
+    else
+      return bombre("invalid -omnipresent sytnax", omnipresent_usage, 0);
     return 1;
     }
 
@@ -2448,6 +2479,23 @@ long limit_AP(PLOT_SPEC *plotspec, char **item, long items)
     return 1;
     }
 
+long intensityBar_AP(PLOT_SPEC *plotspec, char **item, long items)
+{
+  PLOT_REQUEST *plreq;
+
+  plreq = &plotspec->plot_request[plotspec->plot_requests-1];
+  plreq->intensityBar_settings.flags = 0;
+  if (items<1 ||
+      !scanItemList(&plreq->intensityBar_settings.flags, item, &items, 0,
+                    "labelsize", SDDS_DOUBLE, &plreq->intensityBar_settings.labelsize, 1, INTENSITYBAR_LABELSIZE_GIVEN,
+                    "unitsize", SDDS_DOUBLE, &plreq->intensityBar_settings.unitsize, 1, INTENSITYBAR_UNITSIZE_GIVEN,
+                    "xadjust", SDDS_DOUBLE, &plreq->intensityBar_settings.xadjust, 1, INTENSITYBAR_XADJUST_GIVEN,
+                    NULL))
+    return bombre("invalid -intensityBar syntax", "-intensityBar=[labelsize=<value>][,unitsize=<value>][,xadjust=<value>]\nThe defaults are -intensityBar=labelsize=1,unitsize=1,xadjust=0", 0);
+  
+  return 1;
+}
+
 
 long range_AP(PLOT_SPEC *plotspec, char **item, long items)
 {
@@ -2587,16 +2635,17 @@ long alignzero_AP(PLOT_SPEC *plotspec, char **item, long items)
   return 1;
 }
 
-static char *orderColors_usage = "-orderColors={spectral|start=(<red>,<green>,<blue>){[,finish=(<red>,<green>,<blue>)]|[,increment=(<red>,<green>,<blue>)]}}\n\
+static char *orderColors_usage = "-orderColors={spectral|rspectral|start=(<red>,<green>,<blue>){[,finish=(<red>,<green>,<blue>)]|[,increment=(<red>,<green>,<blue>)]}}\n\
 All colors range from 0 to 65535\n";
 
 #define ORDERCOLORS_KW_START 0
 #define ORDERCOLORS_KW_FINISH 1
 #define ORDERCOLORS_KW_INCREMENT 2
 #define ORDERCOLORS_KW_SPECTRAL 3
-#define ORDERCOLORS_KWS 4
+#define ORDERCOLORS_KW_RSPECTRAL 4
+#define ORDERCOLORS_KWS 5
 static char *ordercolors_kw[ORDERCOLORS_KWS] = {
-  "start", "finish", "increment", "spectral"
+  "start", "finish", "increment", "spectral", "rspectral"
 };
 long orderColors_AP(PLOT_SPEC *plotspec, char **item, long items)
 {
@@ -2735,6 +2784,9 @@ long orderColors_AP(PLOT_SPEC *plotspec, char **item, long items)
       break;
     case ORDERCOLORS_KW_SPECTRAL:
       plreq->color_settings.flags |= COLORSET_SPECTRAL;
+      break;
+    case ORDERCOLORS_KW_RSPECTRAL:
+      plreq->color_settings.flags |= COLORSET_RSPECTRAL;
       break;
     default:
       fprintf (stderr, "error: invalid -orderColors syntax\nusage: %s\n", orderColors_usage);

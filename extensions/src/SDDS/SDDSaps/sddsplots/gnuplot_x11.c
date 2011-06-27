@@ -105,7 +105,7 @@ int main(argc, argv) int argc; char *argv[]; {
 
       for(n=0; n<Ncolors; n++) {
 /*
-	 strcpy(option, color_keys[n]);
+	 strcpy_ss(option, color_keys[n]);
 	 strcat(option, "Color");
 	 value = XGetDefault(dpy, "gnuplot", option);
 	 if (!value) { value = color_values[n]; }
@@ -294,7 +294,7 @@ gnuplot(cd, s, id) char *cd; int *s; XtInputId *id; {
          if (len>STRING_LENGTH)
              commands[nc++] = XtNewString(buf);
          else
-             strcpy(commands[nc++], buf);
+             strcpy_ss(commands[nc++], buf);
 	 }
       }
    if (feof(stdin) || ferror(stdin)) exit(0); 

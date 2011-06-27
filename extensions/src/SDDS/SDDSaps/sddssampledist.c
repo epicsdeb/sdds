@@ -9,6 +9,9 @@
 
 /*
  $Log: sddssampledist.c,v $
+ Revision 1.16  2010/01/14 22:46:39  shang
+ added -optimalHalton option
+
  Revision 1.15  2007/06/21 17:38:12  borland
  Restored ability to read from a file and write to a pipe.
  Fixed usage messages for -gaussian, -uniform, and -poisson.
@@ -79,10 +82,11 @@
 #define CLO_GAUSSIAN 5
 #define CLO_UNIFORM 6
 #define CLO_POISSON 7
-#define CLO_OPTIONS 8
+#define CLO_OPTIMAL_HALTON 8
+#define CLO_OPTIONS 9
 
 static char *option[CLO_OPTIONS] = {
-  "pipe", "columns", "samples", "seed", "verbose", "gaussian", "uniform", "poisson",
+  "pipe", "columns", "samples", "seed", "verbose", "gaussian", "uniform", "poisson", "optimalHalton",
     } ;
 
 char *USAGE1 = "sddssampledist [<input>] [<output>] [-pipe=[in][,out]]\n\
@@ -90,7 +94,7 @@ char *USAGE1 = "sddssampledist [<input>] [<output>] [-pipe=[in][,out]]\n\
 [-columns=...] [-samples=<integer>] [-seed=<integer>] [-verbose] \n\
 [-gaussian=columnName=<columnName>[,meanValue=<value>|@<parameter_name>][,sigmaValue=<value>|@<parameter_name>][,units=<string>]] \n\
 [-uniform=columnName=<columnName>[,minimumValue=<value>|@<parameter_name>][,maximumValue=<value>|@<parameter_name>][,units=<string>]] \n\
-[-poisson=columnName=<columnName>[,meanValue=<value>|@<parameter_name>][,units=<string>]  \n";
+[-poisson=columnName=<columnName>[,meanValue=<value>|@<parameter_name>][,units=<string>] [-optimalHalton] \n";
 char *USAGE2 = "-columns        Gives the name of the independent variable for the distribution\n\
                 and the name of the cumulative distribution function (CDF) or the\n\
                 distribution function (DF).  The CDF is a nondecreasing function normalized\n\
@@ -126,6 +130,7 @@ char *USAGE3 = "-uniform        Sample with uniform distribution with specified 
 -samples        Specifies the number of samples to generate.\n\
 -seed           Specifies the seed for the random number generator.  If not given,\n\
                 the generator is seeded from the system clock.\n\
+-optimalHalton  if provided, the improved halton sequence will be used for generating random numbers.\n\
 -verbose        Prints information to stderr while working.\n\n\
 Program by Michael Borland. (This is version 3, March 2005.)\n";
 
@@ -172,7 +177,7 @@ int main(int argc, char **argv)
   double *sample, *IVValue, *CDFValue;
   char msgBuffer[1000];
   RANDOMIZED_ORDER *randomizationData = NULL;
-  long verbose;
+  long verbose, optimalHalton=0;
   
   SDDS_RegisterProgramName(argv[0]);
   argc = scanargs(&scanned, argc, argv); 
@@ -374,6 +379,9 @@ int main(int argc, char **argv)
         break;
       case CLO_VERBOSE:
         verbose = 1;
+        break;
+      case CLO_OPTIMAL_HALTON:
+        optimalHalton = 1;
         break;
       default:
         fprintf(stderr, "error: unknown/ambiguous option: %s\n", 
@@ -683,9 +691,16 @@ int main(int argc, char **argv)
         if (seqRequest[i].flags&SEQ_HALTONRADIX) {
           if (verbose)
             fprintf(stderr, "Starting halton sequence, offset=%" PRId32 "\n", seqRequest[i].haltonOffset);
-        haltonID = startHaltonSequence(&seqRequest[i].haltonRadix, 0.5);
-          while (seqRequest[i].haltonOffset-- >0)
-            nextHaltonSequencePoint(haltonID);
+          if (!optimalHalton)
+            haltonID = startHaltonSequence(&seqRequest[i].haltonRadix, 0.5);
+          else
+            haltonID = startModHaltonSequence(&seqRequest[i].haltonRadix, 0);
+          while (seqRequest[i].haltonOffset-- >0) {
+            if (!optimalHalton)
+              nextHaltonSequencePoint(haltonID);
+            else
+              nextModHaltonSequencePoint(haltonID);
+          }
         }
         if (verbose)
           fprintf(stderr, "Generating samples\n");
@@ -693,8 +708,12 @@ int main(int argc, char **argv)
           double CDF;
           long code;
           while (1) {
-            if (seqRequest[i].flags&SEQ_HALTONRADIX)
-              CDF = nextHaltonSequencePoint(haltonID);
+            if (seqRequest[i].flags&SEQ_HALTONRADIX) {
+              if (!optimalHalton)
+                CDF = nextHaltonSequencePoint(haltonID);
+              else
+                CDF = nextModHaltonSequencePoint(haltonID);
+            }
             else 
               CDF = random_1(1);
             if (CDF<=CDFValue[values-1] && CDF>=CDFValue[0])

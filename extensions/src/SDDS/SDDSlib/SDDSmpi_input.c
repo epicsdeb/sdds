@@ -23,6 +23,7 @@
 #endif
 #endif
 
+
 typedef struct {
   int32_t type, field_length, dimensions, definition_mode, memory_number, pointer_number;
   int32_t name_len, symbol_len, units_len, description_len, format_string_len, fixed_value_len, group_name_len;
@@ -37,10 +38,17 @@ typedef struct {
 typedef struct {
   int32_t n_columns, n_parameters, n_associates, n_arrays, description_len, contents_len, version, layout_offset, filename_len;
   int32_t mode, lines_per_row, no_row_counts, fixed_row_count, fsync_data, additional_header_lines; /*data_mode definition*/
-  short layout_written,  disconnected,  gzipFile,  popenUsed;
+  short layout_written,  disconnected,  gzipFile,  popenUsed, swapByteOrder;
   uint32_t byteOrderDeclared;
   char description[1024], contents[1024], filename[1024];
 } OTHER_DEF;
+
+/*the string length in array or columns should be less than 40 */
+#define STRING_COL_LENGTH 40
+typedef struct {
+  char str_value[STRING_COL_LENGTH];
+} STRING_DEF; 
+
 
 int32_t SDDS_MPI_ReadPage(SDDS_DATASET *SDDS_dataset)
 {
@@ -64,7 +72,7 @@ int32_t SDDS_MPI_ReadPage(SDDS_DATASET *SDDS_dataset)
 
 int32_t SDDS_MPI_BroadcastLayout(SDDS_DATASET *SDDS_dataset)
 {
-  SDDS_LAYOUT *layout = NULL;
+  SDDS_LAYOUT *layout = &(SDDS_dataset->layout);
   MPI_DATASET *MPI_dataset = SDDS_dataset->MPI_dataset;
   char *symbol, *units, *description, *format_string, *fixed_value, *filename, *path, *contents;
   int i;
@@ -76,7 +84,7 @@ int32_t SDDS_MPI_BroadcastLayout(SDDS_DATASET *SDDS_dataset)
   /* MPI_Aint type used to be consistent with syntax of */
   /* MPI_Type_extent routine */
   MPI_Aint    offsets[4], int_ext, short_ext, uint_ext;
-  
+
   MPI_Type_extent(MPI_INT, &int_ext);
   MPI_Type_extent(MPI_UNSIGNED, &uint_ext);
   MPI_Type_extent(MPI_SHORT, &short_ext);
@@ -113,7 +121,7 @@ int32_t SDDS_MPI_BroadcastLayout(SDDS_DATASET *SDDS_dataset)
   /* Now define structured type and commit it */
   MPI_Type_struct(4, blockcounts, offsets, oldtypes, &otherType);
   MPI_Type_commit(&otherType);
-  
+
   if (MPI_dataset->myid==0) {
     /*fill other layout structure */
     other.n_columns = layout->n_columns;
@@ -135,6 +143,8 @@ int32_t SDDS_MPI_BroadcastLayout(SDDS_DATASET *SDDS_dataset)
     other.additional_header_lines = layout->data_mode.additional_header_lines;
     other.description_len = other.contents_len = other.filename_len = 0;
     other.description[0] = other.contents[0] = other.filename[0] = '\0';
+    other.swapByteOrder = SDDS_dataset->swapByteOrder;
+    
     if (layout->description) {
       other.description_len = strlen(layout->description);
       sprintf(other.description,"%s", layout->description);
@@ -229,7 +239,8 @@ int32_t SDDS_MPI_BroadcastLayout(SDDS_DATASET *SDDS_dataset)
       if (layout->parameter_definition[i].fixed_value) {
 	parameter[i].fixed_value_len = strlen(layout->parameter_definition[i].fixed_value);
 	sprintf(parameter[i].fixed_value, "%s", layout->parameter_definition[i].fixed_value);
-      }
+      } else 
+	parameter[i].fixed_value_len = -1;
     }
     for (i=0; i<other.n_arrays; i++) {
       if (!SDDS_ZeroMemory(&array[i], sizeof(ELEMENT_DEF))) {
@@ -312,6 +323,7 @@ int32_t SDDS_MPI_BroadcastLayout(SDDS_DATASET *SDDS_dataset)
       SDDS_CopyString(&layout->description, other.description);
     if (other.contents_len)
       SDDS_CopyString(&layout->contents, other.contents);
+    SDDS_dataset->swapByteOrder = other.swapByteOrder;
   }
   if (other.n_columns)
     MPI_Bcast(column, other.n_columns, elementType, 0, MPI_dataset->comm);
@@ -366,7 +378,7 @@ int32_t SDDS_MPI_BroadcastLayout(SDDS_DATASET *SDDS_dataset)
 	SDDS_CopyString(&format_string, parameter[i].format_string);
       if (parameter[i].symbol_len)
 	SDDS_CopyString(&symbol, parameter[i].symbol);
-      if (parameter[i].fixed_value_len)
+      if (parameter[i].fixed_value_len>=0)
 	SDDS_CopyString(&fixed_value, parameter[i].fixed_value);
       if (SDDS_DefineParameter(SDDS_dataset, parameter[i].name, symbol, units, description,
 			       format_string, parameter[i].type, fixed_value)<0) {
@@ -428,7 +440,7 @@ int32_t SDDS_MPI_InitializeInput(SDDS_DATASET *SDDS_dataset, char *filename)
 {
   /*  startTime = MPI_Wtime();*/
   MPI_DATASET *MPI_dataset = SDDS_dataset->MPI_dataset;
-  
+
 #if defined(MASTER_READTITLE_ONLY)
   if (MPI_dataset->myid==0) 
 #endif 
@@ -543,14 +555,14 @@ int32_t SDDS_MPI_InitializeInput(SDDS_DATASET *SDDS_dataset, char *filename)
     SDDS_SetError("(SDDS_MPI_File_Open)Unablle to open file for reading.");
     return 0;
   }
-   
+  
   MPI_File_get_size(MPI_dataset->MPI_file, &(MPI_dataset->file_size));
   if (MPI_dataset->file_offset >= MPI_dataset->file_size) {
     SDDS_SetError("No data contained in the input file.");
     return 0;
   }
   MPI_dataset->column_offset = SDDS_MPI_Get_Column_Size(SDDS_dataset);
-  SDDS_dataset->parallel_io = 1;
+    SDDS_dataset->parallel_io = 1; 
   return 1;
 }
 
@@ -565,4 +577,188 @@ int32_t SDDS_MPI_InitializeInputFromSearchPath(SDDS_DATASET *SDDS_dataset, char 
   value = SDDS_MPI_InitializeInput(SDDS_dataset, filename);
   free(filename);
   return value;
+}
+
+int32_t SDDS_Master_InitializeInputFromSearchPath(SDDS_DATASET *SDDS_dataset, MPI_DATASET *MPI_dataset, char *file)
+{
+  char *filename;
+  
+  if (MPI_dataset->myid==0) {
+    if (!(filename=findFileInSearchPath(file))) {
+      SDDS_SetError("file does not exist in searchpath (InitializeInputFromSearchPath)");
+      return 0;
+    }
+    if (!SDDS_InitializeInput(SDDS_dataset, filename)) {
+      free(filename);
+      return 0;
+    }
+    free(filename);
+  } else {
+    if (!SDDS_ZeroMemory((void *)SDDS_dataset, sizeof(SDDS_DATASET))) 
+      SDDS_Bomb("Unable to zero memory for SDDS dataset(SDDS_MPI_Setup)");
+  }
+  SDDS_dataset->parallel_io = 0;
+  SDDS_dataset->MPI_dataset =MPI_dataset;
+  if (!SDDS_MPI_BroadcastLayout(SDDS_dataset))
+    return 0;
+  
+  return 1;
+}
+
+int32_t SDDS_Master_InitializeInput(SDDS_DATASET *SDDS_dataset, MPI_DATASET *MPI_dataset, char *file)
+{
+  if (MPI_dataset->myid==0) {
+    if (!SDDS_InitializeInput(SDDS_dataset, file))
+      return 0;
+  } else {
+    if (!SDDS_ZeroMemory((void *)SDDS_dataset, sizeof(SDDS_DATASET))) 
+      SDDS_Bomb("Unable to zero memory for SDDS dataset(SDDS_MPI_Setup)");
+  }
+  SDDS_dataset->parallel_io = 0;
+  SDDS_dataset->MPI_dataset =MPI_dataset;
+  if (!SDDS_MPI_BroadcastLayout(SDDS_dataset))
+    return 0;
+  
+  return 1;
+}
+
+/*master read the file, and broadcast the contents to other processors, assuming only one page data */
+int32_t SDDS_Master_ReadPage(SDDS_DATASET *SDDS_dataset)
+{
+  MPI_DATASET *MPI_dataset = SDDS_dataset->MPI_dataset;
+  int32_t rows=0, i, j, len, total_len=0, retrival=0;
+  STRING_DEF *str_val=NULL;
+
+  /*master read file */
+  if (MPI_dataset->myid==0) {
+    if ((retrival=SDDS_ReadPage(SDDS_dataset))<=0) {
+      SDDS_SetError("SDDS_MPI_ReadParameterFile2: Error in reading input file");
+      return(retrival);
+    }
+    rows = SDDS_CountRowsOfInterest(SDDS_dataset);
+  }
+  MPI_Bcast(&rows, 1, MPI_INT, 0, MPI_dataset->comm);
+  MPI_Bcast(&retrival, 1, MPI_INT, 0, MPI_dataset->comm);
+  if (MPI_dataset->myid!=0) {
+    /*allocate memory for other processors */
+    if (!SDDS_StartPage(SDDS_dataset, rows))
+      return 0;
+  }
+  /*broadcast the parameters to other processors */
+  for (i=0; i<SDDS_dataset->layout.n_parameters; i++) {
+    switch (SDDS_dataset->layout.parameter_definition[i].type) {
+    case SDDS_DOUBLE:
+      MPI_Bcast(SDDS_dataset->parameter[i], 1, MPI_DOUBLE, 0, MPI_dataset->comm);
+      break;
+    case SDDS_FLOAT:
+      MPI_Bcast(SDDS_dataset->parameter[i], 1, MPI_FLOAT, 0, MPI_dataset->comm);
+      break;
+    case SDDS_LONG:
+      MPI_Bcast(SDDS_dataset->parameter[i], 1, MPI_INT, 0, MPI_dataset->comm);
+      break;
+    case SDDS_ULONG:
+      MPI_Bcast(SDDS_dataset->parameter[i], 1, MPI_UNSIGNED, 0, MPI_dataset->comm);
+      break;
+    case SDDS_SHORT:
+      MPI_Bcast(SDDS_dataset->parameter[i], 1, MPI_SHORT, 0, MPI_dataset->comm);
+      break;
+    case SDDS_USHORT:
+      MPI_Bcast(SDDS_dataset->parameter[i], 1, MPI_UNSIGNED_SHORT, 0, MPI_dataset->comm);
+      break;
+    case SDDS_STRING:
+      if (MPI_dataset->myid==0)
+	len = strlen(*(char**)SDDS_dataset->parameter[i]);
+      MPI_Bcast(&len, 1, MPI_INT, 0, MPI_dataset->comm);
+      if (MPI_dataset->myid!=0)
+	SDDS_dataset->parameter[i] = (char*) malloc(sizeof(char)*len);
+      MPI_Bcast(SDDS_dataset->parameter[i], len, MPI_BYTE, 0, MPI_dataset->comm);
+      break;
+    case SDDS_CHARACTER:
+      MPI_Bcast(SDDS_dataset->parameter[i], 1, MPI_CHAR, 0, MPI_dataset->comm);
+      break;
+    }
+  }
+  /* broadcast arrays to other processros */
+  for (i=0; i<SDDS_dataset->layout.n_arrays; i++) {
+    MPI_Bcast(&(SDDS_dataset->layout.array_definition[i].dimensions), 1, MPI_INT, 0, MPI_dataset->comm);
+    switch (SDDS_dataset->layout.array_definition[i].type) {
+    case SDDS_DOUBLE:
+      MPI_Bcast(SDDS_dataset->array[i].data, SDDS_dataset->layout.array_definition[i].dimensions, MPI_DOUBLE, 0, MPI_dataset->comm);
+      break;
+    case SDDS_FLOAT:
+      MPI_Bcast(SDDS_dataset->array[i].data, SDDS_dataset->layout.array_definition[i].dimensions, MPI_FLOAT, 0, MPI_dataset->comm);
+      break;
+    case SDDS_LONG:
+      MPI_Bcast(SDDS_dataset->array[i].data, SDDS_dataset->layout.array_definition[i].dimensions, MPI_INT, 0, MPI_dataset->comm);
+      break;
+    case SDDS_ULONG:
+      MPI_Bcast(SDDS_dataset->array[i].data, SDDS_dataset->layout.array_definition[i].dimensions, MPI_UNSIGNED, 0, MPI_dataset->comm);
+      break;
+    case SDDS_SHORT:
+      MPI_Bcast(SDDS_dataset->array[i].data, SDDS_dataset->layout.array_definition[i].dimensions, MPI_SHORT, 0, MPI_dataset->comm);
+      break;
+    case SDDS_USHORT:
+      MPI_Bcast(SDDS_dataset->array[i].data, SDDS_dataset->layout.array_definition[i].dimensions, MPI_UNSIGNED_SHORT, 0, MPI_dataset->comm);
+      break;
+    case SDDS_STRING:
+      str_val = malloc(sizeof(*str_val)*SDDS_dataset->layout.array_definition[i].dimensions);
+      if (MPI_dataset->myid==0) {
+	for (j=0; j<SDDS_dataset->layout.array_definition[i].dimensions; j++)
+	  sprintf(str_val[j].str_value, "%s", ((char**)(SDDS_dataset->array[i].data))[j]);
+      } 
+      MPI_Bcast(str_val, SDDS_dataset->layout.array_definition[i].dimensions*256, MPI_BYTE, 0, MPI_dataset->comm);
+      if (MPI_dataset->myid) {
+	for (j=0; j<SDDS_dataset->layout.array_definition[i].dimensions; j++) 
+	  SDDS_CopyString(&(((char**)(SDDS_dataset->array[i].data))[j]), str_val[j].str_value);
+      }
+      free(str_val); str_val=NULL;
+      break;
+    case SDDS_CHARACTER:
+      MPI_Bcast(SDDS_dataset->array[i].data, SDDS_dataset->layout.array_definition[i].dimensions, MPI_CHAR, 0, MPI_dataset->comm);
+      break;
+    }
+  }
+ 
+  /* broadcast columns to other processors */
+  SDDS_dataset->n_rows = SDDS_dataset->n_rows_allocated = rows;
+  MPI_Bcast(SDDS_dataset->row_flag, rows, MPI_INT, 0, MPI_dataset->comm);
+  for (i=0; i<SDDS_dataset->layout.n_columns; i++) {
+    switch (SDDS_dataset->layout.column_definition[i].type) {
+    case SDDS_DOUBLE:
+      MPI_Bcast(SDDS_dataset->data[i], rows, MPI_DOUBLE, 0, MPI_dataset->comm);
+      break;
+    case SDDS_FLOAT:
+      MPI_Bcast(SDDS_dataset->data[i], rows, MPI_FLOAT, 0, MPI_dataset->comm);
+      break;
+    case SDDS_LONG:
+      MPI_Bcast(SDDS_dataset->data[i], rows, MPI_INT, 0, MPI_dataset->comm);
+      break;
+    case SDDS_ULONG:
+      MPI_Bcast(SDDS_dataset->data[i], rows, MPI_UNSIGNED, 0, MPI_dataset->comm);
+      break;
+    case SDDS_SHORT:
+      MPI_Bcast(SDDS_dataset->data[i], rows, MPI_SHORT, 0, MPI_dataset->comm);
+      break;
+    case SDDS_USHORT:
+      MPI_Bcast(SDDS_dataset->data[i], rows, MPI_UNSIGNED_SHORT, 0, MPI_dataset->comm);
+      break;
+    case SDDS_STRING:
+      if (!str_val) str_val = malloc(sizeof(*str_val)*rows);
+      if (MPI_dataset->myid==0) {
+	for (j=0; j<rows; j++)
+	  sprintf(str_val[j].str_value, "%s", ((char**)SDDS_dataset->data[i])[j]);
+      } 
+      MPI_Bcast(str_val, rows*STRING_COL_LENGTH, MPI_BYTE, 0, MPI_dataset->comm);
+      if (MPI_dataset->myid) {
+	for (j=0; j<rows; j++) 
+	  SDDS_CopyString(&(((char**)SDDS_dataset->data[i])[j]), str_val[j].str_value);
+      }
+      break;
+    case SDDS_CHARACTER:
+      MPI_Bcast(SDDS_dataset->data[i], rows , MPI_CHAR, 0, MPI_dataset->comm);
+      break;
+    }
+  }
+  if (str_val) free(str_val);
+  return retrival;
 }

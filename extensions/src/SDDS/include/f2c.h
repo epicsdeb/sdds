@@ -1,59 +1,37 @@
-/*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
-* National Laboratory.
-* Copyright (c) 2002 The Regents of the University of California, as
-* Operator of Los Alamos National Laboratory.
-* This file is distributed subject to a Software License Agreement found
-* in the file LICENSE that is included with this distribution. 
-\*************************************************************************/
-
 /* f2c.h  --  Standard Fortran to C header file */
 
 /**  barf  [ba:rf]  2.  "He suggested using FORTRAN, and everybody barfed."
 
 	- From The Shogakukan DICTIONARY OF NEW ENGLISH (Second edition) 
-$Log: f2c.h,v $
-Revision 1.9  2009/12/02 22:31:22  soliday
-Added complex number support for non C99 compilers.
-
-Revision 1.8  2009/11/09 21:10:40  soliday
-Updated to work on Solaris.
-
-Revision 1.7  2009/11/06 23:39:54  borland
-Changed for compatibility with C99 complex number extension.
-
-Revision 1.6  2003/08/28 22:38:37  soliday
-Added some definitions for vxWorks
-
-Revision 1.5  2002/08/14 15:40:14  soliday
-Added Open License
-
-Revision 1.4  2000/04/13 16:09:51  soliday
-Changed WIN32 to _WIN32
-
-Revision 1.3  1999/05/04 14:46:42  borland
-Added some WIN32-specific conditional compilation statements.
-
- * Revision 1.2  1995/09/05  21:15:02  saunders
- * First test release of the SDDS1.5 package.
- * */
+*/
 
 #ifndef F2C_INCLUDE
 #define F2C_INCLUDE
 
-#include "mdb.h"
+#ifdef _WIN32 
+#include <io.h>				/* for real isatty() */
+#define _COMPLEX_DEFINED
+typedef __int64 longint;
+typedef __int64 ulongint;	/* HACK ALERT */
+// warning C4244: 'xoperx' : conversion from 'xxx ' to 'xxx ', possible loss of data
+// warning C4101: 'xxx' : unreferenced local variable
+#pragma warning( disable: 4244 4101 )
+#endif
 
 typedef long int integer;
+typedef unsigned long uinteger;
 typedef char *address;
 typedef short int shortint;
 typedef float real;
 typedef double doublereal;
-/* 
+/*
 typedef struct { real r, i; } complex;
 typedef struct { doublereal r, i; } doublecomplex;
 */
 typedef long int logical;
 typedef short int shortlogical;
+typedef char logical1;
+typedef char integer1;
 
 #define TRUE_ (1)
 #define FALSE_ (0)
@@ -71,9 +49,9 @@ typedef short flag;
 typedef short ftnlen;
 typedef short ftnint;
 #else
-typedef long flag;
-typedef long ftnlen;
-typedef long ftnint;
+typedef long int flag;
+typedef long int ftnlen;
+typedef long int ftnint;
 #endif
 
 /*external read, write*/
@@ -152,38 +130,25 @@ typedef struct
 } inlist;
 
 #define VOID void
-
-/*#include "SDDScomplex.h"*/
-#if defined(__USE_ISOC99) || defined(__USE_ISOC94)
-#include <complex.h>
-union Multitype {	/* for multiple entry points */
+/*
+union Multitype {
+	integer1 g;
 	shortint h;
 	integer i;
 	real r;
 	doublereal d;
-	float complex c;
-	double complex z;
+	complex c;
+	doublecomplex z;
 	};
-#else
-union Multitype {	/* for multiple entry points */
-	shortint h;
-	integer i;
-	real r;
-	doublereal d;
-	floatcomplex_sdds c;
-	doublecomplex_sdds z;
-	};
-#endif
-
 
 typedef union Multitype Multitype;
-
-typedef long Long;
+*/
+/*typedef long int Long;*/	/* No longer used; formerly in Namelist */
 
 struct Vardesc {	/* for Namelist */
 	char *name;
 	char *addr;
-	Long *dims;
+	ftnlen *dims;
 	int  type;
 	};
 typedef struct Vardesc Vardesc;
@@ -207,6 +172,9 @@ typedef struct Namelist Namelist;
 #endif
 #define dmin(a,b) (doublereal)min(a,b)
 #define dmax(a,b) (doublereal)max(a,b)
+#define bit_test(a,b)	((a) >> (b) & 1)
+#define bit_clear(a,b)	((a) & ~((uinteger)1 << (b)))
+#define bit_set(a,b)	((a) |  ((uinteger)1 << (b)))
 
 /* procedure parameter types for -A and -C++ */
 

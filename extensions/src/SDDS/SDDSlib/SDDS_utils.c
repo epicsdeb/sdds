@@ -12,6 +12,20 @@
  *
  * M. Borland, November 1993
  $Log: SDDS_utils.c,v $
+ Revision 1.69  2010/08/27 16:31:32  soliday
+ Applied patch supplied by outside user to fix a problem on Fedora 13.
+
+ Revision 1.68  2010/03/18 17:28:03  borland
+ Added flag to allow disabling file locking.  Useful for PVFS filesystem.
+
+ Revision 1.67  2010/03/13 22:10:44  borland
+ SDDS_Bomb() now calls SDDS_PrintErrors() to give more useful error messages.
+
+ Revision 1.66  2010/02/18 02:16:29  borland
+ Added SDDS_SetError0() and modified SDDS_PrintErrors() to allow more easily composing
+ multi-part error messages.  One side-effect is that stack traces come out in reverse
+ order to previously.  Also modified SDDS_SetColumn() to use the new feature.
+
  Revision 1.65  2009/08/04 19:49:23  soliday
  Updated SDDS_VerifyPrintfFormat to not require the l (long) format specifier
  because this causes problems on 64bit linux that can't use %ld to format
@@ -413,6 +427,7 @@ void SDDS_Bomb(char *message)
     fprintf(stderr, "Error (%s): %s\n", registeredProgramName, message?message:"?");
   else
     fprintf(stderr, "Error: %s\n", message?message:"?");
+  SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
   exit(1);
 }
 
@@ -424,7 +439,14 @@ void SDDS_Warning(char *message)
     fprintf(stderr, "Warning: %s\n", message?message:"?");
 }
 
-void SDDS_SetError(char *error_text)
+void SDDS_SetError(char *error_text) 
+{
+  SDDS_SetError0(error_text);
+  SDDS_SetError0("\n");
+}
+
+
+void SDDS_SetError0(char *error_text)
 {
   if (n_errors>=n_errors_max) {
     if (!(error_description = SDDS_Realloc(error_description, (n_errors_max+=10)*sizeof(*error_description)))) {
@@ -466,11 +488,11 @@ void SDDS_PrintErrors(FILE *fp, int32_t mode)
   if (!error_description)
     fprintf(stderr, "warning: internal error: error_description pointer is unexpectedly NULL\n");
   else
-    for (i=depth-1; i>=0; i--) {
+    for (i=0; i<depth; i++) {
       if (!error_description[i])
         fprintf(stderr, "warning: internal error: error_description[%" PRId32 "] is unexpectedly NULL\n",
                 i);
-      fprintf(fp, "%s\n", error_description[i]);
+      fprintf(fp, "%s", error_description[i]);
     }
   fflush(fp);
   n_errors = 0;
@@ -1163,7 +1185,7 @@ void SDDS_CutOutComments(char *s, char cc)
 
 int32_t SDDS_GetToken(char *s, char *buffer, int32_t buflen)
 {
-  char *ptr0, *ptr1, *escptr;
+  char *ptr0, *ptr1, *escptr, *temp;
   
   /* save the pointer to the head of the string */
   ptr0 = s;
@@ -1209,7 +1231,10 @@ int32_t SDDS_GetToken(char *s, char *buffer, int32_t buflen)
   buffer[s-ptr1]=0;
   
   /* update the original string to delete the token */
-  strcpy(ptr0, s);
+  temp = malloc(sizeof(char) * (strlen(s) + 1));
+  strcpy(temp, s);
+  strcpy(ptr0, temp);
+  free(temp);
 
   /* return the string length */
   return((int32_t)(s-ptr1));
@@ -1995,7 +2020,7 @@ int32_t SDDS_IsActive(SDDS_DATASET *SDDS_dataset)
 
 int32_t SDDS_FileIsLocked(char *filename)
 {
-#if defined(F_TEST)
+#if defined(F_TEST) && ALLOW_FILE_LOCKING
   FILE *fp;
   if (!(fp = fopen(filename, "rb")))
     return 0;
@@ -2012,7 +2037,7 @@ int32_t SDDS_FileIsLocked(char *filename)
 
 int32_t SDDS_LockFile(FILE *fp, char *filename, char *caller)
 {
-#if defined(F_TEST)
+#if defined(F_TEST) && ALLOW_FILE_LOCKING
   char s[1024];
   if (lockf(fileno(fp), F_TEST, 0)==-1) {
     sprintf(s, "Unable to access file %s--file is locked (%s)", filename, caller);

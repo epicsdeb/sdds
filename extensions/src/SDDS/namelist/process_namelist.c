@@ -9,6 +9,10 @@
 
 /*
   $Log: process_namelist.c,v $
+  Revision 1.12  2010/02/04 14:39:22  borland
+  Added processNamelist(), which is a new interface to the namelist processor
+  that returns NAMELIST_ERROR when their is an error, instead of exiting.
+
   Revision 1.11  2008/03/18 22:03:35  borland
   Changed the special characters for RPN evaluation from [] to ().
 
@@ -84,7 +88,16 @@ void set_namelist_processing_flags(long processing_flags)
 
 long process_namelist(NAMELIST *nl, NAMELIST_TEXT *nl_t)
 {
-  register long i, j;
+  long code;
+  if ((code=processNamelist(nl, nl_t))<0)
+    exit(1);
+  return code;
+}
+
+
+long processNamelist(NAMELIST *nl, NAMELIST_TEXT *nl_t)
+{
+  register long i, j, k;
   register ITEM *item;
   char **item_name;
   long n_items;
@@ -97,8 +110,12 @@ long process_namelist(NAMELIST *nl, NAMELIST_TEXT *nl_t)
       memcpy(nl->item_list[i].root, nl->item_list[i].def_root, nl->item_list[i].data_size);
   }
 
-  for (i=j=0; i<nl_t->n_entities; i++)
-    j += process_entity(nl->item_list, item_name, n_items, nl_t, i);
+  for (i=j=0; i<nl_t->n_entities; i++) {
+    if ((k=process_entity(nl->item_list, item_name, n_items, nl_t, i))<0)
+      return NAMELIST_ERROR;
+    j += k;
+  }
+  
   free(item_name);
   return(j);
 }
@@ -136,20 +153,21 @@ long process_entity(
     printf("known variables are: \n");
     for (i_item=0; i_item<n_items; i_item++) 
       printf("  %s\n", item_name[i_item]);
-    exit(1);
+    return NAMELIST_ERROR;
   }
     
   if (nl_t->n_subscripts[i_entity]!=item[i_item].n_subscripts) {
     printf("error: wrong number of subscripts given for variable %s in namelist %s\n",
            nl_t->entity[i_entity], nl_t->group_name);
-    exit(1);
+    return NAMELIST_ERROR;
   }
     
   switch (item[i_item].type) {
   case TYPE_SHORT:         /* short integer */
-    ptr_short = (short *)get_address(item[i_item].root, 
-                                     item[i_item].n_subscripts, nl_t->subscript[i_entity], 
-                                     item[i_item].dimensions, sizeof(*ptr_short));
+    if (!(ptr_short = (short *)get_address(item[i_item].root, 
+                                           item[i_item].n_subscripts, nl_t->subscript[i_entity], 
+                                           item[i_item].dimensions, sizeof(*ptr_short))))
+      return NAMELIST_ERROR;
     for (value=0; value<nl_t->n_values[i_entity]; value++) {
       for (repetition=0; repetition<nl_t->repeat[i_entity][value]; repetition++) {
         len = strlen(nl_t->value[i_entity][value]);
@@ -164,14 +182,14 @@ long process_entity(
           if (rpn_check_error()) {
             printf("error scanning value %s for namelist member %s\n",
                    nl_t->value[i_entity][value], item[i_item].name);
-            exit(1);
+            return NAMELIST_ERROR;
           }
           rpn_clear();
         } else {
           if (1!=sscanf(nl_t->value[i_entity][value], "%hd", ptr_short)) {
             printf("error scanning value %s for namelist member %s\n",
                    nl_t->value[i_entity][value], item[i_item].name);
-            exit(1);
+            return NAMELIST_ERROR;
           }
         }
         ptr_short++;
@@ -179,9 +197,10 @@ long process_entity(
     }
     break;
   case TYPE_INT:        /* integer */
-    ptr_int = (int *)get_address(item[i_item].root, 
-                                 item[i_item].n_subscripts, nl_t->subscript[i_entity], 
-                                 item[i_item].dimensions, sizeof(*ptr_int));
+    if (!(ptr_int = (int *)get_address(item[i_item].root, 
+                                       item[i_item].n_subscripts, nl_t->subscript[i_entity], 
+                                       item[i_item].dimensions, sizeof(*ptr_int))))
+      return NAMELIST_ERROR;
     for (value=0; value<nl_t->n_values[i_entity]; value++) {
       for (repetition=0; repetition<nl_t->repeat[i_entity][value]; repetition++) {
         len = strlen(nl_t->value[i_entity][value]);
@@ -196,14 +215,14 @@ long process_entity(
           if (rpn_check_error()) {
             printf("error scanning value %s for namelist member %s\n",
                    nl_t->value[i_entity][value], item[i_item].name);
-            exit(1);
+            return NAMELIST_ERROR;
           }
           rpn_clear();
         } else {
           if (1!=sscanf(nl_t->value[i_entity][value], "%d", ptr_int)) {
             printf("error scanning value %s for namelist member %s\n",
                    nl_t->value[i_entity][value], item[i_item].name);
-            exit(1);
+            return NAMELIST_ERROR;
           }
         }
         ptr_int++;
@@ -211,9 +230,10 @@ long process_entity(
     }
     break;
   case TYPE_INT32_T:        /* integer */
-    ptr_int32 = (int32_t *)get_address(item[i_item].root, 
-                                       item[i_item].n_subscripts, nl_t->subscript[i_entity], 
-                                       item[i_item].dimensions, sizeof(*ptr_int32));
+    if (!(ptr_int32 = (int32_t *)get_address(item[i_item].root, 
+                                             item[i_item].n_subscripts, nl_t->subscript[i_entity], 
+                                             item[i_item].dimensions, sizeof(*ptr_int32))))
+      return NAMELIST_ERROR;
     for (value=0; value<nl_t->n_values[i_entity]; value++) {
       for (repetition=0; repetition<nl_t->repeat[i_entity][value]; repetition++) {
         len = strlen(nl_t->value[i_entity][value]);
@@ -228,14 +248,14 @@ long process_entity(
           if (rpn_check_error()) {
             printf("error scanning value %s for namelist member %s\n",
                    nl_t->value[i_entity][value], item[i_item].name);
-            exit(1);
+            return NAMELIST_ERROR;
           }
           rpn_clear();
         } else {
           if (1!=sscanf(nl_t->value[i_entity][value], "%" SCNd32, ptr_int32)) {
             printf("error scanning value %s for namelist member %s\n",
                    nl_t->value[i_entity][value], item[i_item].name);
-            exit(1);
+            return NAMELIST_ERROR;
           }
         }
         ptr_int32++;
@@ -243,9 +263,10 @@ long process_entity(
     }
     break;
   case TYPE_LONG:        /* long integer */
-    ptr_long = (long *)get_address(item[i_item].root, 
-                                   item[i_item].n_subscripts, nl_t->subscript[i_entity], 
-                                   item[i_item].dimensions, sizeof(*ptr_long));
+    if (!(ptr_long = (long *)get_address(item[i_item].root, 
+                                         item[i_item].n_subscripts, nl_t->subscript[i_entity], 
+                                         item[i_item].dimensions, sizeof(*ptr_long))))
+      return NAMELIST_ERROR;
     for (value=0; value<nl_t->n_values[i_entity]; value++) {
       for (repetition=0; repetition<nl_t->repeat[i_entity][value]; repetition++) {
         len = strlen(nl_t->value[i_entity][value]);
@@ -260,14 +281,14 @@ long process_entity(
           if (rpn_check_error()) {
             printf("error scanning value %s for namelist member %s\n",
                    nl_t->value[i_entity][value], item[i_item].name);
-            exit(1);
+            return NAMELIST_ERROR;
           }
           rpn_clear();
         } else {
           if (1!=sscanf(nl_t->value[i_entity][value], "%ld", ptr_long)) {
             printf("error scanning value %s for namelist member %s\n",
                    nl_t->value[i_entity][value], item[i_item].name);
-            exit(1);
+            return NAMELIST_ERROR;
           }
         }
         ptr_long++;
@@ -275,9 +296,10 @@ long process_entity(
     }
     break;
   case TYPE_FLOAT:        /* float */
-    ptr_float = (float *)get_address(item[i_item].root, 
-                                     item[i_item].n_subscripts, nl_t->subscript[i_entity], 
-                                     item[i_item].dimensions, sizeof(*ptr_float));
+    if (!(ptr_float = (float *)get_address(item[i_item].root, 
+                                           item[i_item].n_subscripts, nl_t->subscript[i_entity], 
+                                           item[i_item].dimensions, sizeof(*ptr_float))))
+      return NAMELIST_ERROR;
     for (value=0; value<nl_t->n_values[i_entity]; value++) {
       for (repetition=0; repetition<nl_t->repeat[i_entity][value]; repetition++) {
         len = strlen(nl_t->value[i_entity][value]);
@@ -292,14 +314,14 @@ long process_entity(
           if (rpn_check_error()) {
             printf("error scanning value %s for namelist member %s\n",
                    nl_t->value[i_entity][value], item[i_item].name);
-            exit(1);
+            return NAMELIST_ERROR;
           }
           rpn_clear();
         } else {
           if (1!=sscanf(nl_t->value[i_entity][value], "%f", ptr_float)) {
             printf("error scanning value %s for namelist member %s\n",
                    nl_t->value[i_entity][value], item[i_item].name);
-            exit(1);
+            return NAMELIST_ERROR;
           }
         }
         ptr_float++;
@@ -307,9 +329,10 @@ long process_entity(
     }
     break;
   case TYPE_DOUBLE:        /* double */
-    ptr_double = (double *)get_address(item[i_item].root, 
-                                       item[i_item].n_subscripts, nl_t->subscript[i_entity], 
-                                       item[i_item].dimensions, sizeof(*ptr_double));
+    if (!(ptr_double = (double *)get_address(item[i_item].root, 
+                                             item[i_item].n_subscripts, nl_t->subscript[i_entity], 
+                                             item[i_item].dimensions, sizeof(*ptr_double))))
+      return NAMELIST_ERROR;
     for (value=0; value<nl_t->n_values[i_entity]; value++) {
       for (repetition=0; repetition<nl_t->repeat[i_entity][value]; repetition++) {
         len = strlen(nl_t->value[i_entity][value]);
@@ -325,14 +348,14 @@ long process_entity(
           if (rpn_check_error()) {
             printf("error scanning value %s for namelist member %s\n",
                    nl_t->value[i_entity][value], item[i_item].name);
-            exit(1);
+            return NAMELIST_ERROR;
           }
           rpn_clear();
         } else {
           if (1!=sscanf(nl_t->value[i_entity][value], "%lf", ptr_double)) {
             printf("error scanning value %s for namelist member %s\n",
                    nl_t->value[i_entity][value], item[i_item].name);
-            exit(1);
+            return NAMELIST_ERROR;
           }
         }
         ptr_double++;
@@ -340,9 +363,10 @@ long process_entity(
     }
     break;
   case TYPE_STRING:      /* NUL-terminated character string */
-    ptr_string = (char **)get_address(item[i_item].root, 
-                                      item[i_item].n_subscripts, nl_t->subscript[i_entity], 
-                                      item[i_item].dimensions, sizeof(*ptr_string));
+    if (!(ptr_string = (char **)get_address(item[i_item].root, 
+                                            item[i_item].n_subscripts, nl_t->subscript[i_entity], 
+                                            item[i_item].dimensions, sizeof(*ptr_string))))
+      return NAMELIST_ERROR;
     for (value=0; value<nl_t->n_values[i_entity]; value++) {
       for (repetition=0; repetition<nl_t->repeat[i_entity][value]; repetition++) {
         if (strcmp(nl_t->value[i_entity][value], "{NULL}")==0 || strcmp(nl_t->value[i_entity][value], "(NULL)")==0 ||
@@ -355,15 +379,16 @@ long process_entity(
     }
     break;
   case TYPE_CHAR:         /* character */
-    ptr_char = (char *)get_address(item[i_item].root, 
-                                   item[i_item].n_subscripts, nl_t->subscript[i_entity], 
-                                   item[i_item].dimensions, sizeof(*ptr_char));
+    if (!(ptr_char = (char *)get_address(item[i_item].root, 
+                                         item[i_item].n_subscripts, nl_t->subscript[i_entity], 
+                                         item[i_item].dimensions, sizeof(*ptr_char))))
+      return NAMELIST_ERROR;
     for (value=0; value<nl_t->n_values[i_entity]; value++) {
       for (repetition=0; repetition<nl_t->repeat[i_entity][value]; repetition++) {
         if (1!=sscanf(nl_t->value[i_entity][value], "%c", ptr_char)) {
           printf("error scanning value %s for namelist member %s\n",
                  nl_t->value[i_entity][value], item[i_item].name);
-          exit(1);
+          return NAMELIST_ERROR;
         }
         ptr_char++;
       }
@@ -371,7 +396,7 @@ long process_entity(
     break;
   default:
     printf("unknown item type in process_item: %ld\n", item[i_item].type);
-    exit(1);
+    return NAMELIST_ERROR;
     break;
   }
   return(1);
@@ -389,12 +414,16 @@ char *get_address(
   register long i, offset;
 
   if (n_subs>0) {
-    if (subscript[n_subs-1]>=dimension[n_subs-1])
-      bomb("subscript out of range in namelist variable", NULL);
+    if (subscript[n_subs-1]>=dimension[n_subs-1]) {
+      printf("subscript out of range in namelist variable\n");
+      return NULL;
+    }
     offset = subscript[n_subs-1];
     for (i=1; i<n_subs; i++) {
-      if (subscript[i-1]>=dimension[i-1])
-        bomb("subscript out of range in namelist variable", NULL);
+      if (subscript[i-1]>=dimension[i-1]) {
+        printf("subscript out of range in namelist variable\n");
+        return NULL;
+      }
       offset += dimension[i]*subscript[i-1];
     }
   }

@@ -9,6 +9,9 @@
 
 /*
  $Log: findMinMax.c,v $
+ Revision 1.7  2010/06/08 14:26:32  borland
+ Added index_min_max_long().
+
  Revision 1.6  2003/12/03 05:44:19  borland
  find_min_max and index_min_max no longer require both results pointers to be
  non-NULL.
@@ -86,6 +89,40 @@ int index_min_max(
 
     lo =  DBL_MAX;
     hi = -DBL_MAX;
+    iMin = iMax = 0;
+    for (i=0; i<n; i++) {
+        if ((val=list[i])<lo) {
+            iMin = i;
+            lo = val;
+            }
+        if (val>hi) {
+            hi = val;
+            iMax = i;
+            }
+        }
+    if (imin)
+      *imin = iMin;
+    if (imax)
+      *imax = iMax;
+    
+    return(1);
+    }
+
+int index_min_max_long(
+    long *imin, long *imax, long *list, long n
+    )
+{
+    register long i;
+    register long lo, hi, val;
+    long iMin, iMax;
+    
+    if (!n || !list) 
+        return(0);
+    if (!imin && !imax)
+      return 0;
+
+    lo =  LONG_MAX;
+    hi = -LONG_MAX;
     iMin = iMax = 0;
     for (i=0; i<n; i++) {
         if ((val=list[i])<lo) {

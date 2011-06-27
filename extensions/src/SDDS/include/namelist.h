@@ -10,6 +10,13 @@
 /* definitions for use with namelist scanning routines */
 /* Michael Borland, 1988 
  $Log: namelist.h,v $
+ Revision 1.7  2010/02/04 23:42:34  soliday
+ Updated so that it can be used by c++
+
+ Revision 1.6  2010/02/04 14:39:12  borland
+ Added processNamelist(), which is a new interface to the namelist processor
+ that returns NAMELIST_ERROR when their is an error, instead of exiting.
+
  Revision 1.5  2005/11/09 22:04:00  soliday
  Added support for int32_t
 
@@ -25,6 +32,10 @@
 */
 
 #ifndef _NAMELIST_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define _NAMELIST_ 1
 
@@ -84,6 +95,9 @@ void set_namelist_processing_flags(long flags);
 long process_namelists(NAMELIST **nl, char **nl_name, long n_nl, 
     NAMELIST_TEXT *nl_t);
 long process_namelist(NAMELIST *nl, NAMELIST_TEXT *nl_t);
+
+#define NAMELIST_ERROR -1
+long processNamelist(NAMELIST *nl, NAMELIST_TEXT *nl_t);
 long process_entity(ITEM *item, char **item_name, long n_items, 
     NAMELIST_TEXT *nl_t, long i_entity);
 char *get_address(char *root, long n_subs, long *subscript, long *dimension,
@@ -96,5 +110,9 @@ void print_namelist(FILE *fp, NAMELIST *nl);
 char *escape_quotes(char *s);
 
 typedef char *STRING;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

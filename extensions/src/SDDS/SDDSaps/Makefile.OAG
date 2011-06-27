@@ -8,6 +8,15 @@
 #*************************************************************************
 #
 # $Log: Makefile.OAG,v $
+# Revision 1.47  2011/01/28 16:43:50  shang
+# removed sddsmatrixop
+#
+# Revision 1.46  2010/09/08 19:40:51  borland
+# Added sddsduplicate.
+#
+# Revision 1.45  2010/03/30 05:14:40  soliday
+# Added the missing sddssortcolumn program
+#
 # Revision 1.44  2009/12/02 22:31:48  soliday
 # Removed agilent scope programs on Windows.
 #
@@ -175,7 +184,7 @@ SDDSPROD =  citi2sdds csv2sdds elegant2genesis \
         sddsgenericfit sddsgfit sddshist \
         sddsimageprofiles sddsinteg sddsinterp \
         sddsinterpset sddsmakedataset sddsmatrixmult \
-        sddsmatrixop sddsminterp sddsmpfit \
+        sddsminterp sddsmpfit \
         sddsmselect sddsmultihist sddsmxref \
         sddsnaff sddsnormalize sddsoutlier \
         sddspeakfind sddspfit sddspoly \
@@ -184,11 +193,11 @@ SDDSPROD =  citi2sdds csv2sdds elegant2genesis \
         sddssampledist sddsselect sddssequence \
         sddsseparate sddsshift sddsshiftcor \
         sddssinefit sddsslopes sddssmooth \
-        sddssort sddssplit sddsspotanalysis \
+        sddssort sddssortcolumn sddssplit sddsspotanalysis \
         sddstimeconvert sddstranspose sddsvslopes \
         sddsxref sddszerofind tek2sdds \
         TFS2sdds sddsdiff wfm2sdds sddssyncflux \
-        sdds2dinterpolate sddscombinelogfiles
+        sdds2dinterpolate sddscombinelogfiles sddsduplicate
         
 
 ifndef WIN32

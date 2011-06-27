@@ -10,6 +10,9 @@
 /* program: sddsfdfilter.c
  * purpose: SDDS-format frequency-domain filter program
  $Log: sddsfdfilter.c,v $
+ Revision 1.13  2010/04/12 21:41:13  lemery
+ Added comments on real and imaginary parts of FFT. Added a debug line.
+
  Revision 1.12  2006/10/19 17:55:39  soliday
  Updated to work with linux-x86_64.
 
@@ -387,9 +390,13 @@ long applyFilters(double *outputData, double *inputData, double *timeData,
         !(realimagOutput = (double*)malloc(sizeof(*realimagOutput)*(rows+2))) )
         SDDS_Bomb("allocation failure");
 
+    /* input data is real and has "rows" rows */
+    /* result is interleaved real and imaginary */
     realFFT2(realimagInput, inputData, rows, 0);
     frequencies = rows/2 + 1;
 
+    /* length is the assumed length of the periodic signal, 
+       which is one interval longer that the actual data entered */
     length = ((double)rows)*(timeData[rows-1]-timeData[0])/((double)rows-1.0);
     dfrequency = factor = 1.0/length;
     
@@ -398,6 +405,15 @@ long applyFilters(double *outputData, double *inputData, double *timeData,
             return 0;
         SWAP_PTR(realimagOutput, realimagInput);
         }
+    /* input is still interleaved real and imaginary. The flag
+       INVERSE_FFT ensures that the array is interpreted correctly. */
+    /* output is interleaved real and imaginary */
+#if DEBUG
+    for (row=0; row<rows; row++; row++) {
+      fprinf(stdout,"Real: %f, Imag: %i\n", realimagInput[row], realimagInput[row+1]);
+    }
+    
+#endif    
     realFFT2(realimagOutput, realimagInput, rows, INVERSE_FFT);
 
     for (row=0; row<rows; row++)

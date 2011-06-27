@@ -3,6 +3,7 @@
 #include "SDDS.h"
 #include "mdb.h"
 #include "matrixop.h"
+#include "matlib.h"
 #define HUGE DBL_MAX
 
 #ifdef CLAPACK
@@ -596,7 +597,6 @@ double matrix_det(MAT *A)
 {
   double det=1.0;
   MAT *B;
-  
 #if defined(CLAPACK) 
   long i,lda, n, m, *ipvt, info; 
 #endif
@@ -613,19 +613,28 @@ double matrix_det(MAT *A)
   ipvt = calloc(n, sizeof(*ipvt));
   B = matrix_copy(A);
   /*LU decomposition*/
-  dgetrf_(&m, &n, B->base, &lda, ipvt, &info);
+  dgetrf_(&m, &n, B->base, &lda, ipvt, &info); 
   if (info<0) {
     fprintf(stderr, "Error in LU decomposition, the %d-th argument had an illegal value.\n", -info);
     return 0;
   } else if (info>0) {
     fprintf(stderr, "Error in LU decomposition, U(%d,%d) is exactly zero. The factorization has been completed, but the factor U is exactly singular, and division by zero will occur if it is used to solve a system of equations.\n", info);
     return 0;
-  }
+    }
   for (i=0; i<n; i++) 
     det *= B->me[i][i];
   matrix_free(B);
 #else
-  SDDS_Bomb("The matrix determinant is not implemented for non LAPACK/CLAPACK library.");
+  MATRIX *DET;
+  long i, j;
+  /* m is A's rows, n is A's columns A is in column major order; MATRIX B should be in row major order */
+  m_alloc(&DET, A->m, A->n);
+  for (i=0; i<A->m; i++)
+    for (j=0; j<A->n; j++) {
+      DET->a[i][j] = A->me[j][i];
+    }
+  det = m_det(DET);
+  m_free(&DET);
 #endif
   return det;
 }

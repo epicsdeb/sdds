@@ -13,6 +13,18 @@
  *
  * Michael Borland, 1993
  $Log: SDDS.h,v $
+ Revision 1.92  2010/11/19 15:39:40  shang
+ removed redundant routine declaration.
+
+ Revision 1.91  2010/11/18 21:34:04  shang
+ added routines for master reading file and broadcasting to other processors.
+
+ Revision 1.90  2010/03/16 20:44:43  soliday
+ Added the missing SDDS_SetError0 definition.
+
+ Revision 1.89  2009/12/18 20:40:30  shang
+ moved SDDS_DEFINITION structure definition from elegant/track.h
+
  Revision 1.88  2009/09/03 01:16:55  borland
  Added macro SDDS_LayoutWritten().
 
@@ -417,6 +429,10 @@ extern char *SDDS_data_mode[SDDS_NUM_DATA_MODES];
 #define SDDS_WRITEONLY_DEFINITION 1
 
 typedef struct {
+  char *name, *text; 
+} SDDS_DEFINITION;
+
+typedef struct {
     char *name, *symbol, *units, *description, *format_string;
     int32_t type;
     char *fixed_value;
@@ -795,6 +811,7 @@ epicsShareFuncSDDS extern void *SDDS_Calloc(size_t nelem, size_t elem_size);
 epicsShareFuncSDDS extern int32_t SDDS_NumberOfErrors(void);
 epicsShareFuncSDDS extern void SDDS_ClearErrors(void);
 epicsShareFuncSDDS extern void SDDS_SetError(char *error_text);
+epicsShareFuncSDDS extern void SDDS_SetError0(char *error_text);
 epicsShareFuncSDDS extern void SDDS_Bomb(char *message);
 epicsShareFuncSDDS extern void SDDS_Warning(char *message);
 epicsShareFuncSDDS extern void SDDS_RegisterProgramName(const char *name);
@@ -1046,6 +1063,8 @@ int32_t SDDS_GZipWriteNonNativeBinaryString(char *string, gzFile *gzfp, SDDS_FIL
   int32_t SDDS_MPI_WriteNonNativeBinaryParameters(SDDS_DATASET *MPI_dataset);
   int32_t SDDS_MPI_WriteNonNativeBinaryArrays(SDDS_DATASET *MPI_dataset);
   int32_t SDDS_MPI_WriteNonNativeBinaryRow(SDDS_DATASET *MPI_dataset, int32_t row);
+  int32_t SDDS_MPI_BufferedReadNonNativeBinaryTitle(SDDS_DATASET *SDDS_dataset);
+  int32_t SDDS_MPI_CollectiveReadByRow(SDDS_DATASET *SDDS_dataset);
   MPI_Offset SDDS_MPI_Get_Column_Size(SDDS_DATASET *MPI_dataset);
   int32_t SDDS_MPI_CollectiveWriteByRow(SDDS_DATASET *SDDS_dataset);
   int32_t SDDS_MPI_Get_Title_Size(SDDS_DATASET *MPI_dataset);
@@ -1071,7 +1090,6 @@ int32_t SDDS_GZipWriteNonNativeBinaryString(char *string, gzFile *gzfp, SDDS_FIL
   int32_t SDDS_MPI_ReadNonNativeBinaryPage(SDDS_DATASET *MPI_dataset);
   int32_t SDDS_MPI_ReadNonNativeBinaryRow(SDDS_DATASET *MPI_dataset, int32_t row, int32_t skip);
   int32_t SDDS_MPI_BufferedReadBinaryTitle(SDDS_DATASET *MPI_dataset);
-  int32_t SDDS_MPI_BufferedReadNonNativeBinaryTitle(SDDS_DATASET *MPI_dataset);
   int32_t SDDS_SetDefaultTitleBufferSize(int32_t newSize);
   int32_t SDDS_MPI_WriteBinaryPageByColumn(SDDS_DATASET *MPI_dataset);
   epicsShareFuncSDDS extern void SDDS_MPI_Setup(SDDS_DATASET *SDDS_dataset, int32_t parallel_io, int32_t n_processors, int32_t myid, MPI_Comm comm, short master_read);
@@ -1080,6 +1098,9 @@ int32_t SDDS_GZipWriteNonNativeBinaryString(char *string, gzFile *gzfp, SDDS_FIL
   epicsShareFuncSDDS extern int32_t SDDS_MPI_ReadPage(SDDS_DATASET *MPI_dataset);
   epicsShareFuncSDDS extern int32_t SDDS_MPI_InitializeInput(SDDS_DATASET *MPI_dataset, char *filename);
   epicsShareFuncSDDS extern int32_t SDDS_MPI_InitializeInputFromSearchPath(SDDS_DATASET *MPI_dataset, char *file);
+  epicsShareFuncSDDS extern int32_t SDDS_Master_InitializeInput(SDDS_DATASET *SDDS_dataset, MPI_DATASET *MPI_dataset, char *file);
+   epicsShareFuncSDDS extern int32_t SDDS_Master_InitializeInputFromSearchPath(SDDS_DATASET *SDDS_dataset, MPI_DATASET *MPI_dataset, char *file);
+  epicsShareFuncSDDS extern int32_t SDDS_Master_ReadPage(SDDS_DATASET *SDDS_dataset);
  #define SDDS_MPI_TotalRowCount(SDDS_DATASET) ((SDDS_DATASET)->MPI_dataset->total_rows) 
 #endif
 

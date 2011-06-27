@@ -9,6 +9,13 @@
 
 /*
  $Log: rpn_data.c,v $
+ Revision 1.22  2010/12/03 02:48:33  borland
+ Added isort and dsort functions.
+
+ Revision 1.21  2010/02/24 23:50:41  borland
+ Added InvFq, which returns q solving F(q)=2*(sqrt(q^2-1)-acos(1/q)).
+ See Wiedemann, Particle Accelerator Physics I, 8.2.2
+
  Revision 1.20  2009/10/29 19:53:20  soliday
  Renamed a few global variables that conflicted with MADX.
 
@@ -210,6 +217,7 @@ struct FUNCTION funcRPN[NFUNCS] = {
        {"isnan", "test for equality to NaN            ", rpn_isnan  , LOGICAL_FUNC},
        {"poiSL", "Poisson dist. sig. level (x mu poiSL)", rpn_poissonSL, NUMERIC_FUNC},
        {"simpson", "Simpsons-rule integration (\"udfName\" low high pts simpson)", rpn_simpson, NUMERIC_FUNC},
+       {"InvFq",  "Inverse of F(q)=2*(sqrt(q^2-1)-acos(1/q))", rpn_inverseFq, NUMERIC_FUNC},
 /* stack operations: */
        { "view", "view numeric stack                  ", view       , OTHER_FUNC  },
        { "tsci", "toggle scientific notation          ", tsci       , NUMERIC_FUNC},
@@ -221,6 +229,8 @@ struct FUNCTION funcRPN[NFUNCS] = {
        { "rdn" , "rotate stack downward               ", rdn        , NUMERIC_FUNC},
        { "rup" , "rotate stack upward                 ", rup        , NUMERIC_FUNC},
        { "stlv", "push stack level onto stack         ", stack_lev  , NUMERIC_FUNC},
+       {"isort", "sort the top n items on the stack in increasing order", rpn_isort_stack, NUMERIC_FUNC},
+       {"dsort", "sort the top n items on the stack in decreasing order", rpn_dsort_stack, NUMERIC_FUNC},
        { "vlog", "view logical stack                  ", viewlog    , LOGICAL_FUNC},
        { "popl", "pop logical stack                   ", poplog     , LOGICAL_FUNC},
        { "pops", "pop string stack                    ", pops       , OTHER_FUNC  },
@@ -254,7 +264,6 @@ struct FUNCTION funcRPN[NFUNCS] = {
         {"cshs", "send top of string stack to C shell", rpn_csh_str, OTHER_FUNC},
         {"execs", "send top of string stack to UNIX and put output on string stack", rpn_execs, OTHER_FUNC},
         {"execn", "send top of string stack to UNIX and put result on numerical stack", rpn_execn, NUMERIC_FUNC},
-        {"draw", "send commands to draw subprocess    ", rpn_draw   , OTHER_FUNC},
     };
 
 

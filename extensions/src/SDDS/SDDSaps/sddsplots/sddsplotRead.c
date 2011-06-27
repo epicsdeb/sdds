@@ -13,6 +13,11 @@
  *
  * Michael Borland, 1994.
  $Log: sddsplotRead.c,v $
+ Revision 1.36  2011/01/11 22:51:04  soliday
+ Changed all the strcpy commands to strcpy_ss because of problems with
+ RedHat Enterprise 6. If a strcpy copies the result to the same memory
+ space you will get unexpected results.
+
  Revision 1.35  2006/11/15 16:06:33  jiaox
  In the previous version, accidently deleted lines to read parameter values
  for -string=@parameter keyword. It is back now.
@@ -596,7 +601,7 @@ long extract_name_and_units(DATA_INFO *info, char *label)
 
     info->symbol = info->units = NULL;
     SDDS_CopyString(&info->description, label);
-    strcpy(buffer, label);
+    strcpy_ss(buffer, label);
     if ((uptr=strchr(buffer, '('))) {
         *uptr++ = 0;
         if ((ptr=strchr(uptr, ')')))
@@ -828,7 +833,7 @@ void determine_dataset_legends(PLOT_SPEC *plspec, SDDS_TABLE *table, PLOT_DATA *
         fprintf(stderr, "editing legend %s with edit command %s\n",
                 dataset->legend, request->legend.edit_command);
 #endif
-        strcpy(buffer, dataset->legend); 
+        strcpy_ss(buffer, dataset->legend); 
         edit_string(buffer, request->legend.edit_command);
         free(dataset->legend);
         SDDS_CopyString(&dataset->legend, buffer);
@@ -890,7 +895,7 @@ void determine_dataset_strings(PLOT_SPEC *plspec, SDDS_TABLE *table, PLOT_DATA *
 #endif
         if (request->string_label[i].flags&LABEL_EDITCOMMAND_GIVEN &&
             request->string_label[i].edit_command) {
-            strcpy(buffer, dataset->string_label[i].string); 
+            strcpy_ss(buffer, dataset->string_label[i].string); 
             edit_string(buffer, request->string_label[i].edit_command);
             free(dataset->string_label[i].string);
             SDDS_CopyString(&dataset->string_label[i].string, buffer);

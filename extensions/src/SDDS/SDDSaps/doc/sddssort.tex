@@ -20,7 +20,9 @@ sddssort APS.twi APS.twi.sorted -column=ElementName -unique
 \item {\bf synopsis:} \\
 \begin{flushleft}{\tt
 sddssort [-pipe=[input][,output]] [{\em SDDSinput}] [{\em SDDSoutput}] 
--column={\em name}[,\{increasing | decreasing\}] [-column...]
+-column={\em name}[,\{increasing | decreasing\}] [-column...] 
+[-parameter=<name>[,{increasing|decreasing}]...]
+[-numericHigh] [-nonDominateSort] 
 [-unique[=count]] [-noWarnings]
 }\end{flushleft}
 \item {\tt files:}\\
@@ -35,10 +37,17 @@ specified, then {\em SDDSinput} will be replaced.
         data section.  Each subsequent \verb|column| request specifies a subsort of the ordering produced
         by the previous requests.  The \verb|increasing| and \verb|decreasing| keywords may be given to
         specify the desired ordering of the (sub)sort, with increasing order being the default.
+     \item {\tt -parameter={\em name}[,\{increasing | decreasing\}]} --- similar to column requests, but sort
+        the data pages by parameters.
     \item {\tt -unique[=count]} --- Specifies that for any rows that are identical in the sort column values,
         only the first should be included in the output file.  If the {\tt count} qualifier is given,
         then a count of the number of identical rows is supplied in
         a column called IdenticalCount.
+    \item {\tt -nonDominateSort} --- perform non-dominated-sort when multiply sorting columns supplied.
+        non-dominated-sort only works for numeric columns. 
+    \item {\tt -numericHigh} --- works for string sorting which rank the numeric characters higher than 
+       other characters in a string comparison. It also ranks numeric character sets with fewer characters 
+       below numeric character sets with more characters.
     \item {\tt -noWarnings} --- Suppresses warning messages.
     \end{itemize}
 \item {\bf author:} M. Borland, ANL/APS.

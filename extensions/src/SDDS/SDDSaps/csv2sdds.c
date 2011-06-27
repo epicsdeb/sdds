@@ -10,6 +10,18 @@
 /*
  *
  $Log: csv2sdds.c,v $
+ Revision 1.27  2010/07/29 21:19:28  borland
+ Updated usage message.
+
+ Revision 1.26  2010/07/29 21:12:00  soliday
+ If a numerical column is empty it will now use the value from the previous
+ row. If the first rows has empty values it will use the previous behaviour
+ of substituting the largest possible value for that data type.
+
+ Revision 1.25  2010/07/29 20:17:05  soliday
+ Added the -uselabel option for files that have column names and units in the
+ file before the data.
+
  Revision 1.24  2009/11/18 00:56:04  lemery
  Allow program to proceed when the lines that are skipped have no
  printable characters.  Previously the input file would be closed on
@@ -106,18 +118,20 @@
 #define SET_SPANLINES 6
 #define SET_MAXROWS 7
 #define SET_SKIPLINES 8
-#define N_OPTIONS 9
+#define SET_USELABELS 9
+#define N_OPTIONS 10
  
 char *option[N_OPTIONS] = {
-    "asciioutput", "delimiters", "separator", "columndata", "schfile",
-    "pipe", "spanlines", "maxrows","skiplines",
-        };
+  "asciioutput", "delimiters", "separator", "columndata", "schfile",
+  "pipe", "spanlines", "maxrows","skiplines","uselabels"
+};
 
 char *USAGE = "csv2sdds [<inputFile>] [<outputFile>] [-pipe[=in][,out]]\n\
 [-asciiOutput] [-spanLines] [-maxRows=<number>]\n\
 [-schfile=<filename>] [-skiplines=<number>]\n\
 [-delimiters=start=<start>,end=<char>] [-separator=<char>]\n\
-[-columnData=name=<name>,type=<type>,units=<units>...]\n\n\
+[-columnData=name=<name>,type=<type>,units=<units>...]\n\
+[-uselabels[=units]]\n\n\
 pipe            SDDS toolkit pipe option.\n\
 asciiOutput     Requests SDDS ASCII output.  Default is binary.\n\
 spanLines       Ignore line breaks in parsing the input data.\n\
@@ -133,9 +147,11 @@ columnData      Gives the name of a column in <inputFile> along with the\n\
                 character, or string), and optional units input.\n\
                 -column options must be given in the\n\
                 order corresponding to the order of the data in <inputFile>.\n\
+uselabels       The column names and optionally the units are defined in the\n\
+                file prior to the data.\n\
 maxRows         Maximum number of rows to expect in input.\n\n\
 Converts Comma Separated Values data to SDDS.\n\
-Program by Michael Borland. (This is version 5, March 2000, D. Blachowicz.)\n" ;
+Program by Michael Borland. (This is version 6, July 2010, R. Soliday.)\n" ;
 
 typedef struct {
     char *name, *units;
@@ -161,6 +177,7 @@ int main(int argc,char **argv)
   SCANNED_ARG *scanned;
   long i, iArg, rows, maxRows, column;
   long asciiOutput, columns, spanLines,skipLines=0,lines;
+  short columnlabels=0,unitlabels=0,uselabels=0;
   COLUMN_DATA *columnData;
   char separator, startDelim, endDelim;
   char s[10240], *ptr, *typeName, *unitsName;
@@ -248,6 +265,14 @@ int main(int argc,char **argv)
             skipLines<1) 
           SDDS_Bomb("invalid -skipline syntax");
         break;  
+      case SET_USELABELS:
+        if (scanned[iArg].n_items>2)
+          SDDS_Bomb("invalid -uselabels syntax");
+        uselabels=1;
+        columnlabels=1;
+        if (scanned[iArg].n_items==2)
+          unitlabels=1;
+        break;
       default:
         bomb("invalid option seen", USAGE);
         break;
@@ -263,8 +288,14 @@ int main(int argc,char **argv)
     }
   }
   
-  if (!columns && !schFile)
-    SDDS_Bomb("either give one or more -columnData options, or -schFile option");
+  if (!columns && !schFile && !columnlabels)
+    SDDS_Bomb("either give one or more -columnData options or -schFile option or -uselabels option");
+  if (columns && schFile)
+    SDDS_Bomb("either give one or more -columnData options or -uselabels option");
+  if (columns && columnlabels)
+    SDDS_Bomb("either give one or more -columnData options or -uselabels option");
+  if (schFile && columnlabels)
+    SDDS_Bomb("either give -schFile options or -uselabels option");
   
   processFilenames("csv2sdds", &input, &output, pipeFlags, 0, NULL);
   if (input) {
@@ -275,15 +306,16 @@ int main(int argc,char **argv)
   } else {
     fpi = stdin;
   }
+
+  if (!columnlabels) {
+    if (!columns && !(columns=ParseSchFile(schFile, &columnData, &separator, &startDelim, &endDelim)))
+      SDDS_Bomb("problem reading or parsing sch file");
+  
+    SetUpOutputFile(&SDDSout, input, output, columnData, columns, asciiOutput);
     
-  if (!columns && !(columns=ParseSchFile(schFile, &columnData, &separator, &startDelim, &endDelim)))
-    SDDS_Bomb("problem reading or parsing sch file");
-  
-  SetUpOutputFile(&SDDSout, input, output, columnData, columns, asciiOutput);
-  
-  if (!SDDS_StartPage(&SDDSout, maxRows))
-    SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
-  
+    if (!SDDS_StartPage(&SDDSout, maxRows))
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+  }
   rows = 0;      /* the row index we are storing in */
   column = 0;    /* the column index we are storing to */
   lines=0;
@@ -296,18 +328,61 @@ int main(int argc,char **argv)
     /* I added the second condition because sometimes we get files that
        has headers of fixed number of lines that are garbage. 
        The loop will break only when real data has first been read */
-    if (strlen(s)==0 && (skipLines && lines >skipLines))
+    if (strlen(s)==0 && (skipLines && (lines > skipLines)))
       break;
     ptr = s;
 #if defined(DEBUG)
     fprintf(stderr, "line: >%s<\n", ptr);
 #endif
-    if (!skipLines) {
-      writeOneRowToOutputFile (&SDDSout,ptr,separator,startDelim,endDelim,
-                               spanLines,columnData,columns,rows,maxRows);
-      rows++;
+    if (columnlabels && (!skipLines || (lines > skipLines))) {
+      char t[10240];
+      t[0]=0;
+      while (1) {
+        ptr = getToken(ptr, separator, startDelim, endDelim, t);
+        if (strlen(t)==0)
+          break;
+        columnData = SDDS_Realloc(columnData, sizeof(*columnData)*(columns+1));
+        columnData[columns].name = malloc(sizeof(char*) * strlen(t));
+        replace_chars(t, (char*)" ", (char*)"_");
+        sprintf(columnData[columns].name, "%s", t);
+        columnData[columns].units = NULL;
+        columnData[columns].type = SDDS_STRING;
+        columns++;
+      }
+      columnlabels = 0;
+      continue;
+    } else if (unitlabels && (!skipLines || (lines > skipLines))) {
+      char t[10240];
+      t[0]=0;
+      for (i=0; i<columns; i++) {
+        ptr = getToken(ptr, separator, startDelim, endDelim, t);
+        if (strlen(t)==0)
+          break;
+        columnData[i].units = malloc(sizeof(char*) * strlen(t));
+        sprintf(columnData[i].units, "%s", t);
+      }
+      unitlabels = 0;
+      continue;
     }
-    if (skipLines && lines >skipLines) {
+    if (uselabels) {
+      char *tmpPtr;
+      char t[10240];
+      double tD;
+      t[0]=0;
+      tmpPtr = ptr;
+      for (i=0; i<columns; i++) {
+        tmpPtr = getToken(tmpPtr, separator, startDelim, endDelim, t);
+        if (strlen(t)==0)
+          break;
+        if (sscanf(t, "%lf", &tD)==1)
+          columnData[i].type = SDDS_DOUBLE;
+      }
+      SetUpOutputFile(&SDDSout, input, output, columnData, columns, asciiOutput);    
+      if (!SDDS_StartPage(&SDDSout, maxRows))
+        SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+      uselabels=0;
+    }
+    if (!skipLines || (lines > skipLines)) {
       writeOneRowToOutputFile (&SDDSout,ptr,separator,startDelim,endDelim,
                                spanLines,columnData,columns,rows,maxRows);
       rows++;
@@ -514,35 +589,51 @@ void writeOneRowToOutputFile (SDDS_DATASET *SDDSout, char *ptr, char separator,
     switch (columnData[column].type) {
     case SDDS_SHORT:
       if (nullData || !sscanf(t, "%hd", &shortValue))
-        shortValue = SHRT_MAX;
+        if (rows == 0)
+          shortValue = SHRT_MAX;
+        else
+          shortValue = ((short*)SDDSout->data[columnData[column].index])[rows-1];
       if (!SDDS_SetRowValues(SDDSout, SDDS_SET_BY_INDEX|SDDS_PASS_BY_VALUE, rows,
                              columnData[column].index, shortValue, -1))
         SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
       break;
     case SDDS_LONG:
       if (nullData || !sscanf(t, "%ld", &longValue))
-        longValue = LONG_MAX;
+        if (rows == 0)
+          longValue = LONG_MAX;
+        else
+          longValue = ((long*)SDDSout->data[columnData[column].index])[rows-1];
       if (!SDDS_SetRowValues(SDDSout, SDDS_SET_BY_INDEX|SDDS_PASS_BY_VALUE, rows,
                              columnData[column].index, longValue, -1))
         SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
       break;
     case SDDS_FLOAT:
       if (nullData || !sscanf(t, "%f", &floatValue))
-        floatValue = FLT_MAX;
+        if (rows == 0)
+          floatValue = FLT_MAX;
+        else
+          floatValue = ((float*)SDDSout->data[columnData[column].index])[rows-1];
       if (!SDDS_SetRowValues(SDDSout, SDDS_SET_BY_INDEX|SDDS_PASS_BY_VALUE, rows,
                              columnData[column].index, floatValue, -1))
         SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
       break;
     case SDDS_DOUBLE:
-      if (nullData || !sscanf(t, "%lf", &doubleValue))
-        doubleValue = DBL_MAX;
+      if (nullData || !sscanf(t, "%lf", &doubleValue)) {
+        if (rows == 0)
+          doubleValue = DBL_MAX;
+        else 
+          doubleValue = ((double*)SDDSout->data[columnData[column].index])[rows-1];
+      }
       if (!SDDS_SetRowValues(SDDSout, SDDS_SET_BY_INDEX|SDDS_PASS_BY_VALUE, rows,
                              columnData[column].index, doubleValue, -1))
         SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
       break;
     case SDDS_CHARACTER:
       if (nullData || !sscanf(t, "%c", &charValue))
-        charValue = 0;
+        if (rows == 0)
+          charValue = 0;
+        else 
+          charValue = ((char*)SDDSout->data[columnData[column].index])[rows-1];
       if (!SDDS_SetRowValues(SDDSout, SDDS_SET_BY_INDEX|SDDS_PASS_BY_VALUE, rows, 
                              columnData[column].index, charValue, -1))
         SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);

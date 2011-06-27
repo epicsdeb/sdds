@@ -1,0 +1,16 @@
+/Makefile/1.6/Wed Jan 12 16:20:37 2011//
+/build.h/1.1/Fri Apr 24 18:22:02 2009//
+/config.h/1.2/Mon Apr 27 17:17:39 2009//
+/templates_off.h/1.1/Tue Jun 29 20:48:38 2010//
+/templates_on.h/1.1/Tue Jun 29 20:48:38 2010//
+D/block////
+D/complex////
+D/err////
+D/gsl////
+D/interpolation////
+D/linalg////
+D/matrix////
+D/poly////
+D/specfunc////
+D/sys////
+D/vector////

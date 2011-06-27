@@ -8,6 +8,9 @@
 #*************************************************************************
 #
 # $Log: Makefile.OAG,v $
+# Revision 1.26  2010/08/13 21:07:28  ywang25
+# Added the gsl lib to user libraries to build static program, as rpnlib requires function definition from gsl.
+#
 # Revision 1.25  2009/04/15 17:55:51  soliday
 # Updated to deal with HDF versions newer than 1.6
 #
@@ -115,7 +118,7 @@ ifdef WIN32
 USR_LIBS += mdbcommon SDDS1 mdblib z
 z_DIR = $(INSTALL_LIB)
 else
-USR_LIBS = mdbcommon matlib fftpack SDDS1 rpnlib mdbmth mdblib
+USR_LIBS = mdbcommon matlib fftpack SDDS1 rpnlib mdbmth mdblib gsl
 SYS_PROD_LIBS_DEFAULT += z
 ifeq ($(NCURSES),NO)
 SYS_PROD_LIBS_Linux += z

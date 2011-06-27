@@ -20,6 +20,9 @@
  *
  * Michael Borland, 1994, 1995
  $Log: sddsxref.c,v $
+ Revision 1.44  2010/12/09 16:13:26  borland
+ The ifnot and ifis options now respect the -nowarnings request.
+
  Revision 1.43  2009/11/30 19:07:47  soliday
  Updated to fix a an issue with keyGroups being uninitialized.
 
@@ -262,40 +265,40 @@ from the list of files separated by space <input2> <input3> <input4...> \n\
 and adds them to successive pages from <input1>.\n\
 If <output> is given, the result is placed there; otherwise, <input1>\n\
 is replaced. By default, all columns are taken from <input2>.\n\n\
-ifnot      specifies names of parameters, arrays, and columns that may not\n\
-           exist in <input1> if the program is to run as asked.\n\
-ifis       specifies names of parameters, arrays, and columns that must\n\
-           exist in <input1> if the program is to run as asked.\n\
-transfer   specifies names of parameters or arrays to transfer from <input2>.\n\
-take       specifies names of columns to take from <input2>.\n\
-leave      specifies names of columns not to take from <input2>.\n\
-           Overrides -take if both name a given column.\n\
-           -leave=* results in no columns being taken.";
-char *USAGE2 = "fillIn     specifies filling in NULL and 0 values in rows for which\n\
-           no match is found.  By default, such rows are omitted.\n\
-match      specifies names of columns to match between <input1> and\n\
-           <input2> for selection and placement of data taken from\n\
-           <input2>.  In general, the first unused match from <input2>\n\
-           is taken.\n\
-wildMatch  similar to -match, but the data in <input2> may contain wildcards.\n\
-           The first row in <input2> that matches each row in <input1> is used.\n\
-equate     specifies names of columns to equate between <input1> and\n\
-           <input2> for selection and placement of data taken from\n\
-           <input2>.  In general, the first unused match from <input2>\n\
-           is taken.\n\
-rename     Specifies new names for entities in the output data set.\n\
-           The entities must still be referred to by their old names in \n\
-           the other commandline options. \n\
-editnames  Specifies creation of new names for entities of the specified \n\
-           type with names matching the specified wildcard string. Editing \n\
-           is performed using commands reminiscent of emacs keystrokes. \n\
-           if -editnames=<entity>{column|parameter|array},wildcard,ei/%ld/ \n\
-           is specified, the entity names will be changed to <name>N, N is the \n\
-           position of input files in the command line. \n\
-reuse      specifies that rows of <input2> may be reused, i.e., matched\n\
-           with more than one row of <input1>.  Also, -reuse=page specifies\n\n\
-           that only the first page of <input2> is used.\n\
-           nowarnings specifies that warning messages should be suppressed.\n\
+ifnot       specifies names of parameters, arrays, and columns that may not\n\
+            exist in <input1> if the program is to run as asked.\n\
+ifis        specifies names of parameters, arrays, and columns that must\n\
+            exist in <input1> if the program is to run as asked.\n\
+transfer    specifies names of parameters or arrays to transfer from <input2>.\n\
+take        specifies names of columns to take from <input2>.\n\
+leave       specifies names of columns not to take from <input2>.\n\
+            Overrides -take if both name a given column.\n\
+            -leave=* results in no columns being taken.";
+char *USAGE2 = "fillIn      specifies filling in NULL and 0 values in rows for which\n\
+            no match is found.  By default, such rows are omitted.\n\
+match       specifies names of columns to match between <input1> and\n\
+            <input2> for selection and placement of data taken from\n\
+            <input2>.  In general, the first unused match from <input2>\n\
+            is taken.\n\
+wildMatch   similar to -match, but the data in <input2> may contain wildcards.\n\
+            The first row in <input2> that matches each row in <input1> is used.\n\
+equate      specifies names of columns to equate between <input1> and\n\
+            <input2> for selection and placement of data taken from\n\
+            <input2>.  In general, the first unused match from <input2>\n\
+            is taken.\n\
+rename      Specifies new names for entities in the output data set.\n\
+            The entities must still be referred to by their old names in \n\
+            the other commandline options. \n\
+editnames   Specifies creation of new names for entities of the specified \n\
+            type with names matching the specified wildcard string. Editing \n\
+            is performed using commands reminiscent of emacs keystrokes. \n\
+            if -editnames=<entity>{column|parameter|array},wildcard,ei/%ld/ \n\
+            is specified, the entity names will be changed to <name>N, N is the \n\
+            position of input files in the command line. \n\
+reuse       specifies that rows of <input2> may be reused, i.e., matched\n\
+            with more than one row of <input1>.  Also, -reuse=page specifies\n\n\
+            that only the first page of <input2> is used.\n\
+-nowarnings specifies that warning messages should be suppressed.\n\
 Program by Michael Borland. (This is version 8, April 2005, M. Borland)\n";
 
 
@@ -651,7 +654,7 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  if (!check_ifitems(&SDDS_1, &ifnot_item, 0) || !check_ifitems(&SDDS_1, &ifis_item, 1))
+  if (!check_ifitems(&SDDS_1, &ifnot_item, 0, warnings) || !check_ifitems(&SDDS_1, &ifis_item, 1, warnings))
     exit(0);
 
   for (it=0; it<ifnot_item.items; it++) {

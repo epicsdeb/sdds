@@ -12,6 +12,20 @@
    *          with new parameters and columns
    * Michael Borland, 1994
    $Log: sddsprocess.c,v $
+   Revision 1.61  2010/12/10 18:18:49  soliday
+   Added support for algebraic mode when getting an equation from a parameter.
+
+   Revision 1.60  2010/12/09 16:13:26  borland
+   The ifnot and ifis options now respect the -nowarnings request.
+
+   Revision 1.59  2010/12/07 17:11:38  borland
+   Removed debugging statement from sddsprocess (related to @parameter equations).
+   Added test to ensure that @parameter equation isn't used for algebraic mode.
+
+   Revision 1.58  2010/11/15 21:53:17  borland
+   Added the ability to specify the equation for -define=column,... using a
+   string parameter.
+
    Revision 1.57  2009/07/10 21:03:21  shang
    modified the filter option to accept string as parameter name for defining lower and upper limit of the filter
 
@@ -277,8 +291,8 @@ char *usageArray[] = {
 " [-numberTest={column|parameter},<name>[,invert]]\n",
 " [-rpndefinitionsfiles=<filename>[,...]] [-rpnexpression=<expression>[,repeat][,algebraic]] \n",
 " [-convertunits={column|parameter},<name>,<new-units-name>,<old-units-name>[,<factor>]] \n",
-" [-define={column|parameter},<name>,<equation>[,<definition_entries>][,algebraic]] \n",
-" [-redefine={column|parameter},<name>,<equation>[,<definition_entries>][,algebraic]] \n",
+" [-define={column|parameter},<name>,{<equation>|@<parameterName>}[,<definition_entries>][,algebraic]] \n",
+" [-redefine={column|parameter},<name>,{<equation>|@<parameterName>}[,<definition_entries>][,algebraic]] \n",
 " [-cast={column|parameter},<newName>,<sourceName>,<newType>]\n",
 " [-scan={column|parameter},<new-name>,<source-name>,<sscanf-string>[,<definition-entries>][,edit=<string>]] \n",
 " [-edit={column|parameter},<new-name>,<source-name>,<edit-string>[,<definition-entries>]] \n",
@@ -301,7 +315,7 @@ char *usageArray[] = {
 "A <definition-entry> is of the form <entry-name>=<value>, where <entry-name> is one of \"symbol\", \"units\", \"description\",\n",
 "\"format_string\", and \"type\".\n",
 "sddsprocess reads data from a SDDS file, processes it, and writes the results to a new SDDS file.\n",
-"Program by Michael Borland.  (This is version 1.40, H. Shang, March 2002.)\n",
+"Program by Michael Borland.  (This is version 1.41, M. Borland, December 2010.)\n",
 NULL
 };
 
@@ -879,7 +893,7 @@ int main(int argc, char **argv)
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
       exit(1);
     }
-    if (!check_ifitems(&SDDS_input, &ifnot_item, 0) || !check_ifitems(&SDDS_input, &ifis_item, 1))
+    if (!check_ifitems(&SDDS_input, &ifnot_item, 0, !nowarnings) || !check_ifitems(&SDDS_input, &ifis_item, 1, !nowarnings))
       exit(0);
     original_parameters = SDDS_input.layout.n_parameters;
     
@@ -1004,7 +1018,28 @@ int main(int argc, char **argv)
 	delete_chars(s, " ");
 	if (!SDDS_CopyString(&equation_ptr->udf_name, s))
 	  SDDS_Bomb("string copying failed (making udf name)");
-	create_udf(equation_ptr->udf_name, equation_ptr->equation);
+        if (equation_ptr->equation[0]=='@') {
+          if (equation_ptr->equation[1]=='@') {
+            /* parameter contains algebraic notation */
+            if ((index=SDDS_GetParameterIndex(&SDDS_output, equation_ptr->equation+2))<0 ||
+                SDDS_GetParameterType(&SDDS_input, index)!=SDDS_STRING) {
+              SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
+              fprintf(stderr, "Error (sddsprocess): parameter %s does not exist or is not string type\n",
+                      equation_ptr->equation+2);
+              exit(1);
+            }
+          } else {
+            if ((index=SDDS_GetParameterIndex(&SDDS_output, equation_ptr->equation+1))<0 ||
+                SDDS_GetParameterType(&SDDS_input, index)!=SDDS_STRING) {
+              SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
+              fprintf(stderr, "Error (sddsprocess): parameter %s does not exist or is not string type\n",
+                      equation_ptr->equation+1);
+              exit(1);
+            }
+          }
+        }
+        else 
+          create_udf(equation_ptr->udf_name, equation_ptr->equation);
 	if (equation_ptr->redefinition) {
 	  if (equation_ptr->is_parameter) {
 	    if ((index=SDDS_GetParameterIndex(&SDDS_output, equation_ptr->name))<0)
@@ -2027,6 +2062,27 @@ long SDDS_ComputeSetOfColumns(SDDS_DATASET *SDDS_dataset, long equ_begin, long e
     if (++column_list_ptr>=max_column_list_counter || !column_list)
       column_list = trealloc(column_list, sizeof(*column_list)*(max_column_list_counter+=4));
     column_list[column_list_ptr].column = SDDS_GetColumnIndex(SDDS_dataset, equation_ptr->name);
+    if (equation_ptr->equation[0]=='@') {
+      char **equation, *ptr, pfix[IFPF_BUF_SIZE];
+      if (equation_ptr->equation[1]=='@') {
+        /* Parameter contains algebraic notation */
+        if (!(equation=SDDS_GetParameter(SDDS_dataset, equation_ptr->equation+2, NULL)))
+          SDDS_Bomb("unable to read parameter for equation definition");
+        ptr = addOuterParentheses(*equation);
+        if2pf(pfix, ptr, sizeof pfix);
+        free(ptr);
+        if (!SDDS_CopyString(equation, pfix)) {
+          fprintf(stderr, "error: problem copying argument string\n");
+          return NULL;
+        }
+      } else {
+        if (!(equation=SDDS_GetParameter(SDDS_dataset, equation_ptr->equation+1, NULL)))
+          SDDS_Bomb("unable to read parameter for equation definition");
+      }
+
+      create_udf(equation_ptr->udf_name, *equation);
+      free(*equation);
+    }
     cp_str(&column_list[column_list_ptr].equation,equation_ptr->udf_name);
     if (column_list[column_list_ptr].column<0 || column_list[column_list_ptr].column>=layout->n_columns)
       return(0);

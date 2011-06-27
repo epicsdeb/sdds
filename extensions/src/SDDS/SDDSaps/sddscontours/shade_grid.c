@@ -12,6 +12,9 @@
    *
    * Michael Borland, 1993
    $Log: shade_grid.c,v $
+   Revision 1.36  2010/01/15 15:45:56  soliday
+   Modified the call to make_intensity_bar because it accepts more options now.
+
    Revision 1.35  2007/05/17 19:41:21  soliday
    Modified to allow changing the thickness for the intensity bar labels.
 
@@ -281,7 +284,7 @@ void go_shade_grid(
 	     hue0, hue1, n_levels, reverse, flags);
   set_linetype(pen0);
   if (!(flags&NO_COLOR_BAR))
-      make_intensity_bar(n_levels, 0, reverse, min_level, max_level, hue0, hue1, colorName, colorUnits, thickness);
+    make_intensity_bar(n_levels, 0, reverse, min_level, max_level, hue0, hue1, colorName, colorUnits, thickness, 1.0, 1.0, 0.0);
   set_linetype(pen[0]);
 
   if (flags&DATE_STAMP)

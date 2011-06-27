@@ -1,0 +1,36 @@
+/COPYRIGHT.TXT/1.1.1.1/Fri Aug 25 16:18:00 1995//
+/LICENSE/1.6/Thu Aug 15 22:28:59 2002//
+/MPLDriver/1.2/Fri Oct 20 14:10:36 2006//
+/Makefile/1.36/Fri Apr 24 18:27:25 2009//
+D/2d_interpolate////
+D/OOSDDSlib////
+D/SDDS3lib////
+D/SDDSaps////
+D/SDDSlib////
+D/cmatlib////
+D/daq////
+D/examples////
+D/fdlibm////
+D/fftpack////
+D/fortran////
+D/gd////
+D/gnuplot2.0////
+D/gsl////
+D/include////
+D/java////
+D/levmar////
+D/matlab////
+D/matlib////
+D/mdbcommon////
+D/mdblib////
+D/mdbmth////
+D/meschach////
+D/namelist////
+D/oagLib////
+D/pgapack////
+D/png////
+D/python////
+D/rpns////
+D/tiff////
+D/utils////
+D/zlib////

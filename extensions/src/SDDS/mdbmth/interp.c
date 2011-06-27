@@ -9,6 +9,12 @@
 
 /*
  $Log: interp.c,v $
+ Revision 1.8  2010/11/29 23:22:16  shang
+ improved interp_short to return the corresponding function value if the independent value is found in the input array.
+
+ Revision 1.7  2010/06/23 18:48:03  shang
+ added interp_short routine
+
  Revision 1.6  2003/10/10 18:16:04  borland
  Replaced SDDS_Bomb() with bomb() so that libraries are not interdependent.
 
@@ -250,4 +256,98 @@ double interpolate(double *f, double *x, long n, double xo, OUTRANGE_CONTROL *be
   if (!code)
     bomb("zero denominator in LagrangeInterp", NULL);
   return result;
+}
+
+short interp_short(short *f, double *x, long n, double xo, long warnings, short order, 
+                 long *returnCode, long *next_start_pos)
+{
+  long hi, lo, mid, i;
+  short value;
+  
+  lo = 0;
+  hi = n-1;
+
+  /*if the value is in one of the indepent, return the corresponding f value */
+  for (i=0; i<n; i++) 
+    if (xo==x[i]) {
+      *next_start_pos=i;
+      return f[i];
+    }
+  
+  if (lo==hi) {
+    if (warnings)
+      printf("warning: only one point--returning value for that point\n");
+    *returnCode = 0;
+    *next_start_pos = lo;
+    return(f[0]);
+  }
+  if (x[lo]<x[hi]) {/* indep variable ordered from small to large */    
+    if (xo<x[lo=0]) {
+      if (warnings)
+        printf("warning: %22.15e outside [%22.15e,%22.15e] (interp)\n",
+               xo, x[0], x[n-1]);
+      *returnCode = 0;
+      *next_start_pos = lo;
+      return(f[lo]);
+    }
+    if (xo>x[hi=n-1]) {
+      if (warnings)
+        printf("warning: %22.15e outside [%22.15e,%22.15e] (interp)\n",
+               xo, x[0], x[n-1]);
+      *returnCode = 0;
+      *next_start_pos = hi;
+      return(f[hi]);
+    }
+    
+    /* do binary search for closest point */
+    while ((hi-lo)>1) {
+      mid = (lo+hi)/2;
+      if (xo<x[mid]) 
+        hi = mid;
+      else lo = mid;
+    }
+  }
+  else {/* indep variable ordered from large to small */
+    if (xo>x[lo=0]) {
+      if (warnings)
+        printf("warning: %22.15e outside [%22.15e,%22.15e] (interp)\n",
+               xo, x[n-1], x[0]);
+      *returnCode = 0;
+      *next_start_pos = lo;
+      return(f[lo]);
+    }
+    if (xo<x[hi=n-1]) {
+      if (warnings)
+        printf("warning: %22.15e outside [%22.15e,%22.15e] (interp)\n",
+               xo, x[n-1], x[0]);
+      *returnCode = 0;
+      *next_start_pos = hi;
+      return(f[hi]);
+    }
+    
+    /* do binary search for closest point */
+    while ((hi-lo)>1) {
+      mid = (lo+hi)/2;
+      if (xo>x[mid]) 
+        hi = mid;
+      else lo = mid;
+    }
+  }
+  /*remember this position so that one can start from her to speed up the interp of
+    other points assume the interping points are sorted.*/
+  *next_start_pos = lo;
+  
+ 
+  if (order==-1) {
+    /* inherit value from previous point*/
+    value=(short)f[lo];
+  }
+  else if (order==-2) {
+    /* inherit value from next point */
+    value=(short)f[hi];
+  } 
+  else {
+    value = (f[hi]-f[lo])/(xo-x[lo]);
+  }
+  return value;
 }

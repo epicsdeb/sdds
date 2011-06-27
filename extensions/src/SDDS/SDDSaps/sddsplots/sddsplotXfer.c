@@ -13,6 +13,11 @@
  *
  * Michael Borland, 1994.
  $Log: sddsplotXfer.c,v $
+ Revision 1.12  2011/01/11 22:51:04  soliday
+ Changed all the strcpy commands to strcpy_ss because of problems with
+ RedHat Enterprise 6. If a strcpy copies the result to the same memory
+ space you will get unexpected results.
+
  Revision 1.11  2004/04/20 17:20:18  shang
  modified transferNamesToLists() to obtain y1names from editing ynames if
  y1name contains "y1edit="
@@ -195,7 +200,7 @@ long transferNamesToLists(char ***yname, char ***xname, char ***x1name, char ***
         if (strstr(y1name1,"y1edit=")==NULL && strstr(y1name1,"edit=")==NULL)
           bomb("Invalid y1name with edit command, should be y1edit=<edit string> !",NULL);
         editcommand=strchr(y1name1,'=');
-        strcpy(s,newname[i]);
+        strcpy_ss(s,newname[i]);
         if (!edit_string(s,editcommand))
           bomb("Can not edit string from yname to get y1name!",NULL);
         SDDS_CopyString(&y1name1sub,s);

@@ -8,6 +8,9 @@
 #*************************************************************************
 #
 # $Log: Makefile.OAG,v $
+# Revision 1.9  2010/02/04 23:43:28  soliday
+# Updated because dfilter.cc replaces dfilter.c
+#
 # Revision 1.8  2009/12/02 22:22:13  soliday
 # Added the -D_ISOC99_SOURCE flag.
 #
@@ -47,7 +50,8 @@ endif
 
 LIBRARY = fftpack
 
-USR_CFLAGS += -I../../include -DEXPORT_FFTPACK -D_ISOC99_SOURCE
+USR_CFLAGS += -I../../include -DEXPORT_FFTPACK
+USR_CPPFLAGS += -I../../include -DEXPORT_FFTPACK
 ifeq ($(OS_CLASS),solaris)
 ACC_DEP_CFLAGS += -KPIC -v
 CCC_DEP_CFLAGS += -KPIC -v
@@ -58,7 +62,7 @@ LIBSRCS =	cfftb.c cfftb1.c cfftf.c \
 		cfftf1.c cffti.c cffti1.c \
 		cosqb.c cosqb1.c cosqf.c \
 		cosqf1.c cosqi.c cost.c \
-		costi.c dfilter.c ezfft1.c \
+		costi.c dfilter.cc ezfft1.c \
 		ezfftb.c ezfftf.c ezffti.c \
 		fftpackC.c naff.c passb.c \
 		passb2.c passb3.c passb4.c \

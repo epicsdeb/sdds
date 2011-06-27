@@ -12,6 +12,11 @@
  *      
  * Michael Borland, 1991-994.
  $Log: plot_data_sets.c,v $
+ Revision 1.11  2011/01/11 22:51:03  soliday
+ Changed all the strcpy commands to strcpy_ss because of problems with
+ RedHat Enterprise 6. If a strcpy copies the result to the same memory
+ space you will get unexpected results.
+
  Revision 1.10  2009/09/23 21:45:40  borland
  Use mtimes() instead of mtime() for date/time stamp (includes seconds).
 
@@ -694,14 +699,14 @@ void strip_bounding_quotes(char *s, char *qb, char *qe)
     while (*ptr) {
         if (strncmp(ptr, qb, strlen(qb))==0) {
             if (level==-1 || level==0)
-               strcpy(ptr, ptr+2);
+               strcpy_ss(ptr, ptr+2);
             else
                ptr += 2;
             level++; 
             }
         else if (strncmp(ptr, qe, strlen(qe))==0) {
             if (level==1 || level==0)
-               strcpy(ptr, ptr+2);
+               strcpy_ss(ptr, ptr+2);
             else
                ptr += 2;
             level--;

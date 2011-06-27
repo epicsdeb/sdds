@@ -19,6 +19,9 @@
  *
  * Michael Borland, 1994
  $Log: sddsmxref.c,v $
+ Revision 1.22  2010/12/09 16:13:26  borland
+ The ifnot and ifis options now respect the -nowarnings request.
+
  Revision 1.21  2005/11/07 21:48:10  soliday
  Updated to remove Linux compiler warnings.
 
@@ -493,7 +496,7 @@ int main(int argc, char **argv)
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
     exit(1);
   }
-  if (!check_ifitems(&SDDS_1, &ifnot_item, 0) || !check_ifitems(&SDDS_1, &ifis_item, 1))
+  if (!check_ifitems(&SDDS_1, &ifnot_item, 0, warnings) || !check_ifitems(&SDDS_1, &ifis_item, 1, warnings))
     exit(0);
   if (!SDDS_InitializeInput(&SDDS_2, input2)) {
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);

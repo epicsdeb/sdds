@@ -198,25 +198,26 @@ command     stack    logical stack
             4
 \end{verbatim}
 \end{flushleft}
-In order to keep the stack small, the command could have been written ``\verb.0 < pop pop ? -1 : 1 $.\ '', where the pop commands would eliminate the 0 and 4 from the stack before the conditional is executed.
+In order to keep the stack small, the command should be written ``\verb.0 < pop pop ? -1 : 1 $.\ '', where the pop commands would eliminate the 0 and 4 from the stack before the conditional is executed.
 
 If the command is executed with rpnl command in a C-shell, then the \$
-character has to be escaped with single quotes:\\
+character has to be followed by a blank space to prevent the shell
+from interperting the \$ as part of variable:\\
 
-C-shell\verb.>.\ rpnl ``\verb.4 0 < pop pop ? -1 : 1 "'$'.\\
+C-shell\verb.>.\ rpnl \verb."4 0 < pop pop ? -1 : 1 $ ".\\
 
 If the command is executed in a C-shell sddsprocess command to create
 a new column, then we write:\\
 \begin{flushleft}
 \begin{verbatim}
 sddsprocess <infile> <outfile> \
-   -def=col,NewColumn,"OldColumn 0 < pop pop ? -1 : 1 "'$'
+   -def=col,NewColumn,"OldColumn 0 < pop pop ? -1 : 1 $ "
 
 \end{verbatim}
 \end{flushleft}
 which is similar to the rpnl command above.
 
-If the sddsprocess command is run in a tcl/tk shell, then the \$ character is escaped with a backslash:\\
+If the sddsprocess command is run in a tcl/tk shell, the \$ character can be escaped with a backslash as well as with a blank space:\\
 \begin{flushleft}
 \begin{verbatim}
 sddsprocess <infile> <outfile> \

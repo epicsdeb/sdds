@@ -15,6 +15,21 @@
  *
  * Michael Borland, 1994
  $Log: sddsplot.h,v $
+ Revision 1.79  2010/09/14 16:20:11  soliday
+ Added the rspectral order for the colors. This is the reverse of the spectral
+ order.
+
+ Revision 1.78  2010/07/08 21:26:47  borland
+ Added "first" qualifier to -omnipresent option.  When given, omnipresent datasets
+ are plotted first.  The default is to plot them last.
+
+ Revision 1.77  2010/06/03 16:33:45  borland
+ Added fixForRequest qualifier to -graphic option.
+
+ Revision 1.76  2010/01/05 20:06:45  soliday
+ Added the -intensityBar option which can be used to move the intensity bar
+ and to resize the label text to the left and the unit text above.
+
  Revision 1.75  2009/07/28 14:01:16  borland
  Added scroll feature to -replicate option.  Greatly improved memory management for
  split and replicated datasets.  Added -nocolorbar option.
@@ -371,6 +386,7 @@ typedef struct {
 #define GRAPHIC_SUBTYPE_EQ_TYPE    0x00000100
 #define GRAPHIC_VARY_FIXFORNAME    0x00000200
 #define GRAPHIC_VARY_FIXFORFILE    0x00000400
+#define GRAPHIC_VARY_FIXFORREQUEST 0x00000800
 
 typedef struct {
   double maximum[2];
@@ -636,17 +652,28 @@ typedef struct {
   unsigned long long flags;
 } TICK_SETTINGS;
 
-#define COLORSET_START         0x00000001
-#define COLORSET_INCREMENT     0x00000002
-#define COLORSET_FINISH        0x00000004
-#define COLORSET_SPECTRAL      0x00000008
-#define COLORSET_USERDEFINED   0x00000016
+#define COLORSET_START         0x00000001U
+#define COLORSET_INCREMENT     0x00000002U
+#define COLORSET_FINISH        0x00000004U
+#define COLORSET_SPECTRAL      0x00000008U
+#define COLORSET_RSPECTRAL     0x00000010U
+#define COLORSET_USERDEFINED   0x00000020U
 typedef struct {
   unsigned short red[2], green[2], blue[2];
   double increment[3];
   unsigned long flags;
   long num;
 } COLOR_SETTINGS;
+
+typedef struct {
+  double labelsize;
+  double unitsize;
+  double xadjust;
+  unsigned long flags;
+} INTENSITYBAR_SETTINGS;
+#define INTENSITYBAR_LABELSIZE_GIVEN  0x0001U
+#define INTENSITYBAR_UNITSIZE_GIVEN   0x0002U
+#define INTENSITYBAR_XADJUST_GIVEN    0x0004U
 
 typedef struct {
   char **enumerate, *editcommand;
@@ -826,6 +853,7 @@ typedef struct {
   POINTLABEL_SETTINGS pointLabelSettings;
   REPLICATE_SETTINGS replicateSettings;
   COLOR_SETTINGS color_settings;
+  INTENSITYBAR_SETTINGS intensityBar_settings;
 } PLOT_REQUEST;
 /* These flags are used with the 'flags' member of PLOT_REQUEST */
 #define PLREQ_OMNIPRESENT     0x00000001
@@ -859,6 +887,7 @@ typedef struct {
 #define PLREQ_AXESY           0x10000000
 #define PLREQ_NEXTPAGE        0x20000000
 #define PLREQ_THICKNESS       0x40000000    
+#define PLREQ_OMNIFIRST       0x80000000
 
 #define PLREQ_XFLAGS (PLREQ_XGAP+PLREQ_SAMESCALEX+PLREQ_UNSUPPRESSX+PLREQ_NOSCALESX+PLREQ_GRIDX+PLREQ_AXESX)
 #define PLREQ_YFLAGS (PLREQ_YGAP+PLREQ_SAMESCALEY+PLREQ_UNSUPPRESSY+PLREQ_NOSCALESY+PLREQ_GRIDY+PLREQ_AXESY)

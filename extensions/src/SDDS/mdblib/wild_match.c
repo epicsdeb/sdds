@@ -22,6 +22,9 @@
  *
  * Michael Borland, 1991.
  $Log: wild_match.c,v $
+ Revision 1.17  2011/01/27 18:34:04  shang
+ made a copy of template in expand_ranges() to fix the core dump error when dereference it (*ptr1)
+
  Revision 1.16  2007/07/13 15:02:45  soliday
  Renamed strcpy_s to strcpy_ss because Microsoft is already using this name.
 
@@ -467,7 +470,8 @@ char *expand_ranges(char *template)
 
     end_new = new = tmalloc(sizeof(*new)*(strlen(template)+1));
     *new = 0;
-    ptr = template;
+    ptr = tmalloc(sizeof(*new)*(strlen(template)+1));
+    strcpy(ptr, template);
     while (*ptr) {
         if (*ptr==ESCAPE_CHAR) {
             *end_new++ = *ptr++;

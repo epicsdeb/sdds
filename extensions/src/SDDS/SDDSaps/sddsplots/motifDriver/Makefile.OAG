@@ -8,6 +8,9 @@
 #*************************************************************************
 #
 # $Log: Makefile.OAG,v $
+# Revision 1.19  2010/04/08 17:29:53  soliday
+# Fixed an issue on linux-x86_64
+#
 # Revision 1.18  2007/11/09 21:31:26  soliday
 # This has to be built with STATIC_BUILD=NO because there is a problem
 # on linux.
@@ -91,11 +94,13 @@ endif
 USR_CFLAGS = 	-I../../../../include -I$(MOTIF_INC) \
 		-I$(X11_INC) -DXREL5 -DzLib
 
+ifeq ($(OS_CLASS),solaris)
 ifneq ($(words $(notdir $(wildcard $(X11_LIB)/libz.a $(X11_LIB)/libz.so))), 0)
 ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
 OPT_LDFLAGS += -L/usr/lib
 else
 STATIC_LDFLAGS += -L/usr/lib
+endif
 endif
 endif
 
@@ -174,6 +179,7 @@ ifeq ($(OS_CLASS),Linux)
 ifeq ($(STATIC_BUILD),YES)
 STATIC_LDFLAGS_YES += -L$(X11_LIB)
 OP_SYS_LDLIBS = -Wl,-Bdynamic -lXm -lXt -lXmu -lX11 -lXpm -Wl,-Bstatic
+#OP_SYS_LDLIBS = -lXm -ljpeg -lXp -lXext -lXft -lfontconfig -lfreetype -lexpat -lXrender -lXt -lSM -lICE -lXmu -lX11 -lXdmcp -lXau -ldl -lXpm -lpthread
 else
 PROD_LIBS_Linux += Xm Xt Xmu X11 Xpm
 endif

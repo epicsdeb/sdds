@@ -10,6 +10,12 @@
 /*
  *
  $Log: agilentwaveform2sdds.cpp,v $
+ Revision 1.4  2011/01/31 03:07:42  soliday
+ Fixed a minor problem with an error message.
+
+ Revision 1.3  2009/12/10 17:31:46  soliday
+ Changed so that it builds on 64bit solaris.
+
  Revision 1.2  2009/10/26 18:40:26  soliday
  Fixed issue on Mac computers.
 
@@ -521,7 +527,8 @@ enum clnt_stat create_link_1(Create_LinkParms *argp, Create_LinkResp *clnt_res, 
 
 bool_t xdr_Create_LinkParms (XDR *xdrs, Create_LinkParms *objp)
 {
-#if defined(SOLARIS)
+
+#if defined(SOLARIS) && !defined(_LP64)
   register long *buf;
 #else
   register int32_t *buf;
@@ -538,9 +545,9 @@ bool_t xdr_Create_LinkParms (XDR *xdrs, Create_LinkParms *objp)
         return FALSE;
 
     } else {
-      IXDR_PUT_LONG(buf, objp->clientId);
+      IXDR_PUT_INT32(buf, objp->clientId);
       IXDR_PUT_BOOL(buf, objp->lockDevice);
-      IXDR_PUT_U_LONG(buf, objp->lock_timeout);
+      IXDR_PUT_U_INT32(buf, objp->lock_timeout);
     }
     if (!xdr_string (xdrs, &objp->device, ~0))
       return FALSE;
@@ -556,9 +563,9 @@ bool_t xdr_Create_LinkParms (XDR *xdrs, Create_LinkParms *objp)
         return FALSE;
 
     } else {
-      objp->clientId = IXDR_GET_LONG(buf);
+      objp->clientId = IXDR_GET_INT32(buf);
       objp->lockDevice = IXDR_GET_BOOL(buf);
-      objp->lock_timeout = IXDR_GET_U_LONG(buf);
+      objp->lock_timeout = IXDR_GET_U_INT32(buf);
     }
     if (!xdr_string (xdrs, &objp->device, ~0))
       return FALSE;
@@ -604,11 +611,11 @@ bool_t xdr_Device_Link (XDR *xdrs, Device_Link *objp)
 }
 
 int agilent_init(CLINK *clink) {
-  char	cmd[256];
   int	ret;
   ret=vxi11_send(clink, ":SYSTEM:HEADER 0");
   if(ret < 0) {
-    printf("error in agilent init, could not send command '%s'\n",cmd);
+    printf("Error: vxi11_send_and_receive: could not send cmd.\n");
+    printf("       The function vxi11_send returned %d. ",ret);
     return ret;
   }
   vxi11_send(clink, ":ACQUIRE:COMPLETE 100");
@@ -933,7 +940,7 @@ enum clnt_stat device_read_1(Device_ReadParms *argp, Device_ReadResp *clnt_res, 
 
 bool_t xdr_Device_ReadParms (XDR *xdrs, Device_ReadParms *objp)
 {
-#if defined(SOLARIS)
+#if defined(SOLARIS) && !defined(_LP64)
   register long *buf;
 #else
   register int32_t *buf;
@@ -952,9 +959,9 @@ bool_t xdr_Device_ReadParms (XDR *xdrs, Device_ReadParms *objp)
         return FALSE;
 
     } else {
-      IXDR_PUT_U_LONG(buf, objp->requestSize);
-      IXDR_PUT_U_LONG(buf, objp->io_timeout);
-      IXDR_PUT_U_LONG(buf, objp->lock_timeout);
+      IXDR_PUT_U_INT32(buf, objp->requestSize);
+      IXDR_PUT_U_INT32(buf, objp->io_timeout);
+      IXDR_PUT_U_INT32(buf, objp->lock_timeout);
     }
     if (!xdr_Device_Flags (xdrs, &objp->flags))
       return FALSE;
@@ -974,9 +981,9 @@ bool_t xdr_Device_ReadParms (XDR *xdrs, Device_ReadParms *objp)
         return FALSE;
 
     } else {
-      objp->requestSize = IXDR_GET_U_LONG(buf);
-      objp->io_timeout = IXDR_GET_U_LONG(buf);
-      objp->lock_timeout = IXDR_GET_U_LONG(buf);
+      objp->requestSize = IXDR_GET_U_INT32(buf);
+      objp->io_timeout = IXDR_GET_U_INT32(buf);
+      objp->lock_timeout = IXDR_GET_U_INT32(buf);
     }
     if (!xdr_Device_Flags (xdrs, &objp->flags))
       return FALSE;
