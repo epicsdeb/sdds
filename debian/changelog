@@ -1,3 +1,9 @@
+sdds (2.9-3) unstable; urgency=low
+
+  * Missing runtime deps for sdds-dev
+
+ -- Michael Davidsaver <mdavidsaver@bnl.gov>  Fri, 15 Jul 2011 16:54:01 -0400
+
 sdds (2.9-2) unstable; urgency=low
 
   * Fix library package name libsdds2.9
