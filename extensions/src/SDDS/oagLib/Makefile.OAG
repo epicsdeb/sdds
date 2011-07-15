@@ -20,7 +20,7 @@ LIB_SYS_LIBS_DEFAULT = z
 LIB_SYS_LIBS_solaris = z curses
 LIB_SYS_LIBS_Linux = z ncurses
 
-OAG_LIBS = mdbcommon matlib fftpack SDDSlib namelist rpns/code mdbmth mdblib gsl zlib meschach
+OAG_LIBS = mdbcommon matlib fftpack SDDSlib namelist rpns/code mdbmth mdblib gsl gslcblas zlib meschach
 schach zlib png gd fdlibm
 LIBOBJS1 = $(foreach lib,$(OAG_LIBS),$(wildcard ../../$(lib)/O.$(T_A)/*.o))
 LIBOBJS2 = $(subst ../../namelist/O.$(T_A)/namelist_pp.o,,$(LIBOBJS1))

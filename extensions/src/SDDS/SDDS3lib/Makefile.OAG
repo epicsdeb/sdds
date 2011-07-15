@@ -39,6 +39,6 @@ USR_LIBS_WIN32 += z
 LIB_SYS_LIBS_DEFAULT = z
 LIB_SYS_LIBS_WIN32 = -nil-
 
-z_DIR = $(INSTALL_LIB)
+z_DIR = /usr/lib
 
 

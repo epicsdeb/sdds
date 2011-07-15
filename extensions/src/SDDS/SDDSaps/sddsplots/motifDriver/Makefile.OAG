@@ -141,6 +141,8 @@ GDFOUND = 0
 endif
 endif
 
+PROD_SYS_LIBS += gsl gslcblas
+
 ifneq ($(GDFOUND), 0)
 ifeq ($(STATIC_BUILD),YES)
 ifneq ($(words $(notdir $(wildcard /usr/lib/libgd.a \

@@ -110,7 +110,7 @@ LIBRARY = mdblib
 
 ifdef WIN32
 DLL_LIBS += z
-z_DIR = $(INSTALL_LIB)
+z_DIR = /usr/lib
 else
 LIB_SYS_LIBS_DEFAULT = z
 LIB_SYS_LIBS_Linux = z ncurses

@@ -236,6 +236,8 @@ ifndef LAPACK
 LAPACK = 0
 endif
 
+PROD_SYS_LIBS += gsl gslcblas
+
 # for four choices:
 #ifneq
 #else
@@ -340,9 +342,9 @@ ifeq ($(OS_CLASS),solaris)
 OP_SYS_LDLIBS += -lz
 endif
 
-sddsmatrixop_LIBS = rpnlib gsl
+sddsmatrixop_LIBS = rpnlib
 
-z_DIR = $(INSTALL_LIB)
+z_DIR = /usr/lib
 SDDS1_DIR = $(INSTALL_LIB)
 rpnlib_DIR = $(INSTALL_LIB)
 meschach_DIR = $(INSTALL_LIB)
@@ -351,5 +353,5 @@ mdbcommon_DIR = $(INSTALL_LIB)
 mdbmth_DIR = $(INSTALL_LIB)
 matlib_DIR = $(INSTALL_LIB)
 fftpack_DIR = $(INSTALL_LIB)
-gsl_DIR = $(INSTALL_LIB)
 fdlibm_DIR = $(INSTALL_LIB)
+gsl_DIR = /usr/lib

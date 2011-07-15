@@ -42,6 +42,6 @@ endif
 SRCS = mpl_motif.cc
 RCS = mpl_motif.rc
 
-gd_DIR = $(INSTALL_LIB)
-png_DIR = $(INSTALL_LIB)
-z_DIR = $(INSTALL_LIB)
+gd_DIR = /usr/lib
+png_DIR = /usr/lib
+z_DIR = /usr/lib

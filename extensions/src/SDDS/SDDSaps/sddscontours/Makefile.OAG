@@ -154,15 +154,17 @@ sddscongen_LIBS += gd png
 sddshist2d_LIBS += gd png
 sddsimageconvert_LIBS += gd png
 PROD_LIBS_WIN32 += gd png
-gd_DIR = $(INSTALL_LIB)
-png_DIR = $(INSTALL_LIB)
+gd_DIR = /usr/lib
+png_DIR = /usr/lib
 endif
 
-PROD_LIBS_DEFAULT = mdbcommon fftpack SDDS1c rpnlib gsl mdbmth mdblib
-PROD_LIBS_Darwin = mdbcommon fftpack SDDS1c rpnlib gsl mdbmth mdblib
-PROD_LIBS_Linux = mdbcommon matlib fftpack SDDS1c rpnlib gsl mdbmth mdblib
-PROD_LIBS_WIN32 += mdbcommon fftpack SDDS1c rpnlib gsl mdbmth mdblib fdlibm z
-PROD_LIBS_BORLANDC = mdbcommon fftpack SDDS1c rpnlib gsl mdbmth mdblib fdlibm z
+PROD_SYS_LIBS += gsl gslcblas
+
+PROD_LIBS_DEFAULT = mdbcommon fftpack SDDS1c rpnlib gsl gslcblas mdbmth mdblib
+PROD_LIBS_Darwin = mdbcommon fftpack SDDS1c rpnlib gsl gslcblas mdbmth mdblib
+PROD_LIBS_Linux = mdbcommon matlib fftpack SDDS1c rpnlib mdbmth mdblib
+PROD_LIBS_WIN32 += mdbcommon fftpack SDDS1c rpnlib gsl gslcblas mdbmth mdblib fdlibm z
+PROD_LIBS_BORLANDC = mdbcommon fftpack SDDS1c rpnlib gsl gslcblas mdbmth mdblib fdlibm z
 
 SYS_PROD_LIBS_DEFAULT = z
 SYS_PROD_LIBS_Darwin = z
@@ -210,8 +212,8 @@ mdbmth_DIR = $(INSTALL_LIB)
 mdblib_DIR = $(INSTALL_LIB)
 matlib_DIR = $(INSTALL_LIB)
 mdbcommon_DIR = $(INSTALL_LIB)
-gsl_DIR = $(INSTALL_LIB)
-z_DIR = $(INSTALL_LIB)
+gsl_DIR = /usr/lib
+z_DIR = /usr/lib
 Xpm_DIR = $(X11_LIB)
 X11_DIR = $(X11_LIB)
 sddscontour_CFLAGS = -DRPN_SUPPORT

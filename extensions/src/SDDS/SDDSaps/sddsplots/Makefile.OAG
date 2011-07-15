@@ -216,7 +216,7 @@ endif
 endif
 endif
 
-
+SYS_PROD_LIBS += gsl gslcblas
 
 ifneq ($(GDFOUND), 0)
 ifeq ($(STATIC_BUILD),YES)

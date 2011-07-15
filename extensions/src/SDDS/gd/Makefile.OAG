@@ -136,8 +136,8 @@ endif
 
 ifdef WIN32
 DLL_LIBS += png z
-z_DIR = $(INSTALL_LIB)
-png_DIR = $(INSTALL_LIB)
+z_DIR = /usr/lib
+png_DIR = /usr/lib
 else
 
 PRIVATE_PNG=0
@@ -162,7 +162,7 @@ LIB_SYS_LIBS += z
 else
 LIB_SYS_LIBS += z Xpm
 endif
-png_DIR = $(INSTALL_LIB)
+png_DIR = /usr/lib
 else
 LIB_SYS_LIBS += png z
 endif

@@ -1,3 +1,5 @@
+gsl_DIR := /usr/lib
+gslcblas_DIR := /usr/lib
 #*************************************************************************
 # Copyright (c) 2002 The University of Chicago, as Operator of Argonne
 # National Laboratory.
@@ -227,6 +229,7 @@ endif
 PROD_LIBS_DEFAULT = mdbcommon matlib fftpack rpnlib SDDS1 mdbmth mdblib nnetwork csa
 PROD_LIBS_WIN32 = mdbcommon matlib fftpack rpnlib SDDS1 mdbmth mdblib nnetwork csa z fdlibm
 PROD_LIBS_BORLANDC = mdbcommon matlib fftpack rpnlib SDDS1 mdbmth mdblib z fdlibm
+PROD_SYS_LIBS += gsl gslcblas
 SYS_PROD_LIBS_DEFAULT = z
 ifeq ($(NCURSES),NO)
 SYS_PROD_LIBS_Linux = z 
@@ -240,12 +243,12 @@ ifeq ($(OS_CLASS),solaris)
 OP_SYS_LDLIBS += -lz -lrt
 endif
 
-sddsprocess_LIBS = mdbcommon matlib fftpack rpnlib gsl SDDS1c mdbmth mdblib
-sddsgenericfit_LIBS = mdbcommon matlib fftpack rpnlib gsl SDDS1c mdbmth mdblib
-sddsmatrixop_LIBS = rpnlib gsl
-sddssyncflux_LIBS = rpnlib gsl
+sddsprocess_LIBS = mdbcommon matlib fftpack rpnlib gsl gslcblas SDDS1c mdbmth mdblib
+sddsgenericfit_LIBS = mdbcommon matlib fftpack rpnlib gsl gslcblas SDDS1c mdbmth mdblib
+sddsmatrixop_LIBS = rpnlib gsl gslcblas
+sddssyncflux_LIBS = rpnlib gsl gslcblas
 
-z_DIR = $(INSTALL_LIB)
+z_DIR = /usr/lib
 mdbmth_DIR = $(INSTALL_LIB)
 SDDS1_DIR = $(INSTALL_LIB)
 fftpack_DIR = $(INSTALL_LIB)
@@ -257,7 +260,7 @@ SDDS1c_DIR = $(INSTALL_LIB)
 fdlibm_DIR = $(INSTALL_LIB)
 nnetwork_dir = $(INSTALL_LIB)
 csa_dir = $(INSTALL_LIB)
-gsl_DIR = $(INSTALL_LIB)
+gsl_DIR = /usr/lib
 
 sddsprocess_CFLAGS = -DRPN_SUPPORT
 sddsgenericfit_CFLAGS = -DRPN_SUPPORT
@@ -352,7 +355,7 @@ endif #ifneq ($(TIFF), 0)
 ifeq ($(TIFFFOUND), 0)
 tiff2sdds_LIBS = tiff
 sdds2tiff_LIBS = tiff
-tiff_DIR = $(INSTALL_LIB)
+tiff_DIR = /usr/lib
 endif #ifeq ($(TIFFFOUND), 0)
 
 endif

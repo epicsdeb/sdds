@@ -149,7 +149,7 @@ endif
 
 ifdef WIN32
 DLL_LIBS += mdblib rpnlib z
-z_DIR = $(INSTALL_LIB)
+z_DIR = /usr/lib
 else
 USR_LIBS = rpnlib mdbmth mdblib
 LIB_SYS_LIBS_DEFAULT = z

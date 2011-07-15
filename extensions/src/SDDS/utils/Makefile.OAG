@@ -1,3 +1,5 @@
+gsl_DIR := /usr/lib
+gslcblas_DIR := /usr/lib
 #*************************************************************************
 # Copyright (c) 2002 The University of Chicago, as Operator of Argonne
 # National Laboratory.
@@ -116,9 +118,9 @@ endif
 
 ifdef WIN32
 USR_LIBS += mdbcommon SDDS1 mdblib z
-z_DIR = $(INSTALL_LIB)
+z_DIR = /usr/lib
 else
-USR_LIBS = mdbcommon matlib fftpack SDDS1 rpnlib mdbmth mdblib gsl
+USR_LIBS = mdbcommon matlib fftpack SDDS1 rpnlib mdbmth mdblib gsl gslcblas
 SYS_PROD_LIBS_DEFAULT += z
 ifeq ($(NCURSES),NO)
 SYS_PROD_LIBS_Linux += z

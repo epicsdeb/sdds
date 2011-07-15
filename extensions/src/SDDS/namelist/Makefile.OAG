@@ -86,6 +86,7 @@ PROD_LIBS += rpnlib mdblib
 DLL_LIBS += rpnlib mdblib
 else
 USR_LIBS = rpnlib mdblib
+PROD_SYS_LIBS += gsl gslcblas
 SYS_PROD_LIBS_DEFAULT = z
 ifeq ($(NCURSES),NO)
 SYS_PROD_LIBS_Linux = z

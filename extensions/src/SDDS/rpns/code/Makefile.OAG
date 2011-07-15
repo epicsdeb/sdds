@@ -73,7 +73,7 @@ PROD_HOST = rpn rpnl if2pf
 endif
 LIBRARY = rpnlib
 
-USR_CFLAGS = -I../../../include -I../../../gsl
+USR_CFLAGS = -I../../../include
 ifeq ($(OS_CLASS),solaris)
 ACC_DEP_CFLAGS += -KPIC -v
 CCC_DEP_CFLAGS += -KPIC -v
@@ -117,11 +117,13 @@ udf_CFLAGS += -DDefineBinaryInsert
 endif
 
 ifdef WIN32
-PROD_LIBS += rpnlib mdbmth mdblib fdlibm gsl
-DLL_LIBS += mdbmth mdblib fdlibm gsl
+PROD_LIBS += rpnlib mdbmth mdblib fdlibm gsl gslcblas
+DLL_LIBS += mdbmth mdblib fdlibm gsl gslcblas
 else
-PROD_LIBS = rpnlib gsl
-USR_LIBS = mdbmth mdblib gsl
+PROD_LIBS = rpnlib
+USR_LIBS = mdbmth mdblib
+USR_SYS_LIBS += gsl gslcblas
+PROD_SYS_LIBS += gsl gslcblas
 SYS_PROD_LIBS_DEFAULT = z
 ifeq ($(NCURSES),NO)
 SYS_PROD_LIBS_Linux = z 

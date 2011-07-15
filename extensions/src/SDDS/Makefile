@@ -169,97 +169,37 @@ ifdef BUILD_FDLIBM
 DIRS += fdlibm
 endif
 
-DIRS += zlib gsl mdblib mdbmth rpns/code namelist \
+DIRS += mdblib mdbmth rpns/code namelist \
 	SDDSlib fftpack matlib mdbcommon utils 2d_interpolate
 
 PNG = $(words $(notdir $(wildcard \
-/usr/lib/libpng.a \
 /usr/lib/libpng.so \
-/usr/lib64/libpng.a \
 /usr/lib64/libpng.so \
-/lib/libpng.a \
-/lib/libpng.so \
-/lib64/libpng.a \
-/lib64/libpng.so \
-/sw/lib/libpng.a \
-/sw/lib/libpng.dylib \
-/usr/sfw/lib/libpng.a \
-/usr/sfw/lib/libpng.so )))
+)))
 PNGINC = $(words $(notdir $(wildcard \
 /usr/include/png.h \
-/include/png.h \
-/sw/include/png.h \
-/usr/sfw/include/png.h )))
-
-ifeq ($(PNG), 0)
-DIRS += png
-else
-ifeq ($(PNGINC), 0)
-DIRS += PNG
-endif
-endif
+)))
 
 GD = $(words $(notdir $(wildcard \
-/usr/lib/libgd.a \
 /usr/lib/libgd.so \
-/usr/lib64/libgd.a \
 /usr/lib64/libgd.so \
-/lib/libgd.a \
-/lib/libgd.so \
-/lib64/libgd.a \
-/lib64/libgd.so \
-/sw/lib/libgd.a \
-/sw/lib/libgd.dylib \
-/opt/sfw/lib/libgd.a \
-/opt/sfw/lib/libgd.so \
-/opt/local/lib/libgd.a \
-/opt/local/lib/libgd.so )))
+)))
 GDINC = $(words $(notdir $(wildcard \
 /usr/include/gd.h \
-/include/gd.h \
-/sw/include/gd.h \
-/opt/sfw/include/gd.h \
-/opt/local/include/gd.h )))
+)))
 
 #Here at the APS /opt/local/lib/libgd.a exists but is not 64 bit
 ifeq ($(HOST_ARCH),solaris-x86_64)
 GD = 0
 endif
 
-ifeq ($(GD), 0)
-DIRS += gd
-else
-ifeq ($(GDINC), 0)
-DIRS += gd
-endif
-endif
-
 TIFF = $(words $(notdir $(wildcard \
-/usr/lib/libtiff.a \
 /usr/lib/libtiff.so \
-/usr/lib64/libtiff.a \
 /usr/lib64/libtiff.so \
-/lib/libtiff.a \
-/lib/libtiff.so \
-/lib64/libtiff.a \
-/lib64/libtiff.so \
-/sw/lib/libtiff.a \
-/sw/lib/libtiff.dylib \
-/usr/sfw/lib/libtiff.a \
-/usr/sfw/lib/libtiff.so )))
+)))
 TIFFINC = $(words $(notdir $(wildcard \
 /usr/include/tiffio.h \
-/include/tiffio.h \
-/sw/include/tiffio.h \
-/usr/sfw/include/tiffio.h )))
-
-ifeq ($(TIFF), 0)
-DIRS += tiff
-else
-ifeq ($(TIFFINC), 0)
-DIRS += tiff
-endif
-endif
+)))
 
 DIRS += SDDSaps SDDSaps/sddsplots
 ifdef BUILD_WINMOTIFDRIVER

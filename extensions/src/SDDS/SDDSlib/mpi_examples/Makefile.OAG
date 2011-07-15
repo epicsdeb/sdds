@@ -80,7 +80,7 @@ USR_CFLAGS_DEFAULT = 	-DUNIX
 
 ifdef WIN32
 USR_LIBS = oagphy mdbcommon matlib fftpack SDDSmpi rpnlib mdbmth namelist mdblib z fftpack
-z_DIR = $(EPICS_EXTENSIONS_LIB)
+z_DIR = /usr/lib
 else
 USR_LIBS = oagphy mdbcommon matlib fftpack SDDSmpi rpnlib mdbmth namelist mdblib
 SYS_PROD_LIBS_DEFAULT += z
