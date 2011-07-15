@@ -40,7 +40,7 @@ Description: The Self Describing Data Sets
  .
  Development headers
 
-Package: libsdds2.7
+Package: libsdds2.9
 Section: contrib/devel
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
