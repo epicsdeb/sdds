@@ -1,3 +1,9 @@
+sdds (2.9-2) unstable; urgency=low
+
+  * Fix library package name libsdds2.9
+
+ -- Michael Davidsaver <mdavidsaver@bnl.gov>  Fri, 15 Jul 2011 12:25:00 -0400
+
 sdds (2.9-1) unstable; urgency=low
 
   * new upstream version
