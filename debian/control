@@ -17,7 +17,7 @@ Homepage: http://www.aps.anl.gov/Accelerator_Systems_Division/Operations_Analysi
 Package: sdds-util
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
-         libsdds2.9 (= ${binary:Version}),
+         libsdds2.11 (= ${binary:Version}),
 Description: The Self Describing Data Sets
  The Self Describing Data Sets (SDDS) is for an accelerator 
  simulation, beam commissioning, physics study, and operation. 
@@ -31,7 +31,7 @@ Section: contrib/devel
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
          sdds-util (= ${binary:Version}),
-         libsdds2.9 (= ${binary:Version}),
+         libsdds2.11 (= ${binary:Version}),
          libgsl0-dev,
          libpng-dev, zlib1g, zlib1g-dev, libmotif-dev,
          libxaw7-dev, libx11-dev, libxp-dev,  libxt-dev,
@@ -48,7 +48,7 @@ Description: The Self Describing Data Sets
  .
  Development headers
 
-Package: libsdds2.9
+Package: libsdds2.11
 Section: contrib/devel
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},

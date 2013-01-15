@@ -1,3 +1,9 @@
+sdds (2.11-1) UNRELEASED; urgency=low
+
+  * import 2.11 upstream
+
+ -- Guobao Shen <shengb@bnl.gov>  Tue, 15 Jan 2013 13:51:20 -0500
+
 sdds (2.9-3) unstable; urgency=low
 
   * Missing runtime deps for sdds-dev

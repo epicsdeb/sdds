@@ -1,0 +1,2 @@
+libsdds2.11: package-name-doesnt-match-sonames
+# One packge for many libraries
