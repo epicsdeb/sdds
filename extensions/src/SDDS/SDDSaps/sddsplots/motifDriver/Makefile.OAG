@@ -113,6 +113,10 @@ GD = $(words $(notdir $(wildcard \
 /usr/lib/libgd.so \
 /usr/lib64/libgd.a \
 /usr/lib64/libgd.so \
+/usr/lib/i386-linux-gnu/libgd.a \
+/usr/lib/i386-linux-gnu/libgd.so \
+/usr/lib/x86_64-linux-gnu/libgd.a \
+/usr/lib/x86_64-linux-gnu/libgd.so \
 /lib/libgd.a \
 /lib/libgd.so \
 /lib64/libgd.a \
@@ -181,7 +185,8 @@ STATIC_LDFLAGS_YES += -L$(X11_LIB)
 OP_SYS_LDLIBS = -Wl,-Bdynamic -lXm -lXt -lXmu -lX11 -lXpm -Wl,-Bstatic
 #OP_SYS_LDLIBS = -lXm -ljpeg -lXp -lXext -lXft -lfontconfig -lfreetype -lexpat -lXrender -lXt -lSM -lICE -lXmu -lX11 -lXdmcp -lXau -ldl -lXpm -lpthread
 else
-PROD_LIBS_Linux += Xm Xt Xmu X11 Xpm
+PROD_SYS_LIBS = Xm Xt Xmu X11 Xpm
+#PROD_LIBS_Linux += Xm Xt Xmu X11 Xpm
 endif
 endif
 

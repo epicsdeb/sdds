@@ -192,10 +192,10 @@ endif
 #This is often available as a system package for linux.
 #The source code can be found at ftp://ftp.gnu.org/gnu/gsl/
 #It is required for Pelegant
-GSL = $(words $(wildcard gsl))
-ifeq ($(GSL), 1)
-DIRS += gsl
-endif
+#GSL = $(words $(wildcard gsl))
+#ifeq ($(GSL), 1)
+#DIRS += gsl
+#endif
 
 DIRS += mdblib mdbmth rpns/code namelist \
 	SDDSlib fftpack matlib mdbcommon utils 2d_interpolate

@@ -167,6 +167,10 @@ GD = $(words $(notdir $(wildcard \
 /usr/lib/libgd.so \
 /usr/lib64/libgd.a \
 /usr/lib64/libgd.so \
+/usr/lib/i386-linux-gnu/libgd.a \
+/usr/lib/i386-linux-gnu/libgd.so \
+/usr/lib/x86_64-linux-gnu/libgd.a \
+/usr/lib/x86_64-linux-gnu/libgd.so \
 /lib/libgd.a \
 /lib/libgd.so \
 /lib64/libgd.a \

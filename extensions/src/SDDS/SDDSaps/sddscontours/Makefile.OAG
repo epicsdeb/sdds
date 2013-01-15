@@ -101,6 +101,10 @@ GD = $(words $(notdir $(wildcard \
 /usr/lib/libgd.so \
 /usr/lib64/libgd.a \
 /usr/lib64/libgd.so \
+/usr/lib/i386-linux-gnu/libgd.a \
+/usr/lib/i386-linux-gnu/libgd.so \
+/usr/lib/x86_64-linux-gnu/libgd.a \
+/usr/lib/x86_64-linux-gnu/libgd.so \
 /lib/libgd.a \
 /lib/libgd.so \
 /lib64/libgd.a \
@@ -180,7 +184,8 @@ ifeq ($(OS_CLASS),Linux)
 ifeq ($(STATIC_BUILD),YES)
 #OP_SYS_LDLIBS += -Wl,-Bdynamic -lX11 -lXpm -Wl,-Bstatic
 else
-PROD_LIBS_Linux += X11 Xpm
+PROD_SYS_LIBS += X11 Xpm
+#PROD_LIBS_Linux += X11 Xpm
 endif
 ifndef BGL
 ifneq ($(words $(notdir $(wildcard /usr/include/fontconfig/fontconfig.h))), 0)

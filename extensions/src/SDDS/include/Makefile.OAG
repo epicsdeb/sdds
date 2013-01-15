@@ -46,7 +46,7 @@
 INC = SDDS.h mdb.h scan.h match_string.h SDDStypes.h \
       constants.h mdbsunos4.h contour.h fftpackC.h \
       matlib.h namelist.h rpn.h table.h non_dominated_sort.h \
-      oagphy.h pgapack.h gsl_vector.h gsl_matrix.h gsl_poly.h \
+      oagphy.h pgapack.h \
       mdbsun.h sort.h f2c.h
 
 

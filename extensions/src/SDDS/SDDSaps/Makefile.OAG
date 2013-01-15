@@ -212,7 +212,7 @@ SDDSPROD =  citi2sdds csv2sdds elegant2genesis \
         sddssort sddssortcolumn sddssplit sddsspotanalysis \
         sddstimeconvert sddstranspose sddsvslopes \
         sddsxref sddszerofind tek2sdds \
-        TFS2sdds sddsdiff wfm2sdds sddssyncflux \
+        TFS2sdds sddsdiff wfm2sdds \
         sdds2dinterpolate sddscombinelogfiles sddsduplicate
         
 
@@ -263,6 +263,10 @@ sddsprocess_LIBS = mdbcommon matlib fftpack rpnlib gsl gslcblas SDDS1c mdbmth md
 sddsgenericfit_LIBS = mdbcommon matlib fftpack rpnlib gsl gslcblas SDDS1c mdbmth mdblib
 sddsmatrixop_LIBS = rpnlib gsl gslcblas
 sddssyncflux_LIBS = rpnlib gsl gslcblas
+#Look for private version of XLSLIB used here at APS
+#xlslib can be found at http://sourceforge.net/projects/xlslib/files/
+XLS = $(words $(wildcard ../../xlslib))
+ifeq ($(XLS), 1)
 sdds2spreadsheet_CFLAGS = -I../../xlslib -DUSE_XLS
 sdds2spreadsheet_LIBS = mdbcommon matlib fftpack rpnlib SDDS1 mdbmth mdblib xls
 ifeq ($(OS_CLASS),Darwin)
@@ -361,6 +365,10 @@ sddstranspose_SRCS = SDDSutils.c sddstranspose.c
 ifndef BGL
 TIFFLOCATION = $(wildcard /usr/lib/libtiff.a \
                           /usr/lib/libtiff.so \
+                          /usr/lib/i386-linux-gnu/libtiff.a \
+                          /usr/lib/i386-linux-gnu/libtiff.so \
+                          /usr/lib/x86_64-linux-gnu/libtiff.a \
+                          /usr/lib/x86_64-linux-gnu/libtiff.so \
                           /usr/lib64/libtiff.a \
                           /usr/lib64/libtiff.so \
                           /lib/libtiff.a \
