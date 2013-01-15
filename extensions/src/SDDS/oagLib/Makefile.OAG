@@ -1,8 +1,5 @@
 # makefile for oagLib
-# $Log: Makefile.OAG,v $
-# Revision 1.3  2010/06/09 19:44:37  soliday
-# Added the gsl library.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.2  2005/02/04 20:29:36  soliday
 # Added the creation of oagLib4. oagLib3 was skipped to avoid confusion with
 # SDDSepics3

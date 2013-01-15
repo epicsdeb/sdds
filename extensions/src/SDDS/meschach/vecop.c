@@ -29,7 +29,7 @@
 #include	<stdio.h>
 #include	"matrix.h"
 
-static	char	rcsid[] = "$Id: vecop.c,v 1.3 1999/10/27 21:50:41 borland Exp $";
+static	char	rcsid[] = "$Id: vecop.c,v 1.3 1999-10-27 21:50:41 borland Exp $";
 
 /* _in_prod -- inner product of two vectors from i0 downwards */
 double	_in_prod(a,b,i0)

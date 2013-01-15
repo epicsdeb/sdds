@@ -11,10 +11,7 @@
  * purpose: compute and evaluate correlations among columns of data
  *
  * Michael Borland, 1994, 1995
- $Log: sddscorrelate.c,v $
- Revision 1.13  2005/11/04 22:46:12  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.12  2004/10/13 15:25:11  borland
  Use a more reliable algorithm for computing the standard deviation in doing
  outlier elimination.

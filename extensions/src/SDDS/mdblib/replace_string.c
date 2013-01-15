@@ -11,10 +11,7 @@
  * purpose: replace all occurances of one string with another string
  * return value: the number of replacements.
  * Michael Borland, 1991
- $Log: replace_string.c,v $
- Revision 1.7  2002/08/14 16:06:12  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2001/07/10 19:44:35  borland
  Removed debugging statement.
 

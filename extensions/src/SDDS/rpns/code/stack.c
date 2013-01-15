@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: stack.c,v $
- Revision 1.5  2005/01/13 16:44:16  shang
- rpn_clear() now clears string stack too.
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2002/08/14 16:29:00  soliday
  Added Open License
 

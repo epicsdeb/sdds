@@ -11,12 +11,7 @@
  * purpose: plots multiple data sets on the same graph
  *      
  * Michael Borland, 1991-994.
- $Log: plot_data_sets.c,v $
- Revision 1.11  2011/01/11 22:51:03  soliday
- Changed all the strcpy commands to strcpy_ss because of problems with
- RedHat Enterprise 6. If a strcpy copies the result to the same memory
- space you will get unexpected results.
-
+ $Log: not supported by cvs2svn $
  Revision 1.10  2009/09/23 21:45:40  borland
  Use mtimes() instead of mtime() for date/time stamp (includes seconds).
 

@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # makefile for Java SDDS command line applications
-# $Log: Makefile,v $
-# Revision 1.10  2002/12/02 22:07:41  soliday
-# Added a new javadoc option
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.9  2002/08/14 19:32:52  soliday
 # Added Open License
 #

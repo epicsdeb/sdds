@@ -11,10 +11,7 @@
  * purpose: split a SDDS file up into many files, one page per file
  *
  * Michael Borland, 1994, 1995
- $Log: sddssplit.c,v $
- Revision 1.9  2009/03/26 16:09:35  borland
- Added -offset argument.
-
+ $Log: not supported by cvs2svn $
  Revision 1.8  2006/12/14 22:22:00  soliday
  Updated a bunch of programs because SDDS_SaveLayout is now called by
  SDDS_WriteLayout and it is no longer required to be called directly.

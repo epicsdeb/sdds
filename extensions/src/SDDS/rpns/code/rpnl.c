@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: rpnl.c,v $
- Revision 1.7  2003/09/02 17:59:33  soliday
- Cleaned up code for Linux.
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2003/08/28 20:49:12  soliday
  Cleaned up the code.
 

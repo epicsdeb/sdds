@@ -28,7 +28,7 @@
 	library, parts 1 and 2
 */
 
-static char rcsid[] = "$Id: torture.c,v 1.6 2003/09/02 17:52:25 soliday Exp $";
+static char rcsid[] = "$Id: torture.c,v 1.6 2003-09-02 17:52:25 soliday Exp $";
 
 #include	<stdio.h>
 #include	<math.h>

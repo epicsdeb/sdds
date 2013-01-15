@@ -1,8 +1,5 @@
 #
-# $Log: Makefile,v $
-# Revision 1.3  2000/12/07 22:00:06  jba
-# Changes for building with base R3.14.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.2  2000/04/17 19:20:05  soliday
 # Only Microsoft Visual C can make this library.
 #

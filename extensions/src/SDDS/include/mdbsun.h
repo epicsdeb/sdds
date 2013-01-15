@@ -12,10 +12,7 @@
  *          These definitions are specific to the SUNOS4.
  *
  * Michael Borland, 1988
- $Log: mdbsun.h,v $
- Revision 1.4  2002/08/14 15:40:16  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1999/09/14 18:06:00  soliday
  Added export commands for WIN32 dll files.
 

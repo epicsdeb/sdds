@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /* 
- $Log: elegant2genesis.c,v $
- Revision 1.22  2008/08/13 15:53:33  borland
- Added -localFit option to remove local chirp.
-
+ $Log: not supported by cvs2svn $
  Revision 1.21  2006/10/19 17:55:39  soliday
  Updated to work with linux-x86_64.
 

@@ -11,11 +11,7 @@
  * contents: unweightedLinearFit()
  * purpose: simple linear fit
  * M. Borland 1995.
- $Log: linfit.c,v $
- Revision 1.5  2008/08/13 15:52:49  borland
- Added unweightedLinearFitSelect(), which has a selection array option.
- unweightedLinearFit() now simply calls unweightedLinearFitSelect().
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2002/08/14 16:18:57  soliday
  Added Open License
 

@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- * $Log: if2pf.c,v $
- * Revision 1.4  2003/10/21 19:50:12  soliday
- * Updated so that it does not abort an on error and returns the error code.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.3  2003/09/02 17:59:33  soliday
  * Cleaned up code for Linux.
  *

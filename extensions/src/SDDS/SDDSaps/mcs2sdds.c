@@ -12,10 +12,7 @@
  *
  * M. Borland, 1994
  * Based partly on readmcs.c, a sample program provided by EG&G.
- $Log: mcs2sdds.c,v $
- Revision 1.6  2002/08/14 17:12:37  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2001/01/23 19:47:26  soliday
  Fixed Solaris compiler warnings.
 

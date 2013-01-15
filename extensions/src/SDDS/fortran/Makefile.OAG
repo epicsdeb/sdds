@@ -1,5 +1,5 @@
 #
-# $Log: Makefile.OAG,v $
+# $Log: not supported by cvs2svn $
 # Revision 1.3  2009/09/01 20:39:40  soliday
 # Fixed support for Windows using Intel Visual Fortran and added support
 # for cygwin-x86.
@@ -45,6 +45,9 @@ ifeq ($(OS_CLASS),cygwin32)
 f77_OPTIONS = -O -Wall -Wno-unused
 endif
 #f77_OPTIONS = -O
+endif
+ifeq ($(EPICS_HOST_ARCH),linux-x86)
+f77_OPTIONS += -m32
 endif
 
 ifeq ($(OS_CLASS),solaris)

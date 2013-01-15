@@ -11,10 +11,7 @@
  * contents: mtime(), convert_date_time()
  * 
  * Michael Borland, 1987
- $Log: time.c,v $
- Revision 1.6  2009/09/23 21:45:56  borland
- Added mtimes() (like mtime(), but with seconds).
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2002/08/14 16:06:16  soliday
  Added Open License
 

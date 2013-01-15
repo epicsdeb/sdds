@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: aptest.c,v $
- Revision 1.6  2002/08/14 16:34:51  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  1995/12/12 21:05:18  borland
  Removed call to SDDS_SetNoRowCounts().
 

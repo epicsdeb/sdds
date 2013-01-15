@@ -14,10 +14,7 @@
  * version 2.0 June 1995 reads multiple table from the data file,
  *     uses option syntax that resembles that of sddsinterp,
  *     uses pipes.
- $Log: sddsminterp.c,v $
- Revision 1.10  2006/10/19 17:55:39  soliday
- Updated to work with linux-x86_64.
-
+ $Log: not supported by cvs2svn $
  Revision 1.9  2005/11/04 22:46:15  soliday
  Updated code to be compiled by a 64 bit processor.
 

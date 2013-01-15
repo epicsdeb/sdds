@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- * $Log: sddsshiftcor.c,v $
- * Revision 1.7  2005/11/04 22:46:18  soliday
- * Updated code to be compiled by a 64 bit processor.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.6  2003/09/02 19:16:07  soliday
  * Cleaned up code for Linux.
  *

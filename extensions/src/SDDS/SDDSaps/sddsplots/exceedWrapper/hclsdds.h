@@ -1,9 +1,6 @@
 /*
  *
- $Log: hclsdds.h,v $
- Revision 1.1  2000/04/17 18:32:07  soliday
- First version of hclsdds.h.
-
+ $Log: not supported by cvs2svn $
  *
  */
 #define HCLXmInit HCLXmInit_BC

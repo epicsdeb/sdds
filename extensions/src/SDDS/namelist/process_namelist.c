@@ -8,7 +8,10 @@
 \*************************************************************************/
 
 /*
-  $Log: process_namelist.c,v $
+  $Log: not supported by cvs2svn $
+  Revision 1.13  2011/04/20 21:22:53  borland
+  Replaced strcpy() by strcpy_ss() to fix bug on RHEL6.
+
   Revision 1.12  2010/02/04 14:39:22  borland
   Added processNamelist(), which is a new interface to the namelist processor
   that returns NAMELIST_ERROR when their is an error, instead of exiting.
@@ -176,7 +179,7 @@ long process_entity(
         if ((len > 2) && 
             (namelist_str[0] == '(') && 
             (namelist_str[len - 1] == ')')) {
-          strcpy(namelist_str, namelist_str+1);
+          strcpy_ss(namelist_str, namelist_str+1);
           namelist_str[len - 2] = 0;
           *ptr_short = (short)rpn(namelist_str);
           if (rpn_check_error()) {
@@ -209,7 +212,7 @@ long process_entity(
         if ((len > 2) && 
             (namelist_str[0] == '(') && 
             (namelist_str[len - 1] == ')')) {
-          strcpy(namelist_str, namelist_str+1);
+          strcpy_ss(namelist_str, namelist_str+1);
           namelist_str[len - 2] = 0;
           *ptr_int = (int)rpn(namelist_str);
           if (rpn_check_error()) {
@@ -242,7 +245,7 @@ long process_entity(
         if ((len > 2) && 
             (namelist_str[0] == '(') && 
             (namelist_str[len - 1] == ')')) {
-          strcpy(namelist_str, namelist_str+1);
+          strcpy_ss(namelist_str, namelist_str+1);
           namelist_str[len - 2] = 0;
           *ptr_int32 = (int32_t)rpn(namelist_str);
           if (rpn_check_error()) {
@@ -275,7 +278,7 @@ long process_entity(
         if ((len > 2) && 
             (namelist_str[0] == '(') && 
             (namelist_str[len - 1] == ')')) {
-          strcpy(namelist_str, namelist_str+1);
+          strcpy_ss(namelist_str, namelist_str+1);
           namelist_str[len - 2] = 0;
           *ptr_long = (long)rpn(namelist_str);
           if (rpn_check_error()) {
@@ -308,7 +311,7 @@ long process_entity(
         if ((len > 2) && 
             (namelist_str[0] == '(') && 
             (namelist_str[len - 1] == ')')) {
-          strcpy(namelist_str, namelist_str+1);
+          strcpy_ss(namelist_str, namelist_str+1);
           namelist_str[len - 2] = 0;
           *ptr_float = (float)rpn(namelist_str);
           if (rpn_check_error()) {
@@ -342,7 +345,7 @@ long process_entity(
             (namelist_str[0] == '(') && 
             (namelist_str[len - 1] == ')')) {
           fflush(stdout);
-          strcpy(namelist_str, namelist_str+1);
+          strcpy_ss(namelist_str, namelist_str+1);
           namelist_str[len - 2] = 0;
           *ptr_double = rpn(namelist_str);
           if (rpn_check_error()) {

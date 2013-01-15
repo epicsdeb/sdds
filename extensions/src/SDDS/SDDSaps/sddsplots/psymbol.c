@@ -47,11 +47,7 @@ LICENSING INQUIRIES MAY BE DIRECTED TO THE INDUSTRIAL TECHNOLOGY
 DEVELOPMENT CENTER AT ARGONNE NATIONAL LABORATORY.
 
 CopyrightNotice001
- $Log: psymbol.c,v $
- Revision 1.7  2001/03/12 21:41:15  soliday
- Fixed a problem when "I" is the only character. Redrew it so that it has a
- width.
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  1999/06/03 16:08:16  soliday
  Removed compiler warnings under linux.
 

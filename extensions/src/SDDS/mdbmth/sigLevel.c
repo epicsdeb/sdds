@@ -13,10 +13,7 @@
  *
  * M. Borland, 1995.
  * Based on Abramowitz and Stegun, 26.5.8, 26.6 
- $Log: sigLevel.c,v $
- Revision 1.14  2003/08/28 19:56:29  soliday
- Cleaned up some of the code.
-
+ $Log: not supported by cvs2svn $
  Revision 1.13  2002/08/14 16:19:00  soliday
  Added Open License
 

@@ -11,10 +11,7 @@
  * purpose: add mpl data sets to a SDDS data set
  *
  * Michael Borland, 1993
- $Log: mpl2sdds.c,v $
- Revision 1.7  2009/06/01 15:37:51  soliday
- Moved the WriteLayout before the StartPage.
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2002/08/14 17:12:38  soliday
  Added Open License
 

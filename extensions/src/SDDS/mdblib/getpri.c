@@ -11,10 +11,7 @@
  * purpose: get process priority
  *
  * Michael Borland,1989
- $Log: getpri.c,v $
- Revision 1.3  2002/08/14 16:06:09  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  1995/09/05 21:17:35  saunders
  First test release of the SDDS1.5 package.
 

@@ -36,7 +36,7 @@
 #include        "matrix2.h"
 
 
-static char rcsid[] = "$Id: schur.c,v 1.4 1999/12/15 16:01:27 soliday Exp $";
+static char rcsid[] = "$Id: schur.c,v 1.4 1999-12-15 16:01:27 soliday Exp $";
 
 
 

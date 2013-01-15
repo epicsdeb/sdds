@@ -39,7 +39,7 @@
 #include	"sparse.h"
 #include        "iter.h"
 
-static char rcsid[] = "$Id: itersym.c,v 1.3 2000/04/05 20:55:50 soliday Exp $";
+static char rcsid[] = "$Id: itersym.c,v 1.3 2000-04-05 20:55:50 soliday Exp $";
 
 
 #ifdef ANSI_C

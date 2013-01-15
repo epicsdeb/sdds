@@ -9,10 +9,7 @@
 
 /* program: sddsrunstats
  * 
- $Log: sddsrunstats.c,v $
- Revision 1.18  2008/01/24 19:12:33  shang
- added -median option
-
+ $Log: not supported by cvs2svn $
  Revision 1.17  2006/12/14 22:22:00  soliday
  Updated a bunch of programs because SDDS_SaveLayout is now called by
  SDDS_WriteLayout and it is no longer required to be called directly.

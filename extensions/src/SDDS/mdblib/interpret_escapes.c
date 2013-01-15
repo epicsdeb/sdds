@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: interpret_escapes.c,v $
- Revision 1.4  2002/08/14 16:06:10  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1998/07/16 16:02:07  borland
  Fixed bug that occured when a string ended in a double-quote.
 

@@ -11,10 +11,7 @@
  * purpose: definitions for use with linked-list subroutines.
  * 
  * Michael Borland, 1988
- $Log: linked_list.h,v $
- Revision 1.4  2002/08/14 15:40:15  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1999/05/25 18:53:19  soliday
  Modified qsort_list parameters
 

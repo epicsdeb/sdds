@@ -9,10 +9,7 @@
 
 /*
  *
- $Log: agilentwaveform2sdds.cpp,v $
- Revision 1.4  2011/01/31 03:07:42  soliday
- Fixed a minor problem with an error message.
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2009/12/10 17:31:46  soliday
  Changed so that it builds on 64bit solaris.
 

@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: pop_push.c,v $
- Revision 1.6  2005/11/04 22:47:19  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2003/06/19 18:20:08  shang
  added push_long and pop_long function
 

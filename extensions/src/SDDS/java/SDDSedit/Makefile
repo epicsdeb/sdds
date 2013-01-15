@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # makefile for Java SDDS Editor
-# $Log: Makefile,v $
-# Revision 1.6  2008/06/10 15:31:56  soliday
-# Updated to work with new build rules.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.5  2002/08/14 19:32:57  soliday
 # Added Open License
 #

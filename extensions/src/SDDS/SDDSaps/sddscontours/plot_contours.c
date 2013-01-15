@@ -12,10 +12,7 @@
  * contents: go_plot_contours(), label_contours(), label_contour()
  *
  * Michael Borland, 1989, 1991
- $Log: plot_contours.c,v $
- Revision 1.16  2006/10/19 21:48:47  soliday
- Fixed issue with tsetFlags
-
+ $Log: not supported by cvs2svn $
  Revision 1.15  2005/08/30 21:32:05  soliday
  Updated to compile with recent changes to sddsplot functions.
 

@@ -17,10 +17,7 @@
  * converted to a parameter string. 
  * L. Emery with some code from M. Borland, ANL (1995)
  * added sigma for slopes and intercept 5/18/95
- $Log: sddsslopes.c,v $
- Revision 1.17  2005/11/04 22:46:18  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.16  2002/08/14 17:12:55  soliday
  Added Open License
 

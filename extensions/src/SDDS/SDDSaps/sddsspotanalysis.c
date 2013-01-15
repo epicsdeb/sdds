@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: sddsspotanalysis.c,v $
- Revision 1.22  2007/01/23 16:32:17  emery
- Adjusted calculation of ROI by 1 pixel.
-
+ $Log: not supported by cvs2svn $
  Revision 1.21  2006/10/19 17:55:40  soliday
  Updated to work with linux-x86_64.
 

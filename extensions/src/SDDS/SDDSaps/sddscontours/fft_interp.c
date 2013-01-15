@@ -12,10 +12,7 @@
  * purpose: interpolation, low-pass filtering, and other operations on
  *          each dimension of a 2D array.
  * Michael Borland, 1993.
- $Log: fft_interp.c,v $
- Revision 1.4  2002/08/14 17:35:27  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1999/06/03 20:42:29  soliday
  Removed compiler warnings under Linux.
 

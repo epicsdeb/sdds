@@ -11,10 +11,7 @@
  *       proto-types for string-buffering routines
  *
  * Michael Borland, 1990
- $Log: buffer.h,v $
- Revision 1.6  2003/07/22 20:01:17  soliday
- Added support for Kylix.
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2002/08/14 15:40:13  soliday
  Added Open License
 

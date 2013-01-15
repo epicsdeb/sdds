@@ -11,7 +11,7 @@
  * purpose: SDDS-format multi-column histogramming program
  *
  * Michael Borland, 1996
- $Log: sddsmultihist.c,v $
+ $Log: not supported by cvs2svn $
  Revision 1.26  2009/03/03 19:18:56  borland
  Fixed problem with -autobins argument parsing.
 
@@ -532,8 +532,12 @@ int main(int argc, char **argv)
         if (bins<1 && !doSides)
           bins = 2;
         if (doSeparate)
-          for (column=0; column<columnNames; column++) 
-            dx[column] = (upperLimit[column]-lowerLimit[column])/bins;
+          for (column=0; column<columnNames; column++) {
+            range = upperLimit[column]-lowerLimit[column];
+            upperLimit[column] += (maxRange-range)/2;
+            lowerLimit[column] -= (maxRange-range)/2;
+            dx[column] = binSize;
+          }
       } else {
         if (doSeparate) {
           for (column=0; column<columnNames; column++)

@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: testout1.c,v $
- Revision 1.4  2002/08/14 16:34:51  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1995/12/12 04:26:46  borland
  Added SDDS_SetNoRowCounts() routine, plus support for writing and appending
  to files with no_row_counts=1.

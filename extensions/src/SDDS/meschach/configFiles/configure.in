@@ -1,6 +1,6 @@
 dnl Meschach autoconf script
 dnl Copyright (C) Brook Milligan and David Stewart, 1993
-dnl $Id: configure.in,v 1.1.1.1 1999/04/14 14:16:20 borland Exp $
+dnl $Id: configure.in,v 1.1.1.1 1999-04-14 14:16:20 borland Exp $
 dnl
 dnl Brook Milligan's prototype check
 dnl Check if $(CC) supports prototypes

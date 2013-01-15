@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
-# Revision 1.4  2008/08/11 18:15:20  shang
-# fixed a typo
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.3  2008/08/11 15:31:40  shang
 # only compiles read, write, copy, convert2row, row2column
 #

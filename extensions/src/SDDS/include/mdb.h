@@ -11,7 +11,10 @@
  * purpose: definitions for general use, for mdblib, and for mdbmth.
  *
  * Michael Borland, 1988
- $Log: mdb.h,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.131  2011/02/21 16:05:56  shang
+ made the returnCode type of interp_short consistent with interp().
+
  Revision 1.130  2011/01/11 16:47:17  soliday
  The double_cmpdes function is now exported corretly with DLLs.
 
@@ -879,6 +882,7 @@ epicsShareFuncMDBMTH extern double simpson(double (*function)(), double lower_li
                     double upper_limit, long n_panels);
 epicsShareFuncMDBMTH long trapazoidIntegration(double *x, double *y, long n, double *integral);
 epicsShareFuncMDBMTH long trapazoidIntegration1(double *x, double *y, long n, double *integral);
+epicsShareFuncMDBMTH int GillMillerIntegration(double *integral, double *error, double *f, double *x, long n);
 epicsShareFuncMDBMTH extern double ipow(double base, long power);
 epicsShareFuncMDBMTH extern double amod(double x, double m);
 epicsShareFuncMDBMTH extern double zeroInterp(double (*function)(), double value,
@@ -1315,7 +1319,7 @@ epicsShareFuncMDBLIB extern void substituteTagValue(char *input, long buflen,
                         char **macroTag, char **macroValue, long macros); 
 
 epicsShareFuncMDBMTH short interp_short(short *f, double *x, long n, double xo, long warnings,
-                                        short order, long *returnCode, long *next_start_pos);
+                                        short order, unsigned long *returnCode, long *next_start_pos);
 #define iceil(x) ((int)ceil(x))
 #define round(x) ( x < 0.0 ? ((int)((x)-.5)) : ((int)((x)+.5)) )
 

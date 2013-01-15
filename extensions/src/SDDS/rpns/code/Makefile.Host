@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # makefile for rpns/code
-# $Log: Makefile.Host,v $
-# Revision 1.18  2003/07/22 23:29:46  soliday
-# Modified makefiles to work with base versions 3.13 and 3.14
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.17  2003/07/18 21:41:14  soliday
 # Added Kylix support.
 #

@@ -10,10 +10,7 @@
 /* routine: tmpname()
  * purpose: to supply a UNIQUE temporary filename
  * Michael Borland, 1986.
- $Log: tmpname.c,v $
- Revision 1.8  2002/08/14 16:06:17  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.7  1999/12/21 17:54:41  soliday
  vxWorks does not support getpid
 

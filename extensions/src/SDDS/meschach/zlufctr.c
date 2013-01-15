@@ -28,7 +28,7 @@
 	Complex version
 */
 
-static	char	rcsid[] = "$Id: zlufctr.c,v 1.3 1999/10/27 21:50:41 borland Exp $";
+static	char	rcsid[] = "$Id: zlufctr.c,v 1.3 1999-10-27 21:50:41 borland Exp $";
 
 #include	<stdio.h>
 #include	<math.h>

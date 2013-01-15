@@ -15,10 +15,7 @@
  *  m_identity(A);
  *
  * Michael Borland, 1989.
- $Log: m_identity.c,v $
- Revision 1.4  2002/08/14 16:45:22  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1998/04/21 21:26:40  borland
  New names to allow concurrent use with the Meschach library.
 

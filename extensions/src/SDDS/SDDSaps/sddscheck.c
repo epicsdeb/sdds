@@ -11,10 +11,7 @@
  * purpose: checks an SDDS file to make sure there are no problems
  *
  * Michael Borland, 1995
- $Log: sddscheck.c,v $
- Revision 1.11  2007/06/14 21:51:07  soliday
- updated with indent -nut -npcs -npsl -br
-
+ $Log: not supported by cvs2svn $
  Revision 1.10  2007/06/14 20:53:57  soliday
  Reindented code.
 

@@ -1287,8 +1287,10 @@ int allocspectrum(void)
 	for (n=0; n < nspect; n++) {
 	    spectrumalloc[n]=0;
 	    xcol.flags=0xff;
-            if (spectral) {
+            if (spectral == 1) {
               Spectral_RGB_short_values(&xcol.red,&xcol.green,&xcol.blue,n/(nspect-1.0));
+            } else if (spectral == 2) {
+              Spectral_BGR_short_values(&xcol.red,&xcol.green,&xcol.blue,n/(nspect-1.0));
             } else if (customspectral) {
               Custom_RGB_short_values(&xcol.red,&xcol.green,&xcol.blue, red0, green0, blue0, red1, green1, blue1, n/(nspect-1.0));
             } else {
@@ -1938,6 +1940,9 @@ void displayplot(Widget w, caddr_t clientdata, caddr_t calldata)
             } else if (spec == 1) {
               customspectral = 0;
               spectral = 1;
+            } else if (spec == 2) {
+              customspectral = 0;
+              spectral = 2;
             } else {
               customspectral = 0;
               spectral = 0;
@@ -3216,6 +3221,9 @@ void mifprint(int save)
               } else if (spec == 1) {
                 customspectral = 0;
                 spectral = 1;
+              } else if (spec == 2) {
+                customspectral = 0;
+                spectral = 2;
               } else {
                 customspectral = 0;
                 spectral = 0;
@@ -3484,6 +3492,9 @@ void pngprint(int save)
               } else if (spec == 1) {
                 customspectral = 0;
                 spectral = 1;
+              } else if (spec == 2) {
+                customspectral = 0;
+                spectral = 2;
               } else {
                 customspectral = 0;
                 spectral = 0;
@@ -4456,6 +4467,9 @@ void psprint(int save)
               } else if (spec == 1) {
                 customspectral = 0;
                 spectral = 1;
+              } else if (spec == 2) {
+                customspectral = 0;
+                spectral = 2;
               } else {
                 customspectral = 0;
                 spectral = 0;
@@ -5670,13 +5684,15 @@ void newzoom (double x0, double y0, double x1, double y1)
          continue;
        }
        op = trim_spaces(op);	  
-       if( strstr(tmp, "-lim") || strstr(tmp, "-sc") || strstr(tmp,"-zo") ) {
+       if( (strncmp(tmp, "-lim", 4) ==0) || 
+           (strncmp(tmp, "-sc", 3)  ==0) || 
+           (strncmp(tmp, "-zo", 3)  ==0)) {
          XFree(tmp);
 	     XFree(op);
          continue;
        }	  
        
-       if (strstr(tmp,"-mo") )  {
+       if (strncmp(tmp,"-mo",3)==0)  {
 	     if( strstr(tmp,"=n") || strstr(tmp,"=o") || strstr(tmp,"=e") || strstr(tmp,"=m") \
             || strstr(tmp,"=co") || strstr(tmp,"=ce") || strstr(tmp,"=f") ) {
            xerrmsg(1,"New Zoom feature can not handle option -mode with normalize, offset, eoffset,center, meanCenter,coffset,coffset, and fractionalDeviation keywords");
@@ -5708,7 +5724,7 @@ void newzoom (double x0, double y0, double x1, double y1)
        }
        
        
-       if( strstr(tmp,"-col") || strstr(tmp,"-par") ) {
+       if( (strncmp(tmp,"-col",4)==0) || (strncmp(tmp,"-par",4)==0) ) {
 	     sprintf(tmp,"-limit=xMin=%.10g,xMax=%.10g,yMin=%.10g,yMax=%.10g,autoscaling ", \
                  xlog?pow(10,xminLimit/xmult-xoff):xminLimit/xmult-xoff,\
                  xlog?pow(10,xmaxLimit/xmult-xoff):xmaxLimit/xmult-xoff,\
@@ -5728,7 +5744,7 @@ void newzoom (double x0, double y0, double x1, double y1)
 	     ylog=ylog_global;
        }
        
-       if (strstr(tmp,"-fa") ) {
+       if (strncmp(tmp,"-fa",3)==0 ) {
 	     if ( (_tmp1=strstr(tmp, "ym") ) ) {
            _tmp2=strstr(_tmp1,"=");
            ymult =  atof(_tmp2+1);
@@ -5751,7 +5767,7 @@ void newzoom (double x0, double y0, double x1, double y1)
 	     strcat(cmd,tmp);
 	     
        }
-       if (strstr(tmp,"-of") ) {
+       if (strncmp(tmp,"-of",3)==0 ) {
 	     if( (_tmp1=strstr(tmp, "yc") ) ) {
            _tmp2=strstr(_tmp1,"=");
            yoff =  atof(_tmp2+1);

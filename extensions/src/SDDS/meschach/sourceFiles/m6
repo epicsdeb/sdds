@@ -197,7 +197,7 @@ sed >matop.c <<'//GO.SYSIN DD matop.c' 's/^-//'
 -#include	<stdio.h>
 -#include	"matrix.h"
 -
--static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -
 -/* m_add -- matrix addition -- may be in-situ */
@@ -695,7 +695,7 @@ sed >pxop.c <<'//GO.SYSIN DD pxop.c' 's/^-//'
 -#include	<stdio.h>
 -#include	"matrix.h"
 -
--static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -/**********************************************************************
 -Note: A permutation is often interpreted as a matrix
@@ -1054,7 +1054,7 @@ sed >submat.c <<'//GO.SYSIN DD submat.c' 's/^-//'
 -#include	<stdio.h>
 -#include	"matrix.h"
 -
--static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -
 -/* get_col -- gets a specified column of a matrix and retruns it as a vector */
@@ -1236,7 +1236,7 @@ sed >init.c <<'//GO.SYSIN DD init.c' 's/^-//'
 -	This is to be included in the matrix.a library
 -*/
 -
--static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include	"matrix.h"
@@ -1535,7 +1535,7 @@ sed >otherio.c <<'//GO.SYSIN DD otherio.c' 's/^-//'
 -	File for doing assorted I/O operations not invlolving
 -	MAT/VEC/PERM objects
 -*/
--static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include	<ctype.h>
@@ -1705,7 +1705,7 @@ sed >machine.c <<'//GO.SYSIN DD machine.c' 's/^-//'
 -  processors etc).
 -  */
 -
--static	char	*rcsid = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	*rcsid = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	"machine.h"
 -
@@ -1859,7 +1859,7 @@ sed >matlab.c <<'//GO.SYSIN DD matlab.c' 's/^-//'
 -#include        "matrix.h"
 -#include	"matlab.h"
 -
--static char rcsid[] = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -/* m_save -- save matrix in ".mat" file for MATLAB
 -	-- returns matrix to be saved */
@@ -2051,7 +2051,7 @@ sed >ivecop.c <<'//GO.SYSIN DD ivecop.c' 's/^-//'
 -#include	<stdio.h>
 -#include 	"matrix.h"
 -
--static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -static char    line[MAXLINE];
 -
@@ -2495,7 +2495,7 @@ sed >version.c <<'//GO.SYSIN DD version.c' 's/^-//'
 -
 -void	m_version()
 -{
--	static char rcsid[] = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-	static char rcsid[] = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -	printf("Meshach matrix library version 1.2b\n");
 -	printf("RCS id: %s\n",rcsid);
@@ -2516,10 +2516,7 @@ sed >version.c <<'//GO.SYSIN DD version.c' 's/^-//'
 -			"To update the version number"); */
 -}
 -
--/* $Log: m6,v $
--/* Revision 1.1.1.1  1999/04/14 14:16:23  borland
--/* Moved from OAG area
--/*
+-/* $Log: not supported by cvs2svn $
 - * Revision 1.9  1994/03/24  00:04:05  des
 - * Added notes on changes to spILUfactor() and px_inv().
 - *
@@ -2578,7 +2575,7 @@ sed >meminfo.c <<'//GO.SYSIN DD meminfo.c' 's/^-//'
 -#include  "iter.h"
 -#endif
 -
--static char rcsid[] = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -/* this array is defined further in this file */
 -extern MEM_CONNECT mem_connect[MEM_CONNECT_MAX_LISTS];
@@ -2970,7 +2967,7 @@ sed >memstat.c <<'//GO.SYSIN DD memstat.c' 's/^-//'
 -#include  "iter.h"
 -#endif
 -
--static char rcsid[] = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -/* global variable */
 -
@@ -3353,7 +3350,7 @@ sed >lufactor.c <<'//GO.SYSIN DD lufactor.c' 's/^-//'
 -*/
 -
 -/* LUfactor.c 1.5 11/25/87 */
--static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include	"matrix.h"
@@ -3635,7 +3632,7 @@ sed >bkpfacto.c <<'//GO.SYSIN DD bkpfacto.c' 's/^-//'
 -	Matrix factorisation routines to work with the other matrix files.
 -*/
 -
--static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include	"matrix.h"
@@ -3950,7 +3947,7 @@ sed >chfactor.c <<'//GO.SYSIN DD chfactor.c' 's/^-//'
 -*/
 -
 -/* CHfactor.c 1.2 11/25/87 */
--static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m6,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include	"matrix.h"

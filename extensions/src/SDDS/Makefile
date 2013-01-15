@@ -9,7 +9,14 @@
 #
 #
 # High-level makefile for building SDDS
-# $Log: Makefile,v $
+# $Log: not supported by cvs2svn $
+# Revision 1.38  2012/03/22 19:33:24  soliday
+# Modified because xlslib and gsl are GPL licenses and cannot be distributed
+# with our software.
+#
+# Revision 1.37  2012/01/30 19:21:49  soliday
+# Added the xlslib directory.
+#
 # Revision 1.36  2009/04/24 18:27:25  soliday
 # Added the gsl subdirectory.
 #
@@ -169,6 +176,27 @@ ifdef BUILD_FDLIBM
 DIRS += fdlibm
 endif
 
+
+#Look for private version of XLSLIB used here at APS
+#xlslib can be found at http://sourceforge.net/projects/xlslib/files/
+#We use it in sdds2spreadsheet for creating Excel files.
+XLS = $(words $(wildcard xlslib))
+ifeq ($(XLS), 1)
+DIRS += xlslib
+endif
+
+#DIRS += zlib 
+
+
+#Look for private version of GSL used here at APS
+#This is often available as a system package for linux.
+#The source code can be found at ftp://ftp.gnu.org/gnu/gsl/
+#It is required for Pelegant
+GSL = $(words $(wildcard gsl))
+ifeq ($(GSL), 1)
+DIRS += gsl
+endif
+
 DIRS += mdblib mdbmth rpns/code namelist \
 	SDDSlib fftpack matlib mdbcommon utils 2d_interpolate
 
@@ -210,7 +238,11 @@ endif
 DIRS += SDDSaps/pseudoInverse \
 	SDDSaps/sddscontours
 
+#Look for private version of LEVMAR used here at APS
+LEVMAR = $(words $(wildcard levmar))
+ifeq ($(LEVMAR), 1)
 DIRS += levmar
+endif
 
 ifeq (0, $(words $(notdir $(wildcard $(TOP)/configure))))
 include $(TOP)/config/RULES_DIRS

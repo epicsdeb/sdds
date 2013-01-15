@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # makefile for SDDS applications
-# $Log: Makefile.Host,v $
-# Revision 1.5  2003/07/23 19:43:57  soliday
-# Modified makefiles to work with base version 3.13 and 3.14
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.4  2003/02/20 16:18:54  soliday
 # Makefiles now work to build static builds on windows.
 #

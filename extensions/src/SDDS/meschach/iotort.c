@@ -27,7 +27,7 @@
 /* test of I/O functions */
 
 
-static char rcsid[] = "$Id: iotort.c,v 1.1.1.1 1999/04/14 14:16:17 borland Exp $";
+static char rcsid[] = "$Id: iotort.c,v 1.1.1.1 1999-04-14 14:16:17 borland Exp $";
 
 #include "sparse.h"
 #include "zmatrix.h"

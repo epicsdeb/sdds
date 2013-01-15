@@ -11,10 +11,7 @@
  * purpose: convert MAD TFS data to SDDS
  *
  * Michael Borland, 1995
- $Log: TFS2sdds.c,v $
- Revision 1.6  2002/08/14 17:12:35  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2001/01/23 19:14:53  soliday
  Standardized usage message.
 

@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
-# Revision 1.18  2009/05/13 19:29:15  soliday
-# Updated to not create the .depends files.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.17  2007/11/28 17:08:07  soliday
 # Updated to fix a problem on OSX
 #

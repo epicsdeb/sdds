@@ -1,4 +1,4 @@
-/* $Header: /net/phoebus/epicsmgr/cvsroot/epics/extensions/src/SDDS/tiff/tif_fax3.c,v 1.1 2002/09/19 16:38:44 soliday Exp $ */
+/* $Header: /net/phoebus/epicsmgr/cvsroot/epics/extensions/src/SDDS/tiff/tif_fax3.c,v 1.1 2002-09-19 16:38:44 soliday Exp $ */
 
 /*
  * Copyright (c) 1990-1997 Sam Leffler

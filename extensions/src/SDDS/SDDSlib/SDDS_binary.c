@@ -11,11 +11,7 @@
  * contents: SDDS binary data input and output routines
  *
  * M. Borland, November 1993
- $Log: SDDS_binary.c,v $
- Revision 1.57  2008/09/03 15:57:24  soliday
- Fixed a bug when reading non-native data files with arrays that have more
- than one dimension.
-
+ $Log: not supported by cvs2svn $
  Revision 1.56  2007/10/15 23:59:27  soliday
  Fixed a problem when combining SDDS files with different numbers of arrays
  and writing it to a non-native binary file.

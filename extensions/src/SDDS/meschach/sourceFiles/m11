@@ -112,7 +112,7 @@ sed >zqrfctr.c <<'//GO.SYSIN DD zqrfctr.c' 's/^-//'
 -  
 -*/
 -
--static	char	rcsid[] = "$Id: m11,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m11,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include	"zmatrix.h"
@@ -816,7 +816,7 @@ sed >zhessen.c <<'//GO.SYSIN DD zhessen.c' 's/^-//'
 -	Complex version
 -*/
 -
--static	char	rcsid[] = "$Id: m11,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m11,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include	"zmatrix.h"

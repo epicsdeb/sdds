@@ -20,10 +20,7 @@
  * If no string columns exists, then names are made from command line options.
  * The names of the columns of the input file are saved as a string column with name specified
  * in the command line or the default "OldColumnName".
- $Log: sddstranspose.c,v $
- Revision 1.21  2008/08/25 19:40:28  shang
- added -matchColumn option to do tranpose only for matching columns, -indexColumn to added "Index" column to the output file, and -noOldColumnNames to not make a new column of the old column names.
-
+ $Log: not supported by cvs2svn $
  Revision 1.20  2006/12/14 22:22:01  soliday
  Updated a bunch of programs because SDDS_SaveLayout is now called by
  SDDS_WriteLayout and it is no longer required to be called directly.

@@ -2,10 +2,7 @@
  * contents: definitions for internal use by SDDS routines
  * 
  * Michael Borland, November 1993.
- $Log: SDDS_internal.h,v $
- Revision 1.1  1997/03/06 19:24:57  saunders
- New files necessary for build.
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  1996/05/02 00:48:27  borland
  Added buffering to binary output.
 

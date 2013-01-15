@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Id: Makefile,v 1.1 2008/04/14 18:35:13 shang Exp $
+# $Id: Makefile,v 1.1 2008-04-14 18:35:13 shang Exp $
 #
 #  Lowest Level Directroy Makefile
 #

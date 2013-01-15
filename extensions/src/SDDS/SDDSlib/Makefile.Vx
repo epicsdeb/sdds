@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # Makefile for SDDS library
-# $Log: Makefile.Vx,v $
-# Revision 1.4  2003/09/17 19:21:20  soliday
-# Added zlib support.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.3  2003/08/28 21:24:57  soliday
 # Cleaned up the code.
 #

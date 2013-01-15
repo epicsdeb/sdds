@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # makefile for mdblib
-# $Log: Makefile.Vx,v $
-# Revision 1.7  2003/09/17 19:17:59  soliday
-# Added zlib support
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.6  2003/08/28 20:13:43  soliday
 # Cleaned up the code.
 #

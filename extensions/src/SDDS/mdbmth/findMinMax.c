@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: findMinMax.c,v $
- Revision 1.7  2010/06/08 14:26:32  borland
- Added index_min_max_long().
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2003/12/03 05:44:19  borland
  find_min_max and index_min_max no longer require both results pointers to be
  non-NULL.

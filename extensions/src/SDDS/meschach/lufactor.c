@@ -29,7 +29,7 @@
 */
 
 /* LUfactor.c 1.5 11/25/87 */
-static	char	rcsid[] = "$Id: lufactor.c,v 1.4 2003/09/02 17:52:24 soliday Exp $";
+static	char	rcsid[] = "$Id: lufactor.c,v 1.4 2003-09-02 17:52:24 soliday Exp $";
 
 #include	<stdio.h>
 #include	<math.h>

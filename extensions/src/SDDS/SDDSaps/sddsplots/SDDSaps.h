@@ -11,10 +11,7 @@
  * contents: header file for routines used by SDDS command-line applications
  * 
  * M. Borland, 1993.
- $Log: SDDSaps.h,v $
- Revision 1.8  2005/11/04 22:46:45  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.7  2003/04/14 14:44:56  shang
  added TIME_FILTER_DEFINITION structure
 

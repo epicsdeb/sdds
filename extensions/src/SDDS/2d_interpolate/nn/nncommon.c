@@ -379,10 +379,11 @@ void points_getrange(int n, point points[], double zoom, double* xmin, double* x
  * @param nout Pointer to number of output points
  * @param pout Pointer to array of output points [*nout]
  */
+/*changed to arrange the output data in x major order, previously it was y */
 void points_generate(double xmin, double xmax, double ymin, double ymax, int nx, int ny, int* nout, point** pout)
 {
     double stepx, stepy;
-    double x0, xx, yy;
+    double x0, xx, yy, y0;
     int i, j, ii;
 
     if (nx < 1 || ny < 1) {
@@ -398,18 +399,20 @@ void points_generate(double xmin, double xmax, double ymin, double ymax, int nx,
     stepy = (ny > 1) ? (ymax - ymin) / (ny - 1) : 0.0;
     x0 = (nx > 1) ? xmin : (xmin + xmax) / 2.0;
     yy = (ny > 1) ? ymin : (ymin + ymax) / 2.0;
+    y0 = (ny > 1) ? ymin : (ymin + ymax) / 2.0;
+    xx = (nx > 1) ? xmin : (xmin + xmax) / 2.0;
     ii = 0;
-    for (j = 0; j < ny; ++j) {
-        xx = x0;
-        for (i = 0; i < nx; ++i) {
+    for (i = 0; i < nx; ++i) {
+        yy = y0;
+        for (j = 0; j < ny; ++j) {
             point* p = &(*pout)[ii];
 
             p->x = xx;
             p->y = yy;
-            xx += stepx;
+            yy += stepy;
             ii++;
         }
-        yy += stepy;
+        xx += stepx;
     }
 }
 

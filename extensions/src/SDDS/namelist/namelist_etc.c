@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: namelist_etc.c,v $
- Revision 1.4  2007/08/07 16:15:29  ywang25
- Replace strcpy with stcpy_ss to avoid potential memory problems.
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2002/08/14 16:23:49  soliday
  Added Open License
 

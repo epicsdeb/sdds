@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2001/01/02 16:54:13 soliday Exp $
+# $Id: Makefile,v 1.1 2001-01-02 16:54:13 soliday Exp $
 #
 #
 

@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: halton.c,v $
- Revision 1.12  2011/01/12 02:02:18  ywang25
- Fixed bugs to generate optimal Halton sequence correctly and efficiently.
-
+ $Log: not supported by cvs2svn $
  Revision 1.11  2010/12/20 14:33:05  ywang25
  Added restartHaltonSequence and restartModHaltonSequence functions to reinitialize (optimized) Halton sequence when there is only one random bunch to be generated for the multi-step beam generation in elegant; Improved the inhalt function to make it resuable for reintialization; Fixed a bug in startModHaltonSequence, where 0 was returned as the HaltonID for the first dimension and the optimized Halton sequence was not generated properly in elegant.
 

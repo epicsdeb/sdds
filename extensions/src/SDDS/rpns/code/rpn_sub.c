@@ -8,7 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: rpn_sub.c,v $
+ $Log: not supported by cvs2svn $
  Revision 1.14  2009/10/29 19:53:20  soliday
  Renamed a few global variables that conflicted with MADX.
 
@@ -161,7 +161,7 @@ double rpn(char *expression)
         for (i=0; i<FILESTACKSIZE; i++)
             io_file[i].fp = NULL;
         io_file[0].fp = stdin;
-        cp_str(&(io_file[1].name), "stdin");
+        cp_str(&(io_file[0].name), "stdin");
         io_file[0].mode = INPUT;
         io_file[1].fp = stdout;
         cp_str(&(io_file[1].name), "stdout");

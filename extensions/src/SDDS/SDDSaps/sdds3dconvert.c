@@ -20,10 +20,7 @@
  *  origin1, origin2, origin3, max_ext1, max_ext2, max_ext3, delta1, delta2, delta3, numPhysCells1,
  *  numPhysCells12, numPhysCells3, i.e, the minimum, maximum, interval and dimension size of x, y, z
  *
- *  $Log: sdds3dconvert.c,v $
- *  Revision 1.1  2007/04/17 21:15:10  shang
- *  first version, specically convert the vorpal output to sddscontour quantity format for xz and yz plane.
- *
+ *  $Log: not supported by cvs2svn $
  */
 
 #include "mdb.h"

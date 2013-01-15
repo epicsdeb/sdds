@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile,v $
-# Revision 1.2  2004/05/03 15:24:54  soliday
-# Added support for Epics/Base 3.14 build rules.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.1  2002/11/04 22:01:05  soliday
 # Added per Emery's request.
 #

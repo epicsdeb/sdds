@@ -11,10 +11,7 @@
  * contents: query_double(), query_int()
  *
  * Michael Borland,1987
- $Log: query.c,v $
- Revision 1.5  2003/06/17 23:37:00  borland
- Replaced gets() with fgets().
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2002/08/14 16:06:11  soliday
  Added Open License
 

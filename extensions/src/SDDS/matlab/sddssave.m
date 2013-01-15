@@ -11,7 +11,7 @@ function sddssave(sdds, filename)
 %   SDDSSAVE(SDDS,FILENAME), where fileName is the output SDDS data file
 %   and sdds is the SDDS data structure.
 
-import SDDS.java.SDDS.*
+%import SDDS.java.SDDS.*
 
 if nargin < 1
     error('Not enough input arguments.')
@@ -22,6 +22,8 @@ if nargin == 1
     end
     filename = sdds.filename;
 end
+
+is_octave = exist ('OCTAVE_VERSION', 'builtin');
 
 % Set any missing description variables
 if isfield(sdds, 'description') == 0
@@ -38,10 +40,10 @@ end
 if isfield(sdds, 'ascii') == 0
     sdds.ascii = 1;
 else
-    if isnumeric(sdds.ascii) == 0 
-        error('sdds.ascii must be 1 (true) or 0 (false)')
-    end
-    if isequal(sdds.ascii,0) == 0 & isequal(sdds.ascii,1) == 0
+%    if isnumeric(sdds.ascii) == 0 
+%        error('sdds.ascii must be 1 (true) or 0 (false)')
+%    end
+    if isequal(sdds.ascii,0) == 0 && isequal(sdds.ascii,1) == 0
         error('sdds.ascii must be 1 (true) or 0 (false)')
     end
 end
@@ -50,7 +52,7 @@ end
 if isfield(sdds, 'pages') == 0
     sdds.pages = 1;
 else
-    if isnumeric(sdds.pages) == 0 | rem(sdds.pages,1) ~= 0
+    if isnumeric(sdds.pages) == 0 || rem(sdds.pages,1) ~= 0
         error('sdds.pages must be an integer')
     end
 end
@@ -66,26 +68,30 @@ if n_parameters > 0
         error('sdds.parameter is missing')
     end
     for i = 1:n_parameters
-        name = convertSDDSname(strtok(sdds.parameter_names(i,1:end)));
+        if is_octave
+            name = convertSDDSname(strtok(sdds.parameter_names{i,1:end}));
+        else
+	    name = convertSDDSname(strtok(sdds.parameter_names(i,1:end)));
+        end
         if isfield(sdds.parameter, name) == 0
             error(strcat('sdds.parameter.',name,' is missing'))
         end
-        if eval(['isfield(sdds.parameter.',name,', ''type'')']) == 0
+        if isfield(sdds.parameter.(name) , 'type') == 0
             error(['sdds.parameter.',name,'.type is missing'])
         end
         if isvalidSDDSelement(sdds, ['sdds.parameter.',name], 'units') == 0
-            eval(['sdds.parameter.',name,'.units = [];']);
+	    sdds.parameter.(name).units = [];
         end
         if isvalidSDDSelement(sdds, ['sdds.parameter.',name], 'symbol') == 0
-            eval(['sdds.parameter.',name,'.symbol = [];']);
+	    sdds.parameter.(name).symbol = [];
         end
         if isvalidSDDSelement(sdds, ['sdds.parameter.',name], 'format_string') == 0
-            eval(['sdds.parameter.',name,'.format_string = [];']);
+	    sdds.parameter.(name).format_string = [];
         end
         if isvalidSDDSelement(sdds, ['sdds.parameter.',name], 'description') == 0
-            eval(['sdds.parameter.',name,'.description = [];']);
+	  sdds.parameter.(name).description = [];
         end
-        if eval(['isfield(sdds.parameter.',name,', ''data'')']) == 0
+        if isfield(sdds.parameter.(name), 'data') == 0
             error(['sdds.parameter.',name,'.data is missing'])
         end
     end
@@ -102,36 +108,42 @@ if n_arrays > 0
         error('sdds.array is missing')
     end
     for i = 1:n_arrays
-        name = convertSDDSname(strtok(sdds.array_names(i,1:end)));
+        if is_octave
+	    name = convertSDDSname(strtok(sdds.array_names{i,1:end}));
+        else
+            name = convertSDDSname(strtok(sdds.array_names(i,1:end)));
+        end
         if isfield(sdds.array, name) == 0
             error(strcat('sdds.array.',name,' is missing'))
         end
-        if eval(['isfield(sdds.array.',name,', ''dimensions'')']) == 0
+	if isfield(sdds.array.(name), 'dimensions') == 0
             error(['sdds.array.',name,'.dimensions is missing'])
         end
-        if eval(['isfield(sdds.array.',name,', ''type'')']) == 0
+	if isfield(sdds.array.(name), 'type') == 0
             error(['sdds.array.',name,'.type is missing'])
         end
         if isvalidSDDSelement(sdds, ['sdds.array.',name], 'units') == 0
-            eval(['sdds.array.',name,'.units = [];']);
+	    sdds.array.(name).units = [];
         end
         if isvalidSDDSelement(sdds, ['sdds.array.',name], 'symbol') == 0
-            eval(['sdds.array.',name,'.symbol = [];']);
+	    sdds.array.(name).symbol = [];
         end
         if isvalidSDDSelement(sdds, ['sdds.array.',name], 'format_string') == 0
-            eval(['sdds.array.',name,'.format_string = [];']);
+	    sdds.array.(name).format_string = [];
         end
         if isvalidSDDSelement(sdds, ['sdds.array.',name], 'group_name') == 0
-            eval(['sdds.array.',name,'.group_name = [];']);
+	    sdds.array.(name).group_name = [];
         end
         if isvalidSDDSelement(sdds, ['sdds.array.',name], 'description') == 0
-            eval(['sdds.array.',name,'.description = [];']);
+           sdds.array.(name).description = [];
         end
         for j = 1:sdds.pages
-            if eval(['isfield(sdds.array.',name,', ''size_page',int2str(j),''')']) == 0
+	    aaa = sprintf('size_page%d', j);
+	    if isfield(sdds.array.(name), aaa) == 0
                 error(['sdds.array.',name,'.size_page',int2str(j),' is missing'])
             end
-            if eval(['isfield(sdds.array.',name,', ''page',int2str(j),''')']) == 0
+            aaa = sprintf('page%d', j);
+            if isfield(sdds.array.(name), aaa) == 0
                 error(['sdds.array.',name,'.page',int2str(j),' is missing'])
             end
         end
@@ -149,82 +161,113 @@ if n_columns > 0
         error('sdds.column is missing')
     end
     for i = 1:n_columns
-        name = convertSDDSname(strtok(sdds.column_names(i,1:end)));
+        if is_octave
+	    name = convertSDDSname(strtok(sdds.column_names{i,1:end}));
+        else
+            name = convertSDDSname(strtok(sdds.column_names(i,1:end)));
+        end
         if isfield(sdds.column, name) == 0
             error(strcat('sdds.column.',name,' is missing'))
         end
-        if eval(['isfield(sdds.column.',name,', ''type'')']) == 0
+	  if isfield(sdds.column.(name), 'type') == 0
             error(['sdds.column.',name,'.type is missing'])
         end
         if isvalidSDDSelement(sdds, ['sdds.column.',name], 'units') == 0
-            eval(['sdds.column.',name,'.units = [];']);
+	    sdds.column.(name).units = [];
         end
         if isvalidSDDSelement(sdds, ['sdds.column.',name], 'symbol') == 0
-            eval(['sdds.column.',name,'.symbol = [];']);
+	    sdds.column.(name).symbol = [];
         end
         if isvalidSDDSelement(sdds, ['sdds.column.',name], 'format_string') == 0
-            eval(['sdds.column.',name,'.format_string = [];']);
+	    sdds.column.(name).format_string = [];
         end
         if isvalidSDDSelement(sdds, ['sdds.column.',name], 'description') == 0
-            eval(['sdds.column.',name,'.description = [];']);
+	    sdds.column.(name).description = [];
         end
         for j = 1:sdds.pages
-            if eval(['isfield(sdds.column.',name,', ''page',int2str(j),''')']) == 0
+	    aaa = sprintf('page%d', j);
+            if isfield(sdds.column.(name), aaa) == 0
                 error(['sdds.column.',name,'.page',int2str(j),' is missing'])
             end
         end
     end
 end
 
-sddsData = SDDSFile(filename, ~sdds.ascii);
+if is_octave
+    sddsData = java_new('SDDS.java.SDDS.SDDSFile', filename, ~sdds.ascii);
+else
+    sddsData = SDDS.java.SDDS.SDDSFile(filename, ~sdds.ascii);
+end
+
 sddsData.setDescription(sdds.description.text, sdds.description.contents)
 for i = 1:n_parameters
-    name = strtok(sdds.parameter_names(i,1:end));
+    if is_octave
+	name = strtok(sdds.parameter_names{i,1:end});
+    else
+        name = strtok(sdds.parameter_names(i,1:end));
+    end
     name2 = convertSDDSname(name);
-    j = eval(['sddsData.defineParameter(name, sdds.parameter.',name2,'.symbol, sdds.parameter.',name2,'.units, sdds.parameter.',name2,'.description, sdds.parameter.',name2,'.format_string, sdds.parameter.',name2,'.type, []);']);
+     j = sddsData.defineParameter(name, sdds.parameter.(name2).symbol, sdds.parameter.(name2).units, sdds.parameter.(name2).description, sdds.parameter.(name2).format_string, sdds.parameter.(name2).type, []);
     if j == -1
         error(char(sddsData.getErrors))
     end
-    if (eval(['sdds.parameter.',name2,'.type == ''string'''])) | (eval(['sdds.parameter.',name2,'.type == ''character''']))
-        [pages,string_length] = eval(['size(sdds.parameter.',name2,'.data)']);
+    if (strcmp(sdds.parameter.(name2).type, 'string')) || (strcmp(sdds.parameter.(name2).type, 'character'))
+        [pages,string_length] = size(sdds.parameter.(name2).data);
         for k = 1:sdds.pages
             string_end = string_length;
             if string_end == 0
-                eval(['sddsData.setParameter(j, '' '', k);'])
+                sddsData.setParameter(j, ' ', k);
             else
-                while eval(['isequal(sdds.parameter.',name2,'.data(k,string_end), '' '')'])
+	        while isequal(sdds.parameter.(name2).data(k,string_end), ' ')
                     string_end = string_end - 1;
                 end
-                eval(['sddsData.setParameter(j, sdds.parameter.',name2,'.data(k,1:string_end), k);'])
+                sddsData.setParameter(j, sdds.parameter.(name2).data(k,1:string_end), k);
             end
         end
     else
-        eval(['sddsData.setParameter(j, sdds.parameter.',name2,'.data, 1);'])
+        sddsData.setParameter(j, sdds.parameter.(name2).data, 1);
     end
 end
 
 for i = 1:n_columns
-    name = strtok(sdds.column_names(i,1:end));
+    if is_octave
+	name = strtok(sdds.column_names{i,1:end});
+    else
+        name = strtok(sdds.column_names(i,1:end));
+    end
     name2 = convertSDDSname(name);
-    j = eval(['sddsData.defineColumn(name, sdds.column.',name2,'.symbol, sdds.column.',name2,'.units, sdds.column.',name2,'.description, sdds.column.',name2,'.format_string, sdds.column.',name2,'.type, 0);']);
+    j = sddsData.defineColumn(name, sdds.column.(name2).symbol, sdds.column.(name2).units, sdds.column.(name2).description, sdds.column.(name2).format_string, sdds.column.(name2).type, 0);
     if j == -1
         error(char(sddsData.getErrors))
     end
     for k = 1:sdds.pages
-        eval(['sddsData.setColumn(j, sdds.column.',name2,'.page',int2str(k),', k);'])
+	aaa = sprintf('page%d', k);
+        sddsData.setColumn(j, sdds.column.(name2).(aaa), k);
     end
 end
 
 for i = 1:n_arrays
-    name = strtok(sdds.array_names(i,1:end));
+    if is_octave
+	name = strtok(sdds.array_names{i,1:end});
+    else
+        name = strtok(sdds.array_names(i,1:end));
+    end
     name2 = convertSDDSname(name);
-    j = eval(['sddsData.defineArray(name, sdds.array.',name2,'.symbol, sdds.array.',name2,'.units, sdds.array.',name2,'.description, sdds.array.',name2,'.format_string, sdds.array.',name2,'.group_name, sdds.array.',name2,'.type, 0, sdds.array.',name2,'.dimensions);']);
+    j = sddsData.defineArray(name, sdds.array.(name2).symbol, sdds.array.(name2).units, sdds.array.(name2).description, sdds.array.(name2).format_string, sdds.array.(name2).group_name, sdds.array.(name2).type, 0, sdds.array.(name2).dimensions);
     if j == -1
         error(char(sddsData.getErrors))
     end
     for k = 1:sdds.pages
-        eval(['sddsData.setArrayDim(k, j, sdds.array.',name2,'.size_page',int2str(k),');'])
-        eval(['sddsData.setArray(j, sdds.array.',name2,'.page',int2str(k),', k);'])
+        aaa = sprintf('size_page%d', k);
+        if sdds.array.(name2).dimensions == 1
+	    bbb(1) = sdds.array.(name2).(aaa);
+	    bbb(2) = 0;
+            sddsData.setArrayDim(k, j, bbb);
+        else
+            sddsData.setArrayDim(k, j, sdds.array.(name2).(aaa));
+        end
+        aaa = sprintf('page%d', k);
+        sddsData.setArray(j, sdds.array.(name2).(aaa), k);
     end
 end
 

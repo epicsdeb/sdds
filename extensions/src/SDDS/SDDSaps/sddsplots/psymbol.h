@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- * $Log: psymbol.h,v $
- * Revision 1.7  2002/08/14 17:24:52  soliday
- * Added Open License
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.6  2001/03/12 21:41:15  soliday
  * Fixed a problem when "I" is the only character. Redrew it so that it has a
  * width.

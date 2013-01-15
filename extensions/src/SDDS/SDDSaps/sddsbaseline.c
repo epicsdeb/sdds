@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: sddsbaseline.c,v $
- Revision 1.11  2007/04/04 17:25:32  borland
- Updated version information.
-
+ $Log: not supported by cvs2svn $
  Revision 1.10  2007/04/04 17:25:06  borland
  Added control of the number of fit terms for baseline fitting.  Output file now
  has an additional column to show which rows are used for baseline.

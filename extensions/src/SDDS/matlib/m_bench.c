@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: m_bench.c,v $
- Revision 1.6  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2000/05/22 15:54:14  soliday
  Renamed unused main function because of conflicts.
 

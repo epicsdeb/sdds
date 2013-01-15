@@ -11,10 +11,7 @@
  * purpose: 2-d histogram program with output to sddscontour program
  *
  * Michael Borland, 1988, 1995.
- $Log: sddshist2d.c,v $
- Revision 1.16  2009/06/23 22:42:16  borland
- Fixed further bugs. First version that actually works with the next option.
-
+ $Log: not supported by cvs2svn $
  Revision 1.15  2009/06/23 22:31:05  borland
  Fixed bug in last revision.
 

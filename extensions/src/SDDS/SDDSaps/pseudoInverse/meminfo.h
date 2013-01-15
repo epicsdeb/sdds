@@ -26,10 +26,7 @@
 
 /* meminfo.h  26/08/93 */
 /* changed  11/12/93 
- $Log: meminfo.h,v $
- Revision 1.2  1995/09/05 21:08:34  saunders
- First test release of the SDDS1.5 package.
- */
+ $Log: not supported by cvs2svn $ */
 
 
 #ifndef MEM_INFOH

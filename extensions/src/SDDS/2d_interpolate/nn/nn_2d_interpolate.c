@@ -1,6 +1,9 @@
 /* file: nn_2d_interpolate.c
  * nn 2d interpolate routine
- $Log: nn_2d_interpolate.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.2  2011/11/29 19:44:34  shang
+ made the zoom work.
+
  Revision 1.1  2007/05/04 21:48:27  shang
  first version
 
@@ -16,7 +19,11 @@ specs* specs_create(void)
   s->generate_points = s->thin =  s->nointerp =  s->linear =  s->invariant =  s->square = s->range = 0;
   s->nx =  s->ny = s->nxd =  s->nyd = -1;
   s->rmax = NaN;
-  s->wmin = -DBL_MAX;
+  /* s->wmin = -DBL_MAX; */ /*this  interpolates in all points it
+     can (that is in points that belong to at least one circle around
+     triangles obtained in Delaunay triangulation) */
+  /* changed the default wmin to 0 to exclude points outside the convex hall of the data to avoid NaN */
+  s->wmin =0 ; 
   s->zoom = 1.0;
   s->xmin =  s->xmax =  s->ymin = s->ymax = NaN; 
   s->npoints = 0;
@@ -107,7 +114,19 @@ void do_nn_2d_interpolate(specs *spec, int *nin, point **pin, int *nout, point *
     return;
   }
   if (!(*nout)) {
-    points_getrange(*nin, *pin, spec->zoom, &spec->xmin, &spec->xmax, &spec->ymin, &spec->ymax);
+    /*
+      points_getrange(*nin, *pin, spec->zoom, &spec->xmin, &spec->xmax, &spec->ymin, &spec->ymax);
+      points_generate(spec->xmin, spec->xmax, spec->ymin, spec->ymax, spec->nx, spec->ny, nout, pout); */
+    if (!isnan(spec->zoom) && spec->zoom!=1.0 ) {
+      double xdiff2 = (spec->xmax - spec->xmin) / 2.0;
+      double ydiff2 = (spec->ymax - spec->ymin) / 2.0;
+      double xav = (spec->xmax + spec->xmin) / 2.0;
+      double yav = (spec->ymax + spec->ymin) / 2.0; 
+      spec->xmin = xav - xdiff2 * spec->zoom;
+      spec->xmax = xav + xdiff2 * spec->zoom;
+      spec->ymin = yav - ydiff2 * spec->zoom;
+      spec->ymax = yav + ydiff2 * spec->zoom;
+    }
     points_generate(spec->xmin, spec->xmax, spec->ymin, spec->ymax, spec->nx, spec->ny, nout, pout);
     if (spec->nx>1)
       spec->dx = (spec->xmax - spec->xmin)/(spec->nx -1);

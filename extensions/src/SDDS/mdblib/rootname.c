@@ -11,10 +11,7 @@
  * purpose: remove extension specification from a filename string
  * 
  * Michael Borland, 1989
- $Log: rootname.c,v $
- Revision 1.4  2002/08/14 16:06:13  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1999/05/25 21:53:24  soliday
  Removed compiler warnings under Linux.
 

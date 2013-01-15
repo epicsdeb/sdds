@@ -12,10 +12,7 @@
  *           one data set to another
  * 
  * Michael Borland, September 1994
- $Log: SDDS_transfer.c,v $
- Revision 1.11  2005/11/04 22:46:53  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.10  2005/01/13 16:47:59  shang
  added string support to rpn functions
 

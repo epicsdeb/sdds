@@ -10,11 +10,7 @@
 /* dlaran.f -- translated by f2c (version of 30 January 1990  16:02:04).
    You must link the resulting object file with the libraries:
 	-lF77 -lI77 -lm -lc   (in that order)
- $Log: dlaran.c,v $
- Revision 1.8  2006/02/08 23:01:42  soliday
- Added functions to increment the seed as if the random function was called
- multiple times. The new functions are random_oag, gauss_rn_oag, gauss_rn_lim_oag
-
+ $Log: not supported by cvs2svn $
  Revision 1.7  2005/11/04 22:47:14  soliday
  Updated code to be compiled by a 64 bit processor.
 

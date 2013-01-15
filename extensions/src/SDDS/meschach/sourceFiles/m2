@@ -188,7 +188,7 @@ sed >torture.c <<'//GO.SYSIN DD torture.c' 's/^-//'
 -	library, parts 1 and 2
 -*/
 -
--static char rcsid[] = "$Id: m2,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $";
+-static char rcsid[] = "$Id: m2,v 1.1.1.1 1999-04-14 14:16:22 borland Exp $";
 -
 -#include	<stdio.h>
 -#include	"matrix2.h"
@@ -1732,7 +1732,7 @@ sed >ztorture.c <<'//GO.SYSIN DD ztorture.c' 's/^-//'
 -	library, complex routines
 -*/
 -
--static char rcsid[] = "$Id: m2,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $";
+-static char rcsid[] = "$Id: m2,v 1.1.1.1 1999-04-14 14:16:22 borland Exp $";
 -
 -#include	<stdio.h>
 -#include 	"zmatrix2.h"
@@ -2452,7 +2452,7 @@ sed >memtort.c <<'//GO.SYSIN DD memtort.c' 's/^-//'
 -  Tests for mem_info.c functions
 -  */
 -
--static char rcsid[] = "$Id: m2,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $";
+-static char rcsid[] = "$Id: m2,v 1.1.1.1 1999-04-14 14:16:22 borland Exp $";
 -
 -#include        <stdio.h>
 -#include        <math.h>

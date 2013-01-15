@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: get_token_rpn.c,v $
- Revision 1.6  2003/03/17 23:26:43  borland
- Fixed bugs in previous changes.
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2002/08/14 16:28:57  soliday
  Added Open License
 

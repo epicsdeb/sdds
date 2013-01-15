@@ -253,7 +253,7 @@ int display() {
    }
 
    /* trigger expose events to display pixmap */
-   XClearArea(dpy, win, 0, 0, 0, 0, True);
+   XClearArea(dpy, win, 0, 0, 0, 0, TRUE);
    return 0;
    }
 

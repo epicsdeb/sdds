@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: data_scan.c,v $
- Revision 1.8  2008/07/04 02:41:48  borland
- Added get_long1(), by H. Shang (uncommitted).
-
+ $Log: not supported by cvs2svn $
  Revision 1.7  2007/07/13 15:02:43  soliday
  Renamed strcpy_s to strcpy_ss because Microsoft is already using this name.
 

@@ -8,7 +8,13 @@
 \*************************************************************************/
 
 /*
- $Log: interp.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.10  2011/02/21 16:06:57  shang
+ changed the type of returnCode argument in interp_short to "unsigned long" to be consistent with interp()
+
+ Revision 1.9  2011/02/17 20:51:10  shang
+ added setting returnCode to zero when it finds the low position, otherwise, it gives error which is not true.
+
  Revision 1.8  2010/11/29 23:22:16  shang
  improved interp_short to return the corresponding function value if the independent value is found in the input array.
 
@@ -259,7 +265,7 @@ double interpolate(double *f, double *x, long n, double xo, OUTRANGE_CONTROL *be
 }
 
 short interp_short(short *f, double *x, long n, double xo, long warnings, short order, 
-                 long *returnCode, long *next_start_pos)
+                unsigned long *returnCode, long *next_start_pos)
 {
   long hi, lo, mid, i;
   short value;
@@ -267,13 +273,19 @@ short interp_short(short *f, double *x, long n, double xo, long warnings, short 
   lo = 0;
   hi = n-1;
 
+  *returnCode = 0;
+  /*if the interpolate point is less or equal to the start point, return the value of the start point */
+  if (xo<=x[0]) {
+    *next_start_pos=0;
+    return f[0];
+  }
+  
   /*if the value is in one of the indepent, return the corresponding f value */
   for (i=0; i<n; i++) 
     if (xo==x[i]) {
       *next_start_pos=i;
       return f[i];
     }
-  
   if (lo==hi) {
     if (warnings)
       printf("warning: only one point--returning value for that point\n");
@@ -336,8 +348,7 @@ short interp_short(short *f, double *x, long n, double xo, long warnings, short 
   /*remember this position so that one can start from her to speed up the interp of
     other points assume the interping points are sorted.*/
   *next_start_pos = lo;
-  
- 
+  *returnCode =0;
   if (order==-1) {
     /* inherit value from previous point*/
     value=(short)f[lo];

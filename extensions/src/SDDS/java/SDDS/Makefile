@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # makefile for Java SDDS library
-# $Log: Makefile,v $
-# Revision 1.12  2008/06/10 15:28:52  soliday
-# Updated so that it builds with the new build rules.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.11  2002/12/02 22:07:03  soliday
 # Added a new javadoc option
 #

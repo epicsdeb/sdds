@@ -13,10 +13,7 @@
  * The names tt_attach() and tt_detach() are used for backward compatibility.
  *
  * Michael Borland, 1991.
- $Log: rawread.c,v $
- Revision 1.7  2005/07/29 21:14:31  soliday
- Updated to build with Blue Gene/L. linux-ppc-bgl-gnu
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2003/07/22 20:01:19  soliday
  Added support for Kylix.
 

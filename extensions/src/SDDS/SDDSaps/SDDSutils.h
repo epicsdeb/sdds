@@ -24,8 +24,3 @@ void moveToStringArray(char ***target, long *targets, char **source,
 
 long greatestProductOfSmallPrimes1(long rows, long *primeList, long nPrimes);
 long greatestProductOfSmallPrimes(long rows);
-
-#define SDDS_MATCH_COLUMN 0
-#define SDDS_MATCH_PARAMETER 1
-#define SDDS_MATCH_ARRAY 2
-char **getMatchingSDDSNames(SDDS_DATASET *dataset, char **matchName, long matches, long *names,  short match_type);

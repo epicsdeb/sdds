@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
+# $Log: not supported by cvs2svn $
 # Revision 1.21  2011/01/12 01:47:45  ywang25
 # The bug related with the MASTER_READTITLE_ONLY flag has been fixed, so we can turn it on by default.
 #
@@ -85,7 +85,7 @@ CC := $(RATIONAL) -best-effort $(CC)
 CCC := $(RATIONAL) -best-effort $(CCC)
 endif
 
-ALLOW_FILE_LOCKING = 0
+ALLOW_FILE_LOCKING = 1
 MPI = 0
 
 USR_CFLAGS += -DALLOW_FILE_LOCKING=$(ALLOW_FILE_LOCKING)
@@ -110,7 +110,8 @@ else
     #USER_MPI_FLAGS+= -DMPI_DEBUG         # print debugging information for MPI 
     #USER_MPI_FLAGS+= -DCHECKFLAGS=1      # if defined, check balance only at the beginning
                                         # or the particle number is changed
-    MPI_PATH = $(wildcard /usr/local/software/mvapich2-gcc/bin/ /share/mpich2_smpd_nemesis/bin/ /act/mvapich2/gnu/bin/)
+    MPI_PATH = $(wildcard /usr/local/software/mvapich2-gcc/bin/ /share/mpich2_smpd_nemesis/bin/ /act/mvapich2/gnu/bin/ /usr/lib64/mvapich2/1.2-gcc/bin/)
+    #MPI_PATH = /home/oxygen/OAG/macStuff/mpich2-1.3.1-darwin-x86/bin/
 ifeq ($(HOST_ARCH),linux-ppc-bgp-ibm)
     CC += $(USER_MPI_FLAGS)
     CCC += $(USER_MPI_FLAGS)

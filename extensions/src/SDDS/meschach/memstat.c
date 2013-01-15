@@ -40,7 +40,7 @@
 #include  "iter.h"
 #endif
 
-static char rcsid[] = "$Id: memstat.c,v 1.4 2000/04/05 20:57:21 soliday Exp $";
+static char rcsid[] = "$Id: memstat.c,v 1.4 2000-04-05 20:57:21 soliday Exp $";
 
 /* global variable */
 

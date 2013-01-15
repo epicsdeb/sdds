@@ -8,11 +8,7 @@
 \*************************************************************************/
 
 /*
- * $Log: infixtopostfix.c,v $
- * Revision 1.9  2008/09/02 21:35:45  soliday
- * Added a few more functions to the known functions list so that they are
- * properly converted.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.8  2008/09/02 20:38:45  soliday
  * Fixed a bug with negative numbers. It was getting the negative sign
  * confused with a minus sign.

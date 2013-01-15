@@ -11,10 +11,7 @@
 /* file: non_dominated_sort.c
  * purpose: definitions for non-dominated sort routines
  * Hairong Shang, May 2005
- $Log: non_dominated_sort.c,v $
- Revision 1.6  2007/04/23 21:14:55  shang
- modified to work with constraints value > 0 case.
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2007/04/09 19:58:09  shang
  fixed the bug that assigining input constraints to corwing distant
 

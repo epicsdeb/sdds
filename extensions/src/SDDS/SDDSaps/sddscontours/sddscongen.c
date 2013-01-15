@@ -12,10 +12,7 @@
  *          equation
  *
  * Michael Borland, 1995
- $Log: sddscongen.c,v $
- Revision 1.11  2005/01/13 21:43:33  soliday
- Made the rpn function calls consistent with the updated rpn library.
-
+ $Log: not supported by cvs2svn $
  Revision 1.10  2003/09/02 19:32:36  soliday
  Cleaned up code for Linux.
 

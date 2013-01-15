@@ -1,4 +1,4 @@
-/* $Id: t4.h,v 1.1 2002/09/19 16:39:12 soliday Exp $ */
+/* $Id: t4.h,v 1.1 2002-09-19 16:39:12 soliday Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler

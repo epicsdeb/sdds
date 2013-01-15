@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: contour.h,v $
- Revision 1.14  2007/01/10 16:46:24  soliday
- Updated to work with linux-x86_64
-
+ $Log: not supported by cvs2svn $
  Revision 1.13  2006/10/19 21:49:24  soliday
  Fixed issue with tsetFlags
 

@@ -10,10 +10,7 @@
 /* file: timeconvert.c
  * 
  * Michael Borland, 1996
- $Log: timeconvert.c,v $
- Revision 1.9  2007/02/01 21:26:01  soliday
- Fixed a typo.
-
+ $Log: not supported by cvs2svn $
  Revision 1.8  2007/02/01 21:25:18  soliday
  Fixed an odd issue seen on Windows.
 

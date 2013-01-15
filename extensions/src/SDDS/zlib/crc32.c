@@ -3,7 +3,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h 
  */
 
-/* @(#) $Id: crc32.c,v 1.1 2000/11/01 17:03:35 soliday Exp $ */
+/* @(#) $Id: crc32.c,v 1.1 2000-11-01 17:03:35 soliday Exp $ */
 
 #include "zlib.h"
 

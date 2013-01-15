@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: trapInteg.c,v $
- Revision 1.5  2004/02/27 16:30:49  borland
- Removed unused variable from trapizoidIntegration1().
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2004/02/27 16:28:50  borland
  Added trapizoidIntegration1(), which gives the integral vs the independet variable.
 

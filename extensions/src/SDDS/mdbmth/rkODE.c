@@ -16,10 +16,7 @@
  *          double-precision version
  *
  * Michael Borland, 1989.
- $Log: rkODE.c,v $
- Revision 1.7  2009/06/21 18:13:34  borland
- Updated rk_odein3_na() to include stochastic process between steps.
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2003/08/28 19:56:28  soliday
  Cleaned up some of the code.
 

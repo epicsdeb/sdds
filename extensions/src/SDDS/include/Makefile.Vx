@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # makefile for include directory (only installs headers)
-# $Log: Makefile.Vx,v $
-# Revision 1.3  2002/08/14 15:40:12  soliday
-# Added Open License
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.2  2002/05/09 14:52:32  soliday
 # Added matlib.h to the INC line.
 #

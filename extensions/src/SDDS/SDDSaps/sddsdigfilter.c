@@ -12,10 +12,7 @@
 /*****************************************************************/
 
 /* program by J Carwardine 
- $Log: sddsdigfilter.c,v $
- Revision 1.11  2006/08/08 17:04:04  emery
- Removed unused variables to remove compilation warnings.
-
+ $Log: not supported by cvs2svn $
  Revision 1.10  2006/03/02 17:04:51  shang
  simplied the code to use SDDS standard library and added the ability to process multiple columns.
 

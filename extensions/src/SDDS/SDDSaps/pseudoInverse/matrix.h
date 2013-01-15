@@ -26,10 +26,7 @@
 
 /*
                Type definitions for general purpose maths package
- $Log: matrix.h,v $
- Revision 1.3  2003/09/02 19:41:10  soliday
- Cleaned up code for Linux.
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  1995/09/05 21:08:30  saunders
  First test release of the SDDS1.5 package.
 

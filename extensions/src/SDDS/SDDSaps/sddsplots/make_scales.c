@@ -12,7 +12,12 @@
  *          and other options.
  *
  * Michael Borland, 1991.
- $Log: make_scales.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.42  2011/03/06 23:16:46  borland
+ Fixed bug in x log scales when -subticks=xNoLogLabel is given (wasn't adjusting
+ position of main labels).  Also adjusted the log label position to prevent it
+ getting too close to the x axis label.
+
  Revision 1.41  2011/01/11 22:59:40  soliday
  Removed debugging statement
 
@@ -596,8 +601,8 @@ void make_scale
       adjustTickCharSize(0, maxPlottedLength, NULL, xRange/nx, nx, allowedSpace*spaceFactor, plane);
       char_scale(tickLabelScale, tickLabelScale);
       get_char_size(&hsize, &vsize, 1);
-      if (doLog) 
-        y = yStart + (doBelow?-0.40:0.40)*allowedSpace;
+      if (!no_log_label && doLog)
+        y = yStart + (doBelow?-0.375:0.375)*allowedSpace;
       else
         y = yStart + (doBelow?-0.25:0.25)*allowedSpace;
       for (i=0; i<nx; i++) {

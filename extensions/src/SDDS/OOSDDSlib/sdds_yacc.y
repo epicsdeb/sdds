@@ -1,7 +1,4 @@
-/* $Log: sdds_yacc.y,v $
-/* Revision 1.3  1997/02/13 17:23:24  saunders
-/* Parser now puts error messages on sdds error stack.
-/*
+/* $Log: not supported by cvs2svn $
  * Revision 1.2  1997/02/12 23:34:10  saunders
  * Intermediate.
  * */

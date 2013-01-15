@@ -9,8 +9,11 @@
 #include "nan.h"
 #include "minell.h"
 
+#if !defined(NN_SERIAL)
 #define NMAX 4096
-#define STRBUFSIZE 64
+#endif
+#define STRBUFSIZE 256
+
 #define NIMAX 2048
 #define BUFSIZE 10240
 #define NALLOCATED_START 1024

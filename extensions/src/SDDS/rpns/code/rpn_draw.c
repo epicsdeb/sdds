@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: rpn_draw.c,v $
- Revision 1.9  2002/08/14 16:28:59  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.8  2000/04/13 16:22:16  soliday
  Moved some WIN32 stuff to mdb.h
 

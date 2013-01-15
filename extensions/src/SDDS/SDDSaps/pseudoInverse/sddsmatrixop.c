@@ -9,10 +9,7 @@
 /* program: sddsmatrixlapackop
  * purpose: a general matrix operation sdds tool using LAPACK or CLAPACK routines
  *
- * $Log: sddsmatrixop.c,v $
- * Revision 1.4  2010/08/12 22:13:19  shang
- * now non-LAPACK routine can also compute the determinant if requested.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.3  2009/01/22 21:06:22  shang
  * modified to be able to work with files that contain string columns
  *

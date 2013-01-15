@@ -13,10 +13,7 @@
  *          the namelist structure that is used for input/output.
  *  
  * Michael Borland, November 1993
- $Log: SDDS_write.c,v $
- Revision 1.13  2005/11/04 22:46:53  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.12  2002/08/14 16:34:50  soliday
  Added Open License
 

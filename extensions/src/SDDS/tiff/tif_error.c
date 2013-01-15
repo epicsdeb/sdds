@@ -1,4 +1,4 @@
-/* $Header: /net/phoebus/epicsmgr/cvsroot/epics/extensions/src/SDDS/tiff/tif_error.c,v 1.1 2002/09/19 16:38:43 soliday Exp $ */
+/* $Header: /net/phoebus/epicsmgr/cvsroot/epics/extensions/src/SDDS/tiff/tif_error.c,v 1.1 2002-09-19 16:38:43 soliday Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler

@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: compress.c,v $
- Revision 1.4  2002/08/14 16:06:06  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2000/01/18 21:30:20  soliday
  Changed compress to compressString to avoid conflict with ZLIB.
 

@@ -11,7 +11,7 @@
  * contents: SDDS utility routines
  *
  * M. Borland, November 1993
- $Log: SDDS_utils.c,v $
+ $Log: not supported by cvs2svn $
  Revision 1.69  2010/08/27 16:31:32  soliday
  Applied patch supplied by outside user to fix a problem on Fedora 13.
 
@@ -3367,4 +3367,56 @@ int32_t SDDS_VerifyParameterExists(SDDS_DATASET *SDDS_dataset, int32_t mode, ...
   }
   va_end(argptr);
   return(-1);
+}
+
+char **getMatchingSDDSNames(SDDS_DATASET *dataset, char **matchName, long matches, long *names, 
+                            short type)
+{
+  char **name, **selectedName, *ptr=NULL;
+  int32_t names0=0, selected=0, i, j;
+
+  name=selectedName=NULL;
+  switch(type) {
+  case SDDS_MATCH_COLUMN:
+    if (!(name=SDDS_GetColumnNames(dataset, &names0)))
+      SDDS_PrintErrors(stderr, SDDS_EXIT_PrintErrors|SDDS_VERBOSE_PrintErrors);
+    break;
+  case SDDS_MATCH_PARAMETER:
+    if (!(name=SDDS_GetParameterNames(dataset, &names0)))
+      SDDS_PrintErrors(stderr, SDDS_EXIT_PrintErrors|SDDS_VERBOSE_PrintErrors);
+    break;
+  case SDDS_MATCH_ARRAY:
+    if (!(name=SDDS_GetArrayNames(dataset, &names0)))
+      SDDS_PrintErrors(stderr, SDDS_EXIT_PrintErrors|SDDS_VERBOSE_PrintErrors);
+    break;
+  default:
+    SDDS_Bomb("Invalid match type provided.");
+    break;
+  }
+  for (i=0; i<matches; i++) {
+    if (has_wildcards(matchName[i])) {
+      ptr = expand_ranges(matchName[i]);
+      for (j=0; j<names0; j++) {
+        if (wild_match(name[j], ptr)) {
+          selectedName = SDDS_Realloc(selectedName, sizeof(*selectedName)*(selected+1));
+          SDDS_CopyString(&selectedName[selected], name[j]);
+          selected++;
+        }
+      }
+      free(ptr);
+    } else {
+      if (match_string(matchName[i], name, names0, EXACT_MATCH)<0) {
+        fprintf(stderr,"%s not found in input file.\n", matchName[i]);
+        exit(1);
+      } else {
+        selectedName = SDDS_Realloc(selectedName, sizeof(*selectedName)*(selected+1));
+        SDDS_CopyString(&selectedName[selected], matchName[i]);
+        selected++;
+      }
+    }
+  }
+  SDDS_FreeStringArray(name, names0);
+  free(name);
+  *names = selected;
+  return selectedName;
 }

@@ -1,9 +1,5 @@
 # makefile for gd
-# $Log: Makefile.Vx,v $
-# Revision 1.7  2005/02/04 20:29:36  soliday
-# Added the creation of oagLib4. oagLib3 was skipped to avoid confusion with
-# SDDSepics3
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.6  2003/09/18 19:22:46  soliday
 # Added zlib support.
 #

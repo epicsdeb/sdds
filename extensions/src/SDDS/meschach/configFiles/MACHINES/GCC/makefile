@@ -4,7 +4,7 @@
 #
 # Copyright (C) David Stewart & Zbigniew Leyk 1993
 #
-# $Id: makefile,v 1.1.1.1 1999/04/14 14:16:20 borland Exp $
+# $Id: makefile,v 1.1.1.1 1999-04-14 14:16:20 borland Exp $
 #
 
 srcdir = .

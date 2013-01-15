@@ -269,6 +269,11 @@ weighted.
 \item {\tt median}, {\tt drange}, {\tt qrange} --- The median value, i.e., the value which is both above and below
 50\% of the data points; the decile-range, which is the range excluding the smallest and largest 10\% of the values;
 the quartile-range, which is the range excluding the smallest and largest 25\% of the values.
+\item {\tt percentile}, {\tt prange} --- These compute percentiles and percentile ranges, as defined by the 
+  {\tt percentlevel} qualifier.  For {\tt percentile}, the value returned is the value of the column corresponding
+  to the given {\tt percentlevel}.  For {\tt prange}, the value return is the span of the values in the column
+  encompassing the given central percentage of the data; for example {\tt percentile=50} would give the quartile range.
+
 \item {\tt minimum}, {\tt maximum}, {\tt spread}, {\tt smallest}, {\tt largest} --- 
 The minimum value, maximum value, spread in values, smallest value (minimum absolute value), and largest value
 (maximum absolute value).  For all except {\tt spread}, the {\tt position} and {\tt functionOf} qualifiers may be
@@ -300,6 +305,13 @@ estimate of the uncertainty in the mean value.
 \item {\tt slope}, {\tt intercept}, {\tt lfsd} --- The slope and intercept of a linear fit.  The {\tt functionOf}
 qualifier must be given to specify the quantity to fit against.  {\tt lfsd} is the Linear-Fit-Standard-Deviation,
 which is the standard deviation of the fit residuals.
+
+\item {\tt gmintegral} --- The integral of the quantity with respect to the quantity named with the {\tt functionOf} qualifier.
+  The integral is performed using the Gill-Miller method, which works well for non-equispaced values of the independent
+  variable.
+
+\item {\tt correlation} --- The Pearson's correlation coefficient of the quantity and the column of which it is 
+  (nominally) a function (as declared with the {\tt functionOf} qualifier).
 
 \end{itemize}
 

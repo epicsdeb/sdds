@@ -10,10 +10,7 @@
 /* program: sddsquery.c
  * purpose: read an SDDS file header and summarize it 
  * Michael Borland, 1993
- $Log: sddsquery.c,v $
- Revision 1.20  2009/07/02 19:38:24  soliday
- Fixed a bug listing the correct endianness on little endian computers.
-
+ $Log: not supported by cvs2svn $
  Revision 1.19  2005/11/07 21:48:11  soliday
  Updated to remove Linux compiler warnings.
 

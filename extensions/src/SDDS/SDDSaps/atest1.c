@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: atest1.c,v $
- Revision 1.3  2002/08/14 17:12:35  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2001/08/29 18:08:40  borland
  Added a 3-D array plus nonequispaced y values.
 

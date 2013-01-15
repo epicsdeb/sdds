@@ -15,10 +15,7 @@
  *           fft_derivative()
  *
  * Michael Borland, 1990-5
- $Log: dfilter.cc,v $
- Revision 1.1  2010/02/04 23:43:51  soliday
- Converted to c++ so that std::complex can be used.
-
+ $Log: not supported by cvs2svn $
  Revision 1.7  2009/12/02 22:22:34  soliday
  Added complex number support for non C99 compilers.
 

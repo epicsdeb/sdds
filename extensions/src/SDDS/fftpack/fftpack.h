@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- * $Log: fftpack.h,v $
- * Revision 1.5  2002/12/02 18:59:26  soliday
- * Fixed problem with comments.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.4  2002/08/14 16:41:19  soliday
  * Added Open License
  *

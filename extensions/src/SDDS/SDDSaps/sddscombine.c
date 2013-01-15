@@ -12,10 +12,7 @@
  *          file with one page for each page in each file
  *
  * Michael Borland, 1994
- $Log: sddscombine.c,v $
- Revision 1.29  2008/01/15 22:30:08  borland
- Fixed bug with -merge=<parameterName> when multiple files are used.
-
+ $Log: not supported by cvs2svn $
  Revision 1.28  2006/12/14 22:21:57  soliday
  Updated a bunch of programs because SDDS_SaveLayout is now called by
  SDDS_WriteLayout and it is no longer required to be called directly.

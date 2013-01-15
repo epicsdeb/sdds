@@ -37,8 +37,4 @@ void minell_destroy(minell* me);
 void minell_scalepoints(minell* me, int n, point p[]);
 void minell_rescalepoints(minell* me, int n, point p[]);
 
-#if defined(vxWorks)
-#define M_PI 3.14159265358979323846
-#endif
-
 #endif

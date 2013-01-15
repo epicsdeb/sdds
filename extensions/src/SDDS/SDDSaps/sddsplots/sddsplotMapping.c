@@ -12,11 +12,7 @@
  * part of sddsplot (plotting program for SDDS files)
  *
  * Michael Borland, 1994.
- $Log: sddsplotMapping.c,v $
- Revision 1.35  2009/07/28 14:01:16  borland
- Added scroll feature to -replicate option.  Greatly improved memory management for
- split and replicated datasets.  Added -nocolorbar option.
-
+ $Log: not supported by cvs2svn $
  Revision 1.34  2005/11/04 22:46:46  soliday
  Updated code to be compiled by a 64 bit processor.
 
@@ -1077,6 +1073,8 @@ char *determineScalesGroupID
       sprintf(buffer, "PG%ld\001\002\003\004", dataset->datapage);
     else if (plreq->scalesGroupSpec[plane].flags&SCALESGROUP_USE_REQUEST)
       sprintf(buffer, "RQ%ld\001\002\003\004", dataset->request_index);
+    else if (plreq->scalesGroupSpec[plane].flags&SCALESGROUP_USE_UNITS)
+      sprintf(buffer, "UN%s\001\002\003\004", dataset->info[plane].units);
     else if (plreq->scalesGroupSpec[plane].flags&SCALESGROUP_USE_INAMESTRING) {
       sprintf(buffer, "INS%s\001\002\003\004", 
               plane?plreq->yname[dataset->dataname_index]:plreq->xname[dataset->dataname_index]);

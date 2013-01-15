@@ -9,10 +9,7 @@
 
 /*
  *
- $Log: agilentcomm.cpp,v $
- Revision 1.3  2009/12/10 17:31:46  soliday
- Changed so that it builds on 64bit solaris.
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2009/10/26 18:40:26  soliday
  Fixed issue on Mac computers.
 

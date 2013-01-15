@@ -11,11 +11,7 @@
  * purpose: copy a SDDS file and allow ascii/binary switching
  *
  * Michael Borland, 1993
- $Log: sddsconvert.c,v $
- Revision 1.20  2007/06/08 21:51:15  soliday
- Removed call to free_scanargs because string arguments currently are not
- copied with SDDS_CopyString which free_scanargs requires.
-
+ $Log: not supported by cvs2svn $
  Revision 1.19  2007/03/27 21:30:56  soliday
  Cleaned up the code.
 

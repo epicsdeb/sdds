@@ -8,7 +8,10 @@
 \*************************************************************************/
 
 /* 
- $Log: sddscombinelogfiles.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.8  2011/06/14 16:51:25  lemery
+ Minor edit of usage message.
+
  Revision 1.7  2008/09/23 20:10:38  soliday
  Fixed a bug that caused problems when a file has zero rows.
 
@@ -54,7 +57,7 @@ static char *option[N_OPTIONS] = {
 char *USAGE="sddscombinelogfiles [<SDDSinputfilelist>] [<SDDSoutputfile>]\n\
 [-pipe=[output]] [-overwrite]\n\n\
 This program is used to combine data logger output files that are in\n\
-the one PV per file format.";
+the one-PV-per-file format.\n";
 
 int main(int argc, char **argv)
 {

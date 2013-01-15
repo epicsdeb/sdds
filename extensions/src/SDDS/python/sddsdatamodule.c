@@ -1400,7 +1400,9 @@ static PyObject* sddsdata_SetParameter( PyObject* self, PyObject* args )
     return NULL;
   switch (type) {
   case SDDS_SHORT:
+  case SDDS_USHORT:
   case SDDS_LONG:
+  case SDDS_ULONG:
     if (PyLong_Check(v)) {
       return PyLong_FromLong(SDDS_SetParameters(&dataset_f[fileIndex],SDDS_SET_BY_INDEX|SDDS_PASS_BY_VALUE,index,PyLong_AsLong(v),-1));
     } else {
@@ -1461,6 +1463,16 @@ static PyObject* sddsdata_SetColumn( PyObject* self, PyObject* args )
 	((short*)data)[i] = (short)PyInt_AsLong(temp);
       }
     break;
+  case SDDS_USHORT:
+    data = malloc(sizeof(unsigned short)*rows);
+    for (i=0;i<rows;i++) {
+      temp = PyList_GetItem(v, i);
+      if (PyLong_Check(temp))
+	((unsigned short*)data)[i] = (unsigned short)PyLong_AsLong(temp);
+      else
+	((unsigned short*)data)[i] = (unsigned short)PyInt_AsLong(temp);
+      }
+    break;
   case SDDS_LONG:
     data = malloc(sizeof(long)*rows);
     for (i=0;i<rows;i++) {
@@ -1469,6 +1481,16 @@ static PyObject* sddsdata_SetColumn( PyObject* self, PyObject* args )
 	((long*)data)[i] = (long)PyLong_AsLong(temp);
       else
 	((long*)data)[i] = (long)PyInt_AsLong(temp);
+    }
+    break;
+  case SDDS_ULONG:
+    data = malloc(sizeof(unsigned long)*rows);
+    for (i=0;i<rows;i++) {
+      temp = PyList_GetItem(v, i);
+      if (PyLong_Check(temp))
+	((unsigned long*)data)[i] = (unsigned long)PyLong_AsLong(temp);
+      else
+	((unsigned long*)data)[i] = (unsigned long)PyInt_AsLong(temp);
     }
     break;
   case SDDS_FLOAT:
@@ -1497,8 +1519,14 @@ static PyObject* sddsdata_SetColumn( PyObject* self, PyObject* args )
   case SDDS_SHORT:
     free((short*)data);
     break;
+  case SDDS_USHORT:
+    free((unsigned short*)data);
+    break;
   case SDDS_LONG:
     free((long*)data);
+    break;
+  case SDDS_ULONG:
+    free((unsigned long*)data);
     break;
   case SDDS_FLOAT:
     free((float*)data);
@@ -1585,11 +1613,23 @@ static PyObject* sddsdata_GetColumn( PyObject* self, PyObject* args )
     }
     free((short*)columnValue);
     break;
+  case SDDS_USHORT:
+    for (i=0;i < rows;i++) {
+      PyList_SetItem(v, i, PyLong_FromLong(((unsigned short*)columnValue)[i]));
+    }
+    free((unsigned short*)columnValue);
+    break;
   case SDDS_LONG:
     for (i=0;i < rows;i++) {
       PyList_SetItem(v, i, PyLong_FromLong(((long*)columnValue)[i]));
     }
     free((long*)columnValue);
+    break;
+  case SDDS_ULONG:
+    for (i=0;i < rows;i++) {
+      PyList_SetItem(v, i, PyLong_FromLong(((unsigned long*)columnValue)[i]));
+    }
+    free((unsigned long*)columnValue);
     break;
   case SDDS_FLOAT:
     for (i=0;i < rows;i++) {
@@ -1685,9 +1725,17 @@ static PyObject* sddsdata_GetParameter( PyObject* self, PyObject* args )
     v = PyLong_FromLong(((short*)parameterValue)[0]);
     free((short*)parameterValue);
     break;
+  case SDDS_USHORT:
+    v = PyLong_FromLong(((unsigned short*)parameterValue)[0]);
+    free((unsigned short*)parameterValue);
+    break;
   case SDDS_LONG:
     v = PyLong_FromLong(((long*)parameterValue)[0]);
     free((long*)parameterValue);
+    break;
+  case SDDS_ULONG:
+    v = PyLong_FromLong(((unsigned long*)parameterValue)[0]);
+    free((unsigned long*)parameterValue);
     break;
   case SDDS_FLOAT:
     sprintf(buffer, "%.6E", ((float*)parameterValue)[0]);

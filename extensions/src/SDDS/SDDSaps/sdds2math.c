@@ -10,10 +10,7 @@
 /* program: sdds2math.c
  * purpose: read an SDDS file and convert it to be read by Mathematica
  * Kenneth Evans, 1994 (based on sddsquery and sdds2stream by Michael Borland)
- $Log: sdds2math.c,v $
- Revision 1.15  2005/11/07 21:48:09  soliday
- Updated to remove Linux compiler warnings.
-
+ $Log: not supported by cvs2svn $
  Revision 1.14  2003/08/28 15:21:28  soliday
  Removed include statement for malloc.h
 

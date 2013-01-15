@@ -14,10 +14,7 @@
  *          file.  The columns of the original file are ignored.
  *
  * Michael Borland, 1994
- $Log: sddscollapse.c,v $
- Revision 1.15  2005/11/04 22:46:12  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.14  2002/08/14 17:12:41  soliday
  Added Open License
 

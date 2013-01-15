@@ -9,7 +9,7 @@ gslcblas_DIR := /usr/lib
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
+# $Log: not supported by cvs2svn $
 # Revision 1.26  2010/08/13 21:07:28  ywang25
 # Added the gsl lib to user libraries to build static program, as rpnlib requires function definition from gsl.
 #

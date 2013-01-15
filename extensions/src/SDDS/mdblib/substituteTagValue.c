@@ -39,4 +39,6 @@ void substituteTagValue(char *input, long buflen,
       strcpy_ss(input, buffer);
   }
   free(buffer);
+  if (version1) free(version1);
+  if (version2) free(version2);
 }

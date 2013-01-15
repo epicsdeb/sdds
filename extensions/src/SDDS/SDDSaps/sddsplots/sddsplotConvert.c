@@ -12,7 +12,10 @@
  * part of sddsplot (plotting program for SDDS files)
  *
  * Michael Borland, 1994.
- $Log: sddsplotConvert.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.51  2012/02/24 17:16:35  shang
+ modified to printout warning message when the leftPoints is less than original datapoints after logarithm for y-log mode.
+
  Revision 1.50  2010/10/08 22:07:40  borland
  When the -factor option is given, now scales the error bar values as well.
 
@@ -584,6 +587,10 @@ void perform_dataset_conversions(PLOT_SPEC *plspec)
         pointsLeft = remove_nonpositive_data(dataset->y, dataset->x, dataset->x1, dataset->y1, 
                                                   dataset->split_data, dataset->enumerate, 
                                                   dataset->pointLabel, dataset->pointsStored);
+	if (pointsLeft==0 && dataset->pointsStored) 
+	  bomb("No data left after logarithm because all y data are non-positive values", NULL);
+	if (pointsLeft!=dataset->pointsStored) 
+	  fprintf(stdout, "Warning: some points are removed after logarithm because of non-positive y values\n");
         if (pointsLeft!=dataset->pointsStored && dataset->scrollParent) 
           bomb("using log mode for scrolling is not possible when data has non-positive values", NULL);
         dataset->pointsStored = pointsLeft;

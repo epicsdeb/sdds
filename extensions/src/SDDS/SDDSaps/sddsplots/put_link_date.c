@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: put_link_date.c,v $
- Revision 1.4  2002/08/14 17:24:53  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1998/08/25 15:05:30  borland
  New version with major changes to allow multiple scales on x and y axes.
 

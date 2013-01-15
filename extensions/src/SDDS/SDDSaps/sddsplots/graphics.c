@@ -11,12 +11,7 @@
  * purpose: graphics utility routines using GNUPLOT drivers.
  *
  * Michael Borland, 1991.
- $Log: graphics.c,v $
- Revision 1.47  2011/01/11 22:51:02  soliday
- Changed all the strcpy commands to strcpy_ss because of problems with
- RedHat Enterprise 6. If a strcpy copies the result to the same memory
- space you will get unexpected results.
-
+ $Log: not supported by cvs2svn $
  Revision 1.46  2010/09/02 15:50:21  soliday
  PS files loose the line type information after plotting dots. This will
  change will reset the line type after plotting dots.

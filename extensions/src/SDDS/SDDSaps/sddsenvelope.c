@@ -12,7 +12,7 @@
  *          minimum, maximum, etc. values for specified columns
  * 
  * Michael Borland, 1995
- $Log: sddsenvelope.c,v $
+ $Log: not supported by cvs2svn $
  Revision 1.24  2010/11/05 04:05:49  borland
  For PMAXIMUM and PMINIMUM, the functionOf name is now part of the output column name.
 
@@ -655,14 +655,14 @@ int main(int argc, char **argv)
     case SET_SLOPE:
       for (i=0; i<rows; i++) {
         double D;
-        D = rows*stat[iStat].value2[i] - stat[iStat].value1[i]*stat[iStat].value1[i];
-        stat[iStat].value1[i] = (rows*stat[iStat].value4[i] - stat[iStat].value1[i]*stat[iStat].value3[i])/D;
+        D = pages*stat[iStat].value2[i] - stat[iStat].value1[i]*stat[iStat].value1[i];
+        stat[iStat].value1[i] = (pages*stat[iStat].value4[i] - stat[iStat].value1[i]*stat[iStat].value3[i])/D;
       }
       break;
     case SET_INTERCEPT:
       for (i=0; i<rows; i++) {
         double D;
-        D = rows*stat[iStat].value2[i] - stat[iStat].value1[i]*stat[iStat].value1[i];
+        D = pages*stat[iStat].value2[i] - stat[iStat].value1[i]*stat[iStat].value1[i];
         stat[iStat].value1[i] = (stat[iStat].value2[i]*stat[iStat].value3[i] -
                                  stat[iStat].value1[i]*stat[iStat].value4[i])/D;
       }

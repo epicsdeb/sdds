@@ -11,10 +11,7 @@
  * purpose: mathematical and physical constants
  *
  * Michael Borland, 1991
- $Log: constants.h,v $
- Revision 1.8  2008/08/15 01:51:54  borland
- Added flag to prevent multiple includes.
-
+ $Log: not supported by cvs2svn $
  Revision 1.7  2005/01/27 20:15:36  borland
  Restored previous version.  Changes resulted in too many annoying discrepancies.
 

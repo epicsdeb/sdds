@@ -29,7 +29,7 @@
 #include	<stdio.h>
 #include	"matrix.h"
 
-static	char	rcsid[] = "$Id: submat.c,v 1.2 1999/10/27 21:50:40 borland Exp $";
+static	char	rcsid[] = "$Id: submat.c,v 1.2 1999-10-27 21:50:40 borland Exp $";
 
 
 /* get_col -- gets a specified column of a matrix and retruns it as a vector */

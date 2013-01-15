@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # makefile for SDDS applications
-# $Log: Makefile.Host,v $
-# Revision 1.31  2003/07/23 18:50:41  soliday
-# Fixed for WIN32
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.30  2003/07/23 06:55:10  soliday
 # Modified makefiles to work with base 3.13 and 3.14
 #

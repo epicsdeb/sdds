@@ -30,7 +30,7 @@
 	factorisations.
 */
 
-static	char	rcsid[] = "$Id: hessen.c,v 1.2 1999/10/27 21:50:36 borland Exp $";
+static	char	rcsid[] = "$Id: hessen.c,v 1.2 1999-10-27 21:50:36 borland Exp $";
 
 #include	<stdio.h>
 #include	"matrix.h"

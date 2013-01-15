@@ -11,10 +11,7 @@
  * purpose: open file with error checking, messages, and aborts
  *
  * Michael Borland, 1987.
- $Log: fopen_e.c,v $
- Revision 1.4  2002/08/14 16:06:08  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1999/05/25 21:53:01  soliday
  Removed compiler warnings under Linux.
 

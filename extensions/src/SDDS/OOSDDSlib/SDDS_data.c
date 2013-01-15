@@ -52,10 +52,7 @@
  * contents: data arrays use by SDDS routines
  * 
  * Michael Borland, November 1993.
- $Log: SDDS_data.c,v $
- Revision 1.1  1997/03/06 19:27:22  saunders
- *** empty log message ***
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1996/03/12 04:00:38  borland
  Reformatted code to 2-space indentation in K&R style.
 

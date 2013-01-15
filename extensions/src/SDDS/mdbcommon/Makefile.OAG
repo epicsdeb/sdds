@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
-# Revision 1.9  2007/04/16 21:06:10  soliday
-# Moved lincorr.c and logfile_gener.c to mdbmth.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.8  2005/02/02 16:09:03  soliday
 # Moved find_files.c from mdblib to mdbcommon
 #

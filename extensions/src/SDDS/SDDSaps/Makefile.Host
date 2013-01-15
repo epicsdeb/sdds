@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # makefile for SDDS applications
-# $Log: Makefile.Host,v $
-# Revision 1.46  2003/07/23 03:54:08  soliday
-# Modified makefiles to work with base versions 3.13 and 3.14
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.45  2003/07/22 20:01:15  soliday
 # Added support for Kylix.
 #

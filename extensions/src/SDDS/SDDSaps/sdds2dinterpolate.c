@@ -24,7 +24,13 @@
 /* sdds2dinterpolate.c   H. Shang  3/20/2007 
    added sdds input and output so that the output can be plotted by sddscontour
    
-   $Log: sdds2dinterpolate.c,v $
+   $Log: not supported by cvs2svn $
+   Revision 1.9  2011/11/29 20:10:54  shang
+   added comments for -preprocess option, made the zoom option work for nn method, and now the output file keeps the properties of independent and dependent columns.
+
+   Revision 1.8  2011/11/01 15:42:21  lemery
+   spelling of consecutive.
+
    Revision 1.7  2010/01/14 16:20:15  shang
    fixed bugs in interpolating multiple page data without merge.
 
@@ -54,10 +60,6 @@
 #include "scan.h"
 #include "nn_2d_interpolate.h"
 #include "csa.h"
-
-#if defined(_WIN32)
-#define isnan(x) _isnan(x)
-#endif
 
 #define CLO_PIPE 0
 #define CLO_INDEPENDENT_COLUMN 1
@@ -100,14 +102,15 @@ static char *USAGE2="-indepentdentColumn provide the independent column names of
                 turns into a circle (this produces results invariant to affine transformations)\n\
 -range          set the Xmin, Xmax, Ymin and Ymax for the output grid.\n\
 -zoom           zoom in (if <zoom> < 1) or out (<zoom> > 1) (activated)\n\
-                only when used in conjunction with -nDimension.\n\
+                only when used in conjunction with -nDimension, it does not work if the output points provided by a file.\n\
 -outDimension   generate <nx>x<ny> output rectangular grid.\n\
 -file           provided the output grid, either outDimension or file has to be provided.\n\
+-preprocess     printout the xcol, ycol and dependent column value, no interpolation will be done and no ouput will be generated.\n\
 -dimensionThin  thin input data by averaging X, Y and Z values within \n\
                 every cell of the rectangular <nx>x<ny> grid size.\n\
                 optional with -outDimension.\n\
 -clusterThin    thin input data by averaging X, Y and Z values within \n\
-                clusters of consequitive input points such that the sum of distances \n\
+                clusters of consecutive input points such that the sum of distances \n\
                 between points within each cluster does not exceed the specified maximum value.\n";
 static char *USAGE3="-algorithm      provide algorithm: \n\
                 nn -- natural neighours interpolation, it has 3 three following options: \n\
@@ -155,8 +158,8 @@ char *algorithm_option[ALGORITHMS]={"nn", "csa"};
 char *scale_option[SCALE_OPTIONS]={"circle", "square"};
 
 void ReadInputFile(char *inputFile, char *xCol, char *yCol, char *zCol, char *stdCol,
-                   long *pages, long **rows, double ***x, double ***y, double ***z, double ***std);
-void SetupOutputFile(SDDS_DATASET *SDDS_out, char *outputFile, char *xCol, char *yCol, char *zCol);
+                   long *pages, long **rows, double ***x, double ***y, double ***z, double ***std, SDDS_DATASET *SDDS_in);
+void SetupOutputFile(SDDS_DATASET *SDDS_out, SDDS_DATASET *SDDS_in, char *outputFile, char *xCol, char *yCol, char *zCol);
 void WriteOutputPage(SDDS_DATASET *SDDS_out, char *xCol, char *yCol, char *zCol, specs *spec, int nout, point *pout);
 void ReadPointFile(char *pointsFile, char *xCol, char *yCol, long *point_pages, OUT_POINT **out_point);
 int interpolate_output_points(int nin, point *pin, double *std, char *xCol, char *yCol, char *zCol,
@@ -166,7 +169,7 @@ static char *INFINITY_OPTION[1]={"infinity"};
 
 int main(int argc, char* argv[])
 {
-  SDDS_DATASET SDDS_out, SDDS_points;
+  SDDS_DATASET SDDS_out, SDDS_points, SDDS_in;
   char *inputFile, *outputFile, *xCol="x", *yCol="y", *zCol="z", *stdCol="StdError", *pointsFile=NULL;
   long i, j, i_arg, algorithm, scale, *rows, pages, merge=0, point_pages=0, page;
   unsigned long dummyFlags=0, pipeFlags=0;
@@ -379,9 +382,11 @@ int main(int argc, char* argv[])
     else
       spec->npoints = spec->nx * spec->ny;
   }
-  ReadInputFile(inputFile, xCol, yCol, zCol, stdCol, &pages, &rows, &x, &y, &z, &std);
+  ReadInputFile(inputFile, xCol, yCol, zCol, stdCol, &pages, &rows, &x, &y, &z, &std, &SDDS_in);
   if (!spec->nointerp)
-    SetupOutputFile(&SDDS_out, outputFile, xCol, yCol, zCol); 
+    SetupOutputFile(&SDDS_out, &SDDS_in, outputFile, xCol, yCol, zCol); 
+  if (!SDDS_Terminate(&SDDS_in))
+    SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   if (pointsFile)
     ReadPointFile(pointsFile, xCol, yCol, &point_pages, &out_point);
   if (merge) {
@@ -527,33 +532,32 @@ int main(int argc, char* argv[])
 }
 
 void ReadInputFile(char *inputFile, char *xCol, char *yCol, char *zCol, char *stdCol,
-                   long *pages, long **rows, double ***x, double ***y, double ***z, double ***std)
+                   long *pages, long **rows, double ***x, double ***y, double ***z, double ***std, SDDS_DATASET *SDDS_in)
 {
-  SDDS_DATASET SDDS_in;
   int32_t rows1=0;
   long pages0=0, std_exist=0;
  
   *rows = NULL;
-  if (!SDDS_InitializeInput(&SDDS_in, inputFile))
+  if (!SDDS_InitializeInput(SDDS_in, inputFile))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
-  if (SDDS_CheckColumn(&SDDS_in, xCol, NULL, SDDS_ANY_NUMERIC_TYPE, stderr)!=SDDS_CHECK_OK) {
+  if (SDDS_CheckColumn(SDDS_in, xCol, NULL, SDDS_ANY_NUMERIC_TYPE, stderr)!=SDDS_CHECK_OK) {
     fprintf(stderr,"x column - %s does not exist!\n", xCol);
     exit(1);
   }
-  if (SDDS_CheckColumn(&SDDS_in, yCol, NULL, SDDS_ANY_NUMERIC_TYPE, stderr)!=SDDS_CHECK_OK) {
+  if (SDDS_CheckColumn(SDDS_in, yCol, NULL, SDDS_ANY_NUMERIC_TYPE, stderr)!=SDDS_CHECK_OK) {
     fprintf(stderr,"y column - %s does not exist!\n", yCol);
     exit(1);
   }
-  if (SDDS_CheckColumn(&SDDS_in, zCol, NULL, SDDS_ANY_NUMERIC_TYPE, stderr)!=SDDS_CHECK_OK) {
+  if (SDDS_CheckColumn(SDDS_in, zCol, NULL, SDDS_ANY_NUMERIC_TYPE, stderr)!=SDDS_CHECK_OK) {
     fprintf(stderr,"z column - %s does not exist!\n", zCol);
     exit(1);
   }
-  if (SDDS_CheckColumn(&SDDS_in, stdCol, NULL, SDDS_ANY_NUMERIC_TYPE, NULL)==SDDS_CHECK_OK)
+  if (SDDS_CheckColumn(SDDS_in, stdCol, NULL, SDDS_ANY_NUMERIC_TYPE, NULL)==SDDS_CHECK_OK)
     std_exist = 1;
   
-  while (SDDS_ReadPage(&SDDS_in)>0) {
+  while (SDDS_ReadPage(SDDS_in)>0) {
     rows1 = 0;
-    rows1=SDDS_CountRowsOfInterest(&SDDS_in);
+    rows1=SDDS_CountRowsOfInterest(SDDS_in);
     if (!rows1)
       continue;
     *rows = SDDS_Realloc(*rows, sizeof(**rows)*(pages0+1));
@@ -573,16 +577,15 @@ void ReadInputFile(char *inputFile, char *xCol, char *yCol, char *zCol, char *st
     }
     
     (*x)[pages0] = (*y)[pages0] = (*z)[pages0] = NULL;
-    if (!((*x)[pages0]=(double*)SDDS_GetColumnInDoubles(&SDDS_in, xCol)) ||
-        !((*y)[pages0]=(double*)SDDS_GetColumnInDoubles(&SDDS_in, yCol)) ||
-        !((*z)[pages0]=(double*)SDDS_GetColumnInDoubles(&SDDS_in, zCol)))
+    if (!((*x)[pages0]=(double*)SDDS_GetColumnInDoubles(SDDS_in, xCol)) ||
+        !((*y)[pages0]=(double*)SDDS_GetColumnInDoubles(SDDS_in, yCol)) ||
+        !((*z)[pages0]=(double*)SDDS_GetColumnInDoubles(SDDS_in, zCol)))
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
-    if (std_exist && !((*std)[pages0]=(double*)SDDS_GetColumnInDoubles(&SDDS_in, stdCol)))
+    if (std_exist && !((*std)[pages0]=(double*)SDDS_GetColumnInDoubles(SDDS_in, stdCol)))
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
     pages0 ++;
   }
-  if (!SDDS_Terminate(&SDDS_in))
-    SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+ 
   if (!pages0) {
     fprintf(stderr, "No data found in the input file.\n");
     exit(1);
@@ -591,17 +594,20 @@ void ReadInputFile(char *inputFile, char *xCol, char *yCol, char *zCol, char *st
   return;
 }
 
-void SetupOutputFile(SDDS_DATASET *SDDS_out, char *outputFile, char *xCol, char *yCol, char *zCol) 
+void SetupOutputFile(SDDS_DATASET *SDDS_out, SDDS_DATASET *SDDS_in,  char *outputFile, char *xCol, char *yCol, char *zCol) 
 {
-  char tmpstr[256];
+  char tmpstr[256], *xUnits=NULL, *yUnits=NULL;
   
   if (!SDDS_InitializeOutput(SDDS_out, SDDS_BINARY,1, NULL, NULL, outputFile))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   if (!SDDS_DefineSimpleParameter(SDDS_out, "Variable1Name", NULL, SDDS_STRING) ||
       !SDDS_DefineSimpleParameter(SDDS_out, "Variable2Name", NULL, SDDS_STRING) ||
-      !SDDS_DefineSimpleColumn(SDDS_out, xCol, NULL, SDDS_DOUBLE) ||
-      !SDDS_DefineSimpleColumn(SDDS_out, yCol, NULL, SDDS_DOUBLE) ||
-      !SDDS_DefineSimpleColumn(SDDS_out, zCol, NULL, SDDS_DOUBLE)) 
+      !SDDS_TransferColumnDefinition(SDDS_out, SDDS_in, xCol, NULL) ||
+      !SDDS_TransferColumnDefinition(SDDS_out, SDDS_in, yCol, NULL) ||
+      !SDDS_TransferColumnDefinition(SDDS_out, SDDS_in, zCol, NULL)) 
+    SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+  if (SDDS_GetColumnInformation(SDDS_in, "units", &xUnits, SDDS_GET_BY_NAME, xCol)!=SDDS_STRING ||
+      SDDS_GetColumnInformation(SDDS_in, "units", &yUnits, SDDS_GET_BY_NAME, yCol)!=SDDS_STRING)
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   sprintf(tmpstr, "%sDimension", xCol);
   if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, NULL, SDDS_LONG))
@@ -610,25 +616,27 @@ void SetupOutputFile(SDDS_DATASET *SDDS_out, char *outputFile, char *xCol, char 
   if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, NULL, SDDS_LONG))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   sprintf(tmpstr, "%sInterval", xCol);
-  if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, NULL, SDDS_DOUBLE))
+  if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, xUnits, SDDS_DOUBLE))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   sprintf(tmpstr, "%sInterval", yCol);
-  if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, NULL, SDDS_DOUBLE))
+  if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, yUnits, SDDS_DOUBLE))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   sprintf(tmpstr, "%sMinimum", xCol);
-  if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, NULL, SDDS_DOUBLE))
+  if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, xUnits, SDDS_DOUBLE))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   sprintf(tmpstr, "%sMinimum", yCol);
-  if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, NULL, SDDS_DOUBLE))
+  if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, yUnits, SDDS_DOUBLE))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   sprintf(tmpstr, "%sMaximum", xCol);
-  if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, NULL, SDDS_DOUBLE))
+  if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, xUnits, SDDS_DOUBLE))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   sprintf(tmpstr, "%sMaximum", yCol);
-  if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, NULL, SDDS_DOUBLE))
+  if (!SDDS_DefineSimpleParameter(SDDS_out, tmpstr, yUnits, SDDS_DOUBLE))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   if (!SDDS_WriteLayout(SDDS_out))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+  if (xUnits) free(xUnits);
+  if (yUnits) free(yUnits);
 }
 
 void WriteOutputPage(SDDS_DATASET *SDDS_out, char *xCol, char *yCol, char *zCol, specs *spec, int nout, point *pout)
@@ -639,7 +647,7 @@ void WriteOutputPage(SDDS_DATASET *SDDS_out, char *xCol, char *yCol, char *zCol,
   if (!SDDS_StartPage(SDDS_out, nout))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   if (!SDDS_SetParameters(SDDS_out, SDDS_SET_BY_NAME|SDDS_PASS_BY_VALUE,
-                         "Variable1Name", yCol, "Variable2Name", xCol, NULL))
+                         "Variable1Name", xCol, "Variable2Name", yCol, NULL))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   sprintf(tmpstr, "%sDimension", xCol);
   if (!SDDS_SetParameters(SDDS_out, SDDS_SET_BY_NAME|SDDS_PASS_BY_VALUE,

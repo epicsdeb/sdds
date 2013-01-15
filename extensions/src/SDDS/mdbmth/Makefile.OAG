@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
+# $Log: not supported by cvs2svn $
 # Revision 1.13  2010/02/04 23:44:57  soliday
 # Updated because complex.cc replaces complex.c
 #
@@ -83,7 +83,7 @@ LIBSRCS = 	betai.c bsODEp.c complex.cc \
 		rkODE.c rowmedian.c sigLevel.c \
 		simplex.c smooth.c topbase.c \
 		trapInteg.c zeroIH.c zeroInterp.c \
-		zeroNewton.c wofz.c qromb.c k13.c k23.c gy.c
+		zeroNewton.c wofz.c qromb.c k13.c k23.c gy.c GillMillerIntegration.c
 
 ifdef WIN32
 DLL_LIBS += mdblib fdlibm

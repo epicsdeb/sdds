@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # makefile for mdblib
-# $Log: Makefile.Host,v $
-# Revision 1.20  2003/07/22 21:40:43  soliday
-# Modified the makefiles to work with epics 3.13 and 3.14
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.19  2003/06/16 19:50:51  soliday
 # Added support for AIX.
 #

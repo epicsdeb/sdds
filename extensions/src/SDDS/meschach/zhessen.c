@@ -31,7 +31,7 @@
 	Complex version
 */
 
-static	char	rcsid[] = "$Id: zhessen.c,v 1.1.1.1 1999/04/14 14:16:19 borland Exp $";
+static	char	rcsid[] = "$Id: zhessen.c,v 1.1.1.1 1999-04-14 14:16:19 borland Exp $";
 
 #include	<stdio.h>
 #include	"zmatrix.h"

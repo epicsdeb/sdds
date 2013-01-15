@@ -26,7 +26,7 @@
 
 /* mfuntort.c,  10/11/93 */
 
-static char rcsid[] = "$Id: mfuntort.c,v 1.1.1.1 1999/04/14 14:16:18 borland Exp $";
+static char rcsid[] = "$Id: mfuntort.c,v 1.1.1.1 1999-04-14 14:16:18 borland Exp $";
 
 #include        <stdio.h>
 #include        <math.h>

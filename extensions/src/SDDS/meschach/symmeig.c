@@ -34,7 +34,7 @@
 #include        "matrix2.h"
 
 
-static char rcsid[] = "$Id: symmeig.c,v 1.3 1999/12/15 15:59:08 soliday Exp $";
+static char rcsid[] = "$Id: symmeig.c,v 1.3 1999-12-15 15:59:08 soliday Exp $";
 
 
 

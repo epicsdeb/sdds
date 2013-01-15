@@ -11,10 +11,7 @@
  * contents: user's routines for getting information about definitions.
  * 
  * Michael Borland, November 1993
- $Log: SDDS_info.c,v $
- Revision 1.6  2005/11/04 22:46:52  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2002/08/14 16:34:48  soliday
  Added Open License
 

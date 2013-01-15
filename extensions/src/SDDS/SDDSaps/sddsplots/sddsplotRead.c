@@ -12,12 +12,7 @@
  * part of sddsplot (plotting program for SDDS files)
  *
  * Michael Borland, 1994.
- $Log: sddsplotRead.c,v $
- Revision 1.36  2011/01/11 22:51:04  soliday
- Changed all the strcpy commands to strcpy_ss because of problems with
- RedHat Enterprise 6. If a strcpy copies the result to the same memory
- space you will get unexpected results.
-
+ $Log: not supported by cvs2svn $
  Revision 1.35  2006/11/15 16:06:33  jiaox
  In the previous version, accidently deleted lines to read parameter values
  for -string=@parameter keyword. It is back now.

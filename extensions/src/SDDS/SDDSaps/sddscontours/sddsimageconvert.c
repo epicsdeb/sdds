@@ -9,17 +9,7 @@
 
 /* 
  *
- $Log: sddsimageconvert.c,v $
- Revision 1.4  2008/08/21 20:54:29  soliday
- Updated to check if the Y interval in the single column input file would result
- in only positive integers for the values for Y. If this is the case then
- it will create the multi-column image output file with column names that have
- the same length by adding zeros in front of the Y value.
- Also it now checks the X interval in the single column input file to see if it
- would result in only integers for the Index column in the multi-column output
- file. If this is the case then it will define the Index column as LONG instead
- of DOUBLE.
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2005/11/04 22:46:40  soliday
  Updated code to be compiled by a 64 bit processor.
 

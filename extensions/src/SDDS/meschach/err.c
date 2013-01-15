@@ -31,7 +31,7 @@
   Ported to Pyramid 9810 late 1987
   */
 
-static	char	rcsid[] = "$Id: err.c,v 1.1.1.1 1999/04/14 14:16:17 borland Exp $";
+static	char	rcsid[] = "$Id: err.c,v 1.1.1.1 1999-04-14 14:16:17 borland Exp $";
 
 #include	<stdio.h>
 #include	<setjmp.h>

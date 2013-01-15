@@ -17,10 +17,7 @@
  *   m_free(&A);
  *
  * Michael Borland, 1986.
- $Log: m_free.c,v $
- Revision 1.6  2002/08/14 16:45:22  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2002/07/31 14:34:19  soliday
  Added support for Mac
 

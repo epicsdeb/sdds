@@ -31,7 +31,7 @@
 #include        <ctype.h>
 #include        "matrix.h"
 
-static char rcsid[] = "$Id: matrixio.c,v 1.3 2000/04/05 20:57:03 soliday Exp $";
+static char rcsid[] = "$Id: matrixio.c,v 1.3 2000-04-05 20:57:03 soliday Exp $";
 
 
 /* local variables */

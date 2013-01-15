@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: m_scmul.c,v $
- Revision 1.4  2002/08/14 16:45:23  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1998/04/21 21:26:41  borland
  New names to allow concurrent use with the Meschach library.
 

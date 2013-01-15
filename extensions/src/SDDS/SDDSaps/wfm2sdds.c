@@ -9,10 +9,7 @@
 
 /*
  *
- $Log: wfm2sdds.c,v $
- Revision 1.7  2009/01/20 20:41:56  soliday
- Fixed an issue with the postcharge offset.
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2009/01/19 22:42:05  soliday
  Added support for FastFrames (multiple waveforms)
 

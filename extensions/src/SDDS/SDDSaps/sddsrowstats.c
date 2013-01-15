@@ -12,7 +12,7 @@
  *          producing a new column of data.
  * 
  * Michael Borland, 1996
- $Log: sddsrowstats.c,v $
+ $Log: not supported by cvs2svn $
  Revision 1.24  2006/12/14 22:22:00  soliday
  Updated a bunch of programs because SDDS_SaveLayout is now called by
  SDDS_WriteLayout and it is no longer required to be called directly.
@@ -121,24 +121,27 @@
 #define SET_LARGEST 14
 #define SET_SMALLEST 15
 #define SET_SPREAD 16
-#define N_OPTIONS 17
+#define SET_PERCENTILE 17
+#define N_OPTIONS 18
 
 char *option[N_OPTIONS] = {
   "maximum", "minimum", "mean", "standarddeviation", "rms", "sum",
   "sigma", "count", "pipe", "median", "mad", "nowarnings", "drange",
-  "qrange", "largest", "smallest", "spread",
+  "qrange", "largest", "smallest", "spread", "percentile",
     } ;
 
 
 #define TOPLIMIT_GIVEN    0x0001U
 #define BOTTOMLIMIT_GIVEN 0x0002U
 #define POSITIONCOLUMN_GIVEN 0x0004U
+#define PERCENT_GIVEN 0x0008U
 
 /* this structure stores a command-line request for statistics computation */
 /* individual elements of sourceColumn may contain wildcards */
 typedef struct {
     char **sourceColumn, *resultColumn, *positionColumn;
     long sourceColumns, sumPower, optionCode, positionColumnIndex;
+    double percent;
     unsigned long flags;
     double topLimit, bottomLimit;
     } STAT_REQUEST;
@@ -149,6 +152,7 @@ typedef struct {
 typedef struct {
     char **sourceColumn, *resultColumn, *positionColumn;
     long sourceColumns, optionCode, resultIndex, sumPower, positionColumnIndex;
+    double percent;
     unsigned long flags;
     double topLimit, bottomLimit;
     } STAT_DEFINITION;
@@ -177,7 +181,8 @@ static char *USAGE="sddsrowstats [<input>] [<output>] [-pipe[=input][,output]]\n
 [-qrange=<newName>[,<limitOps>],<columnNameList>]\n\
 [-smallest=<newName>[,positionColumn=<name>][,<limitOps>],<columnNameList>]\n\
 [-largest=<newName>[,positionColumn=<name>][,<limitOps>],<columnNameList>]\n\
-[-count=<newName>[,<limitOps>],<columnNameList>]\n\n\
+[-count=<newName>[,<limitOps>],<columnNameList>]\n\
+[-percentile=<newName>[,<limitOps>],value=<percent>,<columnNameList]\n\
   <limitOps> is of the form [topLimit=<value>,][bottomLimit=<value>]\n\n\
 Computes statistics for each row of each input table, adding new columns to the\n\
 output table.  Each row statistic is done using data from the columns listed in\n\
@@ -185,7 +190,7 @@ output table.  Each row statistic is done using data from the columns listed in\
 names. positionColumn=<name> for minimum, maximum, smallest, largest option is to store \n\
 the corresponding column name of the minimum, maximum, smallest, or largest in each row to \n\
 the new output column - <name>.\n\n\
-Program by Michael Borland. (This is version 5, May 2000.)\n";
+Program by Michael Borland. (This is version 6, October, 2011)\n";
 
 int main(int argc, char **argv)
 {
@@ -206,7 +211,8 @@ int main(int argc, char **argv)
   double *statWorkArray;
   double quartilePoint[2] = {25.0, 75.0 }, quartileResult[2];
   double decilePoint[2]   = {10.0, 90.0 }, decileResult[2];
-
+  double percent;
+  
   SDDS_RegisterProgramName(argv[0]);
   argc = scanargs(&scanned, argc, argv); 
   if (argc<2) {
@@ -265,6 +271,26 @@ int main(int argc, char **argv)
           free(positionColumn);
           positionColumn = NULL;
         }
+        break;
+      case SET_PERCENTILE:
+        if (scanned[i_arg].n_items<3) {
+          fprintf(stderr, "error: invalid -%s syntax\n", option[code]);
+          exit(1);
+        }
+        if (!scanItemList(&scanFlags, scanned[i_arg].list, &scanned[i_arg].n_items, 
+                          SCANITEMLIST_UNKNOWN_VALUE_OK|SCANITEMLIST_REMOVE_USED_ITEMS|
+                          SCANITEMLIST_IGNORE_VALUELESS,
+                          "value", SDDS_DOUBLE, &percent, 1, PERCENT_GIVEN,
+                          "toplimit", SDDS_DOUBLE, &topLimit, 1, TOPLIMIT_GIVEN,
+                          "bottomlimit", SDDS_DOUBLE, &bottomLimit, 1, BOTTOMLIMIT_GIVEN,
+                          NULL) || 
+            !(scanFlags&PERCENT_GIVEN) || percent<=0 || percent>=100) 
+          SDDS_Bomb("invalid -percentile syntax");
+        requests = addStatRequests(&request, requests, scanned[i_arg].list+1, scanned[i_arg].n_items-1,
+                                   code, scanFlags);
+        request[requests-1].percent = percent;
+        request[requests-1].topLimit = topLimit;
+        request[requests-1].bottomLimit = bottomLimit;
         break;
       case SET_SUM:
         if (scanned[i_arg].n_items<3) {
@@ -651,6 +677,23 @@ int main(int argc, char **argv)
             outputData[row] = value2-value1;
           }
           break;
+        case SET_PERCENTILE:
+          for (row=0; row<rows; row++) {
+            for (iColumn=count=value1=0; iColumn<stat[iStat].sourceColumns; iColumn++) {
+              if (stat[iStat].flags&TOPLIMIT_GIVEN &&
+                  inputData[iColumn][row]>stat[iStat].topLimit)
+                continue;
+              if (stat[iStat].flags&BOTTOMLIMIT_GIVEN &&
+                  inputData[iColumn][row]<stat[iStat].bottomLimit)
+                continue;
+              statWorkArray[count] = inputData[iColumn][row];
+              count++;
+            }
+            outputData[row] = HUGE_VAL;
+            if (count) 
+              compute_percentiles(&outputData[row], &stat[iStat].percent,  1, statWorkArray, count);
+          }
+          break;
         default:
           SDDS_Bomb("invalid statistic code (accumulation loop)");
           break;
@@ -744,6 +787,7 @@ STAT_DEFINITION *compileStatDefinitions(SDDS_DATASET *inData, STAT_REQUEST *requ
       stat[iStat].topLimit     = request[iReq].topLimit;
       stat[iStat].bottomLimit  = request[iReq].bottomLimit;
       stat[iStat].positionColumn = request[iReq].positionColumn;
+      stat[iStat].percent      = request[iReq].percent;
       iStat++;
     }
     *stats = iStat;

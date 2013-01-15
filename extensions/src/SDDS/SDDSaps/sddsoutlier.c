@@ -11,10 +11,7 @@
  * purpose: eliminate statistical outliers from data
  *
  * Michael Borland, 1995
- $Log: sddsoutlier.c,v $
- Revision 1.19  2010/10/07 14:44:28  shang
- made the noWarnings option work as expected.
-
+ $Log: not supported by cvs2svn $
  Revision 1.18  2006/12/14 22:21:59  soliday
  Updated a bunch of programs because SDDS_SaveLayout is now called by
  SDDS_WriteLayout and it is no longer required to be called directly.

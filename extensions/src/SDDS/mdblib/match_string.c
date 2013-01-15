@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: match_string.c,v $
- Revision 1.7  2005/04/07 19:40:41  borland
- Removed debugging statement.
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2005/04/07 19:33:22  borland
  Added WILDCARD_MATCH ability to match_string.  Used by sddsxref -wildMatch option.
 

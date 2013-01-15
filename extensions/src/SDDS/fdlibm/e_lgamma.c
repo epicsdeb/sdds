@@ -1,9 +1,6 @@
 /*
  *
- $Log: e_lgamma.c,v $
- Revision 1.2  2000/04/05 22:12:58  soliday
- Added Borland C support.
-
+ $Log: not supported by cvs2svn $
  Revision 1.1  1999/07/12 19:46:56  soliday
  Customized fdlibm library used with WIN32
 

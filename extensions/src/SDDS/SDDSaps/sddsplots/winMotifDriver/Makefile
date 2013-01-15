@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile,v $
-# Revision 1.3  2003/07/23 19:43:57  soliday
-# Modified makefiles to work with base version 3.13 and 3.14
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.2  2002/08/14 17:27:01  soliday
 # Added Open License
 #

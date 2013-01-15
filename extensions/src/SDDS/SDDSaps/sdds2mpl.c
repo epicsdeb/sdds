@@ -10,10 +10,7 @@
 /* program: sdds2mpl.c
  * purpose: extract data from SDDS format and create mpl files
  * Michael Borland, 1993
- $Log: sdds2mpl.c,v $
- Revision 1.10  2005/11/07 21:48:10  soliday
- Updated to remove Linux compiler warnings.
-
+ $Log: not supported by cvs2svn $
  Revision 1.9  2002/08/14 17:12:39  soliday
  Added Open License
 

@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: topbase.c,v $
- Revision 1.5  2002/08/14 16:19:01  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2000/08/08 20:21:15  borland
  Now use midpoint rather than mean in top/base analysis to section the
  data into two halves.

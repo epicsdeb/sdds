@@ -11,10 +11,7 @@
  * purpose: sorts the columns of an SDDS file 
  *
  * Hairong Shang, 2003
- $Log: sddssortcolumn.c,v $
- Revision 1.4  2010/04/15 16:41:10  soliday
- Fixed some warning messages.
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2009/04/06 18:27:14  shang
  fixed a bug sorting columns by provided order in a file.
 

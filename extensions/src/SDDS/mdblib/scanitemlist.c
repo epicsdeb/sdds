@@ -9,10 +9,7 @@
 
 /* routine: scan_item_list
  * M. Borland, 1994
- $Log: scanitemlist.c,v $
- Revision 1.22  2007/07/13 15:02:45  soliday
- Renamed strcpy_s to strcpy_ss because Microsoft is already using this name.
-
+ $Log: not supported by cvs2svn $
  Revision 1.21  2007/02/02 18:45:28  borland
  Added str_copy.c, with strcpy_s() routine for safe string copies.
  Converted routines from strcpy() to strcpy_s().

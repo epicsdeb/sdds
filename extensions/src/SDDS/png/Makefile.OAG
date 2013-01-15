@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
-# Revision 1.5  2005/01/21 20:30:44  soliday
-# Updated to support purify on Linux
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.4  2003/08/28 22:20:32  soliday
 # Modified so that vxWorks does not try to build this with EPICS ver 3.14
 #

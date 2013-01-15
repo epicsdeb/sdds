@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: print_namelist.c,v $
- Revision 1.12  2007/08/07 16:15:29  ywang25
- Replace strcpy with stcpy_ss to avoid potential memory problems.
-
+ $Log: not supported by cvs2svn $
  Revision 1.11  2005/12/07 16:21:27  soliday
  Fixed some compiler warnings on Linux.
 

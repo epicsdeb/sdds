@@ -151,7 +151,7 @@ sed >zcopy.c <<'//GO.SYSIN DD zcopy.c' 's/^-//'
 -***************************************************************************/
 -
 -
--static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -#include	<stdio.h>
 -#include	"zmatrix.h"
 -
@@ -351,7 +351,7 @@ sed >zmatio.c <<'//GO.SYSIN DD zmatio.c' 's/^-//'
 -#include        <ctype.h>
 -#include        "zmatrix.h"
 -
--static char rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: m10,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -
 -
@@ -754,7 +754,7 @@ sed >zmemory.c <<'//GO.SYSIN DD zmemory.c' 's/^-//'
 -#include	<stdio.h>
 -#include	"zmatrix.h"
 -
--static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -
 -
@@ -1468,7 +1468,7 @@ sed >zvecop.c <<'//GO.SYSIN DD zvecop.c' 's/^-//'
 -#include	<stdio.h>
 -#include	"matrix.h"
 -#include	"zmatrix.h"
--static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -
 -
@@ -1982,7 +1982,7 @@ sed >zmatop.c <<'//GO.SYSIN DD zmatop.c' 's/^-//'
 -#include	<stdio.h>
 -#include	"zmatrix.h"
 -
--static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -
 -#define	is_zero(z)	((z).re == 0.0 && (z).im == 0.0)
@@ -2597,7 +2597,7 @@ sed >znorm.c <<'//GO.SYSIN DD znorm.c' 's/^-//'
 -	A collection of functions for computing norms: scaled and unscaled
 -	Complex version
 -*/
--static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include	"zmatrix.h"
@@ -2811,7 +2811,7 @@ sed >zfunc.c <<'//GO.SYSIN DD zfunc.c' 's/^-//'
 -#include	"zmatrix.h"
 -#include	<math.h>
 -
--static char rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: m10,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#ifndef COMPLEX_H
 -
@@ -3049,7 +3049,7 @@ sed >zlufctr.c <<'//GO.SYSIN DD zlufctr.c' 's/^-//'
 -	Complex version
 -*/
 -
--static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include	"zmatrix.h"
@@ -3331,7 +3331,7 @@ sed >zsolve.c <<'//GO.SYSIN DD zsolve.c' 's/^-//'
 -	Complex case
 -*/
 -
--static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include        "zmatrix2.h"
@@ -3642,7 +3642,7 @@ sed >zmatlab.c <<'//GO.SYSIN DD zmatlab.c' 's/^-//'
 -#include        "zmatrix.h"
 -#include	"matlab.h"
 -
--static char rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: m10,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -/* zm_save -- save matrix in ".mat" file for MATLAB
 -   -- returns matrix to be saved */
@@ -3856,7 +3856,7 @@ sed >zhsehldr.c <<'//GO.SYSIN DD zhsehldr.c' 's/^-//'
 -	Complex version
 -*/
 -
--static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m10,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include	"zmatrix.h"

@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: sddssampledist.c,v $
- Revision 1.16  2010/01/14 22:46:39  shang
- added -optimalHalton option
-
+ $Log: not supported by cvs2svn $
  Revision 1.15  2007/06/21 17:38:12  borland
  Restored ability to read from a file and write to a pipe.
  Fixed usage messages for -gaussian, -uniform, and -poisson.

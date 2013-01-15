@@ -15,10 +15,7 @@
  *  each page has the same z coordinates, and each column has the same y coordinates,
  *  each row has the same x coordniates. 
  *  This programs average z, y and Jz over Rho for each x, the output file contains x, ZAve, YAve, and JzAve columns
- *  $Log: sdds3daverage.c,v $
- *  Revision 1.1  2007/04/17 21:16:46  shang
- *  first version, specifically for averaging y and z over Rho for vorpal totalRhoJ ouput.
- *
+ *  $Log: not supported by cvs2svn $
  */
 
 #include "mdb.h"

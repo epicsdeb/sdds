@@ -11,10 +11,7 @@
  * purpose: flag definitions for use with match_string
  *
  * Michael Borland, 1988
- $Log: match_string.h,v $
- Revision 1.9  2005/04/07 19:33:22  borland
- Added WILDCARD_MATCH ability to match_string.  Used by sddsxref -wildMatch option.
-
+ $Log: not supported by cvs2svn $
  Revision 1.8  2004/12/02 23:02:00  soliday
  The section of code inside the _MATCH_STRING_ ifdef in both the match_string.h
  and mdb.h is now the same. So it will not matter which one is included first.

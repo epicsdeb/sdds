@@ -11,12 +11,7 @@
  * contents: routines used by SDDS command-line applications
  * 
  * M. Borland, 1993.
- $Log: SDDSaps.c,v $
- Revision 1.13  2011/01/11 22:51:02  soliday
- Changed all the strcpy commands to strcpy_ss because of problems with
- RedHat Enterprise 6. If a strcpy copies the result to the same memory
- space you will get unexpected results.
-
+ $Log: not supported by cvs2svn $
  Revision 1.12  2005/11/07 22:20:55  soliday
  Updated to remove compiler warnings on Linux.
 

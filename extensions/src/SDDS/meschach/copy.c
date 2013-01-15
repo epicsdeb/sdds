@@ -24,7 +24,7 @@
 ***************************************************************************/
 
 
-static	char	rcsid[] = "$Id: copy.c,v 1.2 1999/10/27 21:50:35 borland Exp $";
+static	char	rcsid[] = "$Id: copy.c,v 1.2 1999-10-27 21:50:35 borland Exp $";
 #include	<stdio.h>
 #include	"matrix.h"
 

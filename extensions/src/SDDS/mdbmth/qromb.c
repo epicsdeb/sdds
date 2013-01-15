@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
-  $Log: qromb.c,v $
-  Revision 1.3  2009/06/04 15:45:22  soliday
-  Hopefully fixed the comments section.
-
+  $Log: not supported by cvs2svn $
   Revision 1.2  2009/06/04 15:41:38  soliday
   Updated to fix issue on solaris-x86_64.
   

@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- * $Log: resources.h,v $
- * Revision 1.6  2008/05/15 14:33:29  shang
- * added '0' for restoring original plot, '+' for increasing plot size and '-' for decreasing plot size.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.5  2006/10/20 14:08:39  jiaox
  * Added device option -newzoom to turn on/off the newzoom as the mpl_motif
  * starts. Also added newzoom in resource file MPLDriver to set the user default for newzoom feature.

@@ -9,11 +9,7 @@
 
 /* file: find_files.c
    Hairong Shang 
-   $Log: find_files.c,v $
-   Revision 1.3  2008/08/05 19:38:02  soliday
-   Added a backslash to an error message so that it would not see it as a
-   trigraph sequence.
-
+   $Log: not supported by cvs2svn $
    Revision 1.2  2005/03/03 17:22:19  soliday
    Updated to work on WIN32
 

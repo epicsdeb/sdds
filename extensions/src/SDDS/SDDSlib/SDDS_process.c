@@ -13,10 +13,7 @@
  *          for input and the internal structure that the layout is stored in.
  *  
  * Michael Borland, November 1993
- $Log: SDDS_process.c,v $
- Revision 1.11  2008/04/08 14:32:14  shang
- added processing SDDS3
-
+ $Log: not supported by cvs2svn $
  Revision 1.10  2006/08/31 15:08:02  soliday
  Updated to work with SDDS2
 

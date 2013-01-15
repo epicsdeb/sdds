@@ -12,7 +12,7 @@
  * argument parsing for sddsplot
  *
  * Michael Borland, 1994.
- $Log: sddsplotAP.c,v $
+ $Log: not supported by cvs2svn $
  Revision 1.93  2011/01/11 22:51:03  soliday
  Changed all the strcpy commands to strcpy_ss because of problems with
  RedHat Enterprise 6. If a strcpy copies the result to the same memory
@@ -1421,7 +1421,7 @@ long tagrequest_AP(PLOT_SPEC *plotspec, char **item, long items)
 }
 
 
-static char *xScalesGroup_usage = "-xScalesGroup={ID=<string> | fileIndex|fileString|nameIndex|nameString|page|request}";
+static char *xScalesGroup_usage = "-xScalesGroup={ID=<string> | fileIndex|fileString|nameIndex|nameString|page|request|units}";
 long scalesGroup_AP(PLOT_SPEC *plotspec, char **item, long items, long plane,
                     char *errorMessage, char *usage);
 
@@ -1431,7 +1431,7 @@ long xScalesGroup_AP(PLOT_SPEC *plotspec, char **item, long items)
                         xScalesGroup_usage);
 }
 
-static char *yScalesGroup_usage = "-yScalesGroup={ID=<string> | fileIndex|fileString|nameIndex|nameString|page|request}";
+static char *yScalesGroup_usage = "-yScalesGroup={ID=<string> | fileIndex|fileString|nameIndex|nameString|page|request|units}";
 
 long yScalesGroup_AP(PLOT_SPEC *plotspec, char **item, long items)
 {
@@ -1454,6 +1454,7 @@ long scalesGroup_AP(PLOT_SPEC *plotspec, char **item, long items, long plane,
                     "namestring", -1, NULL, 0, SCALESGROUP_USE_NAMESTRING,
                     "page", -1, NULL, 0, SCALESGROUP_USE_PAGE,
                     "request", -1, NULL, 0, SCALESGROUP_USE_REQUEST,
+                    "units", -1, NULL, 0, SCALESGROUP_USE_UNITS,
                     NULL) ||
       bitsSet(plreq->scalesGroupSpec[plane].flags)!=1)
     return bombre(errorMessage, usage, 0);
@@ -2390,7 +2391,7 @@ long enumeratedscales_AP(PLOT_SPEC *plotspec, char **item, long items)
     }
 
 
-char *arrowsettings_usage = "-arrowsettings=[scale=<value>][,barblength=<value>][,barbangle=<deg>][,linetype=<number>][,centered][,cartesiandata[,endpoints]][,polardata][,scalardata][,singlebarb][,autoscale]";
+char *arrowsettings_usage = "-arrowsettings=[scale=<value>][,barblength=<value>][,barbangle=<deg>][,linetype=<number>][,centered][,cartesiandata[,endpoints]][,polardata][,scalardata][,singlebarb][,autoscale][,thickness=<number>]";
 
 long arrowsettings_AP(PLOT_SPEC *plotspec, char **item, long items)
 {
@@ -2415,6 +2416,7 @@ long arrowsettings_AP(PLOT_SPEC *plotspec, char **item, long items)
                         "barblength", SDDS_DOUBLE, &arrow->barbLength, 1, ARROW_BARBLENGTH_GIVEN,
                         "barbangle", SDDS_DOUBLE, &arrow->barbAngle, 1, ARROW_BARBANGLE_GIVEN,
                         "linetype", SDDS_LONG, &arrow->linetype, 1, ARROW_LINETYPE_GIVEN,
+                        "thickness", SDDS_LONG, &arrow->thickness, 1, ARROW_THICKNESS_GIVEN,
                         "cartesiandata", -1, NULL, 0, ARROW_CARTESIAN_DATA,
                         "polardata", -1, NULL, 0, ARROW_POLAR_DATA,
                         "scalardata", -1, NULL, 0, ARROW_SCALAR_DATA,

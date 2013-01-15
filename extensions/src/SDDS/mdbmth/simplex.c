@@ -8,11 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: simplex.c,v $
- Revision 1.29  2004/04/01 14:39:45  borland
- Added SIMPLEX_VERBOSE_LEVEL1 and SIMPLEX_VERBOSE_LEVEL2 flags for simplexMin()
- and simplexMinimization().
-
+ $Log: not supported by cvs2svn $
  Revision 1.28  2003/01/21 18:55:05  borland
  simplexMin() has another argument: a factor by which to multiply the
  parameter ranges at the end of a pass to get the initial step sizes for

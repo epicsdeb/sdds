@@ -1,6 +1,6 @@
 /*
  *
- $Log: fortran_wrapper.c,v $
+ $Log: not supported by cvs2svn $
  Revision 1.11  2010/10/31 19:42:46  soliday
  Added 64bit support.
 
@@ -1118,6 +1118,56 @@ int SDDS_SetParameterByName_F(int fileIndex, char *name, void *value)
   return SDDS_SetParameters(&dataset_f[fileIndex],SDDS_SET_BY_NAME|SDDS_PASS_BY_REFERENCE,name,value,NULL);
 }
 FCALLSCFUN3(INT,SDDS_SetParameterByName_F,SDDS_SETPARAMETERBYNAME_F,sdds_setparameterbyname_f,INT,STRING,PVOID)
+
+/* SDDS_SetParameters
+   Modified from standard version
+   Returns: 0 on error
+            1 success */
+int SDDS_Set2ParametersByName_F(int fileIndex, char *name1, void *value1, char *name2, void *value2)
+{
+  return SDDS_SetParameters(&dataset_f[fileIndex],SDDS_SET_BY_NAME|SDDS_PASS_BY_REFERENCE,name1,value1,name2,value2,NULL);
+}
+FCALLSCFUN5(INT,SDDS_Set2ParametersByName_F,SDDS_SET2PARAMETERSBYNAME_F,sdds_set2parametersbyname_f,INT,STRING,PVOID,STRING,PVOID)
+
+/* SDDS_SetParameters
+   Modified from standard version
+   Returns: 0 on error
+            1 success */
+int SDDS_Set3ParametersByName_F(int fileIndex, char *name1, void *value1, char *name2, void *value2, char *name3, void *value3)
+{
+  return SDDS_SetParameters(&dataset_f[fileIndex],SDDS_SET_BY_NAME|SDDS_PASS_BY_REFERENCE,name1,value1,name2,value2,name3,value3,NULL);
+}
+FCALLSCFUN7(INT,SDDS_Set3ParametersByName_F,SDDS_SET3PARAMETERSBYNAME_F,sdds_set3parametersbyname_f,INT,STRING,PVOID,STRING,PVOID,STRING,PVOID)
+
+/* SDDS_SetParameters
+   Modified from standard version
+   Returns: 0 on error
+            1 success */
+int SDDS_Set4ParametersByName_F(int fileIndex, char *name1, void *value1, char *name2, void *value2, char *name3, void *value3, char *name4, void *value4)
+{
+  return SDDS_SetParameters(&dataset_f[fileIndex],SDDS_SET_BY_NAME|SDDS_PASS_BY_REFERENCE,name1,value1,name2,value2,name3,value3,name4,value4,NULL);
+}
+FCALLSCFUN9(INT,SDDS_Set4ParametersByName_F,SDDS_SET4PARAMETERSBYNAME_F,sdds_set4parametersbyname_f,INT,STRING,PVOID,STRING,PVOID,STRING,PVOID,STRING,PVOID)
+
+/* SDDS_SetParameters
+   Modified from standard version
+   Returns: 0 on error
+            1 success */
+int SDDS_Set5ParametersByName_F(int fileIndex, char *name1, void *value1, char *name2, void *value2, char *name3, void *value3, char *name4, void *value4, char *name5, void *value5)
+{
+  return SDDS_SetParameters(&dataset_f[fileIndex],SDDS_SET_BY_NAME|SDDS_PASS_BY_REFERENCE,name1,value1,name2,value2,name3,value3,name4,value4,name5,value5,NULL);
+}
+FCALLSCFUN11(INT,SDDS_Set5ParametersByName_F,SDDS_SET5PARAMETERSBYNAME_F,sdds_set5parametersbyname_f,INT,STRING,PVOID,STRING,PVOID,STRING,PVOID,STRING,PVOID,STRING,PVOID)
+
+/* SDDS_SetParameters
+   Modified from standard version
+   Returns: 0 on error
+            1 success */
+int SDDS_Set6ParametersByName_F(int fileIndex, char *name1, void *value1, char *name2, void *value2, char *name3, void *value3, char *name4, void *value4, char *name5, void *value5, char *name6, void *value6)
+{
+  return SDDS_SetParameters(&dataset_f[fileIndex],SDDS_SET_BY_NAME|SDDS_PASS_BY_REFERENCE,name1,value1,name2,value2,name3,value3,name4,value4,name5,value5,name6,value6,NULL);
+}
+FCALLSCFUN13(INT,SDDS_Set6ParametersByName_F,SDDS_SET6PARAMETERSBYNAME_F,sdds_set6parametersbyname_f,INT,STRING,PVOID,STRING,PVOID,STRING,PVOID,STRING,PVOID,STRING,PVOID,STRING,PVOID)
 
 /* SDDS_SetParameters
    Modified from standard version

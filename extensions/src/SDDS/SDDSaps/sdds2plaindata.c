@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /* 
- $Log: sdds2plaindata.c,v $
- Revision 1.16  2009/08/05 15:35:23  soliday
- Updated to replace ld and lu in the format strings with PRId32 and PRIu32
-
+ $Log: not supported by cvs2svn $
  Revision 1.15  2009/08/04 19:46:09  soliday
  Updated to convert %ld format strings to %d for 64 bit systems.
 

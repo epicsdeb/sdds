@@ -16,10 +16,7 @@
  * is removed in the output file, but its name is
  * converted to a parameter string. 
  * L. Emery with some code from M. Borland, ANL (1995)
- $Log: sddsvslopes.c,v $
- Revision 1.18  2008/02/08 19:10:08  shang
- fixed a free memory bug
-
+ $Log: not supported by cvs2svn $
  Revision 1.17  2008/02/08 18:29:16  shang
  finished the implementation of -sigma option for computing the slope errors.
 

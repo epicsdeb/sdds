@@ -18,10 +18,7 @@
  *     These routines use the getrusage() routine to get run-time statistics
  * 
  * Michael Borland, 1988
- $Log: timer.c,v $
- Revision 1.21  2009/04/14 02:28:11  ywang25
- Corrected the pre-defined macro name for powerPC
-
+ $Log: not supported by cvs2svn $
  Revision 1.20  2008/08/01 13:15:33  borland
  Modified to disable memory_count() on powerPC and also improve error
  messages when memory_count() fails.  Per Y. Wang.

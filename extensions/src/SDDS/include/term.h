@@ -12,10 +12,7 @@
  *	 mode characteristic getting and setting functions 
  *
  * Michael Borland, 1987
- $Log: term.h,v $
- Revision 1.4  2003/06/15 19:41:03  soliday
- Removed include lines.
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2002/08/14 15:40:18  soliday
  Added Open License
 

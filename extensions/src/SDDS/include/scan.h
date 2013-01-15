@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: scan.h,v $
- Revision 1.19  2005/02/22 17:30:21  shang
- added scanItemListLong() function to deal with unsigned long long type flags
-
+ $Log: not supported by cvs2svn $
  Revision 1.18  2004/03/16 23:26:35  borland
  Added SCANITEMLIST_IGNORE_VALUELESS macro.
 

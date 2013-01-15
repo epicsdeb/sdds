@@ -11,10 +11,7 @@
  * purpose: Create an SDDS file with equispaced indices in a column.
  *
  * M. Borland, 1995
- $Log: sddssequence.c,v $
- Revision 1.10  2005/11/04 22:46:18  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.9  2002/08/14 17:12:54  soliday
  Added Open License
 

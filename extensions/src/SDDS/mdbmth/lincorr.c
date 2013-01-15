@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: lincorr.c,v $
- Revision 1.10  2007/04/16 21:02:51  soliday
- Moved from mdbcommon after I removed SDDS calls.
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2007/04/16 18:41:04  soliday
  Removed SDDS call.
 
@@ -67,27 +64,30 @@ double linearCorrelationCoefficient(double *data1, double *data2,
     double sum1[2]={0,0}, sum2[2]={0,0}, sum12=0;
     double d1, d2, r;
     long i;
+    long count1;
 
-    *count = 0;
+    count1 = 0;
     for (i=0; i<rows; i++) {
         if (isnan(data1[i]) || isnan(data2[i]) || isinf(data1[i]) || isinf(data2[i]))
             continue;
         if ((accept1 && !accept1[i]) || (accept2 && !accept2[i]))
             continue;
-        *count += 1;
+        count1 += 1;
         sum1[0] += data1[i];
         sum1[1] += data1[i]*data1[i];
         sum2[0] += data2[i];
         sum2[1] += data2[i]*data2[i];
         sum12   += data1[i]*data2[i];
         }
-    d1 = (*count)*sum1[1] - sum1[0]*sum1[0];
-    d2 = (*count)*sum2[1] - sum2[0]*sum2[0];
+    if (count)
+      *count = count1;
+    d1 = count1*sum1[1] - sum1[0]*sum1[0];
+    d2 = count1*sum2[1] - sum2[0]*sum2[0];
     if (d1<=0 || d2<=0)
         return 0.0;
     if ((d1*=d2)<=0)
         return 0.0;
-    r = ((*count)*sum12 - sum1[0]*sum2[0])/sqrt(d1);
+    r = (count1*sum12 - sum1[0]*sum2[0])/sqrt(d1);
     if (r<-1)
         r = -1;
     else if (r>1)

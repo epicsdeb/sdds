@@ -11,7 +11,7 @@
  * purpose: make a printout from SDDS data
  *
  * Michael Borland, 1995
- $Log: sddsprintout.c,v $
+ $Log: not supported by cvs2svn $
  Revision 1.47  2009/08/05 15:35:23  soliday
  Updated to replace ld and lu in the format strings with PRId32 and PRIu32
 
@@ -246,6 +246,7 @@ typedef struct {
     } PRINT_ARRAY;
 
 char *makeTexSafeString(char *source);
+char *makeTexExponentialString(char *text);
 void copyAndPad(char *target, char *source, long sourceWidth, long targetWidth);
 long makeColumnHeaders(char ***header, long *fieldWidth, char *name, char *editLabel, char *units, char **format,
 unsigned long spreadsheetFlags);
@@ -1311,7 +1312,10 @@ void doPrintColumns(SDDS_DATASET *inTable, PRINT_COLUMN *printColumn, long print
         continue;
       }
       if (latexFormat) {
-        fputs(makeTexSafeString(printBuffer), fpOut);
+	if (SDDS_FLOATING_TYPE(printColumn[column].type))
+	  fputs(makeTexExponentialString(printBuffer), fpOut);
+	else	  
+	  fputs(makeTexSafeString(printBuffer), fpOut);
         fputs(column!=printColumns-1?" & ":" \\\\ \\hline", fpOut);
         continue;
       }
@@ -1426,3 +1430,26 @@ char *makeTexSafeString(char *source)
   return buffer;
 }
 
+char *makeTexExponentialString(char *text)
+{
+  char *ptr1, *ptr2;
+  char buffer[100];
+  if (ptr1=ptr2=strchr(text, 'e')) {
+    trim_spaces(ptr2);
+    while (*ptr2 && !isdigit(*ptr2))
+      ptr2++;
+    if (!*ptr2) 
+      return text;
+    while (*ptr2=='0')
+      ptr2++;
+    if (!*ptr2)
+      *ptr1 = NULL;
+    else {
+      if (strlen(ptr2)>=100)
+	bomb("buffer overflow in makeTexExponentialString", NULL);
+      strcpy(buffer, ptr2);
+      sprintf(ptr1, "$\\times 10^{%s}$", buffer);
+    }
+  }
+  return text;
+}

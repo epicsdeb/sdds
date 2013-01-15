@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile,v $
-# Revision 1.12  2008/04/14 18:27:26  shang
-# added parallel SDDS.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.11  2007/07/20 19:21:06  soliday
 # Fixed problem on Windows when using non-cygwin perl.
 #

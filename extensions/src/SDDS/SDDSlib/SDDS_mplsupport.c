@@ -11,10 +11,7 @@
  * contents:
  *
  * Michael Borland, December 1993
- $Log: SDDS_mplsupport.c,v $
- Revision 1.7  2005/11/04 22:46:52  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2002/08/14 16:34:49  soliday
  Added Open License
 

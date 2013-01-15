@@ -9,10 +9,7 @@
 
 /*
  *
- $Log: csv2sdds.c,v $
- Revision 1.27  2010/07/29 21:19:28  borland
- Updated usage message.
-
+ $Log: not supported by cvs2svn $
  Revision 1.26  2010/07/29 21:12:00  soliday
  If a numerical column is empty it will now use the value from the previous
  row. If the first rows has empty values it will use the previous behaviour

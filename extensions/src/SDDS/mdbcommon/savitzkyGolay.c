@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: savitzkyGolay.c,v $
- Revision 1.10  2009/12/02 22:21:27  soliday
- Removed old complex.h header include statement.
-
+ $Log: not supported by cvs2svn $
  Revision 1.9  2007/10/01 20:38:02  ywang25
  fixed the bug for the cases when the derivative is not zero
 

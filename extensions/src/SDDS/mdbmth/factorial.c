@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: factorial.c,v $
- Revision 1.4  2002/08/14 16:18:55  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1999/09/14 18:13:43  soliday
  Added mdb.h include statement
 

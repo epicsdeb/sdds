@@ -11,10 +11,7 @@
  * purpose: add two matrices
  * usage  : m_add(C, A, B) ==> C = A+B
  * Michael Borland, 1986.
- $Log: fmat.c,v $
- Revision 1.3  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/08 15:17:32  soliday
  Added support for OSX.
 
@@ -106,10 +103,7 @@ CopyrightNotice001*/
  *   m_alloc(&A, n, m)
  * 
  * Michael Borland, 1986.
- $Log: fmat.c,v $
- Revision 1.3  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/08 15:17:32  soliday
  Added support for OSX.
 
@@ -242,10 +236,7 @@ CopyrightNotice001*/
  *   ...
  *   fmat_copy(A, B);	! copy B to A 
  * Michael Borland, 1986.
- $Log: fmat.c,v $
- Revision 1.3  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/08 15:17:32  soliday
  Added support for OSX.
 
@@ -337,10 +328,7 @@ CopyrightNotice001*/
  *   det = fmat_det(A);
  *
  * Michael Borland, 1986.
- $Log: fmat.c,v $
- Revision 1.3  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/08 15:17:32  soliday
  Added support for OSX.
 
@@ -457,10 +445,7 @@ LICENSING INQUIRIES MAY BE DIRECTED TO THE INDUSTRIAL TECHNOLOGY
 DEVELOPMENT CENTER AT ARGONNE NATIONAL LABORATORY.
 
 CopyrightNotice001
- $Log: fmat.c,v $
- Revision 1.3  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/08 15:17:32  soliday
  Added support for OSX.
 
@@ -550,10 +535,7 @@ CopyrightNotice001*/
  *   fmat_free(&A);
  *
  * Michael Borland, 1986.
- $Log: fmat.c,v $
- Revision 1.3  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/08 15:17:32  soliday
  Added support for OSX.
 
@@ -656,10 +638,7 @@ CopyrightNotice001*/
  *  fmat_identity(A);
  *
  * Michael Borland, 1989.
- $Log: fmat.c,v $
- Revision 1.3  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/08 15:17:32  soliday
  Added support for OSX.
 
@@ -744,10 +723,7 @@ CopyrightNotice001*/
  * usage: fmat_invert(A, B) ==>  A=INV(B); A and B must point to matrix
  * 	  structures of the same size.
  * Michael Borland, 1986 (after CITLIB routine MATINV)
- $Log: fmat.c,v $
- Revision 1.3  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/08 15:17:32  soliday
  Added support for OSX.
 
@@ -957,10 +933,7 @@ CopyrightNotice001*/
  * purpose: multiply two matrices
  * usage  : fmat_mult(C, A, B)  ==>  C= AB
  * Michael Borland, 1986.
- $Log: fmat.c,v $
- Revision 1.3  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/08 15:17:32  soliday
  Added support for OSX.
 
@@ -1049,10 +1022,7 @@ LICENSING INQUIRIES MAY BE DIRECTED TO THE INDUSTRIAL TECHNOLOGY
 DEVELOPMENT CENTER AT ARGONNE NATIONAL LABORATORY.
 
 CopyrightNotice001
- $Log: fmat.c,v $
- Revision 1.3  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/08 15:17:32  soliday
  Added support for OSX.
 
@@ -1153,10 +1123,7 @@ CopyrightNotice001*/
  *   fmat_show(A, "%.4f  ", "label", stdout);   ! print w/a certain format 
  *   
  * Michael Borland, 1986.
- $Log: fmat.c,v $
- Revision 1.3  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/08 15:17:32  soliday
  Added support for OSX.
 
@@ -1246,10 +1213,7 @@ CopyrightNotice001*/
  * purpose: transpose a matrix 
  * usage  : fmat_trans(B, A) ==> B=TRANS(A)
  * Michael Borland, 1986.
- $Log: fmat.c,v $
- Revision 1.3  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/08 15:17:32  soliday
  Added support for OSX.
 
@@ -1341,10 +1305,7 @@ CopyrightNotice001*/
  *  fmat_zero(A);
  *
  * Michael Borland, 1986.
- $Log: fmat.c,v $
- Revision 1.3  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/08 15:17:32  soliday
  Added support for OSX.
 

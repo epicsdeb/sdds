@@ -1,8 +1,5 @@
 #
-# $Log: Makefile.Host,v $
-# Revision 1.17  2004/05/03 15:49:25  soliday
-# Updated to work with Epics/Base 3.14 build rules.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.16  2004/02/05 20:35:39  soliday
 # Updated to work around a link issue.
 #
@@ -42,10 +39,7 @@
 # Revision 1.4  2000/01/19 19:35:39  soliday
 # Added support for ZLIB.
 #
-# $Log: Makefile.Host,v $
-# Revision 1.17  2004/05/03 15:49:25  soliday
-# Updated to work with Epics/Base 3.14 build rules.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.16  2004/02/05 20:35:39  soliday
 # Updated to work around a link issue.
 #

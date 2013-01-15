@@ -1,9 +1,6 @@
 /*
  *
- $Log: wrapper.c,v $
- Revision 1.1  2000/04/17 18:32:26  soliday
- First version of wrapper.c.
-
+ $Log: not supported by cvs2svn $
  *
  */
 #include <X11/Intrinsic.h>

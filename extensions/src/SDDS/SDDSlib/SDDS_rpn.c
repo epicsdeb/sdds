@@ -11,10 +11,7 @@
  * contents: internal routines for rpn definitions of columns and parameters
  *  
  * Michael Borland, November 1993
- $Log: SDDS_rpn.c,v $
- Revision 1.14  2008/07/01 14:37:17  shang
- modified SDDS_GetParameterAsLong to return integer for any numeric parameter
-
+ $Log: not supported by cvs2svn $
  Revision 1.13  2006/08/31 15:08:02  soliday
  Updated to work with SDDS2
 

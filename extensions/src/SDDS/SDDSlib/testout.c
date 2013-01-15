@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: testout.c,v $
- Revision 1.4  2002/08/14 16:34:51  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1995/11/13 16:05:41  borland
  Revised prototype for  SDDS_UpdateBinaryPage to include mode argument.
 

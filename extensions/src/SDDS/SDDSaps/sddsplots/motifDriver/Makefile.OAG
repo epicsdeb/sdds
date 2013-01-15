@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
-# Revision 1.19  2010/04/08 17:29:53  soliday
-# Fixed an issue on linux-x86_64
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.18  2007/11/09 21:31:26  soliday
 # This has to be built with STATIC_BUILD=NO because there is a problem
 # on linux.
@@ -122,9 +119,10 @@ GD = $(words $(notdir $(wildcard \
 /lib64/libgd.so \
 /sw/lib/libgd.a \
 /sw/lib/libgd.dylib \
+/opt/local/lib/libgd.a \
+/opt/local/lib/libgd.dylib \
 /opt/sfw/lib/libgd.a \
 /opt/sfw/lib/libgd.so \
-/opt/local/lib/libgd.a \
 /opt/local/lib/libgd.so )))
 GDINC = $(words $(notdir $(wildcard \
 /usr/include/gd.h \

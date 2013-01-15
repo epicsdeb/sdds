@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: scan_namelist.c,v $
- Revision 1.13  2007/08/07 16:15:29  ywang25
- Replace strcpy with stcpy_ss to avoid potential memory problems.
-
+ $Log: not supported by cvs2svn $
  Revision 1.12  2003/12/17 03:39:31  borland
  Use popen()/pclose() instead of popen()/fclose() for commands.  Prevents problems
  with runs that have many in-namelist commands.

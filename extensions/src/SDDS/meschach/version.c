@@ -36,7 +36,7 @@
 
 void	m_version()
 {
-	static char rcsid[] = "$Id: version.c,v 1.2 1999/06/04 21:53:20 soliday Exp $";
+	static char rcsid[] = "$Id: version.c,v 1.2 1999-06-04 21:53:20 soliday Exp $";
 
 	printf("Meshach matrix library version 1.2b\n");
 	printf("RCS id: %s\n",rcsid);
@@ -58,10 +58,7 @@ void	m_version()
 }
 
 /*
- * $Log: version.c,v $
- * Revision 1.2  1999/06/04 21:53:20  soliday
- * Removed compiler warnings under Linux.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.1.1.1  1999/04/14 14:16:18  borland
  * Moved from OAG area
  *

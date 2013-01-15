@@ -12,7 +12,11 @@
  *
  * Michael Borland, 1995.
  * Based on mpl program 'lsf'.
- $Log: sddspfit.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.32  2011/07/01 22:05:17  borland
+ Added RpnSequence parameter, into which is placed an rpn sequence that will
+ evaluate the fitted polynomial.
+
  Revision 1.31  2010/05/18 02:13:24  borland
  Added Coefficient%02ldSigma parameters.
 
@@ -131,6 +135,7 @@ char **initializeOutputFile(SDDS_DATASET *SDDSout, char *output, SDDS_DATASET *S
 void checkInputFile(SDDS_DATASET *SDDSin, char *xName, char *yName, char *xSigmaName, char *ySigmaName);
 long coefficient_index(int32_t *order, long terms, long order_of_interest);
 void makeFitLabel(char *buffer, long bufsize, char *fitLabelFormat, double *coef, int32_t *order, long terms);
+void createRpnSequence(char *buffer, long bufsize, double *coef, int32_t *order, long terms);
 
 void set_argument_offset(double offset);
 void set_argument_scale(double scale);
@@ -254,6 +259,7 @@ static long *iTerm = NULL, *iTermSig = NULL;
 static long iOffset = -1, iFactor = -1;
 static long iChiSq = -1, iRmsResidual = -1, iSigLevel = -1;
 static long iFitIsValid = -1, iFitLabel = -1, iTerms = -1;
+static long iRpnSequence;
 
 static long ix = -1, iy = -1, ixSigma = -1, iySigma = -1;
 static long iFit = -1, iResidual = -1;
@@ -305,7 +311,7 @@ int main(int argc, char **argv)
   double xMin, xMax, revpowThreshold, revpowCompleteThres, goodEnoughChi;
   double rms_average(double *d_x, int d_n);
   char *fitLabelFormat = "%g";
-  static char fitLabelBuffer[SDDS_MAXLINE];
+  static char fitLabelBuffer[SDDS_MAXLINE], rpnSeqBuffer[SDDS_MAXLINE];
   unsigned long pipeFlags, reviseOrders;
   EVAL_PARAMETERS evalParameters;
 
@@ -841,7 +847,12 @@ int main(int argc, char **argv)
     }
     if (copyParameters && !SDDS_CopyParameters(&SDDSout, &SDDSin))
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+    if (invalid)
+      rpnSeqBuffer[0] = 0;
+    else 
+      createRpnSequence(rpnSeqBuffer, SDDS_MAXLINE, coef, order, terms);
     if (!SDDS_SetParameters(&SDDSout, SDDS_SET_BY_INDEX|SDDS_PASS_BY_VALUE,
+                            iRpnSequence, invalid ? "" : rpnSeqBuffer,
                             iRmsResidual, invalid ? nNum: rmsResidual, iChiSq, invalid ? nNum: chi,
                             iTerms, terms, 
                             iSigLevel, invalid ? nNum : ChiSqrSigLevel(chi, points-terms),
@@ -1081,7 +1092,10 @@ char **initializeOutputFile(SDDS_DATASET *SDDSout, char *output, SDDS_DATASET *S
                             NULL, SDDS_DOUBLE, NULL))<0 ||
       (iSigLevel=
        SDDS_DefineParameter(SDDSout, "SignificanceLevel", NULL, NULL, 
-                            "Probability that data is from fit function", NULL, SDDS_DOUBLE, NULL))<0 )
+                            "Probability that data is from fit function", NULL, SDDS_DOUBLE, NULL))<0 ||
+      (iRpnSequence=
+       SDDS_DefineParameter(SDDSout, "RpnSequence", NULL, NULL, "Rpn sequence to evaluate the fit",
+                            NULL, SDDS_STRING, NULL))<0)
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   if (yUnits)
     free(yUnits);
@@ -1215,7 +1229,7 @@ char **makeCoefficientUnits(SDDS_DATASET *SDDSout, char *xName, char *yName,
                 if (order[i]>1)
                     sprintf(buffer, "1/%s$a%d$n", xUnits, order[i]-1);
                 else
-                    sprintf(buffer, "");
+                    strcpy(buffer, "");
                 SDDS_CopyString(coefUnits+i, buffer);
                 }
             else {
@@ -1468,3 +1482,59 @@ long reviseFitOrders1(double *x, double *y, double *sy, long points,
   free(counterLim);
   return terms;
 }
+
+void createRpnSequence(char *buffer, long bufsize, double *coef, int32_t *order, long terms)
+{
+  long i, j, maxOrder;
+  static char buffer1[SDDS_MAXLINE], buffer2[SDDS_MAXLINE];
+  double coef1;
+  
+  buffer[0] = 0;
+  maxOrder = 0;
+  for (i=0; i<terms; i++) {
+    if (maxOrder<order[i])
+      maxOrder = order[i];
+  }
+  if (maxOrder==0) {
+    sprintf(buffer, "%.15e", coef[0]);
+    return;
+  }
+  for (i=2; i<=maxOrder; i++) {
+    strcat(buffer, "= ");
+    if ((strlen(buffer)+2)>bufsize) {
+      fprintf(stderr, "buffer overflow making rpn expression!\n");
+      return;
+    }
+  }
+  for (i=maxOrder; i>=0; i--) {
+    for (j=0; j<terms; j++) {
+      if (order[j]==i) 
+        break;
+    }
+    if (j==terms)
+      coef1 = 0;
+    else
+      coef1 = coef[j];
+    if (i==maxOrder)
+      sprintf(buffer1, "%.15g * ", coef1);
+    else if (i==0 && order[j]==0) {
+      if (coef1!=0)
+        sprintf(buffer1, "%.15g + ", coef1);
+      else 
+        continue;
+    }
+    else {
+      if (coef1==0)
+        strcpy(buffer1, "* ");
+      else 
+        sprintf(buffer1, "%.15g + * ", coef1);
+    }
+    if ((strlen(buffer)+strlen(buffer1))>=bufsize) {
+      fprintf(stderr, "buffer overflow making rpn expression!\n");
+      return;
+    }
+    strcat(buffer, buffer1);
+  }
+}
+
+

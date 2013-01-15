@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: zeroIH.c,v $
- Revision 1.7  2002/08/14 16:19:01  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2000/11/02 21:25:26  borland
  Added "value" option that allows solving for fn=value instead of just
  fn=0.

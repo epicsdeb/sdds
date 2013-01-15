@@ -13,6 +13,9 @@
  * Michael Borland, 1994
  * based on mpl-format fft program
  $Log: sddsfft.c,v $
+ Revision 1.37  2012/05/04 15:50:36  shang
+ modified to do suppress average before padding zeroes when both options are provided.
+
  Revision 1.36  2010/06/11 17:10:06  borland
  Added more window types.
 
@@ -594,7 +597,16 @@ long process_data(SDDS_DATASET *SDDSout, SDDS_DATASET *SDDSin, double *tdata, lo
   if (imagQuantity && 
       !(imagData = SDDS_GetColumnInDoubles(SDDSin, imagQuantity)))
     return 0;
-  
+  if (flags&FL_SUPPRESSAVERAGE) {
+    compute_average(&r, data, rows);
+    for (i=0; i<rows; i++)
+      data[i] -= r;
+    if (imagData) {
+      compute_average(&r, imagData, rows);
+      for (i=0; i<rows; i++)
+        imagData[i] -= r;
+    }
+  }
   if (rows<rowsToUse) {
     /* pad with zeroes */
     tDataStore = tmalloc(sizeof(*tDataStore)*rowsToUse);
@@ -614,21 +626,8 @@ long process_data(SDDS_DATASET *SDDSout, SDDS_DATASET *SDDSin, double *tdata, lo
       for (i=rows; i<rowsToUse; i++)
         imagData[i] = 0;
     tdata = tDataStore;
-  }
-  
+  }  
   rows = rowsToUse;  /* results in truncation if rows>rowsToUse */
-  
-  if (flags&FL_SUPPRESSAVERAGE) {
-    compute_average(&r, data, rows);
-    for (i=0; i<rows; i++)
-      data[i] -= r;
-    if (imagData) {
-      compute_average(&r, imagData, rows);
-      for (i=0; i<rows; i++)
-        imagData[i] -= r;
-    }
-  }
-
   windowCorrectionFactor = 1;
   switch (windowType) {
   case WINDOW_HANNING:

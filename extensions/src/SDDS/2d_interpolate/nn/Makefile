@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile,v $
-# Revision 1.3  2007/10/03 16:47:43  shang
-# recommit
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.1  2007/05/02 16:11:40  shang
 # first version
 #

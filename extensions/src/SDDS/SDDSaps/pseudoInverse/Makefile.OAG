@@ -8,6 +8,17 @@
 #*************************************************************************
 #
 # $Log: Makefile.OAG,v $
+# Revision 1.37  2012/05/04 20:09:17  soliday
+# Updated to use LAPACK on linux all the time.
+#
+# Revision 1.36  2012/03/22 19:45:40  soliday
+# Modified because gsl has a GPL license and cannot be distributed
+# with our software. We can still link against a system library version of gsl
+# if it is available.
+#
+# Revision 1.35  2012/01/11 23:24:54  soliday
+# Modified so that SUNPERF can be set on the make command line.
+#
 # Revision 1.34  2009/12/03 17:17:45  soliday
 # The fdlibm library is only needed by Windows.
 #
@@ -150,6 +161,8 @@ CC := $(RATIONAL) -best-effort $(CC)
 CCC := $(RATIONAL) -best-effort $(CCC)
 endif
 
+SHARED_LIBRARIES=NO
+
 ifeq ($(EPICS_VERSION).$(EPICS_REVISION),3.13)
 PROD = sddspseudoinverse sddsmatrixop
 else
@@ -200,20 +213,21 @@ ifdef MALIGN
 USR_CFLAGS += -malign-double
 endif
 
-SUNPERF = 0
+
 ifeq ($(OS_CLASS),solaris)
-ifneq ($(ANSI),GCC)
-ifneq ($(GNU),YES)
-SUNPERF = $(words $(notdir $(wildcard /opt/SUNWspro/prod/include/cc/sunperf.h)))
-SUNPERF = 0
-endif
-endif
 ACC_OPT_YES = -fast
 CCC_OPT_YES = -fast
 endif
 
 ifdef WIN32
 CLAPACK = $(words $(notdir $(wildcard c:/CLAPACK/include/clapack.h)))
+endif
+
+ifeq ($(EPICS_HOST_ARCH),linux-x86_64)
+LAPACK = 1
+endif
+ifeq ($(EPICS_HOST_ARCH),linux-x86)
+LAPACK = 1
 endif
 
 # For benchmarking purposes, use the four MACRO assignment lines
@@ -226,6 +240,7 @@ endif
 #CLAPACK = 1
 #LAPACK = 1
 
+
 ifndef NUMERICAL_RECIPES 
 NUMERICAL_RECIPES = 0
 endif
@@ -234,6 +249,9 @@ CLAPACK = 0
 endif
 ifndef LAPACK
 LAPACK = 0
+endif
+ifndef SUNPERF
+SUNPERF = 0
 endif
 
 PROD_SYS_LIBS += gsl gslcblas

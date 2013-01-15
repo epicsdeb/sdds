@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: ipow.c,v $
- Revision 1.4  2003/08/28 19:56:27  soliday
- Cleaned up some of the code.
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2002/08/14 16:18:57  soliday
  Added Open License
 

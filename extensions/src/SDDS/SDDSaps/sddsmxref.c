@@ -18,10 +18,7 @@
  * would result in (name,x,y,z) being put in file.3.
  *
  * Michael Borland, 1994
- $Log: sddsmxref.c,v $
- Revision 1.22  2010/12/09 16:13:26  borland
- The ifnot and ifis options now respect the -nowarnings request.
-
+ $Log: not supported by cvs2svn $
  Revision 1.21  2005/11/07 21:48:10  soliday
  Updated to remove Linux compiler warnings.
 

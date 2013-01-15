@@ -19,10 +19,7 @@
  * would result in (name,x,y,z) being put in file.3.
  *
  * Michael Borland, 1994, 1995
- $Log: sddsxref.c,v $
- Revision 1.44  2010/12/09 16:13:26  borland
- The ifnot and ifis options now respect the -nowarnings request.
-
+ $Log: not supported by cvs2svn $
  Revision 1.43  2009/11/30 19:07:47  soliday
  Updated to fix a an issue with keyGroups being uninitialized.
 

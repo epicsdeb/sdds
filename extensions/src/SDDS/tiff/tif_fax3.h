@@ -1,4 +1,4 @@
-/* $Id: tif_fax3.h,v 1.1 2002/09/19 16:39:13 soliday Exp $ */
+/* $Id: tif_fax3.h,v 1.1 2002-09-19 16:39:13 soliday Exp $ */
 
 /*
  * Copyright (c) 1990-1997 Sam Leffler

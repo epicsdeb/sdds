@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: interpMinimum.c,v $
- Revision 1.2  2002/08/14 16:48:27  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.1  2000/04/11 16:21:55  soliday
  Moved here from mdbmth.
 

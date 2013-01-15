@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
+# $Log: not supported by cvs2svn $
 # Revision 1.18  2009/04/27 16:03:16  soliday
 # Updated to link to the gsl library.
 #
@@ -109,7 +109,6 @@ GD = $(words $(notdir $(wildcard \
 /sw/lib/libgd.dylib \
 /opt/sfw/lib/libgd.a \
 /opt/sfw/lib/libgd.so \
-/opt/local/lib/libgd.a \
 /opt/local/lib/libgd.so )))
 GDINC = $(words $(notdir $(wildcard \
 /usr/include/gd.h \
@@ -199,9 +198,16 @@ endif #BGL
 endif
 
 
-sddscontour_LIBS = mdbplt
-sddscongen_LIBS = mdbplt
-sddshist2d_LIBS = mdbplt
+
+sddscontour_LIBS += mdbplt
+sddscongen_LIBS += mdbplt
+sddshist2d_LIBS += mdbplt
+sddscontour_LDFLAGS += $(SYS_GSLLIB)
+sddscongen_LDFLAGS += $(SYS_GSLLIB)
+sddshist2d_LDFLAGS += $(SYS_GSLLIB)
+sddsimageconvert_LDFLAGS += $(SYS_GSLLIB)
+
+
 
 fdlibm_DIR = $(INSTALL_LIB)
 SDDS1c_DIR = $(INSTALL_LIB)

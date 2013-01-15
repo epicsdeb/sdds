@@ -11,10 +11,7 @@
  * purpose: converts a raw data stream of binary data
  *          to SDDS format
  * M. Borland, 1994
- $Log: raw2sdds.c,v $
- Revision 1.5  2002/08/14 17:12:38  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2001/01/23 19:14:57  soliday
  Standardized usage message.
 

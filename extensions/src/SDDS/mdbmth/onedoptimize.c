@@ -8,11 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: onedoptimize.c,v $
- Revision 1.7  2009/05/11 04:22:04  borland
- Fixed problems with one-dimensional parabolic optimization, so that it is now
- "guaranteed" to quit eventually.
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2004/04/07 02:01:10  borland
  OneDParabolicOptimization now keeps track of the best point and is guaranteed
  to return it.

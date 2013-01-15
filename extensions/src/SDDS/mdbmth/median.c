@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: median.c,v $
- Revision 1.8  2008/02/22 17:23:32  ywang25
- Fixed a problem for histogram range
-
+ $Log: not supported by cvs2svn $
  Revision 1.7  2003/08/28 19:56:27  soliday
  Cleaned up some of the code.
 

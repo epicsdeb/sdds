@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # makefile for Java SDDS 3D Plotter
-# $Log: Makefile,v $
-# Revision 1.5  2008/06/10 15:33:45  soliday
-# Updated to work with new build rules.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.4  2005/05/11 15:13:42  soliday
 # Updated so that the intended jar command is used and not the default jar program.
 #

@@ -8,7 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: math.c,v $
+ $Log: not supported by cvs2svn $
  Revision 1.27  2010/12/03 02:48:33  borland
  Added isort and dsort functions.
 
@@ -109,7 +109,9 @@
 #include "rpn_internal.h"
 #include "mdb.h"
 #include <time.h>
+#ifdef USE_GSL
 #include "gsl/gsl_sf_bessel.h"
+#endif
 
 #if defined(_WIN32)
 #include "fdlibm.h"
@@ -601,7 +603,14 @@ void rpn_KN(void)
   } else if (order==1) {
     result = dbesk1(x);
   } else {
+#ifdef USE_GSL
     result = gsl_sf_bessel_Knu(order, x);
+#else
+  fputs("Kn function was not built with GSL support\n", stderr);
+  stop();
+  rpn_set_error();
+  return;
+#endif
   }
   push_num(result);
 #endif
@@ -635,7 +644,14 @@ void rpn_IN(void)
   } else if (order==1) {
     result = dbesi1(x);
   } else {
+#ifdef USE_GSL
     result = gsl_sf_bessel_Inu(order, x);
+#else
+  fputs("In function was not built with GSL support\n", stderr);
+  stop();
+  rpn_set_error();
+  return;
+#endif
   }
   push_num(result);
 #endif
@@ -954,3 +970,13 @@ void rpn_dsort_stack(void)
   free(data);
 }
 
+void rpn_G1y(void)
+{
+    if (stackptr<1) {
+        fputs("too few items on stack (G1y)\n", stderr);
+        stop();
+        rpn_set_error();
+        return;
+        }
+    push_num(gy(1, pop_num()));
+    }

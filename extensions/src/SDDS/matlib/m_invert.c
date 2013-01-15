@@ -12,10 +12,7 @@
  * usage: m_invert(A, B) ==>  A=INV(B); A and B must point to matrix
  * 	  structures of the same size.
  * Michael Borland, 1986 (after CITLIB routine MATINV)
- $Log: m_invert.c,v $
- Revision 1.4  2002/08/14 16:45:22  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1998/04/21 21:26:40  borland
  New names to allow concurrent use with the Meschach library.
 

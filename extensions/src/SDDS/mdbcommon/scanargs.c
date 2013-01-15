@@ -23,7 +23,14 @@
  *    >>output_file    data writen to stdout goes to end of file
  *
  * Michael Borland, 1986, 1990, 1994, 1995
- $Log: scanargs.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.12  2011/04/12 21:42:48  shang
+ removed free memory of ptr because it caused errors.
+
+ Revision 1.11  2011/04/12 21:35:31  shang
+ due to the string parsing error on echo, cadmus ect linux machine, the "ptr" pointer has to be allocated memory before using it
+ in parsing argments routine.
+
  Revision 1.10  2011/01/10 17:35:29  borland
  Fixed problem on RH6 by switching from strcpy to strcpy_ss.
 
@@ -171,82 +178,82 @@ int scanargs(SCANNED_ARG **scanned, int argc, char **argv)
     sc_arg_ptr = tmalloc((unsigned)argc*sizeof(*sc_arg_ptr));
     *scanned = sc_arg_ptr;
     arg = tmalloc(sizeof(*arg)*(argLimit=1024));
-
+    ptr = 2000; /*this is useless statement to force the compiler to allocate memory for ptr.*/
     for (i=i_store=0; i<argc; i++) {
-        if ((long)strlen(argv[i])>argLimit-1)
-            arg = trealloc(arg, sizeof(*arg)*(argLimit=2*strlen(argv[i])));
-        strcpy(arg, argv[i]);
-        interpret_escapes(arg);
-        if (arg[0]=='-') {
-            /* it's an option or switch: "-key[=item1[,item2]...]".  / may be subsituted
-             * for -, and : or , may be substituted for = */
-            sc_arg_ptr[i_store].arg_type = OPTION;
-            ptr = arg;
-            while (*ptr && (*ptr!='=' && *ptr!=':' && *ptr!=','))
-                ptr++;
-            if (*ptr=='=' || *ptr==':' || *ptr==',') {
-                /* there's a list of items. separate list into an array
-                 * with the key in the first position */
-                *ptr=',';
-                sc_arg_ptr[i_store].n_items = parseList(&(sc_arg_ptr[i_store].list), arg+1);
-                }
-            else if (ptr-arg>1) {
-                /* no list, just scan key */
-                sc_arg_ptr[i_store].n_items = parseList(&(sc_arg_ptr[i_store].list), arg+1);
-                }
-            else {
-                sc_arg_ptr[i_store].n_items = 0;
-                sc_arg_ptr[i_store].list = tmalloc(sizeof(*sc_arg_ptr[i_store].list)*1);
-                sc_arg_ptr[i_store].list[0] = tmalloc(sizeof(**sc_arg_ptr[i_store].list));
-                sc_arg_ptr[i_store].list[0][0] = 0;
-                }
-            i_store++;
-            }
+      if ((long)strlen(argv[i])>argLimit-1)
+	arg = trealloc(arg, sizeof(*arg)*(argLimit=2*strlen(argv[i])));
+      strcpy(arg, argv[i]);
+      interpret_escapes(arg);
+      if (arg[0]=='-') {
+	/* it's an option or switch: "-key[=item1[,item2]...]".  / may be subsituted
+	 * for -, and : or , may be substituted for = */
+	sc_arg_ptr[i_store].arg_type = OPTION;
+	ptr = arg;
+	while (*ptr && (*ptr!='=' && *ptr!=':' && *ptr!=','))
+	  ptr++;
+	if (*ptr=='=' || *ptr==':' || *ptr==',') {
+	  /* there's a list of items. separate list into an array
+	   * with the key in the first position */
+	  *ptr=',';
+	  sc_arg_ptr[i_store].n_items = parseList(&(sc_arg_ptr[i_store].list), arg+1);
+	}
+	else if (ptr-arg>1) {
+	  /* no list, just scan key */
+	  sc_arg_ptr[i_store].n_items = parseList(&(sc_arg_ptr[i_store].list), arg+1);
+	}
+	else {
+	  sc_arg_ptr[i_store].n_items = 0;
+	  sc_arg_ptr[i_store].list = tmalloc(sizeof(*sc_arg_ptr[i_store].list)*1);
+	  sc_arg_ptr[i_store].list[0] = tmalloc(sizeof(**sc_arg_ptr[i_store].list));
+	  sc_arg_ptr[i_store].list[0][0] = 0;
+	}
+	i_store++;
+      }
 #if !defined(UNIX) && !defined(_WIN32) && !defined(vxWorks)
-        /* Set up IO redirection for non-UNIX platforms.
-         * Used to work on VMS, still may...
-         */
-        else if (arg[0]=='>') {
-            /* output redirection */
-            if (arg[1]=='>') {
-                if ((fp=fopen(arg+2, "a+"))==NULL) {
-                    printf("unable to open %s for appending\n", arg+2);
-                    exit(1);
-                    }
-                }
-            else {
-                if ((fp=fopen(arg+1, "w"))==NULL) {
-                    printf("unable to open %s for writing\n", arg+1);
-                    exit(1);
-                    }
-                }
-            /* for other systems, may need to make a different assignment */
-            stdout = fp;
-            }
-        else if (arg[0]=='<') {
-            /* input redirection */
-            if ((fp=fopen(arg+1, "r"))==NULL) {
-                printf("unable to open %s for reading\n", arg+1);
-                exit(1);
-                }
-            /* for other systems, may need to make a different assignment */
-            stdin = fp;
-            }
+      /* Set up IO redirection for non-UNIX platforms.
+       * Used to work on VMS, still may...
+       */
+      else if (arg[0]=='>') {
+	/* output redirection */
+	if (arg[1]=='>') {
+	  if ((fp=fopen(arg+2, "a+"))==NULL) {
+	    printf("unable to open %s for appending\n", arg+2);
+	    exit(1);
+	  }
+	}
+	else {
+	  if ((fp=fopen(arg+1, "w"))==NULL) {
+	    printf("unable to open %s for writing\n", arg+1);
+	    exit(1);
+	  }
+	}
+	/* for other systems, may need to make a different assignment */
+	stdout = fp;
+      }
+      else if (arg[0]=='<') {
+	/* input redirection */
+	if ((fp=fopen(arg+1, "r"))==NULL) {
+	  printf("unable to open %s for reading\n", arg+1);
+	  exit(1);
+	}
+	/* for other systems, may need to make a different assignment */
+	stdin = fp;
+      }
 #endif
-        else {
-            /* not an option or switch */
-            sc_arg_ptr[i_store].arg_type = A_LIST;
+      else {
+	/* not an option or switch */
+	sc_arg_ptr[i_store].arg_type = A_LIST;
 #if COMMAS_SEPARATE_FILENAMES
-            sc_arg_ptr[i_store].n_items = parseList(&(sc_arg_ptr[i_store].list), arg);
+	sc_arg_ptr[i_store].n_items = parseList(&(sc_arg_ptr[i_store].list), arg);
 #else
-            sc_arg_ptr[i_store].n_items = 1;
-            sc_arg_ptr[i_store].list = tmalloc(sizeof(*sc_arg_ptr[i_store].list)*1);
-            cp_str(&sc_arg_ptr[i_store].list[0], arg);
+	sc_arg_ptr[i_store].n_items = 1;
+	sc_arg_ptr[i_store].list = tmalloc(sizeof(*sc_arg_ptr[i_store].list)*1);
+	cp_str(&sc_arg_ptr[i_store].list[0], arg);
 #endif
-            i_store++;
-            }
-        }
-
+	i_store++;
+      }
+    }
+    
     if (argvNew) {
       for (i=0; i<argc; i++) {
 	if (argvNew[i]) free(argvNew[i]);
@@ -254,9 +261,8 @@ int scanargs(SCANNED_ARG **scanned, int argc, char **argv)
       free(argvNew);
     }
     if (arg) free(arg);
-
     return i_store;
-    }
+}
 
 
 int scanargsg(SCANNED_ARG **scanned, int argc, char **argv)

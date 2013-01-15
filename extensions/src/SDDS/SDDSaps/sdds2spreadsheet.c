@@ -10,7 +10,13 @@
 /* program: sdds2spreadsheet.c
  * purpose: read an SDDS file and convert it to be read by a spreadsheet program
  * Kenneth Evans, 1994 (based on sddsquery and sdds2stream by Michael Borland)
- $Log: sdds2spreadsheet.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.18  2012/03/22 19:43:51  soliday
+ Updated to compile if the xlslib library is not available.
+
+ Revision 1.17  2012/01/27 21:31:18  soliday
+ Added Excel XLS support
+
  Revision 1.16  2010/11/23 20:21:44  soliday
  Updated to fix a truncation issue with double and float values when they are
  printed. The full percision was being lost before.
@@ -62,12 +68,30 @@
 #include "mdb.h"
 #include "SDDS.h"
 #include "scan.h"
+#ifdef USE_XLS
+#include "common/xlconfig.h"
+#endif
+
+#ifdef __GNUC__
+#include <stdbool.h>
+#else
+typedef enum
+{
+	false = 0,
+	true = 1
+} bool;
+#endif
+#ifdef USE_XLS
+#include "xlslib.h"
+#include "common/systype.h"
+#endif
 
 #define SET_DELIMITER 0
 #define SET_ALL 1
 #define SET_VERBOSE 2
 #define SET_PIPE 3
-#define N_OPTIONS 4
+#define SET_EXCEL 4
+#define N_OPTIONS 5
 
 #define DELIMITER "\t"
 
@@ -76,16 +100,18 @@ char *option[N_OPTIONS] = {
     "all",
     "verbose",
     "pipe",
+    "excel",
 } ;
 
 
 char *USAGE=
 "\n"
 "sdds2spreadsheet [<SDDSfilename>] [<outputname>] [-pipe[=in][,out]]\n"
-"[-delimiter=<delimiting-string>] [-all] [-verbose]\n"
+"[-delimiter=<delimiting-string>] [-all] [-verbose] [-excel]\n"
 "\n"
 "sdds2spreadsheet converts an SDDS file to a form usable by a spreadsheet.\n"
 "  -pipe      Standard SDDS toolkit pipe option.\n"
+"  -excel     Write XLS Excel output file.\n"
 "  -delimiter Delimiter string (Default is \"\\t\")\n"
 "  -all       Write parameter, column, and array information.\n"
 "               (Default is data and parameters only)\n"
@@ -95,6 +121,8 @@ char *USAGE=
 "      Wingz delimiter can only be \"\\t\"\n"
 "\n"
 "Program by Kenneth Evans.  (This is version 3, July 1996.)\n";
+
+
 
 int main(int argc, char **argv)
 {
@@ -109,10 +137,17 @@ int main(int argc, char **argv)
   long i, j, i_arg, append_units, nrows, ntable;
   SCANNED_ARG *s_arg;
   char *text, *contents, *delimiter;
-  long verbose=0, all=0, nvariableparms=0;
+  long verbose=0, all=0, nvariableparms=0, excel=0, line=0;
   void *data;
   unsigned long pipeFlags;
-  
+#ifdef USE_XLS
+  workbook *w;
+  worksheet *ws;
+#endif
+  int ret;
+  char sheet[256];
+  char buffer[5];
+
   SDDS_RegisterProgramName(argv[0]);
   
   list_request = -1;
@@ -135,6 +170,13 @@ int main(int argc, char **argv)
 	break;
       case SET_ALL:
 	all = 1;
+	break;
+      case SET_EXCEL:
+#ifdef USE_XLS
+	excel = 1;
+#else
+        SDDS_Bomb("-excel option is not available becuase sdds2spreadsheet was not compiled with xlslib support");
+#endif
 	break;
       case SET_VERBOSE:
 	verbose = 1;
@@ -163,15 +205,20 @@ int main(int argc, char **argv)
   processFilenames("sdds2spreadsheet", &input, &output, pipeFlags, 0, NULL);
   
   if (output) {
-    outfile=fopen(output,"w");
-    if(!outfile)
-      SDDS_Bomb(strcat("Can't open output file ", output));
+    if (!excel) {
+      outfile=fopen(output,"w");
+      if(!outfile)
+        SDDS_Bomb(strcat("Can't open output file ", output));
+    }
   }
   else {
+    if (excel) {
+      SDDS_Bomb("-pipe=out and -excel options cannot be used together");
+    }
     outfile = stdout;
   }
   
-  if (input)
+  if (input && !excel)
     fprintf(outfile,"Created from SDDS file: %s\n", input);
   if (!SDDS_InitializeInput(&SDDS_table, input)) {
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
@@ -182,18 +229,23 @@ int main(int argc, char **argv)
   if(verbose && input) 
     fprintf(stderr, "\nfile %s is in SDDS protocol version %" PRId32 "\n", 
 	    input, layout->version);
+
   if (!SDDS_GetDescription(&SDDS_table, &text, &contents)) 
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   
   if (text) 
     if (verbose) 
       fprintf(stderr, "description: %s\n", text);
-  fprintf(outfile,"%s%s\n",text?text:"No description",delimiter);
+
+  if (!excel)
+    fprintf(outfile,"%s%s\n",text?text:"No description",delimiter);
   
   if (contents)
     if (verbose) 
       fprintf(stderr, "contents: %s\n", contents);
-  fprintf(outfile,"%s%s\n",contents?contents:"No description",delimiter);
+
+  if (!excel)
+    fprintf(outfile,"%s%s\n",contents?contents:"No description",delimiter);
   
   if (layout->data_mode.mode==SDDS_ASCII) {
     if (verbose) {
@@ -205,6 +257,7 @@ int main(int argc, char **argv)
   } 
   else if (verbose) 
     fprintf(stderr, "\ndata is binary\n");
+
   /* Columns */    
   if (layout->n_columns) {
     if(verbose) {
@@ -212,7 +265,7 @@ int main(int argc, char **argv)
       fprintf(stderr, "NAME            UNITS           SYMBOL          FORMAT          TYPE    FIELD  DESCRIPTION\n");
       fprintf(stderr, "                                                                        LENGTH\n");
     }
-    if (all) 
+    if (all && !excel) 
       fprintf(outfile,
 	      "\nColumns%s\nName%sUnits%sSymbol%sFormat%sType%sField Length%sDescription%s\n",
 	      delimiter, delimiter, delimiter, delimiter, delimiter, delimiter, delimiter, 
@@ -221,18 +274,21 @@ int main(int argc, char **argv)
       coldef = layout->column_definition+i;
       if(verbose) 
 	fprintf(stderr, "%-15s %-15s %-15s %-15s %-7s %-7" PRId32 " %s\n",
-		coldef->name, coldef->units, coldef->symbol,
-		coldef->format_string, SDDS_type_name[coldef->type-1], coldef->field_length,  
-		coldef->description);
-      if(all) 
+		coldef->name, coldef->units?coldef->units:"", 
+                coldef->symbol?coldef->symbol:"",
+		coldef->format_string?coldef->format_string:"", 
+                SDDS_type_name[coldef->type-1], 
+                coldef->field_length,  
+		coldef->description?coldef->description:"");
+      if(all && !excel) 
 	fprintf(outfile,"%s%s%s%s%s%s%s%s%s%s%-7" PRId32 "%s%s%s\n",
 		coldef->name, delimiter,
-		coldef->units, delimiter,
-		coldef->symbol, delimiter,
-		coldef->format_string, delimiter,
+		coldef->units?coldef->units:"", delimiter,
+		coldef->symbol?coldef->symbol:"", delimiter,
+		coldef->format_string?coldef->format_string:"", delimiter,
 		SDDS_type_name[coldef->type-1], delimiter,
 		coldef->field_length,  delimiter,
-		coldef->description, delimiter);
+		coldef->description?coldef->description:"", delimiter);
     }
   }
   /* Parameters */    
@@ -242,7 +298,7 @@ int main(int argc, char **argv)
       fprintf(stderr, 
 	      "NAME                UNITS               SYMBOL              TYPE                DESCRIPTION\n");
     }
-    if(all) 
+    if(all && !excel) 
       fprintf(outfile,"\nParameters%s\nName%sFixedValue%sUnits%sSymbol%sType%sDescription%s\n",
 	      delimiter, delimiter, delimiter, delimiter, delimiter, delimiter, delimiter);
     for (i=0; i<layout->n_parameters; i++) {
@@ -252,18 +308,20 @@ int main(int argc, char **argv)
 	if(!all) continue;
       }
       if(verbose) fprintf(stderr, "%-19s %-19s %-19s %-19s %s\n",
-			  pardef->name, pardef->units, pardef->symbol, 
-			  SDDS_type_name[pardef->type-1], pardef->description);
-      if(all) fprintf(outfile,"%s%s%s%s%s%s%s%s%s%s%s%s\n",
-		      pardef->name, delimiter,
-		      pardef->fixed_value, delimiter,
-		      pardef->units, delimiter,
-		      pardef->symbol, delimiter,
-		      SDDS_type_name[pardef->type-1], delimiter,
-		      pardef->description, delimiter);
-      else fprintf(outfile,"%s%s%s%s%s\n",
-		   pardef->name, delimiter, delimiter,
-		   pardef->fixed_value, delimiter);
+			  pardef->name, pardef->units?pardef->units:"", pardef->symbol?pardef->symbol:"", 
+			  SDDS_type_name[pardef->type-1], pardef->description?pardef->description:"");
+      if (!excel) {
+        if(all) fprintf(outfile,"%s%s%s%s%s%s%s%s%s%s%s%s\n",
+                        pardef->name, delimiter,
+                        pardef->fixed_value?pardef->fixed_value:"", delimiter,
+                        pardef->units?pardef->units:"", delimiter,
+                        pardef->symbol?pardef->symbol:"", delimiter,
+                        SDDS_type_name[pardef->type-1], delimiter,
+                        pardef->description?pardef->description:"", delimiter);
+        else fprintf(outfile,"%s%s%s%s%s\n",
+                     pardef->name, delimiter, delimiter,
+                     pardef->fixed_value?pardef->fixed_value:"", delimiter);
+      }
     }
   }
   /* Arrays */    
@@ -274,23 +332,26 @@ int main(int argc, char **argv)
 	      "          FORMAT  TYPE            FIELD   GROUP           DESCRIPTION\n");
       fprintf(stderr, "                                                                        LENGTH  NAME\n");
     }
-    fprintf(outfile,"\nArrays%s\nName%sUnits%sSymbol%sFormat%sType%sField Length%sGroup Name%sDescription%s\n",
-	    delimiter, delimiter, delimiter, delimiter, delimiter, delimiter, delimiter, delimiter, delimiter);
+    if (!excel) {
+      fprintf(outfile,"\nArrays%s\nName%sUnits%sSymbol%sFormat%sType%sField Length%sGroup Name%sDescription%s\n", delimiter, delimiter, delimiter, delimiter, delimiter, delimiter, delimiter, delimiter, delimiter);
+    }
     for (i=0; i<layout->n_arrays; i++) {
       arraydef = layout->array_definition+i;
       if(verbose) fprintf(stderr, "%-15s %-15s %-15s %-7s %-8s*^%-5" PRId32 " %-7" PRId32 " %-15s %s\n",
 			  arraydef->name, arraydef->units, arraydef->symbol,
 			  arraydef->format_string, SDDS_type_name[arraydef->type-1], arraydef->dimensions,
 			  arraydef->field_length,  arraydef->group_name, arraydef->description);
-      fprintf(outfile,"%s%s%s%s%s%s%s%s%s*^%-5" PRId32 "%s%-7" PRId32 "%s%s%s%s%s\n",
-	      arraydef->name, delimiter,
-	      arraydef->units, delimiter,
-	      arraydef->symbol, delimiter,
-	      arraydef->format_string, delimiter,
-	      SDDS_type_name[arraydef->type-1], arraydef->dimensions, delimiter,
-	      arraydef->field_length,  delimiter,
-	      arraydef->group_name, delimiter,
-	      arraydef->description, delimiter);
+      if (!excel) {
+        fprintf(outfile,"%s%s%s%s%s%s%s%s%s*^%-5" PRId32 "%s%-7" PRId32 "%s%s%s%s%s\n",
+                arraydef->name, delimiter,
+                arraydef->units, delimiter,
+                arraydef->symbol, delimiter,
+                arraydef->format_string, delimiter,
+                SDDS_type_name[arraydef->type-1], arraydef->dimensions, delimiter,
+                arraydef->field_length,  delimiter,
+                arraydef->group_name, delimiter,
+                arraydef->description, delimiter);
+      }
     }
   }
   /* Associates */    
@@ -315,9 +376,25 @@ int main(int argc, char **argv)
 	    layout->associate_definition[i].description, delimiter);
     }
 */
+
+#ifdef USE_XLS
+  w = xlsNewWorkbook();
+#ifdef __APPLE__
+  xlsWorkbookIconvInType(w, "UCS-4-INTERNAL");
+#endif
+#endif
 /* Process tables */    
   while ((ntable=SDDS_ReadTable(&SDDS_table))>0) {
-    fprintf(outfile,"\nTable %ld\n",ntable);
+    line=0;
+#ifdef USE_XLS
+    if (excel) {
+      sprintf(sheet, "Sheet%d", ntable);
+      ws = xlsWorkbookSheet(w, sheet);
+    } else
+      fprintf(outfile,"\nTable %ld\n",ntable);
+#else
+    fprintf(outfile,"\nTable %ld\n",ntable);  
+#endif
     /* Variable parameters */
     if (nvariableparms) {
       for (i=0; i<layout->n_parameters; i++) {
@@ -327,10 +404,50 @@ int main(int argc, char **argv)
 	  SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
 	  exit(1);
 	}
-	fprintf(outfile,"%s%s%s",pardef->name,delimiter,delimiter);
-	SDDS_PrintTypedValue(data, 0, pardef->type, NULL, outfile, 0);
-	fprintf(outfile,"%s\n",delimiter);
+#ifdef USE_XLS
+        if (excel) {
+          xlsWorksheetLabel(ws, line, 0, pardef->name, NULL);
+          switch(pardef->type) {
+          case SDDS_DOUBLE:
+            xlsWorksheetNumberDbl(ws, line, 1, *((double*)data), NULL);
+            break;
+          case SDDS_FLOAT:
+            xlsWorksheetNumberDbl(ws, line, 1, *((float*)data), NULL);  
+            break;
+          case SDDS_ULONG:
+            xlsWorksheetNumberInt(ws, line, 1, *((uint32_t*)data), NULL);  
+            break;
+          case SDDS_LONG:
+            xlsWorksheetNumberInt(ws, line, 1, *((int32_t*)data), NULL);  
+            break;
+          case SDDS_USHORT:
+            xlsWorksheetNumberInt(ws, line, 1, *((unsigned short*)data), NULL);  
+            break;
+          case SDDS_SHORT:
+            xlsWorksheetNumberInt(ws, line, 1, *((short*)data), NULL);  
+            break;
+          case SDDS_STRING:
+            xlsWorksheetLabel(ws, line, 1, *((char**)data), NULL);
+            break;
+          case SDDS_CHARACTER:
+            sprintf(buffer, "%c", *((char*)data));
+            xlsWorksheetLabel(ws, line, 1, buffer, NULL);
+            break;
+          default:
+            break;
+          }
+
+          line++;
+        } else {
+#endif
+          fprintf(outfile,"%s%s%s",pardef->name,delimiter,delimiter);
+          SDDS_PrintTypedValue(data, 0, pardef->type, NULL, outfile, 0);
+          fprintf(outfile,"%s\n",delimiter);
+#ifdef USE_XLS
+        }
+#endif
       }
+      line++;
     }
     /* Columns */
     if (layout->n_columns) {
@@ -342,9 +459,19 @@ int main(int argc, char **argv)
       }
       for (i=0; i<layout->n_columns; i++) {
 	coldef = layout->column_definition+i;
-	fprintf(outfile,"%s%s",coldef->name,delimiter);
+#ifdef USE_XLS
+        if (excel) {
+          xlsWorksheetLabel(ws, line, i, coldef->name, NULL);
+        }
+        else
+          fprintf(outfile,"%s%s",coldef->name,delimiter);
+#else
+        fprintf(outfile,"%s%s",coldef->name,delimiter);
+#endif
       }
-      fprintf(outfile,"\n");
+      line++;
+      if (!excel)
+        fprintf(outfile,"\n");
       if (nrows) {
 	for (j=0; j<nrows; j++) {
 	  for (i=0; i<layout->n_columns; i++) {
@@ -353,24 +480,67 @@ int main(int argc, char **argv)
 	      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
 	      exit(1);
 	    }
-	    switch(coldef->type) {
-	    case SDDS_DOUBLE:
-              fprintf(outfile, "%.*g", DBL_DIG, *((double*)data));
-	      break;
-	    case SDDS_FLOAT:
-              fprintf(outfile, "%.*g", FLT_DIG, *((float*)data));
-	      break;
-	    default:
-	      SDDS_PrintTypedValue(data, 0, coldef->type, NULL, outfile, 0);
-	      break;
-	    }
-	    fprintf(outfile,delimiter);
+#ifdef USE_XLS
+            if (excel) {
+              switch(coldef->type) {
+              case SDDS_DOUBLE:
+                xlsWorksheetNumberDbl(ws, line, i, *((double*)data), NULL);  
+                break;
+              case SDDS_FLOAT:
+                xlsWorksheetNumberDbl(ws, line, i, *((float*)data), NULL);  
+                break;
+              case SDDS_ULONG:
+                xlsWorksheetNumberInt(ws, line, i, *((uint32_t*)data), NULL);  
+                break;
+              case SDDS_LONG:
+                xlsWorksheetNumberInt(ws, line, i, *((int32_t*)data), NULL);  
+                break;
+              case SDDS_USHORT:
+                xlsWorksheetNumberInt(ws, line, i, *((unsigned short*)data), NULL);  
+                break;
+              case SDDS_SHORT:
+                xlsWorksheetNumberInt(ws, line, i, *((short*)data), NULL);  
+                break;
+              case SDDS_STRING:
+                xlsWorksheetLabel(ws, line, i, *((char**)data), NULL);
+                break;
+              case SDDS_CHARACTER:
+                sprintf(buffer, "%c", *((char*)data));
+                xlsWorksheetLabel(ws, line, i, buffer, NULL);
+                break;
+              default:
+                break;
+              }
+            } else {
+#endif
+              switch(coldef->type) {
+              case SDDS_DOUBLE:
+                fprintf(outfile, "%.*g", DBL_DIG, *((double*)data));
+                break;
+              case SDDS_FLOAT:
+                fprintf(outfile, "%.*g", FLT_DIG, *((float*)data));
+                break;
+              default:
+                SDDS_PrintTypedValue(data, 0, coldef->type, NULL, outfile, 0);
+                break;
+              }
+              fprintf(outfile,delimiter);
+#ifdef USE_XLS
+            }
+#endif
 	  }
-	  fprintf(outfile,"\n");
+          if (!excel)
+            fprintf(outfile,"\n");
+          line++;
 	}
       }
     }
   }
+#ifdef USE_XLS
+  ret = xlsWorkbookDump(w, output);
+  xlsDeleteWorkbook(w);
+#endif
+
   /*	
 	QUIT:
   */
@@ -381,3 +551,4 @@ int main(int argc, char **argv)
   }
   return(0);
 }
+

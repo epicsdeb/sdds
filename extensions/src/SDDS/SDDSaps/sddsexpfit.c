@@ -10,7 +10,7 @@
 /* program: sddsexpfit.c
  * purpose: do an exponential fit:  y(n) = a0 + a1*exp(a2*x(n))
  * M. Borland, 1995
- $Log: sddsexpfit.c,v $
+ $Log: not supported by cvs2svn $
  Revision 1.33  2010/04/12 22:54:06  lemery
  Untabified.
 
@@ -405,9 +405,8 @@ int main(int argc, char **argv)
         a[1] = factorStart;
       if (guessFlags&(START_RATE_GIVEN+FIX_RATE_GIVEN))
         a[2] = rateStart;
-
-      da[0] = a[0]*0.05;
-      da[1] = a[1]*0.05;
+      
+      da[0] = da[1] = fabs(a[1]-a[0])/20.0;
       da[2] = 0.1/(xData[nData-1]-xData[0]);
       if (verbosity>3) 
         fprintf(stderr, "starting guess: %e, %e, %e\n", 

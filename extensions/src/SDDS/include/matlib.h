@@ -11,10 +11,7 @@
  * purpose: definitions for C matrix routines 
  *
  * Michael Borland, 1989
- $Log: matlib.h,v $
- Revision 1.11  2010/02/04 23:42:34  soliday
- Updated so that it can be used by c++
-
+ $Log: not supported by cvs2svn $
  Revision 1.10  2008/01/05 03:35:32  borland
  Adde m_subtract().
 

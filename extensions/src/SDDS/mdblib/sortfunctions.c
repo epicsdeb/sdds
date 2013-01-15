@@ -17,11 +17,7 @@
  *
  * purpose: useful routines for sorting, compatible with qsort()
  * Michael Borland, 1989, 1995
- $Log: sortfunctions.c,v $
- Revision 1.15  2007/10/25 22:36:08  borland
- Added strcmp_skip, which can compare strings while skipping characters
- in a third string.
-
+ $Log: not supported by cvs2svn $
  Revision 1.14  2007/07/13 15:02:45  soliday
  Renamed strcpy_s to strcpy_ss because Microsoft is already using this name.
 

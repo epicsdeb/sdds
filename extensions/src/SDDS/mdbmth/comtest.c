@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: comtest.c,v $
- Revision 1.7  2009/11/06 23:37:54  borland
- Updated to use C99 complex number library.
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2009/10/30 14:07:05  borland
  Added test for clog().
 

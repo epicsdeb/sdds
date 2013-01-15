@@ -13,10 +13,7 @@
  * Extracted from xwd.c on 1-6-92 and modified * 
  * Routine to be used is windowdump()          * 
  *   Dumps a Drawable as Xwd dumps a window    *
- * $Log: xwdfunc.c,v $
- * Revision 1.6  2002/08/14 17:29:25  soliday
- * Added Open License
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.5  2000/05/16 19:46:08  soliday
  * Cleaned up some Solaris compiler warnings.
  *

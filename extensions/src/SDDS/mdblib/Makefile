@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile,v $
-# Revision 1.6  2003/07/22 21:40:43  soliday
-# Modified the makefiles to work with epics 3.13 and 3.14
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.5  2002/08/14 16:06:03  soliday
 # Added Open License
 #

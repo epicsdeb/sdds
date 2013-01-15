@@ -1,5 +1,5 @@
 /*
- *      $Id: tsSLList.h,v 1.1 1997/03/06 19:25:02 saunders Exp $
+ *      $Id: tsSLList.h,v 1.1 1997-03-06 19:25:02 saunders Exp $
  *
  *	 tsSLList - type safe singly linked list templates
  *
@@ -30,10 +30,7 @@
  *
  *
  * History
- * $Log: tsSLList.h,v $
- * Revision 1.1  1997/03/06 19:25:02  saunders
- * New files necessary for build.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.6  1997/01/22 21:14:21  jhill
  * fixed class decl order for VMS
  *

@@ -1,10 +1,7 @@
 #
-# $Id: Makefile,v 1.4 2010/10/31 19:42:46 soliday Exp $
+# $Id: Makefile,v 1.4 2010-10-31 19:42:46 soliday Exp $
 #
-# $Log: Makefile,v $
-# Revision 1.4  2010/10/31 19:42:46  soliday
-# Added 64bit support.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.3  2009/09/01 20:39:40  soliday
 # Fixed support for Windows using Intel Visual Fortran and added support
 # for cygwin-x86.

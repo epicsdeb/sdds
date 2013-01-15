@@ -12,7 +12,13 @@
  *
  * Michael Borland, 1995
  * based on mpl-format interpolation program
- $Log: sddsinterp.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.30  2011/02/21 16:15:48  shang
+ added documentation for interpShort option, and changed the type of returnCode in interp_short to "unsigned long" to be consistent with interp()
+
+ Revision 1.29  2011/02/20 19:41:30  borland
+ Fixed uninitialized variable bug.
+
  Revision 1.28  2011/01/28 16:39:37  shang
  added interp_short option to interpolate short values.
 
@@ -147,7 +153,10 @@ static char *USAGE = "sddsinterp [<inputfile>] [<outputfile>] [-pipe=[input][,ou
  [-order=<number>] [-printout[=bare][,stdout]]\n\
  [-forceMonotonic[={increasing|decreasing}]] \n\
  [-belowRange={value=<value>|skip|saturate|extrapolate|wrap}[,{abort|warn}]]\n\
- [-aboveRange={value=<value>|skip|saturate|extrapolate|wrap}[,{abort|warn}]]\n\n\
+ [-aboveRange={value=<value>|skip|saturate|extrapolate|wrap}[,{abort|warn}]]\n\
+-interpshort    for interpolating short columns, with order of -1 or -2; \n\
+                order=-1, means the interpolating point inheriting value from previous point; \n\
+                order=-2, means the interpolating point inheriting value from next point.\n\n\
     Program by Michael Borland.  (This is version 1.20, August 2003.)\n";
 
 double *makeSequence(long *points, double start, double end, double spacing, double *data, long dataRows);
@@ -187,7 +196,7 @@ int main(int argc, char **argv)
   double *indepValue, **depenValue, *interpPoint, **outputData;
   unsigned long pipeFlags;
   FILE *fpPrint;
-  short interpShort, interpShortOrder=-1, *shortValue=NULL;
+  short interpShort=0, interpShortOrder=-1, *shortValue=NULL;
   long nextPos;
 
   SDDS_RegisterProgramName(argv[0]);
@@ -522,7 +531,7 @@ int main(int argc, char **argv)
     else if (combineDuplicates)
       rows = combineDuplicatePoints(indepValue, depenValue, depenQuantities, rows, 0.0);
     if ((monotonicity=checkMonotonicity(indepValue, rows))==0)
-      SDDS_Bomb("independent data values do not change monotonically");
+      SDDS_Bomb("independent data values do not change monotonically or repeated independent values exist");
     if (interpShort)
       shortValue = malloc(sizeof(*shortValue)*rows);
     
@@ -671,13 +680,13 @@ long checkMonotonicity(double *indepValue, long rows)
     return 1;
   if (indepValue[rows-1]>indepValue[0]) {
     while (--rows>0)
-      if (indepValue[rows]<indepValue[rows-1])
+      if (indepValue[rows]<=indepValue[rows-1])
         return 0;
     return 1;
   }
   else {
     while (--rows>0)
-      if (indepValue[rows]>indepValue[rows-1])
+      if (indepValue[rows]>=indepValue[rows-1])
         return 0;
     return -1;
   }

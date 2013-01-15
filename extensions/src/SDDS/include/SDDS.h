@@ -12,7 +12,7 @@
  *          format
  *
  * Michael Borland, 1993
- $Log: SDDS.h,v $
+ $Log: not supported by cvs2svn $
  Revision 1.92  2010/11/19 15:39:40  shang
  removed redundant routine declaration.
 
@@ -1027,6 +1027,11 @@ int32_t SDDS_WriteNonNativeBinaryString(char *string, FILE *fp, SDDS_FILEBUFFER 
 #if defined(zLib)
 int32_t SDDS_GZipWriteNonNativeBinaryString(char *string, gzFile *gzfp, SDDS_FILEBUFFER *fBuffer);
 #endif
+
+#define SDDS_MATCH_COLUMN 0
+#define SDDS_MATCH_PARAMETER 1
+#define SDDS_MATCH_ARRAY 2
+epicsShareFuncSDDS extern char **getMatchingSDDSNames(SDDS_DATASET *dataset, char **matchName, long matches, long *names,  short match_type);
 
 #if SDDS_MPI_IO
   /* SDDSmpi_output.c */

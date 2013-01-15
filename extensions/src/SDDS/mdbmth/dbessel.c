@@ -5,10 +5,7 @@
 */
 
 /*
- $Log: dbessel.c,v $
- Revision 1.4  2009/04/21 19:04:42  shang
- removed dbeskv routines since they are from numeric recipes
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2009/04/21 15:16:09  shang
  added  dbeskv_nu() routine
 

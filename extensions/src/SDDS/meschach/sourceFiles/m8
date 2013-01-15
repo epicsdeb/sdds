@@ -629,7 +629,7 @@ sed >sparse.c <<'//GO.SYSIN DD sparse.c' 's/^-//'
 -#include	"sparse.h"
 -
 -
--static char	rcsid[] = "$Id: m8,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char	rcsid[] = "$Id: m8,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#define	MINROWLEN	10
 -
@@ -1666,7 +1666,7 @@ sed >sprow.c <<'//GO.SYSIN DD sprow.c' 's/^-//'
 -#include	"sparse.h"
 -
 -
--static char	rcsid[] = "$Id: m8,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char	rcsid[] = "$Id: m8,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#define	MINROWLEN	10
 -
@@ -2381,7 +2381,7 @@ sed >sparseio.c <<'//GO.SYSIN DD sparseio.c' 's/^-//'
 -#include        <stdio.h>
 -#include        "sparse.h"
 -
--static char rcsid[] = "$Id: m8,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: m8,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -
 -
@@ -2697,7 +2697,7 @@ sed >spchfctr.c <<'//GO.SYSIN DD spchfctr.c' 's/^-//'
 -
 -*/
 -
--static char	rcsid[] = "$Id: m8,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char	rcsid[] = "$Id: m8,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include        "sparse2.h"
@@ -3741,7 +3741,7 @@ sed >spbkp.c <<'//GO.SYSIN DD spbkp.c' 's/^-//'
 -  Radical revision completed Mon 07th Dec 1992, 10:59:57 AM
 -*/
 -
--static	char	rcsid[] = "$Id: m8,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m8,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include        "sparse2.h"

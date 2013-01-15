@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
-# Revision 1.15  2007/03/30 20:11:58  soliday
-# Fixed issue on solaris-sparc-gnu
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.14  2007/02/02 18:45:27  borland
 # Added str_copy.c, with strcpy_s() routine for safe string copies.
 # Converted routines from strcpy() to strcpy_s().

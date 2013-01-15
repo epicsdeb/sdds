@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: rpn_io.c,v $
- Revision 1.7  2003/08/28 20:49:12  soliday
- Cleaned up the code.
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2002/08/14 16:29:00  soliday
  Added Open License
 

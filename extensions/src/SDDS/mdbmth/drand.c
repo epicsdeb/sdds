@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: drand.c,v $
- Revision 1.18  2006/02/09 16:37:13  soliday
- Updated gauss_rn_lim_oag so that it works correctly.
-
+ $Log: not supported by cvs2svn $
  Revision 1.17  2006/02/08 23:01:42  soliday
  Added functions to increment the seed as if the random function was called
  multiple times. The new functions are random_oag, gauss_rn_oag, gauss_rn_lim_oag

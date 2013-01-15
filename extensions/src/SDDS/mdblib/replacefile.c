@@ -10,10 +10,7 @@
 /* file: replacefile.c
  * contents: replaceFile(), replaceFileAndBackUp()
  * M. Borland, 1995.
- $Log: replacefile.c,v $
- Revision 1.7  2002/08/14 16:06:12  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2000/04/05 21:33:44  soliday
  Fixed typo with if defined statement
 

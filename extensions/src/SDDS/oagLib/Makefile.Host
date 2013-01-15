@@ -1,8 +1,5 @@
 # makefile for oagLib
-# $Log: Makefile.Host,v $
-# Revision 1.5  2001/02/20 22:39:16  soliday
-# Removed shared libraries line.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.4  2001/02/20 22:17:22  soliday
 # Added curses library.
 #

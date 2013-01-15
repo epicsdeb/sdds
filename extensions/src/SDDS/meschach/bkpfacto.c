@@ -28,7 +28,7 @@
 	Matrix factorisation routines to work with the other matrix files.
 */
 
-static	char	rcsid[] = "$Id: bkpfacto.c,v 1.3 2000/04/05 20:55:29 soliday Exp $";
+static	char	rcsid[] = "$Id: bkpfacto.c,v 1.3 2000-04-05 20:55:29 soliday Exp $";
 
 #include	<stdio.h>
 #include	<math.h>

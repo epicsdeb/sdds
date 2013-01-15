@@ -9,10 +9,7 @@
 /* program: sddsdiff
  * purpose: compare two sdds file.
 
- $Log: sddsdiff.c,v $
- Revision 1.27  2009/09/10 17:13:44  shang
- modified to print errors and warnings to the standard error, and print the difference to stdout so that it can be piped out easily.
-
+ $Log: not supported by cvs2svn $
  Revision 1.26  2008/02/22 22:06:18  shang
  now it ignores the pre and post spaces when compare two strings.
 

@@ -12,12 +12,20 @@ class SDDS:
           self.SDDS_CHECK_WRONGTYPE = 2
           self.SDDS_CHECK_WRONGUNITS = 3
           self.SDDS_DOUBLE = 1
+          self.SDDS_REAL64 = 1
           self.SDDS_FLOAT = 2
+          self.SDDS_REAL32 = 2
           self.SDDS_LONG = 3
-          self.SDDS_SHORT = 4
-          self.SDDS_STRING = 5
-          self.SDDS_CHARACTER = 6
-          self.SDDS_NUM_TYPES = 6
+          self.SDDS_INT32 = 3
+          self.SDDS_ULONG = 4
+          self.SDDS_UINT32 = 4
+          self.SDDS_SHORT = 5
+          self.SDDS_INT16 = 5
+          self.SDDS_USHORT = 6
+          self.SDDS_UINT16 = 6
+          self.SDDS_STRING = 7
+          self.SDDS_CHARACTER = 8
+          self.SDDS_NUM_TYPES = 8
           self.SDDS_BINARY = 1
           self.SDDS_ASCII = 2
           #only indexes of 0 through 19 are allowed

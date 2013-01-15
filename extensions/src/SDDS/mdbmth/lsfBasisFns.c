@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: lsfBasisFns.c,v $
- Revision 1.5  2005/11/04 22:47:15  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2002/08/14 16:18:57  soliday
  Added Open License
 

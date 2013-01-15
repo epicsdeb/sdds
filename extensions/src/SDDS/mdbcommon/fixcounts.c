@@ -13,12 +13,7 @@
  *          failure.
  *          An adaptation of my fixcount program.
  * Michael Borland, 1990
- $Log: fixcounts.c,v $
- Revision 1.3  2006/01/11 23:22:38  shang
- changed the long type of l_count_line, posi_count_line to int32_t,
- since the long type is inconsistent with the type in SDDS and
- caused purify compilation fail.
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/14 16:48:27  soliday
  Added Open License
 

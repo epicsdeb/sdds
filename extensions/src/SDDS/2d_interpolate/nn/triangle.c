@@ -346,9 +346,6 @@
 #include <string.h>
 #include <math.h>
 #include "config.h"
-#if defined(vxWorks)
-#define NO_TIMER 1
-#endif
 #ifndef NO_TIMER
 #include <sys/time.h>
 #endif /* not NO_TIMER */

@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: moments.c,v $
- Revision 1.6  2002/08/14 16:18:59  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2001/11/09 19:33:00  borland
  Fixed error in equations in accumulateWeightedMoments().
 

@@ -9,11 +9,7 @@
 
 /*
  *
- $Log: tiff2sdds.c,v $
- Revision 1.5  2008/08/22 17:31:13  soliday
- Updated so that the multicolumn image column names will now use a fixed
- number of digits by adding zeros in front of the number.
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2005/11/04 22:46:19  soliday
  Updated code to be compiled by a 64 bit processor.
 

@@ -10,10 +10,7 @@
 /* program: sddsdistest.c
  * purpose: test data against various distributions
  * M. Borland, August 1995.
-   $Log: sddsdistest.c,v $
-   Revision 1.8  2005/11/04 22:46:13  soliday
-   Updated code to be compiled by a 64 bit processor.
-
+   $Log: not supported by cvs2svn $
    Revision 1.7  2005/10/18 14:14:01  jiaox
    Corrected PoissonCDF function. Fixed a bug of @parameterName option that did not work.
 

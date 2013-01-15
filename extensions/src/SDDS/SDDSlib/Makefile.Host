@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # Makefile for SDDS library
-# $Log: Makefile.Host,v $
-# Revision 1.26  2003/07/23 00:42:07  soliday
-# Modified makefiles to work with base versions 3.13 and 3.14
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.25  2003/07/22 19:49:19  soliday
 # Added shared library support with Kylix.
 #

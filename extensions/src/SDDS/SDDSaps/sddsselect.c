@@ -16,10 +16,7 @@
  * Similar to sddsxref, but doesn't transfer any data.
  *
  * Michael Borland, 1995
- $Log: sddsselect.c,v $
- Revision 1.17  2005/07/21 14:13:19  borland
- Additional changes to prevent possible free'ing of unallocated memory.
-
+ $Log: not supported by cvs2svn $
  Revision 1.16  2005/07/21 14:08:31  borland
  Fixed problem with freeing unallocated memory in key groups.
 

@@ -11,12 +11,7 @@
  * purpose: duplicate rows in a file according to a weight column
  *
  * Michael Borland, 2010
- $Log: sddsduplicate.c,v $
- Revision 1.2  2010/09/10 01:45:09  borland
- Added -seed and -probabilistic options.  If number of rows after duplication
- is not an integer and -probabilistic is given, the non-integer part is taken
- as a probability.
-
+ $Log: not supported by cvs2svn $
  Revision 1.1  2010/09/08 19:40:41  borland
  First version.
 

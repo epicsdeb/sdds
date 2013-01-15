@@ -11,7 +11,10 @@
  * contents: header file for routines used by SDDS command-line applications
  * 
  * M. Borland, 1993.
-   $Log: SDDSaps.h,v $
+   $Log: not supported by cvs2svn $
+   Revision 1.39  2011/05/16 20:52:13  shang
+   added lower and upper limit parameter for processing_definition so that the lower and upper limit can be obtained from parameters.
+
    Revision 1.38  2010/12/09 16:13:26  borland
    The ifnot and ifis options now respect the -nowarnings request.
 
@@ -195,7 +198,7 @@ typedef struct {
 #define IS_PRINT_DEFINITION 3
 
 typedef struct {
-    char *parameter_name, *column_name, *description, *symbol; 
+  char *parameter_name, *column_name, *description, *symbol, *lower_par, *upper_par; 
     char *functionOf, *weightBy, *match_value, *match_column;
     double lowerLimit, upperLimit, offset, factor, fhead, ftail, topLimit, bottomLimit;
     double percentileLevel, binSize;
@@ -393,7 +396,9 @@ typedef struct {
 #define PROCESS_COLUMN_PRANGE 35
 #define PROCESS_COLUMN_SIGNEDSMALLEST 36
 #define PROCESS_COLUMN_SIGNEDLARGEST  37
-#define N_PROCESS_COLUMN_MODES 38
+#define PROCESS_COLUMN_GMINTEGRAL 38
+#define PROCESS_COLUMN_CORRELATION 39
+#define N_PROCESS_COLUMN_MODES 40
 #if 0
 extern char *process_column_mode[N_PROCESS_COLUMN_MODES];
 extern char *process_column_name[N_PROCESS_COLUMN_MODES];

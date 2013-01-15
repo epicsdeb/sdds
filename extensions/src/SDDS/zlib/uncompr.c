@@ -3,7 +3,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h 
  */
 
-/* @(#) $Id: uncompr.c,v 1.1 2000/11/01 17:03:44 soliday Exp $ */
+/* @(#) $Id: uncompr.c,v 1.1 2000-11-01 17:03:44 soliday Exp $ */
 
 #include "zlib.h"
 

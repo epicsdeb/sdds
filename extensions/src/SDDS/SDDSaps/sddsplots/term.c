@@ -28,7 +28,10 @@
  *
  *
  
- $Log: term.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.28  2011/03/18 18:15:20  borland
+ Added gpng (gigantic PNG) type.
+
  Revision 1.27  2011/01/11 22:51:04  soliday
  Changed all the strcpy commands to strcpy_ss because of problems with
  RedHat Enterprise 6. If a strcpy copies the result to the same memory
@@ -1591,6 +1594,13 @@ struct termentry term_tbl[] = {
      NULL_scale, PNG_graphics, PNG_move, PNG_vector, 
      PNG_linetype, PNG_put_text, PNG_text_angle, 
      NULL_justify_text, PNG_dot, do_arrow, PNG_fill_box, PNG_line_thickness,  PNG_color, PNG_add_color,NULL_sendCoordinates,PNG_spectral}
+  , {"gpng",  "Gigantic PNG Format\n\tPNG devices accept dashes, rootname, template, onwhite, onblack, \n\tand linetypetable device arguments.",
+     GPNG_XMAX, GPNG_YMAX, 0, 0, (HPNG_YMAX/100), (HPNG_YMAX/100), 
+     TERM_HARDCOPY|TERM_POLYFILL|TERM_NOPROMPT, 
+     GPNG_init, PNG_reset, PNG_text, 
+     NULL_scale, PNG_graphics, PNG_move, PNG_vector, 
+     PNG_linetype, PNG_put_text, PNG_text_angle, 
+     NULL_justify_text, PNG_dot, do_arrow, PNG_fill_box, PNG_line_thickness,  PNG_color, PNG_add_color,NULL_sendCoordinates,PNG_spectral}
   , {"gif",  "(No longer suppored, png used instead)",
      PNG_XMAX, PNG_YMAX, 0, 0, (PNG_YMAX/100.0), (PNG_YMAX/100), 
      TERM_HARDCOPY|TERM_POLYFILL|TERM_NOPROMPT, 
@@ -2021,6 +2031,37 @@ void Spectral_RGB_values(double *red, double *green, double *blue, double hue)
   double k;
 
   k = 5 * hue;
+
+  if (k < 1) {
+    *red = (double).99999;
+    *green = (double)k;
+    *blue = (double)(0);
+  } else if ((k >= 1) && (k < 2)) {
+    if (k==1) k=1.00001;
+    *red = (double)(2-k);
+    *green = (double).99999;
+    *blue = (double)(0);
+  } else if ((k >= 2) && (k < 3)) {
+    *red = (double)(0);
+    *green = (double).99999;
+    *blue = (double)(k-2);
+  } else if ((k >= 3) && (k < 4)) {
+    if (k==3) k=3.00001;
+    *red = (double)(0);
+    *green = (double)(4-k);
+    *blue = (double).99999;
+  } else {
+    *red = (double)(k-4);
+    *green = (double)(0);
+    *blue = (double).99999;
+  }
+}
+
+void Spectral_BGR_values(double *red, double *green, double *blue, double hue)
+{
+  double k;
+
+  k = 5 * (1 - hue);
 
   if (k < 1) {
     *red = (double).99999;

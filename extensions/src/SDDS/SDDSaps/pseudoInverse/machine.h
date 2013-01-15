@@ -3,10 +3,7 @@
 /* Add details necessary for your own installation here! */
 
 /*
- * $Log: machine.h,v $
- * Revision 1.5  2002/08/08 15:16:20  soliday
- * Added support for OSX.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.4  2001/01/23 20:36:33  soliday
  * Fixed comments.
  *

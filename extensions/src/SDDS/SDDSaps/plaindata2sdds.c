@@ -8,7 +8,7 @@
 \*************************************************************************/
 
 /* 
- $Log: plaindata2sdds.c,v $
+ $Log: not supported by cvs2svn $
  Revision 1.22  2009/01/30 18:07:42  soliday
  Updated to accept lines 10 times as long as before.
 
@@ -204,6 +204,8 @@ void SetColumnData(long type, SDDS_DATASET *dataset, void *values, long rows, lo
 void *AllocateColumnData(long type, void *values, long rows);
 char **AllocateColumnStringData(char **values, long rows, long previous_rows);
 long getToken(char *s, char *buffer, long buflen, char separator, long whitespace);
+void ConvertDNotationToENotation (char *line);
+
 
 /* ********** */
 
@@ -237,6 +239,7 @@ int main(int argc, char **argv)
   short commentFound;
   long parameters=0, columns=0;
   long skiplines=0;
+  short abort=0, recover=1;
 
   input = output = NULL;
   separator = ' ';
@@ -869,7 +872,7 @@ int main(int argc, char **argv)
       }
       n++;
     }
-
+    
     if (!SDDS_WritePage(&SDDS_dataset)) {
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
     }
@@ -932,6 +935,7 @@ int main(int argc, char **argv)
 	  SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
 	break;
       case SDDS_FLOAT:
+        ConvertDNotationToENotation(ptr);
 	if (sscanf(ptr,"%f",&floatValue) != 1) {
 	  SDDS_SetError("Invalid float parameter");
 	  SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
@@ -940,6 +944,7 @@ int main(int argc, char **argv)
 	  SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
 	break;
       case SDDS_DOUBLE:
+        ConvertDNotationToENotation(ptr);
 	if (sscanf(ptr,"%lf",&doubleValue) != 1) {
 	  SDDS_SetError("Invalid double parameter");
 	  SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
@@ -1018,6 +1023,7 @@ int main(int argc, char **argv)
 	      SDDS_SetError("Invalid float column element");
 	      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
 	    }
+            ConvertDNotationToENotation(data);
 	    if (sscanf(data,"%f",((float*)(columnValues[col].values)+row)) != 1) {
 	      SDDS_SetError("Invalid float column element");
 	      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
@@ -1030,6 +1036,7 @@ int main(int argc, char **argv)
 	      SDDS_SetError("Invalid double column element");
 	      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
 	    }
+            ConvertDNotationToENotation(data);
 	    if (sscanf(data,"%lf",((double*)(columnValues[col].values)+row)) != 1) {
 	      SDDS_SetError("Invalid double column element");
 	      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
@@ -1169,26 +1176,48 @@ int main(int argc, char **argv)
 	  switch (columnValues[i].type) {
 	  case SDDS_SHORT:
 	    if (sscanf(data,"%hd",((short*)(columnValues[i].values)+row)) != 1) {
-	      SDDS_SetError("Invalid short column element");
-	      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
-	    }
+              if (recover) {
+                abort=1;
+                row--;
+              } else {
+                SDDS_SetError("Invalid short column element");
+                SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+              }
+            }
 	    break;
 	  case SDDS_LONG:
 	    if (sscanf(data,"%" SCNd32,((int32_t*)(columnValues[i].values)+row)) != 1) {
-	      SDDS_SetError("Invalid long column element");
-	      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
-	    }
+              if (recover) {
+                abort=1;
+                row--;
+              } else {
+                SDDS_SetError("Invalid long column element");
+                SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+              }
+            }
 	    break;
 	  case SDDS_FLOAT:
+            ConvertDNotationToENotation(data);
 	    if (sscanf(data,"%f",((float*)(columnValues[i].values)+row)) != 1) {
-	      SDDS_SetError("Invalid float column element");
-	      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
-	    }
+              if (recover) {
+                abort=1;
+                row--;
+              } else {
+                SDDS_SetError("Invalid float column element");
+                SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+              }
+            }
 	    break;
 	  case SDDS_DOUBLE:
+            ConvertDNotationToENotation(data);
 	    if (sscanf(data,"%lf",((double*)(columnValues[i].values)+row)) != 1) {
-	      SDDS_SetError("Invalid double column element");
-	      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+              if (recover) {
+                abort=1;
+                row--;
+              } else {
+                SDDS_SetError("Invalid double column element");
+                SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+              }
 	    }
 	    break;
 	  case SDDS_STRING:
@@ -1201,7 +1230,11 @@ int main(int argc, char **argv)
 	    *((char*)(columnValues[i].values)+row) = data[0];
 	    break;
 	  }
-	  }
+
+          if (recover && abort) {
+            break;
+          }
+        }
 	row++;
 	if ((row == rows) && (!noRowCount)) {
 	  if (rows > maxRows) {
@@ -1443,3 +1476,21 @@ long getToken(char *s, char *buffer, long buflen, char separator, long whitespac
   return(n);
 }
 
+/* Description: Converts Fortran D notation to C++ e notation */
+void ConvertDNotationToENotation (char *line)
+{
+  char *ptr = line;
+
+  while (*ptr && (ptr = strstr (ptr, "D+")))
+    {
+    *ptr = 'e'; ptr++;
+    *ptr = '+'; ptr++;
+    }
+
+  ptr = line;
+  while (*ptr && (ptr = strstr (ptr, "D-")))
+    {
+    *ptr = 'e'; ptr++;
+    *ptr = '-'; ptr++;
+    }
+}

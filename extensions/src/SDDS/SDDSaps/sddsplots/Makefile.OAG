@@ -7,11 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
-# Revision 1.32  2010/05/10 19:22:56  soliday
-# Updated again because it turns out that statifier creates a bad
-# executable on RHEL4 unless STATIC_BUILD=NO
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.31  2010/04/26 19:46:27  soliday
 # Updated to build as much of a static sddsplot on RHEL4 as possible.
 #
@@ -177,9 +173,10 @@ GD = $(words $(notdir $(wildcard \
 /lib64/libgd.so \
 /sw/lib/libgd.a \
 /sw/lib/libgd.dylib \
+/opt/local/lib/libgd.a \
+/opt/local/lib/libgd.dylib \
 /opt/sfw/lib/libgd.a \
 /opt/sfw/lib/libgd.so \
-/opt/local/lib/libgd.a \
 /opt/local/lib/libgd.so )))
 GDINC = $(words $(notdir $(wildcard \
 /usr/include/gd.h \

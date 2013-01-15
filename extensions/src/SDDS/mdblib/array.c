@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: array.c,v $
- Revision 1.5  2009/12/18 21:13:17  shang
- moved definition of czarray_2d(), free_czarray_2d(), and resize_czarray_2d() routines from elegant.c
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2002/08/14 16:06:04  soliday
  Added Open License
 

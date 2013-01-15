@@ -12,10 +12,7 @@
  *          SDDS format
  *
  * M. Borland, 1994
- $Log: hpwf2sdds.c,v $
- Revision 1.5  2002/08/14 17:12:37  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2001/01/23 19:14:55  soliday
  Standardized usage message.
 

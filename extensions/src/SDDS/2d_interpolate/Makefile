@@ -9,10 +9,7 @@
 #
 #
 # High-level makefile for building 2d_interpolate
-# $Log: Makefile,v $
-# Revision 1.3  2007/10/03 15:07:46  shang
-# first version for making nn and csa.
-#
+# $Log: not supported by cvs2svn $
 
 TOP=../../..
 ifeq (0, $(words $(notdir $(wildcard $(TOP)/configure))))

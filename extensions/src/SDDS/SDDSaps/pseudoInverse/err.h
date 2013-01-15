@@ -27,10 +27,7 @@
 /* err.h  28/09/1993 */
 
 /*
- * $Log: err.h,v $
- * Revision 1.4  2001/01/23 20:36:33  soliday
- * Fixed comments.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.3  1999/06/03 16:30:47  soliday
  * Removed compiler warnings under linux.
  *

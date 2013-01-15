@@ -11,10 +11,7 @@
  * purpose: namelist preprocessor input file for SDDS library
  *
  * Michael Borland, November 1993
- $Log: SDDSnl.h,v $
- Revision 1.5  2002/08/14 16:34:50  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  1999/05/25 18:59:36  soliday
  Removed compiler warning on linux.
 

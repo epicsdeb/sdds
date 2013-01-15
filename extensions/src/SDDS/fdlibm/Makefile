@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile,v $
-# Revision 1.6  2003/07/23 15:37:09  soliday
-# Fixed for BORLANDC
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.5  2003/07/23 15:13:44  soliday
 # Modified makefiles to work with base versions 3.13 and 3.14
 #

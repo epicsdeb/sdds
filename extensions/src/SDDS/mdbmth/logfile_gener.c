@@ -12,10 +12,7 @@
   area so that other prorams could use them.
   
   Hairong Shang, May 2002
-  $Log: logfile_gener.c,v $
-  Revision 1.4  2009/08/28 20:46:21  soliday
-  Updated to work with cygwin-x86
-
+  $Log: not supported by cvs2svn $
   Revision 1.3  2008/03/07 16:46:27  soliday
   Added the MakeMonthlyGenerationFilename function.
 

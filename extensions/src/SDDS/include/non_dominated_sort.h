@@ -10,10 +10,7 @@
 /* file: non_dominated_sort.h
  * purpose: definitions for non-dominated sort routines
  * Hairong Shang, May 2005
- $Log: non_dominated_sort.h,v $
- Revision 1.5  2007/04/09 15:58:47  shang
- added const_violation argument to fill_population
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2005/11/04 22:47:00  soliday
  Updated code to be compiled by a 64 bit processor.
 

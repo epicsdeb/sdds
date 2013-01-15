@@ -12,10 +12,7 @@
  *
  * Michael Borland, 1995.
  * Based on mpl program 'lsf'.
- $Log: sddsmpfit.c,v $
- Revision 1.15  2006/10/19 17:55:39  soliday
- Updated to work with linux-x86_64.
-
+ $Log: not supported by cvs2svn $
  Revision 1.14  2005/11/07 21:48:10  soliday
  Updated to remove Linux compiler warnings.
 

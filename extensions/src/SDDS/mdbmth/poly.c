@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: poly.c,v $
- Revision 1.5  2003/11/07 16:46:56  borland
- Added function solveQuadratic() to solve quadratic equations.
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2002/08/14 16:18:59  soliday
  Added Open License
 

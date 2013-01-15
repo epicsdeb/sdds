@@ -12,7 +12,13 @@
  * 
  * Michael Borland, 1995
  * based on mpl-format program integ
- $Log: sddsinteg.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.14  2011/08/30 03:16:52  borland
+ Added error output from GM method.
+
+ Revision 1.13  2011/08/11 14:28:10  borland
+ Added Gill-Miller integration method.
+
  Revision 1.12  2006/12/14 22:21:59  soliday
  Updated a bunch of programs because SDDS_SaveLayout is now called by
  SDDS_WriteLayout and it is no longer required to be called directly.
@@ -58,18 +64,29 @@
 #include <ctype.h>
 
 static char *USAGE = "sddsinteg [<input>] [<output>] [-pipe=[input][,output]]\n\
--integrate=<column-name>[,<sigma-name>]...\n\
+-integrate=<column-name>[,<sigma-name>] ...\n\
 [-exclude=<column-name>[,...]] -versus=<column-name>[,<sigma-name>]\n\
 [-mainTemplates=<item>=<string>[,...]] \n\
 [-errorTemplates=<item>=<string>[,...]] \n\
-[-method=<method-name>] [-printFinal[=bare][,stdout][,format=<string>]]\n\n\
-At present the only method supported is \"trapezoidRule\".\n\
-The -templates <item> may be \"name\", \"symbol\" or \"description\".\n\
-The default main name, description, and symbol templates are \"%yNameInteg\",\n\
-\"Integral w.r.t %xSymbol of %ySymbol\", and \"$sI$e %ySymbol d%xSymbol\", respectively.\n\
-The default error name, description, and symbol templates are \"%yNameIntegSigma\",\n\
-\"Sigma of integral w.r.t %xSymbol of %ySymbol\", and \"Sigma[$sI$e %ySymbol d%xSymbol]\", respectively.\n\
-Program by Michael Borland.  (This is version 3, December 1998.)" ;
+[-method={trapazoid|GillMiller}] [-printFinal[=bare][,stdout][,format=<string>]]\n\n\
+-pipe         Standard SDDS pipe option.\n\
+-integrate    Name of column to integrate, plus optional rms error.\n\
+              Column name may include wildcards, in which case the error\n\
+              name should include the field %s for substitution of the main name.\n\
+-exclude      List of names to exclude from integration.\n\
+-versus       Name of column to integrate against, plus optional rms error.\n\
+-mainTemplate <item> may be \"name\", \"symbol\" or \"description\".\n\
+              The default main name, description, and symbol templates are \"%yNameInteg\",\n\
+              \"Integral w.r.t %xSymbol of %ySymbol\", and \"$sI$e %ySymbol d%xSymbol\", respectively.\n\
+-errorTemplate <item> may be \"name\", \"symbol\" or \"description\".\n\
+               The default error name, description, and symbol templates are \"%yNameIntegSigma\",\n\
+               \"Sigma of integral w.r.t %xSymbol of %ySymbol\", and \"Sigma[$sI$e %ySymbol d%xSymbol]\", respectively.\n\
+-method       Integration method. Trapazoid is the default, mostly for historical reasons.\n\
+              Gill-Miller is from P.E. Gill and G. F. Miller, The Computer Journal, Vol. 15, N. 1, 80-83, 1972;\n\
+              it uses cubic interpolation and is more accurate than trapazoid, but there is no\n\
+              error propagation.\n\
+-printFinal   As for printout of the final value of the integral.\n\n\
+Program by Michael Borland.  (This is version 4, August 2011.)" ;
 
 #define CLO_INTEGRATE 0
 #define CLO_VERSUS 1
@@ -95,11 +112,18 @@ long setupOutputFile(SDDS_DATASET *SDDSout, SDDS_DATASET *SDDSin, char *output,
                      char ***yOutputName, char ***yOutputErrorName, char ***yOutputUnits,
                      char *xName, char *xErrorName,
                      char **yName, char **yErrorName, long yNames,
-                     char **mainTemplate, char **errorTemplate);
+                     char **mainTemplate, char **errorTemplate, long methodCode);
 
 #define NORMAL_PRINTOUT 1
 #define BARE_PRINTOUT 2
 #define STDOUT_PRINTOUT 4
+
+#define TRAPAZOID_METHOD 0
+#define GILLMILLER_METHOD 1
+#define N_METHODS 2
+static char *methodOption[N_METHODS] = {
+  "trapazoid", "gillmiller"
+};
 
 int main(int argc, char **argv)
 {
@@ -109,13 +133,16 @@ int main(int argc, char **argv)
     char *mainTemplate[3] = {"%yNameInteg", "Integral w.r.t. %xSymbol of %ySymbol", "$sI$e %ySymbol d%xSymbol"};
     char *errorTemplate[3] = {"%yNameIntegSigma", "Sigma of integral w.r.t. %xSymbol of %ySymbol", 
                                   "Sigma[$sI$e %ySymbol d%xSymbol]"};
+    char *GMErrorTemplate[3] = {"%yNameIntegError", "Error estimate for integral w.r.t. %xSymbol of %ySymbol", 
+                                  "Error[$sI$e %ySymbol d%xSymbol]"};
     long i, iArg, yNames, yExcludeNames, rows;
     SDDS_DATASET SDDSin, SDDSout;
     SCANNED_ARG *scanned;
     unsigned long flags, pipeFlags, printFlags;
     FILE *fpPrint;
     char *printFormat;
-
+    int methodCode;
+    
     SDDS_RegisterProgramName(argv[0]);
 
     argc = scanargs(&scanned, argc, argv); 
@@ -129,7 +156,8 @@ int main(int argc, char **argv)
     pipeFlags = printFlags = 0;
     fpPrint = stderr;
     printFormat = "%21.15e";
-
+    methodCode = TRAPAZOID_METHOD;
+    
     for (iArg=1; iArg<argc; iArg++) {
         if (scanned[iArg].arg_type==OPTION) {
             /* process options here */
@@ -163,6 +191,8 @@ int main(int argc, char **argv)
                     xErrorName = NULL;
                 break;
               case CLO_METHOD:
+                if (scanned[iArg].n_items!=2 || (methodCode=match_string(scanned[iArg].list[1], methodOption, N_METHODS, 0))<0)
+                  SDDS_Bomb("invalid -method syntax");
                 break;
               case CLO_PRINTFINAL:
                 if ((scanned[iArg].n_items-=1)>=1) {
@@ -219,7 +249,12 @@ int main(int argc, char **argv)
         }
 
     processFilenames("sddsinteg", &input, &output, pipeFlags, 0, NULL);
-
+    if (methodCode!=TRAPAZOID_METHOD) {
+      xErrorName = NULL;
+      for (i=0; i<yNames; i++)
+        yErrorName[i] = NULL;
+    }
+    
     if (printFlags&STDOUT_PRINTOUT)
         fpPrint = stdout;
 
@@ -254,7 +289,8 @@ int main(int argc, char **argv)
         }
 
     setupOutputFile(&SDDSout, &SDDSin, output, &yOutputName, &yOutputErrorName, &yOutputUnits,
-                    xName, xErrorName, yName, yErrorName, yNames, mainTemplate, errorTemplate);
+                    xName, xErrorName, yName, yErrorName, yNames, mainTemplate, methodCode==GILLMILLER_METHOD?GMErrorTemplate:errorTemplate,
+		    methodCode);
 
     while (SDDS_ReadPage(&SDDSin)>0) {
       rows = SDDS_CountRowsOfInterest(&SDDSin);
@@ -274,14 +310,21 @@ int main(int argc, char **argv)
 	if (!(yData = SDDS_GetColumnInDoubles(&SDDSin, yName[i])) ||
 	    (yErrorName && yErrorName[i] && !(yError=SDDS_GetColumnInDoubles(&SDDSin, yErrorName[i]))))
 	  SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
-	trapizoid(xData, yData, xError, yError, rows, integral, integralError);
+        switch (methodCode) {
+        case TRAPAZOID_METHOD:
+          trapizoid(xData, yData, xError, yError, rows, integral, integralError);
+          break;
+        case GILLMILLER_METHOD:
+	  GillMillerIntegration(integral, integralError, yData, xData, rows);
+          break;
+        }
 	if (!SDDS_SetColumnFromDoubles(&SDDSout, SDDS_BY_NAME, integral, rows, yOutputName[i]) ||
-	    (yOutputErrorName && yOutputErrorName[i] && 
+	    (yOutputErrorName && yOutputErrorName[i] &&
 	     !SDDS_SetColumnFromDoubles(&SDDSout, SDDS_BY_NAME, integralError, rows, yOutputErrorName[i])))
 	  SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
 	if (printFlags&BARE_PRINTOUT) {
 	  fprintf(fpPrint, printFormat, integral[rows-1]);
-	  if (xError || yError) {
+	  if (xError || yError || (yOutputErrorName && yOutputErrorName[i])) {
 	    fputc(' ', fpPrint);
 	    fprintf(fpPrint, printFormat, integralError[rows-1]);
 	  }
@@ -290,7 +333,7 @@ int main(int argc, char **argv)
 	else if (printFlags&NORMAL_PRINTOUT) {
 	  fprintf(fpPrint, "%s: ", yName[i]);
 	  fprintf(fpPrint, printFormat, integral[rows-1]);
-	  if (xError || yError) {
+	  if (xError || yError || (yOutputErrorName && yOutputErrorName[i])) {
 	    fputs(" +/- ", fpPrint);
 	    fprintf(fpPrint, printFormat, integralError[rows-1]);
 	    fputs(yOutputUnits[i], fpPrint);
@@ -320,7 +363,7 @@ long setupOutputFile(SDDS_DATASET *SDDSout, SDDS_DATASET *SDDSin, char *output,
                      char ***yOutputName, char ***yOutputErrorName, char ***yOutputUnits,
                      char *xName, char *xErrorName,
                      char **yName, char **yErrorName, long yNames,
-                     char **mainTemplate, char **errorTemplate)
+                     char **mainTemplate, char **errorTemplate, long methodCode)
 {
     long i;
     char *xSymbol, *ySymbol;
@@ -353,7 +396,7 @@ long setupOutputFile(SDDS_DATASET *SDDSout, SDDS_DATASET *SDDSin, char *output,
         (*yOutputUnits)[i] = multiplyColumnUnits(SDDSout, yName[i], xName);
         (*yOutputName)[i] = changeInformation(SDDSout, yName[i], yName[i], ySymbol, xName, xSymbol, mainTemplate,
                                               (*yOutputUnits)[i]);
-        if (yErrorName || xErrorName) {
+        if (yErrorName || xErrorName || methodCode==GILLMILLER_METHOD) {
             if (yErrorName && yErrorName[i]) {
                 if (!SDDS_TransferColumnDefinition(SDDSout, SDDSin, yErrorName[i], NULL)) { 
                     fprintf(stderr, "error: problem transferring definition for column %s\n", yErrorName[i]);

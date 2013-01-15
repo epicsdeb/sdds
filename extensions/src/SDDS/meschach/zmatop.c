@@ -28,7 +28,7 @@
 #include	<stdio.h>
 #include	"zmatrix.h"
 
-static	char	rcsid[] = "$Id: zmatop.c,v 1.2 1999/10/27 21:50:42 borland Exp $";
+static	char	rcsid[] = "$Id: zmatop.c,v 1.2 1999-10-27 21:50:42 borland Exp $";
 
 
 #define	is_zero(z)	((z).re == 0.0 && (z).im == 0.0)

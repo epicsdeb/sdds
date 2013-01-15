@@ -12,10 +12,7 @@
  *          of a SDDS data set
  *
  * Michael Borland, 1994
- $Log: sdds2stream.c,v $
- Revision 1.23  2005/11/07 21:48:10  soliday
- Updated to remove Linux compiler warnings.
-
+ $Log: not supported by cvs2svn $
  Revision 1.22  2004/01/13 18:30:24  borland
  Fixed an error in the usage text for -rows option.
 

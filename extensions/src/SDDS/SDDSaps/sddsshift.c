@@ -12,10 +12,7 @@
 /*********************************************************************/
 
 /* program by J Carwardine 
- $Log: sddsshift.c,v $
- Revision 1.15  2006/03/02 21:44:32  shang
- simplifed the code through using standard SDDS library
-
+ $Log: not supported by cvs2svn $
  Revision 1.14  2003/09/02 19:16:07  soliday
  Cleaned up code for Linux.
 

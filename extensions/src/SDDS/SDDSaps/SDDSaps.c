@@ -11,7 +11,13 @@
  * contents: routines used by SDDS command-line applications
  * 
  * M. Borland, 1993.
- $Log: SDDSaps.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.72  2011/10/04 20:27:11  borland
+ Added gmintegral processing option to allow integration using Gill-Miller method.
+
+ Revision 1.71  2011/05/16 20:52:13  shang
+ added lower and upper limit parameter for processing_definition so that the lower and upper limit can be obtained from parameters.
+
  Revision 1.70  2010/12/10 18:18:49  soliday
  Added support for algebraic mode when getting an equation from a parameter.
 
@@ -280,6 +286,7 @@ typedef struct {
 #define PROCMODE_STRINGPOS_OK    0x0040UL
 #define PROCMODE_YtX_UNITS       0x0080UL
 #define PROCMODE_Y_UNITS         0x0100UL
+#define PROCMODE_NO_UNITS        x00200UL
 
 static char *process_column_name[N_PROCESS_COLUMN_MODES] = {NULL};
 static PROCESS_COLUMN_DATA process_column_data[N_PROCESS_COLUMN_MODES] = {
@@ -316,11 +323,13 @@ static PROCESS_COLUMN_DATA process_column_data[N_PROCESS_COLUMN_MODES] = {
 { "drange", "decile range", PROCMODE_NORMAL|PROCMODE_Y_UNITS },
 { "percentile", "percentile", PROCMODE_NORMAL|PROCMODE_Y_UNITS },
 { "mode", "mode of", PROCMODE_NORMAL|PROCMODE_Y_UNITS },
-{ "integral", "integral of", PROCMODE_NORMAL|PROCMODE_FUNCOF_REQUIRED|PROCMODE_YtX_UNITS},
+{ "integral", "integral of ", PROCMODE_NORMAL|PROCMODE_FUNCOF_REQUIRED|PROCMODE_YtX_UNITS},
 { "product", "product of ", PROCMODE_NORMAL|PROCMODE_WEIGHT_OK},
 { "prange", "percentile range", PROCMODE_NORMAL|PROCMODE_Y_UNITS },
 { "signedsmallest", "signed smallest of ", PROCMODE_NORMAL|PROCMODE_Y_UNITS|PROCMODE_POSITION_OK|PROCMODE_STRINGPOS_OK},
 { "signedlargest", "signed largest of ", PROCMODE_NORMAL|PROCMODE_Y_UNITS|PROCMODE_POSITION_OK|PROCMODE_STRINGPOS_OK},
+{ "gmintegral", "integral of ", PROCMODE_NORMAL|PROCMODE_FUNCOF_REQUIRED|PROCMODE_YtX_UNITS},
+{ "correlation", "correlation coefficient", PROCMODE_FUNCOF_REQUIRED}
 } ;
 
 
@@ -334,6 +343,8 @@ static PROCESS_COLUMN_DATA process_column_data[N_PROCESS_COLUMN_MODES] = {
 static char *selectQualifier[SELECT_QUALIFIERS] = {
   "select", "editselection", "exclude"
 };
+
+void GillMillerIntegration1(double *indepData, double *data, long n_data, double *result);
 
 void show_process_modes(FILE *fp)
 {
@@ -1427,7 +1438,12 @@ long process_column(SDDS_DATASET *Dataset, PROCESSING_DEFINITION *processing_ptr
       *result = n_data;
     return 1;
   }
-
+  if (processing_ptr->lower_par && !SDDS_GetParameterAsDouble(Dataset, processing_ptr->lower_par,
+							      &processing_ptr->lowerLimit))
+    SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+  if (processing_ptr->upper_par && !SDDS_GetParameterAsDouble(Dataset,processing_ptr->upper_par,
+							      &processing_ptr->upperLimit))
+     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   if (!(data = SDDS_GetColumnInDoubles(Dataset, processing_ptr->column_name)))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   indepData = weightData = NULL;
@@ -1992,6 +2008,9 @@ long process_column(SDDS_DATASET *Dataset, PROCESSING_DEFINITION *processing_ptr
   case PROCESS_COLUMN_INTEGRAL:
     trapazoidIntegration(indepData, data, n_data, result);
     break;
+  case PROCESS_COLUMN_GMINTEGRAL:
+    GillMillerIntegration1(indepData, data, n_data, result);
+    break;
   case PROCESS_COLUMN_QRANGE:
     if (!compute_percentiles(quartileResult, quartilePoint, 2, data, n_data))
       returnValue = 0;
@@ -2022,6 +2041,10 @@ long process_column(SDDS_DATASET *Dataset, PROCESSING_DEFINITION *processing_ptr
       returnValue = 1;
     }
     break; 
+  case PROCESS_COLUMN_CORRELATION:
+    *result = linearCorrelationCoefficient(data, indepData, NULL, NULL, n_data, NULL);
+    returnValue = 1;
+    break;
   default:
     returnValue = 0;
     break;
@@ -2184,14 +2207,14 @@ char *process_string_column(SDDS_DATASET *Dataset, PROCESSING_DEFINITION *proces
 static char *PROCESSING_USAGE = 
   "[-process=<column-name>,<analysis-name>,<result-name>[,description=<string>][,symbol=<string>][,weightBy=<column-name>]\n\
    [,match=<column-name>,value=<match-string>] \n\
-   [,functionOf=<column-name>[,lowerLimit=<value>][,upperLimit=<value>][,position]]\n\
+   [,functionOf=<column-name>[,lowerLimit=<value>|@parameter_name][,upperLimit=<value>|@<parameter_name>][,position]]\n\
    [,head=<number>][,tail=<number>][fhead=<fraction>][ftail=<fraction>][,topLimit=<value>][,bottomLimit=<value>]\n\
    [,offset=<value>][,factor=<value>]][,binSize=<value>]\n";
 
 PROCESSING_DEFINITION *record_processing_definition(char **argument, long arguments)
 {
   PROCESSING_DEFINITION *pd;
-
+  char *lower_str=NULL, *upper_str=NULL;
   pd = tmalloc(sizeof(*pd));
   if (arguments<3)
     bomb("invalid -process syntax--wrong number of arguments", PROCESSING_USAGE);
@@ -2201,7 +2224,7 @@ PROCESSING_DEFINITION *record_processing_definition(char **argument, long argume
     for (i=0; i<N_PROCESS_COLUMN_MODES; i++)
       process_column_name[i] = process_column_data[i].name;
   }
-
+  pd->lower_par = pd->upper_par = NULL;
   if ((pd->mode=match_string(argument[1], process_column_name, N_PROCESS_COLUMN_MODES, 0))<0) {
     fprintf(stderr, "invalid -process mode: %s\n", argument[1]);
     show_process_modes(stderr);
@@ -2219,8 +2242,8 @@ PROCESSING_DEFINITION *record_processing_definition(char **argument, long argume
                     "symbol", SDDS_STRING, &pd->symbol, 1, PROCESSING_SYMBOL_GIVEN,
                     "toplimit", SDDS_DOUBLE, &pd->topLimit, 1, PROCESSING_TOPLIM_GIVEN,
                     "bottomlimit", SDDS_DOUBLE, &pd->bottomLimit, 1, PROCESSING_BOTLIM_GIVEN,
-                    "lowerlimit", SDDS_DOUBLE, &pd->lowerLimit, 1, PROCESSING_LOLIM_GIVEN,
-                    "upperlimit", SDDS_DOUBLE, &pd->upperLimit, 1, PROCESSING_UPLIM_GIVEN,
+                    "lowerlimit", SDDS_STRING, &lower_str, 1, PROCESSING_LOLIM_GIVEN,
+                    "upperlimit", SDDS_STRING, &upper_str, 1, PROCESSING_UPLIM_GIVEN,
                     "head", SDDS_LONG, &pd->head, 1, PROCESSING_HEAD_GIVEN,
                     "tail", SDDS_LONG, &pd->tail, 1, PROCESSING_TAIL_GIVEN,
                     "fhead", SDDS_DOUBLE, &pd->fhead, 1, PROCESSING_FHEAD_GIVEN,
@@ -2234,6 +2257,22 @@ PROCESSING_DEFINITION *record_processing_definition(char **argument, long argume
                     "value", SDDS_STRING, &pd->match_value, 1, PROCESSING_MATCHVALUE_GIVEN,
                     NULL))
     bomb("invalid -process syntax", PROCESSING_USAGE);
+  if (lower_str) {
+    if (wild_match(lower_str, "@*")) {
+      SDDS_CopyString(&pd->lower_par, lower_str+1);
+      free(lower_str);
+    } else if (!get_double(&pd->lowerLimit, lower_str)) {
+      bomb("invalid lower limit provided for -process option", PROCESSING_USAGE);
+    }
+  }
+  if (upper_str) {
+    if (wild_match(upper_str, "@*")) {
+      SDDS_CopyString(&pd->upper_par, upper_str+1);
+      free(upper_str);
+    } else if (!get_double(&pd->upperLimit, upper_str)) {
+      bomb("invalid upper limit provided for -process option", PROCESSING_USAGE);
+    }
+  }
   if (pd->flags&PROCESSING_BINSIZE_GIVEN && pd->binSize<=0)
     SDDS_Bomb("invalid -process syntax---bin size is zero");
   if (pd->flags&PROCESSING_FACTOR_GIVEN && pd->factor==0)
@@ -4115,4 +4154,14 @@ char *addOuterParentheses(char *arg)
   sprintf(ptr, "(%s)", arg);
   return ptr;
 }
+
+void GillMillerIntegration1(double *indepData, double *data, long n_data, double *result)
+{
+  double *integral;
+  integral = tmalloc(sizeof(*integral)*n_data);
+  GillMillerIntegration(integral, NULL, data, indepData, n_data);
+  *result = integral[n_data-1];
+  free(integral);
+}
+
 

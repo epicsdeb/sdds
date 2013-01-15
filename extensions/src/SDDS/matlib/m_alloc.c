@@ -15,10 +15,7 @@
  *   m_alloc(&A, n, m)
  * 
  * Michael Borland, 1986.
- $Log: m_alloc.c,v $
- Revision 1.5  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  1999/05/28 14:55:29  soliday
  Removed compiler warnings under Linux.
 

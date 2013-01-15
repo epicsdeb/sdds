@@ -28,7 +28,7 @@
 	A collection of functions for computing norms: scaled and unscaled
 	Complex version
 */
-static	char	rcsid[] = "$Id: znorm.c,v 1.3 2003/08/28 19:07:24 soliday Exp $";
+static	char	rcsid[] = "$Id: znorm.c,v 1.3 2003-08-28 19:07:24 soliday Exp $";
 
 #include	<stdio.h>
 #include	<math.h>

@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: rpn_internal.h,v $
- Revision 1.24  2010/12/03 02:48:33  borland
- Added isort and dsort functions.
-
+ $Log: not supported by cvs2svn $
  Revision 1.23  2009/10/29 19:53:20  soliday
  Renamed a few global variables that conflicted with MADX.
 
@@ -127,7 +124,7 @@ struct FUNCTION {
 #define OTHER_FUNC 3
 
 /* array of function structures */
-#define NFUNCS 96
+#define NFUNCS 97
 /*it was 88 before, added ssto and streq, strlt, strgt, and strmatch */
 epicsShareFuncRPNLIB struct FUNCTION funcRPN[NFUNCS];
 

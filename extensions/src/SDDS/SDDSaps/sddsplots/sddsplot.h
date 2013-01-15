@@ -14,11 +14,7 @@
  * include file for sddsplot.c and associated files
  *
  * Michael Borland, 1994
- $Log: sddsplot.h,v $
- Revision 1.79  2010/09/14 16:20:11  soliday
- Added the rspectral order for the colors. This is the reverse of the spectral
- order.
-
+ $Log: not supported by cvs2svn $
  Revision 1.78  2010/07/08 21:26:47  borland
  Added "first" qualifier to -omnipresent option.  When given, omnipresent datasets
  are plotted first.  The default is to plot them last.
@@ -768,6 +764,7 @@ typedef struct {
 #define SCALESGROUP_USE_PAGE        0x0020U
 #define SCALESGROUP_USE_REQUEST     0x0040U
 #define SCALESGROUP_USE_INAMESTRING 0x0080U
+#define SCALESGROUP_USE_UNITS       0x0100U
 #define RESERVED_SCALESGROUP_ID "\001\002\003\004\005\006\007\010"
 
 /* used for collecting and sorting scales group data for each ID */

@@ -11,10 +11,7 @@
  * contents: data arrays use by SDDS routines
  * 
  * Michael Borland, November 1993.
- $Log: SDDS_data.c,v $
- Revision 1.7  2006/08/31 15:08:01  soliday
- Updated to work with SDDS2
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2005/11/04 22:46:51  soliday
  Updated code to be compiled by a 64 bit processor.
 

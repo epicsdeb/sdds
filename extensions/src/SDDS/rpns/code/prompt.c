@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: prompt.c,v $
- Revision 1.5  2002/08/14 16:28:58  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  1999/09/14 18:22:06  soliday
  Added rpn.h include statement
 

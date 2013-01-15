@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: kstests.c,v $
- Revision 1.3  2002/08/14 16:18:57  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  1995/09/05 21:20:13  saunders
  First test release of the SDDS1.5 package.
 

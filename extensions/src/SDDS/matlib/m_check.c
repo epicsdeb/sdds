@@ -14,10 +14,7 @@
  *   ...
  *   m_copy(A);
  * Michael Borland, 1986.
- $Log: m_check.c,v $
- Revision 1.4  2002/08/14 16:45:21  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1998/04/21 21:26:38  borland
  New names to allow concurrent use with the Meschach library.
 

@@ -13,12 +13,7 @@
  *          This version considers errors in the dependent variable.
  *
  * Michael Borland, 1988, 1990
- $Log: gaussFit.c,v $
- Revision 1.10  2003/01/21 18:55:04  borland
- simplexMin() has another argument: a factor by which to multiply the
- parameter ranges at the end of a pass to get the initial step sizes for
- the next pass.  A value of 1.0 reproduces the old behavior.
-
+ $Log: not supported by cvs2svn $
  Revision 1.9  2003/01/16 18:39:11  soliday
  Changed because the arguments to simplexMin changed.
 

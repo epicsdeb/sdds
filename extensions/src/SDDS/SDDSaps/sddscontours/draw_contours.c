@@ -13,10 +13,7 @@
  *
  * Original code: A.D.Cox, 1982.
  * C version: M.Borland, 1991.
- $Log: draw_contours.c,v $
- Revision 1.4  2002/08/14 17:35:27  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2000/05/11 20:19:17  soliday
  Added extra argument to plot_lines.
 

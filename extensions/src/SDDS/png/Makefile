@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Id: Makefile,v 1.3 2003/07/23 03:09:48 soliday Exp $
+# $Id: Makefile,v 1.3 2003-07-23 03:09:48 soliday Exp $
 #
 
 TOP=../../..

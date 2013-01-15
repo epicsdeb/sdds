@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Id: Makefile,v 1.6 2003/07/24 14:38:56 soliday Exp $
+# $Id: Makefile,v 1.6 2003-07-24 14:38:56 soliday Exp $
 #
 #  Lowest Level Directroy Makefile
 #

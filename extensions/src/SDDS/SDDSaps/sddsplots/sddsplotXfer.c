@@ -12,12 +12,7 @@
  * part of sddsplot (plotting program for SDDS files)
  *
  * Michael Borland, 1994.
- $Log: sddsplotXfer.c,v $
- Revision 1.12  2011/01/11 22:51:04  soliday
- Changed all the strcpy commands to strcpy_ss because of problems with
- RedHat Enterprise 6. If a strcpy copies the result to the same memory
- space you will get unexpected results.
-
+ $Log: not supported by cvs2svn $
  Revision 1.11  2004/04/20 17:20:18  shang
  modified transferNamesToLists() to obtain y1names from editing ynames if
  y1name contains "y1edit="

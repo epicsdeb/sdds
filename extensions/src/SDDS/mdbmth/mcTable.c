@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: mcTable.c,v $
- Revision 1.5  2002/08/14 16:18:58  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  1999/05/28 14:58:30  soliday
  Removed compiler warnings under Linux.
 

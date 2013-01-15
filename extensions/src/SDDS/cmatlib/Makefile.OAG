@@ -7,11 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
-# Revision 1.4  2010/05/19 15:18:51  soliday
-# Reverted to pre C99 changes because as far as I can tell, this library is only
-# used by ceispack and clinchor which are not written with C99.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.1  2004/05/03 15:24:55  soliday
 # Added support for Epics/Base 3.14 build rules.
 #

@@ -11,7 +11,11 @@
    * contents: go_shade_grid()
    *
    * Michael Borland, 1993
-   $Log: shade_grid.c,v $
+   $Log: not supported by cvs2svn $
+   Revision 1.37  2011/03/25 00:45:45  soliday
+   Updated a function call because the alloc_spectrum function behaves differently
+   now.
+
    Revision 1.36  2010/01/15 15:45:56  soliday
    Modified the call to make_intensity_bar because it accepts more options now.
 
@@ -176,7 +180,7 @@ void go_shade_grid(
   if(gray) 
     alloc_spectrum(n_levels+1,0,0,0,0,65535,65535,65535);
   else   
-    alloc_spectrum(n_levels+1,2,0,0,0,0,0,0);
+    alloc_spectrum(n_levels+1,3,0,0,0,0,0,0);
 
   if (layout[0] && layout[1]) {
     wpmin = (1.0*ix+0)/layout[0];
@@ -302,7 +306,6 @@ void shade_grid(double **fxy, double xmin, double xmax, double ymin, double ymax
   long xeq, yeq;
   double fxymax, fxymin, value;
   int shade, **sxy;
-
   if (nlev && *max != *min) {
     fxymin = *min;
     fxymax = *max;
@@ -341,14 +344,19 @@ void shade_grid(double **fxy, double xmin, double xmax, double ymin, double ymax
 	sxy[ix][iy] = -1;
 	continue;
       }
-      if (reverse)
-	shade = nlev*(fxymax - fxy[ix][iy])/(fxymax-fxymin);
-      else
-	shade = nlev*(fxy[ix][iy] - fxymin)/(fxymax-fxymin);
-      if (nlev >= 100) {
-        sxy[ix][iy] = (hue1-hue0)*(100*shade/nlev)+nlev*hue0;
+      if (isnan(fxy[ix][iy])) {
+        sxy[ix][iy]=-1;
       } else {
-        sxy[ix][iy] = (hue1-hue0)*shade+nlev*hue0;
+        if (reverse) {
+          shade = nlev*(fxymax - fxy[ix][iy])/(fxymax-fxymin);
+        } else {
+          shade = nlev*(fxy[ix][iy] - fxymin)/(fxymax-fxymin);
+        }
+        if (nlev >= 100) {
+          sxy[ix][iy] = (hue1-hue0)*(100*shade/nlev)+nlev*hue0;
+        } else {
+          sxy[ix][iy] = (hue1-hue0)*shade+nlev*hue0;
+        }
       }
     }
   }

@@ -8,12 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: buftest.c,v $
- Revision 1.4  2003/06/18 19:52:31  borland
- Removed the query() and query_e() macros, and replaced with queryn()
- and queryn_e() macros.  The former used gets() whereas the latter do
- not.
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2002/08/14 16:06:05  soliday
  Added Open License
 

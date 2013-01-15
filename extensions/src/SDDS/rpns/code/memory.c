@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: memory.c,v $
- Revision 1.11  2005/11/04 22:47:19  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.10  2005/01/12 21:43:54  shang
  added is_string argument to is_memeory() to tell the memory data type.
 

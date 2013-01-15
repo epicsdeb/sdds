@@ -31,10 +31,7 @@
  *   -Lines beyond N+5 will be ignored.
  *
  * Michael Borland, 1988
- $Log: table.h,v $
- Revision 1.7  2005/11/04 22:47:00  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2003/07/22 20:01:18  soliday
  Added support for Kylix.
 

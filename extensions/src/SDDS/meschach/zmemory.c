@@ -29,7 +29,7 @@
 #include	<stdio.h>
 #include	"zmatrix.h"
 
-static	char	rcsid[] = "$Id: zmemory.c,v 1.3 1999/10/27 21:50:42 borland Exp $";
+static	char	rcsid[] = "$Id: zmemory.c,v 1.3 1999-10-27 21:50:42 borland Exp $";
 
 
 

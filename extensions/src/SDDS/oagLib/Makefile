@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2004/07/29 19:36:56 soliday Exp $
+# $Id: Makefile,v 1.2 2004-07-29 19:36:56 soliday Exp $
 #
 
 TOP=../../..

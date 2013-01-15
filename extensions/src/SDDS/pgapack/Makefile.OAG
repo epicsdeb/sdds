@@ -30,7 +30,7 @@ ifdef WIN32
     CC := $(CC) $(USER_MPI_FLAGS)
     CCC := $(CCC) $(USER_MPI_FLAGS)
 else
-MPI_PATH = $(wildcard /usr/local/software/mvapich2-gcc/bin/ /share/mpich2_smpd_nemesis/bin/ /act/mvapich2/gnu/bin/)
+MPI_PATH = $(wildcard /usr/local/software/mvapich2-gcc/bin/ /share/mpich2_smpd_nemesis/bin/ /act/mvapich2/gnu/bin/ /usr/lib64/mvapich2/1.2-gcc/bin/)
 ifeq ($(HOST_ARCH),linux-ppc-bgp-ibm)
     CC += $(USER_MPI_FLAGS)
     CCC += $(USER_MPI_FLAGS)

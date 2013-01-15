@@ -9,11 +9,7 @@
 
 /*
  *
- $Log: sdds2tiff.c,v $
- Revision 1.5  2009/08/17 20:21:15  soliday
- Updated with pipe=in support. Also added the -columnPrefix option for cases
- where Line* is not the correct matching string for the column names.
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2005/11/07 21:48:10  soliday
  Updated to remove Linux compiler warnings.
 

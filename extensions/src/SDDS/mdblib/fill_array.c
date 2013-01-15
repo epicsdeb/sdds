@@ -12,10 +12,7 @@
  *           fill_float_array()
  *
  * Michael Borland, 1990
- $Log: fill_array.c,v $
- Revision 1.4  2003/01/08 20:06:51  borland
- Fixed problem in a comment.
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2002/08/14 16:06:08  soliday
  Added Open License
 

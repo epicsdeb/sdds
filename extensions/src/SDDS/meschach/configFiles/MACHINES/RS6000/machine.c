@@ -30,7 +30,7 @@
   full advantage of specialised architectures (pipelining, vector
   processors etc).
   */
-static	char	*rcsid = "$Header: /net/phoebus/epicsmgr/cvsroot/epics/extensions/src/SDDS/meschach/configFiles/MACHINES/RS6000/machine.c,v 1.1.1.1 1999/04/14 14:16:20 borland Exp $";
+static	char	*rcsid = "$Header: /net/phoebus/epicsmgr/cvsroot/epics/extensions/src/SDDS/meschach/configFiles/MACHINES/RS6000/machine.c,v 1.1.1.1 1999-04-14 14:16:20 borland Exp $";
 
 #include	"machine.h"
 

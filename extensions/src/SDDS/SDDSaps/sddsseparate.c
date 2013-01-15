@@ -11,11 +11,7 @@
  * purpose: takes an SDDS file with many columns in one page and
  *          separates the columns onto multiple pages, under common names.
  *
- * $Log: sddsseparate.c,v $
- * Revision 1.9  2007/06/26 20:29:39  shang
- * fixed the bug in the loop of checking datatypes of original columns which caused it
- * does not accept more than one columns.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.8  2006/12/14 22:22:00  soliday
  * Updated a bunch of programs because SDDS_SaveLayout is now called by
  * SDDS_WriteLayout and it is no longer required to be called directly.

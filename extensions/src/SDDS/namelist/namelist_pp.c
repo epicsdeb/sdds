@@ -8,11 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: namelist_pp.c,v $
- Revision 1.7  2010/02/08 16:43:05  soliday
- Added (char*) in front of quoted strings because c++ on solaris prints
- a bunch of warning messages if it has to convert literal strings into char*
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2007/08/07 16:15:29  ywang25
  Replace strcpy with stcpy_ss to avoid potential memory problems.
 

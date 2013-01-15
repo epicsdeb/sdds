@@ -1,8 +1,5 @@
 # makefile for pythoninterp
-# $Log: Makefile.Host,v $
-# Revision 1.3  2005/06/02 17:35:09  soliday
-# Added OSX support.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.2  2003/05/06 19:05:58  soliday
 # Changed CFLAGS on Solaris so that it would use the reentrant flag.
 #

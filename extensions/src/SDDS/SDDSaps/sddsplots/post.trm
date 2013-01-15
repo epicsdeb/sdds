@@ -781,8 +781,10 @@ int CPS_fill_box(int shade, int xl, int xh, int yl, int yh)
 		ps_path_count = 0;
                 }
         shade = shade%(ncolors_ps);
-        if (spectralps)
+        if (spectralps == 1)
           Spectral_RGB_values(&r,  &g,  &b, ncolors_ps > 1 ? shade/(ncolors_ps - 1.0) : 0);
+        else if (spectralps == 2)
+          Spectral_BGR_values(&r,  &g,  &b, ncolors_ps > 1 ? shade/(ncolors_ps - 1.0) : 0);
         else if (customspectralps)
           Custom_RGB_values(&r, &g, &b, r0_ps, g0_ps, b0_ps, r1_ps, g1_ps, b1_ps, ncolors_ps > 1 ? shade/(ncolors_ps - 1.0) : 0);
         else
@@ -855,6 +857,9 @@ int CPS_spectral(long num, int spec, unsigned short red0, unsigned short green0,
     b1_ps = blue1;
   } else if (spec == 1) {
     spectralps = 1;
+    customspectralps = 0;
+  } else if (spec == 2) {
+    spectralps = 2;
     customspectralps = 0;
   } else {
     spectralps = 0;

@@ -9,10 +9,7 @@
 
 /* program: sddsfdfilter.c
  * purpose: SDDS-format frequency-domain filter program
- $Log: sddsfdfilter.c,v $
- Revision 1.13  2010/04/12 21:41:13  lemery
- Added comments on real and imaginary parts of FFT. Added a debug line.
-
+ $Log: not supported by cvs2svn $
  Revision 1.12  2006/10/19 17:55:39  soliday
  Updated to work with linux-x86_64.
 

@@ -11,7 +11,17 @@
    * purpose: do contour plotting of SDDS data
    *
    * Michael Borland, 1993
-   $Log: sddscontour.c,v $
+   $Log: not supported by cvs2svn $
+   Revision 1.66  2011/03/22 15:51:37  shang
+   fixed a typo.
+
+   Revision 1.65  2011/03/22 15:43:22  shang
+   added -drawline option.
+
+   Revision 1.64  2011/03/04 15:15:33  soliday
+   Added the -xyz plotting option. With this you can now supply the x, y and z
+   columns. The x and y columns must define a grid.
+
    Revision 1.63  2009/04/30 21:14:30  shang
    now it is able to get the units of varible1 and variable2 from the parameeters and plot them along with the variable1 and variable2 names as the x/y labels
 
@@ -284,7 +294,10 @@
 #define SET_XRANGE 42
 #define SET_NO_COLOR_BAR 43
 #define SET_YAXIS 44
-#define OPTIONS 45
+#define SET_XAXIS 45
+#define SET_XYZ 46
+#define SET_DRAWLINE 47
+#define OPTIONS 48
 
 
 
@@ -296,7 +309,7 @@ static char *option[OPTIONS] = {
     "rpndefinitionsfiles", "rpnexpressions", "rpntransform", "fixedrange", 
     "columnmatch", "logscale", "deltas", "ystrings", "yeditstrings",
     "v1v2preferred", "mapshade", "layout", "array", "swaparray",
-    "thickness", "ticksettings", "pipe", "waterfall", "yrange", "xrange", "nocolorbar", "yaxis",
+    "thickness", "ticksettings", "pipe", "waterfall", "yrange", "xrange", "nocolorbar", "yaxis", "xaxis", "xyz", "drawline",
   } ;
 
 
@@ -306,6 +319,7 @@ char *USAGE = "sddscontour [-pipe] [<SDDSfilename>]\n\
   -waterfall=parameter=<parameter>,independentColumn=<xColumn>,colorColumn=<colorColumn>[,scroll=vertical|horizontal] | \n\
   -columnmatch=<indep-column-name>,<expression> [-deltas[={fractional|normalize}]]}]]\n\
  [-array=<z-2d-array>[,<x-1d-array>,<y-id-array>]] [-swaparray]\n\
+ [-xyz=<x-column>,<y-column>,<z-column>]\n\
  [-rpndefinitionsfiles=<filename>[,...]]\n\
  [-rpnexpressions=<setup-expression>[,...][,algebraic]]\n\
  [-rpntransform=<expression>[,algebraic]] [-fixedrange]\n\
@@ -318,14 +332,59 @@ char *USAGE = "sddscontour [-pipe] [<SDDSfilename>]\n\
  [-shapes=<filename>,<xColumn>,<yColumn>] [-swapxy] [-equalaspect[={-1,1}]]\n\
  [-xlabel=<string>|@<parameter-name>[,scale=<value>][,edit=<edit-command>]] [-ylabel=<string>|@<parameter-name>[,scale=<value>][,edit=<edit-command>]] \n\
  [-title=<string>|@<parameter-name>|filename[,edit=<string>]]\n\
- [-topline=<string>|@<parameter-name>|filename[,edit=<string>]] [-toptitle] [-nolabels]\n\
+ [-topline=<string>|@<parameter-name>|filename[,edit=<string>][,format=string]] [-toptitle] [-nolabels]\n\
  [-yrange=minimum=<value>|@<parameter_name>,maximum=<value>|@<parameter_name>] \n\
  [-xrange=minimum=<value>|@<parameter_name>,maximum=<value>|@<parameter_name>] \n\
  [-ystrings=[edit=<editCommand>][,sparse=<integer>][,scale=<value>]]\n\
  [-noborder] [-noscales] [-datestamp] [-verbosity[=<level>]]\n\
  [-layout=<nx>,<ny>] [-thickness=<integer>]\n\
- [-ticksettings=[{xy}time]] [-nocolorbar] [-yaxis=scaleValue=<value>|scaleParameter=<name>[,offsetValue=<number>|offsetParameter=<name>] \n\n\
+ [-ticksettings=[{xy}time]] [-nocolorbar] [-yaxis=scaleValue=<value>|scaleParameter=<name>[,offsetValue=<number>|offsetParameter=<name>] \n\
+ [-xaxis=scaleValue=<value>|scaleParameter=<name>[,offsetValue=<number>|offsetParameter=<name>] \n\
+ [-drawLine={x0value=<value> | p0value=<value> | x0parameter=<name> | p0parameter=<name>},\n\
+            {x1value=<value> | p1value=<value> | x1parameter=<name> | p1parameter=<name>},\n\
+            {y0value=<value> | q0value=<value> | y0parameter=<name> | q0parameter=<name>},\n\
+            {y1value=<value> | q1value=<value> | y1parameter=<name> | q1parameter=<name>}\n\
+            [,linetype=<integer>][,thickness=<integer>][,clip]\n\
 Program by Michael Borland. (This is version 3, January 2002.)\n";
+
+static char *drawlineUsage = "-drawLine=\n\
+{x0value=<value> | p0value=<value> | x0parameter=<name> | p0parameter=<name>}, \n\
+{x1value=<value> | p1value=<value> | x1parameter=<name> | p1parameter=<name>}, \n\
+{y0value=<value> | q0value=<value> | y0parameter=<name> | q0parameter=<name>}, \n\
+{y1value=<value> | q1value=<value> | y1parameter=<name> | q1parameter=<name>} \n\
+[,linetype=<integer>][,thickness=<integer>][,clip]\n";
+
+#define DRAW_LINE_LINETYPEGIVEN   0x000001U
+#define DRAW_LINE_CLIPGIVEN       0x000002U
+#define DRAW_LINE_X0GIVEN         0x000040U
+#define DRAW_LINE_Y0GIVEN         0x000080U
+#define DRAW_LINE_P0GIVEN         0x000100U
+#define DRAW_LINE_Q0GIVEN         0x000200U
+#define DRAW_LINE_X1GIVEN         0x000400U
+#define DRAW_LINE_Y1GIVEN         0x000800U
+#define DRAW_LINE_P1GIVEN         0x001000U
+#define DRAW_LINE_Q1GIVEN         0x002000U
+#define DRAW_LINE_X0PARAM         0x004000U
+#define DRAW_LINE_Y0PARAM         0x008000U
+#define DRAW_LINE_P0PARAM         0x010000U
+#define DRAW_LINE_Q0PARAM         0x020000U
+#define DRAW_LINE_X1PARAM         0x040000U
+#define DRAW_LINE_Y1PARAM         0x080000U
+#define DRAW_LINE_P1PARAM         0x100000U
+#define DRAW_LINE_Q1PARAM         0x200000U
+typedef struct {
+  /* The order of the data in this special section must not be 
+     changed
+  */
+  double x0, y0, p0, q0;
+  double x1, y1, p1, q1;
+  char *x0Param, *y0Param, *p0Param, *q0Param;
+  char *x1Param, *y1Param, *p1Param, *q1Param;
+  /* end special section */
+  int32_t linetype;
+  int32_t linethickness;
+  unsigned long flags;
+} DRAW_LINE_SPEC;
 
 double *fill_levels(double **level, double min, double max, long levels);
 void getDimensionParameters(SDDS_TABLE *SDDS_table, char *name_of_name, char **variable, 
@@ -336,7 +395,7 @@ double **window_2d_array(double **data_value, double *xmin, double *xmax, double
                          double dx, double dy, int32_t *nx, int32_t *ny, double *limit);
 void PlotShapesData(SHAPE_DATA *shape, long shapes, double xmin, double xmax, double ymin, double ymax);
 
-char *getParameterLabel(SDDS_TABLE *SDDS_table, char *parameter_name);
+char *getParameterLabel(SDDS_TABLE *SDDS_table, char *parameter_name, char *edit, char *format);
 void checkParameter(SDDS_TABLE *SDDS_table, char *parameter_name);
 void checkLabelParameters(SDDS_TABLE *SDDS_table, char *p1, char *p2, char *p3, char *p4);
 void freeParameterLabel(char *users_label, char *label);
@@ -354,7 +413,8 @@ long plot_contour(double **data_value, long nx, long ny, long verbosity,
                   long pause_interval, long columnmatches, char **columnname, long columns, 
                   char *yEditCommand, long ySparseInterval, double yScale, long contour_label_interval,
                   long contour_label_offset, long do_shade, long waterfall,
-                  char *colorName, char *colorUnits, long swap_xy, double xlabelScale, double ylabelScale, long yRangeProvided, long xRangeProvided);
+                  char *colorName, char *colorUnits, long swap_xy, double xlabelScale, double ylabelScale, long yRangeProvided, long xRangeProvided,
+                  DRAW_LINE_SPEC *drawLineSpec, long drawlines);
 long get_plot_labels(SDDS_DATASET *SDDS_table, char *indeptcolumn, char **columnname, long columnnames, 
                      char *allmatches, char *waterfall_par,
                      char *users_xlabel, char *users_ylabel, char *users_title,
@@ -365,13 +425,20 @@ void process_data(double ***data_value, int32_t *nx, int32_t *ny, double *xmin, 
                   double *ymin, double *ymax, double *dx, double *dy, 
                   double *limit, long logscale, double logfloor,
                   long nx_interp, long ny_interp, long x_lowpass, long y_lowpass, long interp_flags,
-                  char **xyzArray, long verbosity);
+                  char **xyzArray, char **xyzColumn, long verbosity);
 
 int X11_args(int argc, char **argv);
 char *addOuterParentheses(char *arg);
 void jxyplot_string(double *x, double *y, char *s, char xmode, char ymode);
 
 char * rearrange_by_index(char *data,long *index,long element_size,long num);
+long drawline_AP(DRAW_LINE_SPEC **drawLineSpec, long *drawlines,  char **item, long items);
+void determine_drawline(DRAW_LINE_SPEC *drawLineSpec, long drawlines, SDDS_TABLE *table);
+void draw_lines(DRAW_LINE_SPEC *drawLineSpec, long drawlines, long linetypeDefault, double *limit);
+void get_xyaxis_value(char *xscalePar, char *xoffsetPar, char *yscalPar, char *yoffsetPar, 
+                      SDDS_DATASET *SDDS_table,
+		      double *xscaleValue, double *xoffsetValue, double *yscaleValue, double *yoffetValue,
+		      char **users_xlabel, char **users_ylabel);
 
 #ifndef COMPILE_AS_SUBROUTINE
 FILE *outfile;
@@ -424,21 +491,23 @@ int main(int argc, char **argv)
   int argc;
   char **argv;
 #endif
-  long i, j, i_arg, preferv1v2Parameters, thickness, yaxisScaleProvided=0, yaxisOffset;
+  long i, j, i_arg, preferv1v2Parameters, thickness, yaxisScaleProvided=0, xaxisScaleProvided=0;
+  double  yaxisOffset=0, xaxisOffset=0;
   SCANNED_ARG *s_arg;
   SDDS_TABLE SDDS_table;
   char s[SDDS_MAXLINE];
-  char *quantity, *variable1, *variable2, **columnmatch, *allmatches, *indepcolumn, *yaxisScalePar=NULL, *yaxisOffsetPar=NULL;
+  char *quantity, *variable1, *variable2, **columnmatch, *allmatches, *indepcolumn, *yaxisScalePar=NULL, *yaxisOffsetPar=NULL,*xaxisScalePar=NULL, *xaxisOffsetPar=NULL ;
   char *waterfall_par, *waterfall_indeptcol, *waterfall_colorcol, *waterfall_scroll;
   char *variable1Units, *variable2Units, *variable1name, *variable2name;
   long columnmatches = 0, variable1Index, variable2Index;
   char *inputfile;
-  char *users_title, *users_topline, *users_xlabel, *users_ylabel, *topline_editcommand=NULL, *title_editcommand=NULL;
+  char *users_title, *users_topline, *users_xlabel, *users_ylabel, *topline_editcommand=NULL, *topline_formatcommand=NULL,
+    *title_editcommand=NULL;
   char *title, *topline, *xlabel, *ylabel=NULL, *xlabel_editcommand=NULL, *ylabel_editcommand=NULL;
   double **data_value, *waterfall_parValue, ylabelScale, xlabelScale;
   int32_t nx, ny;
   long swap_xy, swap_array, waterfall;
-  double dx, dy, xmin, xmax, ymin, ymax, yaxisScale=0, xmin0, xmax0, ymin0, ymax0;
+  double dx, dy, xmin, xmax, ymin, ymax, yaxisScale=0, xaxisScale=0, xmin0, xmax0, ymin0, ymax0;
   char *ymaxPar, *yminPar, *xmaxPar, *xminPar, *maxPar, *minPar;
   double *xintervals, *yintervals;
   long levels, label_contour_interval, contour_label_offset;
@@ -474,9 +543,12 @@ int main(int argc, char **argv)
   int xTimeMode=0;
   char *colorName=NULL, *colorUnits=NULL;
   char *xyzArray[3], *ptr2;
+  char *xyzColumn[3];
   long pipe=0;
   char **shadelist;
-  long shade_items;
+  long shade_items, drawlines=0;
+  DRAW_LINE_SPEC *drawLineSpec=NULL;
+  
   xlabelScale=ylabelScale=1.0;
   rpn_definitions_file = rpn_expression = NULL;
   rpn_equation = rpn_transform = NULL;
@@ -507,6 +579,7 @@ int main(int argc, char **argv)
   hue1 = 1;
   layout[0] = layout[1] = 0;
   xyzArray[0] = xyzArray[1] = xyzArray[2] = NULL;
+  xyzColumn[0] = xyzColumn[1] = xyzColumn[2] = NULL;
   xintervals = yintervals = NULL;
   thickness = 1;
   dx=dy=xmin=ymin=xmax=ymax=0;
@@ -589,14 +662,29 @@ int main(int argc, char **argv)
         if (!scanItemList(&dummyFlags, s_arg[i_arg].list+1, &s_arg[i_arg].n_items, 0,
                           "scaleValue", SDDS_DOUBLE,&yaxisScale, 1, 0,
                           "scaleParameter", SDDS_STRING,&yaxisScalePar, 1, 0,
-                          "offsetValue", SDDS_LONG,&yaxisOffset, 1, 0,
+                          "offsetValue", SDDS_DOUBLE,&yaxisOffset, 1, 0,
                           "offsetParameter", SDDS_STRING,&yaxisOffsetPar, 1, 0,
                           NULL))
           SDDS_Bomb("invalid -versus syntax/values");
         s_arg[i_arg].n_items += 1;
         if (!yaxisScale && !yaxisScalePar)
-          SDDS_Bomb("Invaid -yaxis systax, the yaxis scalar is not provided!");
+          SDDS_Bomb("Invaid -yaxis systax, the yaxis scale is not provided!");
         yaxisScaleProvided = 1;
+        break;
+      case SET_XAXIS:
+        /*this is only valid for columnMatch plotting */
+        s_arg[i_arg].n_items -= 1;
+        if (!scanItemList(&dummyFlags, s_arg[i_arg].list+1, &s_arg[i_arg].n_items, 0,
+                          "scaleValue", SDDS_DOUBLE,&xaxisScale, 1, 0,
+                          "scaleParameter", SDDS_STRING,&xaxisScalePar, 1, 0,
+                          "offsetValue", SDDS_DOUBLE,&xaxisOffset, 1, 0,
+                          "offsetParameter", SDDS_STRING,&xaxisOffsetPar, 1, 0,
+                          NULL))
+          SDDS_Bomb("invalid -versus syntax/values");
+        s_arg[i_arg].n_items += 1;
+        if (!xaxisScale && !xaxisScalePar)
+          SDDS_Bomb("Invaid -xaxis systax, the xaxis scale is not provided!");
+        xaxisScaleProvided = 1;
         break;
       case SET_COLUMNMATCH:
         if (s_arg[i_arg].n_items<3) {
@@ -635,6 +723,24 @@ int main(int argc, char **argv)
             return(1);
           }
 	}
+        break;
+      case SET_XYZ:
+        if (s_arg[i_arg].n_items!=4) {
+          fprintf(stderr, "Error (sddscontour): invalid -xyz syntax\n");
+          return(1);
+        }
+        if (!SDDS_CopyString(&(xyzColumn[0]),s_arg[i_arg].list[1])) {
+          fprintf(stderr, "Error (sddscontour): invalid -xyz syntax\n");
+          return(1);
+        }
+        if (!SDDS_CopyString(&(xyzColumn[1]),s_arg[i_arg].list[2])) {
+          fprintf(stderr, "Error (sddscontour): invalid -xyz syntax\n");
+          return(1);
+        }
+        if (!SDDS_CopyString(&(xyzColumn[2]),s_arg[i_arg].list[3])) {
+          fprintf(stderr, "Error (sddscontour): invalid -xyz syntax\n");
+          return(1);
+        }
         break;
       case SET_SWAPARRAY:
 	swap_array = 1;
@@ -838,7 +944,8 @@ int main(int argc, char **argv)
         if (s_arg[i_arg].n_items>2) {
           s_arg[i_arg].n_items -=2;
           if (!scanItemList(&dummyFlags, s_arg[i_arg].list+2, &s_arg[i_arg].n_items, 0,
-                            "edit", SDDS_STRING, &topline_editcommand, 1, 0, NULL)) {
+                            "edit", SDDS_STRING, &topline_editcommand, 1, 0, 
+			    "format", SDDS_STRING, &topline_formatcommand, 1, 0, NULL)) {
             fprintf(stderr, "Error (sddscontour): invalid -topline syntax/values\n");
             return(1);
           }
@@ -1229,6 +1336,12 @@ int main(int argc, char **argv)
       case SET_PIPE:
         pipe = 1;
         break;
+      case SET_DRAWLINE:
+	if (!drawline_AP(&drawLineSpec, &drawlines, s_arg[i_arg].list+1, s_arg[i_arg].n_items-1)) {
+	  fprintf(stderr, "Error (sddscontour): invalid -drawline syntax\n");
+          return(1);
+	}
+	break;
       default:
         fprintf(stderr, "unknown option - %s given.\n", s_arg[i_arg].list[0]);
         exit(1);
@@ -1247,7 +1360,11 @@ int main(int argc, char **argv)
     if (!pipe)
       bomb("no input file listed", NULL);
   }
-
+  if (xRangeProvided && xaxisScaleProvided)
+    bomb("-xrange and -xaxis options can not be provided at the same time.", NULL);
+  if (yRangeProvided && yaxisScaleProvided)
+    bomb("-yrange and -yaxis options can not be provided at the same time.", NULL);
+  
   if (!device)
     device = DEFAULT_DEVICE;
 
@@ -1302,10 +1419,18 @@ int main(int argc, char **argv)
       edit_string(bufferstr, topline_editcommand);
       free(users_topline);
       SDDS_CopyString(&users_topline, bufferstr);
+      free(topline_editcommand);
+      topline_editcommand = NULL;
+    }
+    if (topline_formatcommand) {
+      printf("%s\n", topline_formatcommand);
+      sprintf(bufferstr, topline_formatcommand, users_topline);
+      SDDS_CopyString(&users_topline, bufferstr);
+      free(topline_formatcommand);
+      topline_formatcommand = NULL;
     }
   }
-  if (topline_editcommand) free(topline_editcommand);
-  
+ 
   if (users_title && strlen(users_title) &&  strncmp_case_insensitive(users_title,"filename", MIN(8, strlen(users_title)))==0) {
     free(users_title);
     SDDS_CopyString(&users_title, inputfile);
@@ -1314,10 +1439,11 @@ int main(int argc, char **argv)
       edit_string(bufferstr, title_editcommand);
       free(users_title);
       SDDS_CopyString(&users_title, bufferstr);
+      free(title_editcommand);
+      title_editcommand = NULL;
     }
   }
-  if (title_editcommand) free(title_editcommand);
-  
+
   checkLabelParameters(&SDDS_table, users_xlabel, users_ylabel, users_title,
                        users_topline);
 
@@ -1326,7 +1452,7 @@ int main(int argc, char **argv)
   if (swap_xy) 
     SWAP_DOUBLE(xlabelScale, ylabelScale);
   
-  if (!quantity && !rpn_equation && !columnmatch && !xyzArray[0] && !waterfall) {
+  if (!quantity && !rpn_equation && !columnmatch && !xyzArray[0] && !xyzColumn[2] && !waterfall) {
     char **ptr;
     int32_t number;
     if (!(ptr=SDDS_GetColumnNames(&SDDS_table, &number)))
@@ -1338,9 +1464,33 @@ int main(int argc, char **argv)
     if (verbosity>0)
       printf("will do contour plotting for the quantity %s\n", quantity);
   }
+  if (yaxisScalePar) {
+      if (SDDS_GetParameterIndex(&SDDS_table, yaxisScalePar)<0) {
+        fprintf(stderr, "parameter %s does not exist in the input file.\n", yaxisScalePar);
+        return(1);
+      }
+    }
+    if (yaxisOffsetPar) {
+      if (SDDS_GetParameterIndex(&SDDS_table, yaxisOffsetPar)<0) {
+        fprintf(stderr, "parameter %s does not exist in the input file.\n", yaxisOffsetPar);
+        return(1);
+      }
+    }
+    if (xaxisScalePar) {
+      if (SDDS_GetParameterIndex(&SDDS_table, xaxisScalePar)<0) {
+        fprintf(stderr, "parameter %s does not exist in the input file.\n", xaxisScalePar);
+        return(1);
+      }
+    }
+    if (xaxisOffsetPar) {
+      if (SDDS_GetParameterIndex(&SDDS_table, xaxisOffsetPar)<0) {
+        fprintf(stderr, "parameter %s does not exist in the input file.\n", xaxisOffsetPar);
+        return(1);
+      }
+    }
   if (waterfall) {
-    if (rpn_equation || columnmatch || quantity || xyzArray[0]) {
-      SDDS_Bomb("waterfall option is not compatible with equation, columnmatch or array option!");
+    if (rpn_equation || columnmatch || quantity || xyzArray[0] || xyzColumn[2]) {
+      SDDS_Bomb("waterfall option is not compatible with equation, columnmatch, xyz or array option!");
     }
     
     if (0>SDDS_GetParameterIndex(&SDDS_table, waterfall_par) ||
@@ -1350,25 +1500,14 @@ int main(int argc, char **argv)
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
       return(1);
     }
-    if (columnmatch && yaxisScalePar) {
-      if (SDDS_GetParameterIndex(&SDDS_table, yaxisScalePar)<0) {
-        fprintf(stderr, "parameter %s does not exist in the input file.\n", yaxisScalePar);
-        return(1);
-      }
-    }
-    if (columnmatch && yaxisOffsetPar) {
-      if (SDDS_GetParameterIndex(&SDDS_table, yaxisOffsetPar)<0) {
-        fprintf(stderr, "parameter %s does not exist in the input file.\n", yaxisOffsetPar);
-        return(1);
-      }
-    }
+    
     if (SDDS_GetColumnInformation(&SDDS_table, "symbol", &colorName, SDDS_GET_BY_NAME, waterfall_colorcol)!=SDDS_STRING ||
         SDDS_GetColumnInformation(&SDDS_table, "units", &colorUnits, SDDS_GET_BY_NAME, waterfall_colorcol)!=SDDS_STRING ) {
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
     }
     if (!colorName)
       colorName=waterfall_colorcol;
-  } else if (!rpn_equation && !columnmatch && !xyzArray[0]) {
+  } else if (!rpn_equation && !columnmatch && !xyzArray[0] && !xyzColumn[2]) {
     if (0>SDDS_GetColumnIndex(&SDDS_table, quantity)) {
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
       return(1);
@@ -1413,6 +1552,9 @@ int main(int argc, char **argv)
         }
         else
           topline = users_topline;
+         get_xyaxis_value(xaxisScalePar, xaxisOffsetPar, yaxisScalePar, yaxisOffsetPar, 
+                          &SDDS_table, 
+                         &xaxisScale, &xaxisOffset, &yaxisScale, &yaxisOffset, &users_xlabel, &users_ylabel);
       } else {
         rows1 = SDDS_CountRowsOfInterest(&SDDS_table);
         if (rows1<rows) {
@@ -1430,7 +1572,8 @@ int main(int argc, char **argv)
         SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
         return(1);
       }
-     
+     if (drawlines && pages==0)
+      determine_drawline(drawLineSpec, drawlines,  &SDDS_table);
       
       data_value[pages] =(double *) rearrange_by_index((char *) tmpptr,sorted_index,SDDS_type_size[SDDS_DOUBLE-1],rows);
      
@@ -1446,7 +1589,6 @@ int main(int argc, char **argv)
     free(sorted_index);
     free(data_value);
     data_value = tmpptr2;
-    
     find_min_max(&xmin, &xmax, waterfall_parValue, nx);
     find_min_max(&ymin,&ymax, indepdata,ny);
     get_plot_labels(&SDDS_table, waterfall_par, &waterfall_colorcol, 1,
@@ -1481,38 +1623,40 @@ int main(int argc, char **argv)
       SWAP_DOUBLE(xmax, ymax);
       SWAP_LONG(nx, ny);
     }
-    if (xlabel[0]=='@') {
-      xlabel = getParameterLabel(&SDDS_table, xlabel+1);
-      if (xlabel_editcommand) {
-        strcpy(bufferstr, xlabel);
-        edit_string(bufferstr, xlabel_editcommand);
-        free(xlabel);
-        SDDS_CopyString(&xlabel, bufferstr);
-      }
-    }
+    if (xlabel[0]=='@') 
+      xlabel = getParameterLabel(&SDDS_table, xlabel+1, xlabel_editcommand, NULL);
+    
     if (ylabel[0]=='@') {
-      ylabel = getParameterLabel(&SDDS_table, ylabel+1);
-      if (ylabel_editcommand) {
-        strcpy(bufferstr, ylabel);
-        edit_string(bufferstr, ylabel_editcommand);
-        free(ylabel);
-        SDDS_CopyString(&ylabel, bufferstr);
-      }
+      ylabel = getParameterLabel(&SDDS_table, ylabel+1, ylabel_editcommand, NULL);
     }
     if (title[0]=='@')
-      title = getParameterLabel(&SDDS_table, title+1);
-    if (topline[0]=='@')
-      topline = getParameterLabel(&SDDS_table, topline+1);
+      title = getParameterLabel(&SDDS_table, title+1, title_editcommand, NULL);
+    if (topline[0]=='@') 
+      topline = getParameterLabel(&SDDS_table, topline+1, topline_editcommand, topline_formatcommand);
+     
     if (!SDDS_Terminate(&SDDS_table)) {
       SDDS_SetError("problem closing file");
       SDDS_PrintErrors(stderr,  SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
     }
+    
     xmax = xmin + (nx-1)*dx;
     ymax = ymin + (ny-1)*dy;
+  
     process_data(&data_value, &nx, &ny, &xmin, &xmax, &ymin, &ymax, &dx, &dy, 
                  orig_limit, logscale, logfloor, nx_interp, ny_interp, x_lowpass, 
-                 y_lowpass, interp_flags, xyzArray, verbosity); 
-    
+                 y_lowpass, interp_flags, xyzArray, xyzColumn, verbosity); 
+    if (yaxisScaleProvided) {
+      ymin = (ymin - yaxisOffset) * yaxisScale;
+      ymax = (ymax - yaxisOffset) * yaxisScale;
+      dy = (ymax - ymin)/(ny-1);
+      yRangeProvided = 1;
+    }
+    if (xaxisScaleProvided) {
+      xmin = (xmin - xaxisOffset) * xaxisScale;
+      xmax = (xmax - xaxisOffset) * xaxisScale;
+      dx = (xmax - xmin)/(nx-1);
+      xRangeProvided = 1;
+    }
     plot_contour(data_value,  nx, ny, verbosity,
                  xmin,  xmax, ymin, ymax,
                  dx,  dy,  xintervals, yintervals,
@@ -1523,7 +1667,8 @@ int main(int argc, char **argv)
                  shape, shapes, pen, &flags, 
                  pause_interval, columnmatches, columnname,  columns, 
                  yEditCommand, ySparseInterval, yScale,  contour_label_interval,
-                 contour_label_offset, do_shade, 1, colorName, colorUnits, swap_xy, xlabelScale, ylabelScale, yRangeProvided, xRangeProvided);
+                 contour_label_offset, do_shade, 1, colorName, colorUnits, swap_xy, xlabelScale, ylabelScale, yRangeProvided, xRangeProvided,
+                 drawLineSpec, drawlines);
     if (data_value)
       SDDS_FreeMatrix((void**)data_value, nx);
     data_value = NULL;
@@ -1538,7 +1683,7 @@ int main(int argc, char **argv)
   } else {
     rowNumberType = 0;
     columnNumberType = 0;
-    if (!columnmatch && !xyzArray[0]) {
+    if (!columnmatch && !xyzArray[0] && !xyzColumn[2]) {
       if (!preferv1v2Parameters) {
         rowNumberType = SDDS_GetNamedParameterType(&SDDS_table, "NumberOfRows");
         columnNumberType = SDDS_GetNamedParameterType(&SDDS_table, "NumberOfColumns");
@@ -1581,7 +1726,7 @@ int main(int argc, char **argv)
         }
       }
     }
-    else if (!xyzArray[0]) {
+    else if (!xyzArray[0] && !xyzColumn[2]) {
       if (!xRangeProvided) {
         if (SDDS_GetColumnIndex(&SDDS_table, indepcolumn)<0) {
           fprintf(stderr, "error: couldn't find column %s in file\n", indepcolumn);
@@ -1608,7 +1753,7 @@ int main(int argc, char **argv)
         return(1);
       }
       SDDS_SetColumnFlags(&SDDS_table, 1);
-    } else {
+    } else if (!xyzColumn[2]) {
       for (i=0; i<3; i++) {
         if (xyzArray[i]) {
           if (SDDS_GetArrayIndex(&SDDS_table, xyzArray[i])<0) {
@@ -1617,20 +1762,27 @@ int main(int argc, char **argv)
           }
         }
       }
+    } else {
+      for (i=0; i<3; i++) {
+        if (SDDS_GetColumnIndex(&SDDS_table, xyzColumn[i])<0) {
+          fprintf(stderr, "error: couldn't find column %s in file\n", xyzColumn[i]);
+          return(1);
+        }
+      }
     }
     
     if (rpn_equation)
       create_udf(equdf_name, rpn_equation);
     if (rpn_transform)
       create_udf(trudf_name, rpn_transform);
-    if (fixed_range && quantity) {
-      double minMin, maxMax, thisMin, thisMax, *data;
+    if (fixed_range && (quantity || xyzColumn[2])) {
+      double minMin, maxMax, thisMin, thisMax, *data, page1=0;
       long rows;
       maxMax = -(minMin = DBL_MAX);
       while (SDDS_ReadPage(&SDDS_table)>0) {
         if ((rows = SDDS_RowCount(&SDDS_table))<=0)
           continue;
-        if (!(data = SDDS_GetColumnInDoubles(&SDDS_table, quantity))) {
+        if (!(data = SDDS_GetColumnInDoubles(&SDDS_table, quantity?quantity:xyzColumn[2]))) {
           SDDS_SetError("problem reading data for fixed range determination");
           SDDS_PrintErrors(stderr,  SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
         }
@@ -1640,6 +1792,7 @@ int main(int argc, char **argv)
           minMin = thisMin;
         if (thisMax>maxMax)
           maxMax = thisMax;
+        page1++;
       }
       if (maxMax>minMin) {
         max_level = maxMax;
@@ -1652,6 +1805,11 @@ int main(int argc, char **argv)
       }
     }
     while ((readstatus=SDDS_ReadPage(&SDDS_table))>0) {
+      get_xyaxis_value(xaxisScalePar, xaxisOffsetPar, yaxisScalePar, yaxisOffsetPar,
+                         &SDDS_table, 
+                         &xaxisScale, &xaxisOffset, &yaxisScale, &yaxisOffset, &users_xlabel, &users_ylabel);
+      if (drawlines)
+         determine_drawline(drawLineSpec, drawlines,  &SDDS_table);
       if (rowNumberType && columnNumberType) {
         if (!SDDS_GetParameter(&SDDS_table, "NumberOfRows", &nx) 
             || !SDDS_GetParameter(&SDDS_table, "NumberOfColumns", &ny)) {
@@ -1691,7 +1849,7 @@ int main(int argc, char **argv)
         else
           title = users_title;
       } /*end of if (rowNumberType && columnNumberType) */
-      else if (!columnmatch && !xyzArray[0]) {
+      else if (!columnmatch && !xyzArray[0] && !xyzColumn[2]) {
         getDimensionParameters(&SDDS_table, "Variable1Name", 
                                &variable1, &variable1Units, 
                                &xmin, &dx, &nx);
@@ -1756,6 +1914,10 @@ int main(int argc, char **argv)
         if (data_value)
           SDDS_FreeMatrix((void**)data_value, nx);
         data_value=NULL;
+        get_xyaxis_value(xaxisScalePar, xaxisOffsetPar, yaxisScalePar, yaxisOffsetPar, 
+                         &SDDS_table, 
+                         &xaxisScale, &xaxisOffset, &yaxisScale, &yaxisOffset, &users_xlabel, &users_ylabel);
+        
         if (swap_xy) {
           SWAP_PTR(xlabel, ylabel);
           SWAP_DOUBLE(xmin, ymin);
@@ -1809,32 +1971,9 @@ int main(int argc, char **argv)
             return 1;
           }
         }
-        if (yaxisScalePar) {
-          char *label, *units, s[1024];
-          label = units = NULL;
-          if (!SDDS_GetParameterAsDouble(&SDDS_table, yaxisScalePar, &yaxisScale)) {
-            SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
-            return(1);
-          }
-          if (!users_ylabel) {
-            SDDS_GetParameterInformation(&SDDS_table, "units", &units, SDDS_GET_BY_NAME, yaxisScalePar);
-            SDDS_GetParameterInformation(&SDDS_table, "symbol", &label, SDDS_GET_BY_NAME, yaxisScalePar);
-            if (label) {
-              sprintf(s, "%s", label);
-              if (units)
-                sprintf(s,"%s (%s)", s, units);
-              SDDS_CopyString(&users_ylabel, s);
-              free(label);
-              if (units) free(units);
-            }
-          }
-        }
-        if (yaxisOffsetPar) {
-          if (!SDDS_GetParameterAsLong(&SDDS_table, yaxisOffsetPar, &yaxisOffset)) {
-            SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
-            return(1);
-          } 
-        }
+        get_xyaxis_value(xaxisScalePar, xaxisOffsetPar, yaxisScalePar, yaxisOffsetPar, &SDDS_table, 
+                         &xaxisScale, &xaxisOffset, &yaxisScale, &yaxisOffset, &users_xlabel, &users_ylabel);
+        
         if (verbosity>1)
           printf("range of independent variable: %e to %e\n", xmin,xmax); 
         
@@ -1890,8 +2029,8 @@ int main(int argc, char **argv)
           printf("%" PRId32 " rows and %" PRId32 " columns\n", nx, ny);
         dx = (xmax-xmin)/(nx-1);
         if (yaxisScaleProvided) {
-          ymin = (minID - yaxisOffset) * yaxisScale;
-          ymax = (maxID - yaxisOffset) * yaxisScale;
+          ymin = (minID - (long)yaxisOffset) * yaxisScale;
+          ymax = (maxID - (long)yaxisOffset) * yaxisScale;
           dy = (ymax - ymin)/(ny-1);
           yRangeProvided = 1;
         } else {
@@ -1903,7 +2042,6 @@ int main(int argc, char **argv)
             dy = 1;
           }
         }
-        
         get_plot_labels(&SDDS_table,indepcolumn,columnname,columns,
                         allmatches,NULL,users_xlabel,users_ylabel,users_title,
                         &xlabel,&ylabel,&title,deltas, xRangeProvided);
@@ -2144,6 +2282,128 @@ int main(int argc, char **argv)
           }
         }
       }
+      else if (xyzColumn[2]) {
+        double *xyzData[3];
+        int32_t rows;
+        char *columnunits;
+        long ix, iy;
+        for (i=0; i<3; i++) {
+          /*Add xrange and yrange support*/
+          if (!(xyzData[i]=SDDS_GetColumnInDoubles(&SDDS_table, xyzColumn[i]))) {
+            fprintf(stderr, "Error: unable to read %s column\n", xyzColumn[i]);
+            return(1);
+          }
+        }
+        nx = ny = rows = SDDS_RowCount(&SDDS_table);
+        qsort((void*)(xyzData[0]), rows, sizeof(*(xyzData[0])), double_cmpasc);
+        qsort((void*)(xyzData[1]), rows, sizeof(*(xyzData[1])), double_cmpasc);
+        
+        for (i=0; i<rows-1; i++) {
+          if (xyzData[0][i] == xyzData[0][i+1]) {
+            nx--;
+          }
+        }
+        for (i=0; i<rows-1; i++) {
+          if (xyzData[1][i] == xyzData[1][i+1]) {
+            ny--;
+          }
+        }
+        if (nx * ny != rows) {
+          fprintf(stderr, "Error: x and y data does not appear to form a grid\n");
+          return(1);
+        }
+        xmin = xyzData[0][0];
+        xmax = xyzData[0][rows - 1];
+        ymin = xyzData[1][0];
+        ymax = xyzData[1][rows - 1];
+        dx = (xmax-xmin)/(nx-1);
+        dy = (ymax-ymin)/(ny-1);
+        xintervals = malloc(sizeof(double) * nx);
+        yintervals = malloc(sizeof(double) * ny);
+        for (i=0; i<nx; i++)
+          xintervals[i] = xyzData[0][i*ny];
+        for (i=0; i<ny; i++)
+          yintervals[i] = xyzData[1][i*nx];
+
+        for (i=0; i<2; i++) {
+          free(xyzData[i]);
+          if (!(xyzData[i]=SDDS_GetColumnInDoubles(&SDDS_table, xyzColumn[i]))) {
+            fprintf(stderr, "Error: unable to read %s column\n", xyzColumn[i]);
+            return(1);
+          }
+        }
+        get_xyaxis_value(xaxisScalePar, xaxisOffsetPar, yaxisScalePar, yaxisOffsetPar, &SDDS_table, 
+                         &xaxisScale, &xaxisOffset, &yaxisScale, &yaxisOffset, &users_xlabel, &users_ylabel);
+        
+        if (data_value)
+          SDDS_FreeMatrix((void**)data_value, nx);
+        data_value = SDDS_AllocateMatrix(sizeof(**data_value), nx, ny);
+
+        for (i=0; i<rows; i++) {
+          ix = 0;
+          while (xyzData[0][i] != xintervals[ix]) {
+            ix++;
+          }
+          iy = 0;
+          while (xyzData[1][i] != yintervals[iy]) {
+            iy++;
+          }
+          data_value[ix][iy] = xyzData[2][i];
+        }
+        
+        if (xaxisScaleProvided) {
+            for (ix=0; ix<nx; ix++)
+               xintervals[ix] = (xintervals[ix] - xaxisOffset) * xaxisScale;
+         }
+         if (yaxisScaleProvided) {
+            for (iy=0; iy<ny; iy++)
+               yintervals[iy] = (yintervals[iy] - yaxisOffset) * yaxisScale;
+         }
+        if (!do_shade) {
+          fprintf(stderr, "warning: dx and dy are static in a contour plot\n");
+        }
+
+        if (!users_xlabel) {
+          SDDS_GetColumnInformation(&SDDS_table, "units", &xlabel, SDDS_GET_BY_NAME, xyzColumn[0]);
+          if (xlabel && xlabel[0])
+              sprintf(s, "%s (%s)", xyzColumn[0], xlabel);
+          else
+            sprintf(s, "%s", xyzColumn[0]);
+          free(xlabel);
+          SDDS_CopyString(&xlabel, s);
+        }
+        else
+          xlabel = users_xlabel;
+
+        if (!users_ylabel) {
+          SDDS_GetColumnInformation(&SDDS_table, "units", &ylabel, SDDS_GET_BY_NAME, xyzColumn[1]);
+          if (ylabel && ylabel[0])
+              sprintf(s, "%s (%s)", xyzColumn[1], ylabel);
+          else
+            sprintf(s, "%s", xyzColumn[1]);
+          free(ylabel);
+          SDDS_CopyString(&ylabel, s);
+        }
+        else
+          ylabel = users_ylabel;
+
+        if (!users_title) {
+          columnunits = NULL;
+          SDDS_GetColumnInformation(&SDDS_table, "units", &columnunits, SDDS_GET_BY_NAME, xyzColumn[2]);
+          if (columnunits && columnunits[0])
+            sprintf(s, "%s (%s)", xyzColumn[2], columnunits);
+          else
+            sprintf(s, "%s", xyzColumn[2]);
+          if (columnunits) free(columnunits);
+          SDDS_CopyString(&title, s);
+          users_title = title;
+        }
+        else
+          title = users_title;
+
+        if (SDDS_NumberOfErrors())
+          SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+      }
       else {
         if (swap_xy) {
           SWAP_PTR(xlabel, ylabel);
@@ -2154,29 +2414,16 @@ int main(int argc, char **argv)
         data_value = SDDS_AllocateMatrix(sizeof(double), nx, ny);
       }
       
-      if (xlabel[0]=='@') {
-        xlabel = getParameterLabel(&SDDS_table, xlabel+1);
-        if (xlabel_editcommand) {
-          strcpy(bufferstr, xlabel);
-          edit_string(bufferstr, xlabel_editcommand);
-          free(xlabel);
-          SDDS_CopyString(&xlabel, bufferstr);
-        }
-      }
-      if (ylabel[0]=='@') {
-        ylabel = getParameterLabel(&SDDS_table, ylabel+1);
-        if (ylabel_editcommand) {
-          strcpy(bufferstr, ylabel);
-          edit_string(bufferstr, ylabel_editcommand);
-          free(ylabel);
-          SDDS_CopyString(&ylabel, bufferstr);
-        }
-      }
-      if (title[0]=='@')
-        title = getParameterLabel(&SDDS_table, title+1);
-      if (topline[0]=='@')
-        topline = getParameterLabel(&SDDS_table, topline+1);
+      if (xlabel[0]=='@') 
+        xlabel = getParameterLabel(&SDDS_table, xlabel+1, xlabel_editcommand, NULL );
       
+      if (ylabel[0]=='@') 
+        ylabel = getParameterLabel(&SDDS_table, ylabel+1,ylabel_editcommand, NULL );
+       
+      if (title[0]=='@')
+        title = getParameterLabel(&SDDS_table, title+1, title_editcommand, NULL );
+      if (topline[0]=='@') 
+        topline = getParameterLabel(&SDDS_table, topline+1, topline_editcommand, topline_formatcommand);
       if (rpn_equation) {
         if (!swap_xy) {
           mem1 = rpn_create_mem(variable1?variable1:"row", 0);
@@ -2245,11 +2492,24 @@ int main(int argc, char **argv)
       xmax0 = xmax;
       ymax0 = ymax;
       ymin0 = ymin;
+      
       /*the xmin, xmax, ymin, ymax will be changed after processing data, needs remind their values for next plot */
       process_data(&data_value, &nx, &ny, &xmin, &xmax, &ymin, &ymax, &dx, &dy, 
                    orig_limit, logscale, logfloor, nx_interp, ny_interp, x_lowpass, 
-                   y_lowpass, interp_flags, xyzArray, verbosity); 
-       
+                   y_lowpass, interp_flags, xyzArray, xyzColumn, verbosity); 
+      
+       if (yaxisScaleProvided) {
+          ymin = (ymin - yaxisOffset) * yaxisScale;
+          ymax = (ymax - yaxisOffset) * yaxisScale;
+          dy = (ymax - ymin)/(ny-1);
+          yRangeProvided = 1;
+      }
+       if (xaxisScaleProvided) {
+          xmin = (xmin - xaxisOffset) * xaxisScale;
+          xmax = (xmax - xaxisOffset) * xaxisScale;
+          dx = (xmax - xmin)/(nx-1);
+          xRangeProvided = 1;
+      }
       if (!plot_contour(data_value,  nx, ny, verbosity,
                         xmin,  xmax, ymin, ymax,
                         dx,  dy,  xintervals, yintervals,
@@ -2260,7 +2520,8 @@ int main(int argc, char **argv)
                         shape, shapes, pen, &flags, 
                         pause_interval, columnmatches, columnname,  columns, 
                         yEditCommand, ySparseInterval, yScale,  contour_label_interval,
-                        contour_label_offset, do_shade, 0, colorName, colorUnits, swap_xy, xlabelScale, ylabelScale, yRangeProvided, xRangeProvided))
+                        contour_label_offset, do_shade, 0, colorName, colorUnits, swap_xy, xlabelScale, ylabelScale, yRangeProvided, xRangeProvided,
+                        drawLineSpec, drawlines))
         continue;
       /*restore the values after swap since they will be used for next plot */
      
@@ -2309,6 +2570,8 @@ int main(int argc, char **argv)
     }
     free(columnname);
   }
+  if (drawlines)
+     free(drawLineSpec);
   free_scanargs(&s_arg,argc);
   return(0);
 }
@@ -2325,9 +2588,10 @@ long plot_contour(double **data_value, long nx, long ny, long verbosity,
                   long pause_interval, long columnmatches, char **columnname, long columns, 
                   char *yEditCommand, long ySparseInterval, double yScale, long contour_label_interval,
                   long contour_label_offset, long do_shade, long waterfall, char *colorName, 
-                  char *colorUnits, long swap_xy, double xlabelScale, double ylabelScale, long yRangeProvided, long xRangeProvided) {
+                  char *colorUnits, long swap_xy, double xlabelScale, double ylabelScale, long yRangeProvided, long xRangeProvided,
+                  DRAW_LINE_SPEC *drawLineSpec, long drawlines) {
   long i,j, ix_min=0, ix_max=0, iy_min=0, iy_max=0,gray=0;
-  double max_value, min_value, *level;
+  double max_value, min_value, *level, limit[4];
   register double value;
 
   level=NULL;
@@ -2362,13 +2626,15 @@ long plot_contour(double **data_value, long nx, long ny, long verbosity,
 #endif
   if (!xintervals) {
     xintervals = malloc(sizeof(double) * nx);
-    for (i=0; i<nx; i++)
+    for (i=0; i<nx; i++) {
       xintervals[i] = xmin + dx * i;
+    }
   }
   if (!yintervals) {
     yintervals = malloc(sizeof(double) * ny);
-    for (i=0; i<ny; i++)
+    for (i=0; i<ny; i++) {
       yintervals[i] = ymin + dy * i;
+    }
   }
   set_mapping(0.0, 0.0, 0.0, 0.0);
   *frameEnded = 0;
@@ -2403,12 +2669,18 @@ long plot_contour(double **data_value, long nx, long ny, long verbosity,
     *flags |= DEVICE_DEFINED;
   }
   if (columnmatches) {
-    if (!swap_xy && !yRangeProvided)
+    if (!swap_xy && !yRangeProvided) 
       make_enumerated_yscale(columnname, NULL, columns, yEditCommand, ySparseInterval, yScale, thickness, ylabel, ylabelScale);
-    else if (swap_xy && !xRangeProvided)
+    else if (swap_xy && !xRangeProvided) 
       make_enumerated_xscale(columnname, NULL, columns, yEditCommand, ySparseInterval, yScale, thickness, xlabel, xlabelScale);
+    
   }
-  
+  limit[0] = xmin;
+  limit[1] = xmax;
+  limit[2] = ymin;
+  limit[3] = ymax;
+  if (drawlines)
+     draw_lines(drawLineSpec, drawlines, 0, limit);
   
   if (xintervals) free(xintervals);
   if (yintervals) free(yintervals);
@@ -2603,13 +2875,39 @@ void checkParameter(SDDS_TABLE *SDDS_table, char *parameter_name)
   }
 }
 
-char *getParameterLabel(SDDS_TABLE *SDDS_table, char *parameter_name)
+char *getParameterLabel(SDDS_TABLE *SDDS_table, char *parameter_name, char *edit, char *format)
 {
-  char *ptr;
+  char *ptr, buffer[SDDS_MAXLINE], *dataBuffer=NULL;
+  long type=0;
   
-  if (!SDDS_GetParameterAsString(SDDS_table, parameter_name, &ptr)) {
-    SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
-    exit (1);
+  if (format && !SDDS_StringIsBlank(format)) {
+    if ( !(dataBuffer = malloc(sizeof(double)*4)))
+      SDDS_Bomb("Allocation failure in determin_dataset_labels");
+    if (!SDDS_GetParameter(SDDS_table, parameter_name, dataBuffer))
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors); 
+    
+    if(!(type=SDDS_GetParameterType(SDDS_table,SDDS_GetParameterIndex(SDDS_table, parameter_name))))
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+    if(!SDDS_VerifyPrintfFormat(format,type)) {
+      fprintf(stderr, "error: given format (\"%s\") for parameter %s is invalid\n",
+	      format, parameter_name);
+      exit(1);
+    }   
+    if(!(SDDS_SprintTypedValue((void*)dataBuffer,0,type,format,buffer,SDDS_PRINT_NOQUOTES)))
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+    SDDS_CopyString(&ptr,buffer); 
+    free(dataBuffer);
+  } else {
+    if (!SDDS_GetParameterAsString(SDDS_table, parameter_name, &ptr)) {
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
+      exit (1);
+    }
+  }
+  if (edit) {
+    strcpy(buffer, ptr);
+    edit_string(buffer, edit);
+    free(ptr);
+    SDDS_CopyString(&ptr, buffer);
   }
   return(ptr);
 }
@@ -3058,7 +3356,7 @@ void process_data(double ***data_value0, int32_t *nx, int32_t *ny, double *xmin,
                   double *ymin, double *ymax, double *dx, double *dy, 
                   double *orig_limit, long logscale, double logfloor,
                   long nx_interp, long ny_interp, long x_lowpass, long y_lowpass, long interp_flags,
-                  char **xyzArray, long verbosity)
+                  char **xyzArray, char **xyzColumn, long verbosity)
 {
   long i, j;
   double limit[4], **data_value, xmim0, xmax0, ymax0, ymin0;
@@ -3077,7 +3375,7 @@ void process_data(double ***data_value0, int32_t *nx, int32_t *ny, double *xmin,
                                  *dx, *dy, nx, ny, limit);
   }
   if (nx_interp!=0 || ny_interp!=0) {
-    if (xyzArray[0]) {
+    if (xyzArray[0] || xyzColumn[2]) {
       fprintf(stderr, "warning: interpolation done using static dx and dy\n");
     }
     if (nx_interp!=1 || x_lowpass>0) {
@@ -3121,4 +3419,203 @@ char * rearrange_by_index(char *data,long *index,long element_size,long num) {
    }
    
    return (tmpdata);
+}
+
+long drawline_AP(DRAW_LINE_SPEC **drawLineSpec, long *drawlines, char **item, long items)
+{
+  long i = *drawlines;  
+  *drawLineSpec = SDDS_Realloc(*drawLineSpec, sizeof(**drawLineSpec)*(i+1));
+  (*drawLineSpec)[i].linethickness = 0;
+  if (!scanItemList(&(*drawLineSpec)[i].flags, item, &items, 0,
+		    "x0value", SDDS_DOUBLE, &(*drawLineSpec)[i].x0, 1, DRAW_LINE_X0GIVEN,
+                    "y0value", SDDS_DOUBLE, &(*drawLineSpec)[i].y0, 1, DRAW_LINE_Y0GIVEN,
+                    "p0value", SDDS_DOUBLE, &(*drawLineSpec)[i].p0, 1, DRAW_LINE_P0GIVEN,
+		    "q0value", SDDS_DOUBLE, &(*drawLineSpec)[i].q0, 1, DRAW_LINE_Q0GIVEN,
+                    "x1value", SDDS_DOUBLE, &(*drawLineSpec)[i].x1, 1, DRAW_LINE_X1GIVEN,
+                    "y1value", SDDS_DOUBLE, &(*drawLineSpec)[i].y1, 1, DRAW_LINE_Y1GIVEN,
+                    "p1value", SDDS_DOUBLE, &(*drawLineSpec)[i].p1, 1, DRAW_LINE_P1GIVEN,
+                    "q1value", SDDS_DOUBLE, &(*drawLineSpec)[i].q1, 1, DRAW_LINE_Q1GIVEN,
+                    "x0parameter", SDDS_STRING, &(*drawLineSpec)[i].x0Param, 1, DRAW_LINE_X0PARAM,
+                    "y0parameter", SDDS_STRING, &(*drawLineSpec)[i].y0Param, 1, DRAW_LINE_Y0PARAM,
+                    "p0parameter", SDDS_STRING, &(*drawLineSpec)[i].p0Param, 1, DRAW_LINE_P0PARAM,
+                    "q0parameter", SDDS_STRING, &(*drawLineSpec)[i].q0Param, 1, DRAW_LINE_Q0PARAM,
+                    "x1parameter", SDDS_STRING, &(*drawLineSpec)[i].x1Param, 1, DRAW_LINE_X1PARAM,
+                    "y1parameter", SDDS_STRING, &(*drawLineSpec)[i].y1Param, 1, DRAW_LINE_Y1PARAM,
+                    "p1parameter", SDDS_STRING, &(*drawLineSpec)[i].p1Param, 1, DRAW_LINE_P1PARAM,
+                    "q1parameter", SDDS_STRING, &(*drawLineSpec)[i].q1Param, 1, DRAW_LINE_Q1PARAM,
+                    "linetype", SDDS_LONG, &(*drawLineSpec)[i].linetype, 1, DRAW_LINE_LINETYPEGIVEN, 
+                    "thickness", SDDS_LONG, &(*drawLineSpec)[i].linethickness, 1, 0, 
+                    "clip", -1, NULL, 0, DRAW_LINE_CLIPGIVEN,
+                    NULL)) 
+    return bombre("invalid -drawline syntax", drawlineUsage, 0);
+
+
+  if (bitsSet((*drawLineSpec)[i].flags&
+              (DRAW_LINE_X0GIVEN+DRAW_LINE_P0GIVEN+DRAW_LINE_X0PARAM+DRAW_LINE_P0PARAM))!=1 ||
+      bitsSet((*drawLineSpec)[i].flags&
+              (DRAW_LINE_Y0GIVEN+DRAW_LINE_Q0GIVEN+DRAW_LINE_Y0PARAM+DRAW_LINE_Q0PARAM))!=1 ||
+      bitsSet((*drawLineSpec)[i].flags&
+              (DRAW_LINE_X1GIVEN+DRAW_LINE_P1GIVEN+DRAW_LINE_X1PARAM+DRAW_LINE_P1PARAM))!=1 ||
+      bitsSet((*drawLineSpec)[i].flags&
+              (DRAW_LINE_Y1GIVEN+DRAW_LINE_Q1GIVEN+DRAW_LINE_Y1PARAM+DRAW_LINE_Q1PARAM))!=1)
+    return bombre("invalid -drawline syntax", drawlineUsage, 0);
+
+  if ((*drawLineSpec)[i].linethickness < 0)
+    (*drawLineSpec)[i].linethickness = 0;
+  if ((*drawLineSpec)[i].linethickness >= 10)
+    (*drawLineSpec)[i].linethickness = 9;
+
+  *drawlines +=1 ;
+  return 1;
+}
+
+void determine_drawline(DRAW_LINE_SPEC *drawLineSpec, long drawlines, SDDS_TABLE *table)
+{
+  long i, j;
+  double *positionPtr;
+  unsigned long flagMask, flagSubs;
+  char **namePtr;
+
+
+  for (i=0; i<drawlines; i++) {
+    drawLineSpec[i].x0Param = 
+    drawLineSpec[i].y0Param = 
+    drawLineSpec[i].p0Param = 
+    drawLineSpec[i].q0Param = 
+    drawLineSpec[i].x1Param = 
+    drawLineSpec[i].y1Param = 
+    drawLineSpec[i].p1Param = 
+    drawLineSpec[i].q1Param = NULL;
+    flagMask = DRAW_LINE_X0PARAM;
+    flagSubs = DRAW_LINE_X0GIVEN;
+    positionPtr = &(drawLineSpec[i].x0);
+    namePtr = &(drawLineSpec[i].x0Param);
+    
+    for (j=0; j<8; j++) {
+      if (!(drawLineSpec[i].flags&flagMask)) {
+	flagMask = flagMask << 1;
+	flagSubs = flagSubs << 1;
+	positionPtr += 1;
+	namePtr += 1;
+	continue;
+      }
+      if (!SDDS_GetParameterAsDouble(table, *namePtr, positionPtr)) {
+	SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+      }
+      drawLineSpec[i].flags |= flagSubs;
+      flagMask = flagMask << 1;
+      flagSubs = flagSubs << 1;
+      positionPtr += 1;
+      namePtr += 1;
+    }
+  }
+}
+
+void draw_lines(DRAW_LINE_SPEC *drawLineSpec, long drawlines, long linetypeDefault, double *limit)
+{
+  long iline, oldLinetype;
+  double x0equiv, x1equiv, y0equiv, y1equiv;
+  double x[2], y[2];
+  oldLinetype = set_linetype(linetypeDefault);
+  
+  for (iline=0; iline<drawlines; iline++) {
+    if (drawLineSpec[iline].flags&DRAW_LINE_LINETYPEGIVEN) {
+      set_linetype(drawLineSpec[iline].linetype);
+    }
+    set_linethickness(drawLineSpec[iline].linethickness);
+    if (drawLineSpec[iline].flags&DRAW_LINE_X0GIVEN)
+      x0equiv = drawLineSpec[iline].x0;
+    else {
+      x0equiv = (limit[1]-limit[0])*drawLineSpec[iline].p0+limit[0];
+    }
+    if (drawLineSpec[iline].flags&DRAW_LINE_Y0GIVEN)
+      y0equiv = drawLineSpec[iline].y0;
+    else {
+      y0equiv = (limit[3]-limit[2])*drawLineSpec[iline].q0 + limit[2];
+    }
+    if (drawLineSpec[iline].flags&DRAW_LINE_X1GIVEN)
+      x1equiv = drawLineSpec[iline].x1;
+    else {
+      x1equiv = (limit[1]-limit[0])*drawLineSpec[iline].p1+limit[0];
+    }
+    if (drawLineSpec[iline].flags&DRAW_LINE_Y1GIVEN)
+      y1equiv = drawLineSpec[iline].y1;
+    else {
+      y1equiv = (limit[3]-limit[2])*drawLineSpec[iline].q1 + limit[2];
+    }
+    if (drawLineSpec[iline].flags&DRAW_LINE_CLIPGIVEN) {
+      x[0] = x0equiv;
+      y[0] = y0equiv;
+      x[1] = x1equiv;
+      y[1] = y1equiv;
+      plot_lines(x, y, 2, 
+                 drawLineSpec[iline].flags&DRAW_LINE_LINETYPEGIVEN?
+                 drawLineSpec[iline].linetype:oldLinetype,0);
+    }
+    else {
+      pdraw(x0equiv, y0equiv, 0);
+      pdraw(x1equiv, y1equiv, 1);
+    }
+    if (drawLineSpec[iline].flags&DRAW_LINE_LINETYPEGIVEN) {
+      set_linetype(linetypeDefault);
+    }
+  }
+  set_linetype(oldLinetype);
+  set_linethickness(0);
+}
+
+void get_xyaxis_value(char *xaxisScalePar, char *xaxisOffsetPar, char *yaxisScalePar, char *yaxisOffsetPar, 
+		      SDDS_DATASET *SDDS_table,
+		      double *xaxisScale, double *xaxisOffset, double *yaxisScale, double *yaxisOffset,
+		      char **users_xlabel, char **users_ylabel)
+{
+  
+  if (yaxisScalePar) {
+    char *label, *units, s[1024];
+    label = units = NULL;
+    if (!SDDS_GetParameterAsDouble(SDDS_table, yaxisScalePar, yaxisScale)) {
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
+    }
+    if (!(*users_ylabel)) {
+      SDDS_GetParameterInformation(SDDS_table, "units", &units, SDDS_GET_BY_NAME, yaxisScalePar);
+      SDDS_GetParameterInformation(SDDS_table, "symbol", &label, SDDS_GET_BY_NAME, yaxisScalePar);
+      if (label) {
+	sprintf(s, "%s", label);
+	if (units)
+	  sprintf(s,"%s (%s)", s, units);
+	SDDS_CopyString(users_ylabel, s);
+	free(label);
+	if (units) free(units);
+      }
+    }
+  }
+  if (yaxisOffsetPar) {
+    if (!SDDS_GetParameterAsDouble(SDDS_table, yaxisOffsetPar, yaxisOffset)) {
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
+    } 
+  }
+  if (xaxisScalePar) {
+    char *label, *units, s[1024];
+    label = units = NULL;
+    if (!SDDS_GetParameterAsDouble(SDDS_table, xaxisScalePar, xaxisScale)) {
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
+    }
+    if (!(*users_xlabel)) {
+      SDDS_GetParameterInformation(SDDS_table, "units", &units, SDDS_GET_BY_NAME, xaxisScalePar);
+      SDDS_GetParameterInformation(SDDS_table, "symbol", &label, SDDS_GET_BY_NAME, xaxisScalePar);
+      if (label) {
+	sprintf(s, "%s", label);
+	if (units)
+	  sprintf(s,"%s (%s)", s, units);
+	SDDS_CopyString(users_xlabel, s);
+	free(label);
+	if (units) free(units);
+      }
+    }
+  }
+  if (xaxisOffsetPar) {
+    if (!SDDS_GetParameterAsDouble(SDDS_table, xaxisOffsetPar, xaxisOffset)) {
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);   
+    }
+  }
 }

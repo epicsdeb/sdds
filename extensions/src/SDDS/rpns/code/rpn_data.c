@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: rpn_data.c,v $
- Revision 1.22  2010/12/03 02:48:33  borland
- Added isort and dsort functions.
-
+ $Log: not supported by cvs2svn $
  Revision 1.21  2010/02/24 23:50:41  borland
  Added InvFq, which returns q solving F(q)=2*(sqrt(q^2-1)-acos(1/q)).
  See Wiedemann, Particle Accelerator Physics I, 8.2.2
@@ -196,6 +193,7 @@ struct FUNCTION funcRPN[NFUNCS] = {
        { "Yn"  , "Bessel functions (2nd kind)         ", rpn_YN     , NUMERIC_FUNC},
        {"BesIn", "Modified Bessel functions (1st kind)", rpn_IN     , NUMERIC_FUNC},
        {"BesKn", "Modified Bessel functions (2nd kind)", rpn_KN     , NUMERIC_FUNC},
+       {"G1y"  , "G1y (Synch. Rad. Function)"          , rpn_G1y     , NUMERIC_FUNC},
        { "cei1", "1st complete elliptic integral      ", rpn_cei1   , NUMERIC_FUNC},
        { "cei2", "2nd complete elliptic integral      ", rpn_cei2   , NUMERIC_FUNC},
        {"lngam", "ln of gamma function                ", rpn_lngam  , NUMERIC_FUNC},

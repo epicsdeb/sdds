@@ -29,7 +29,7 @@
 	library, complex routines
 */
 
-static char rcsid[] = "$Id: ztorture.c,v 1.2 1999/12/15 15:58:17 soliday Exp $";
+static char rcsid[] = "$Id: ztorture.c,v 1.2 1999-12-15 15:58:17 soliday Exp $";
 
 #include	<stdio.h>
 #include	<math.h>

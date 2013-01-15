@@ -38,7 +38,7 @@
 */
 
 
-static	char	rcsid[] = "$Id: qrfactor.c,v 1.4 2000/04/05 20:58:14 soliday Exp $";
+static	char	rcsid[] = "$Id: qrfactor.c,v 1.4 2000-04-05 20:58:14 soliday Exp $";
 
 #include	<stdio.h>
 #include	<math.h>

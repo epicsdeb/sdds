@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: lsfp.c,v $
- Revision 1.3  2002/08/14 16:48:28  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2001/04/30 21:58:35  borland
  It is now acceptable for the sigma-y array to be NULL.
 

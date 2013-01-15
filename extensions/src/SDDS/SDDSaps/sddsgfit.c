@@ -10,15 +10,7 @@
 /* program: sddsgfit.c
  * purpose: do an gaussian fit:  y(n) = baseline + N*exp(-0.5*(x(n)-mean)^2/sigma^2)
  * M. Borland, 1995
- $Log: sddsgfit.c,v $
- Revision 1.25  2006/12/14 22:21:58  soliday
- Updated a bunch of programs because SDDS_SaveLayout is now called by
- SDDS_WriteLayout and it is no longer required to be called directly.
- Also the AutoCheckMode is turned off by default now so I removed calls to
- SDDS_SetAutoCheckMode that would attempt to turn it off. It is now up to
- the programmer to turn it on in new programs until debugging is completed
- and then remove the call to SDDS_SetAutoCheckMode.
-
+ $Log: not supported by cvs2svn $
  Revision 1.24  2005/11/04 22:46:14  soliday
  Updated code to be compiled by a 64 bit processor.
 

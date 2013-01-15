@@ -16,10 +16,7 @@
  *   det = m_det(A);
  *
  * Michael Borland, 1986.
- $Log: m_det.c,v $
- Revision 1.6  2002/08/14 16:45:22  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2002/03/21 16:50:32  shang
  replaced A->a[j][j]!=0 (which is a bug) by A->a[j][i]!=0
 

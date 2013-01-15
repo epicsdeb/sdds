@@ -5,12 +5,9 @@
  * Author: Jim Kowalkowski
  * Date: 2/96
  *
- * $Id: gddNewDel.h,v 1.1 1997/02/10 19:37:45 saunders Exp $
+ * $Id: gddNewDel.h,v 1.1 1997-02-10 19:37:45 saunders Exp $
  *
- * $Log: gddNewDel.h,v $
- * Revision 1.1  1997/02/10 19:37:45  saunders
- * Initial work on oosdds.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.1  1996/06/25 19:11:47  jbk
  * new in EPICS base
  *

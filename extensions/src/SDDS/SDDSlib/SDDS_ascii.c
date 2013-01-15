@@ -11,10 +11,7 @@
  * contents: SDDS ascii data input and output routines
  *
  * M. Borland, November 1993
- $Log: SDDS_ascii.c,v $
- Revision 1.33  2006/12/12 17:32:00  soliday
- Mike added changes to improve the speed which ascii column data is read.
-
+ $Log: not supported by cvs2svn $
  Revision 1.32  2006/12/07 16:41:53  soliday
  Added SDDS_ScanData2 which is now used when reading ascii array data.
 

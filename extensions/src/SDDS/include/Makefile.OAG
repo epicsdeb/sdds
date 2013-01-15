@@ -7,7 +7,13 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
+# $Log: not supported by cvs2svn $
+# Revision 1.11  2012/01/06 20:35:23  ywang25
+# Use the original version of the ODE solver instead of the newer version in GSL.
+#
+# Revision 1.10  2011/11/04 21:06:54  ywang25
+# Added some files from GSL for UR
+#
 # Revision 1.9  2011/01/12 20:38:50  xiaoam
 # Added the gsl_poly.h to the GSL lib.
 #
@@ -42,6 +48,8 @@ INC = SDDS.h mdb.h scan.h match_string.h SDDStypes.h \
       matlib.h namelist.h rpn.h table.h non_dominated_sort.h \
       oagphy.h pgapack.h gsl_vector.h gsl_matrix.h gsl_poly.h \
       mdbsun.h sort.h f2c.h
+
+
 
 ifdef WIN32
 INC += fdlibm.h

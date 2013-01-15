@@ -49,13 +49,18 @@ integral error is constructed by appending ``IntegSigma''.
         strings for  names and definition entries for the integral error columns
         in the output file.  {\em item} may be one of {\tt name}, {\tt description},
         the independent variable name and the name of the integrand, respectively.
-    \item {\tt -method={\em methodName}} --- Specifies the integration method.  At present,
-        only trapizoidal rule integration is support, so this option is ignored.
+    \item {\tt -method={\em methodName}} --- Specifies the integration method.  The default method
+        is ``trapazoid,'' for trapizoid rule integration.
+        Another method is ``GillMiller,'' which is based on cubic interpolation and is much more
+        accurate than trapazoid rule; unlike most higher-order formulae, it is not restricted to
+        equispaced points.  (See P.E. Gill and G. F. Miller, The Computer Journal, Vol. 15, N. 1, 80-83, 1972.)
+        Error propagation is available for trapazoid rule integration only.
         If higher-order integration is needed, one can first interpolate the data with reduced
         spacing of the independent variable using {\tt sddsinterp} with the {\tt -equispaced} option and
-        {-order=2} or higher, then integrate using {\tt sddsinteg}.
+        {\tt -order=2} or higher, then integrate using {\tt sddsinteg}.
         This is mathematically equivalent to using a higher-order formula, but is 
         more general as it is not restricted to initially equispaced data.
+        However, using Gill-Miller is probably the best approach.
     \item {\tt -printFinal[=bare][,stdout]} --- Specifies that the final value of each
         integral should be printed out.  By default, the printout goes to stderr and
         includes the name of the integral.  If {\tt bare} is given, the names are omitted.

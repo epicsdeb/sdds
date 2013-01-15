@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: gridopt.c,v $
- Revision 1.8  2006/05/31 16:52:40  ywang25
- Updated for parallel random number generators.
-
+ $Log: not supported by cvs2svn $
  Revision 1.7  2003/01/09 19:42:08  borland
  Fixed bug in random walk minimizer.
 

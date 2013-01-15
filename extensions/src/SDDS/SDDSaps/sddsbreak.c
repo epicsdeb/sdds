@@ -11,10 +11,11 @@
  * purpose: break up pages of a SDDS file into subpages
  *
  * Michael Borland, 1994
- $Log: sddsbreak.c,v $
- Revision 1.16  2009/06/23 22:58:43  borland
- Added -matchto option.
+ $Log: not supported by cvs2svn $
 
+ Revision 1.16 2012/08/30 14:29:21   shang
+ added overlap option -rowlimit option to be able to break a file into overlapping regions.
+ 
  Revision 1.15  2007/04/09 15:58:13  soliday
  Cleaned up code.
 
@@ -84,7 +85,7 @@ char *USAGE = "sddsbreak [-pipe=[input][,output]] [<inputfile>] [<outputfile>]\n
  -increaseof=<column-name> -decreaseof=<column-name> \n\
  -changeof=<column-name>[,amount=<value>,base=<value>] \n\
  -matchto=<column-name>,<pattern>[,after] \n\
- -rowlimit=<integer> \n\n\
+ -rowlimit=<integer>[,overlap=<integer>] \n\n\
 Program by Michael Borland. (This is version 4, June 2009.)\n";
 
 #define GAPIN_AMOUNT    0x0001U
@@ -108,7 +109,7 @@ int main(int argc, char **argv)
   
   double changeAmount, changeBase;
   long retval, newStart, rowLimit, breakNext;
-  int32_t dataType;
+  int32_t dataType, overlap=0;
   unsigned long flags, pipeFlags, changeFlags;
   char **stringData;
     
@@ -166,11 +167,23 @@ int main(int argc, char **argv)
         mode = matchCode;
         break;
       case SET_ROWLIMIT:
-        if (scArg[iArg].n_items!=2 ||
-            sscanf(scArg[iArg].list[1], "%ld", &rowLimit)!=1 ||
+        if (scArg[iArg].n_items<2) {
+          fprintf(stderr, "Error: invalid -rowlimit syntax\n");
+          return(1);
+        }
+        if (sscanf(scArg[iArg].list[1], "%ld", &rowLimit)!=1 ||
             rowLimit<=0) {
           fprintf(stderr, "Error: invalid -rowlimit syntax\n");
           return(1);
+        }
+        if (scArg[iArg].n_items>2) {
+          scArg[iArg].n_items-=2;
+          if (!scanItemList(&flags, scArg[iArg].list+2, &scArg[iArg].n_items,  0,
+                           "overlap", SDDS_LONG, &overlap, NULL) ||
+              overlap<0) {
+            fprintf(stderr, "Error: invalid overlap given in -rowlimit syntax\n");
+            return(1);
+          }
         }
         mode = matchCode;
         break;
@@ -445,7 +458,7 @@ int main(int argc, char **argv)
       SDDS_FreeStringArray(stringData, rows);
       break;
     case SET_ROWLIMIT:
-      for (i=0; i<rows; i+=rowLimit) {
+      for (i=0; i<rows; i+=rowLimit-overlap) {
         if ((j=i+rowLimit-1)>=rows)
           j = rows-1;
         if (!SDDS_SetRowFlags(&SDDSold, 0) || 
@@ -454,6 +467,8 @@ int main(int argc, char **argv)
           SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
           return(1);
         }
+        if (j==rows-1)
+          break;
       }
       break;
     default:

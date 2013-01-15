@@ -11,10 +11,7 @@
  * purpose: add a specified number of spaces to the end of a string.
  * 
  * Michael Borland, 1990. 
- $Log: pad_with_spaces.c,v $
- Revision 1.3  2002/08/14 16:06:11  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  1995/09/05 21:18:01  saunders
  First test release of the SDDS1.5 package.
 

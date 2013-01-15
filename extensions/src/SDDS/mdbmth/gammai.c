@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: gammai.c,v $
- Revision 1.7  2003/08/28 19:56:26  soliday
- Cleaned up some of the code.
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2002/08/14 16:18:55  soliday
  Added Open License
 

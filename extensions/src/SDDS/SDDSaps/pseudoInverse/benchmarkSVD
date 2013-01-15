@@ -6,10 +6,7 @@ set auto_path [linsert $auto_path 0 /usr/local/oag/apps/lib/$env(HOST_ARCH)]
 set auto_path [linsert $auto_path 0 /usr/local/oag/lib_patch/$env(HOST_ARCH)]
 APSDebugPath
  
-# $Log: benchmarkSVD,v $
-# Revision 1.8  2005/08/01 21:58:33  soliday
-# No Changes.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.7  2005/08/01 21:54:49  emery
 # Inserted ${hostname} to the name of executables to run, following
 # script makeAll.

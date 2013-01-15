@@ -26,10 +26,7 @@
 
 /*
        Header file for ``matrix2.a'' library file
- $Log: matrix2.h,v $
- Revision 1.2  1995/09/05 21:08:32  saunders
- First test release of the SDDS1.5 package.
-
+ $Log: not supported by cvs2svn $
 */
 
 

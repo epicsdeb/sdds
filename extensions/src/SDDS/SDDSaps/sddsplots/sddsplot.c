@@ -12,7 +12,13 @@
  * plotting program for SDDS files
  *
  * Michael Borland, 1994.
- $Log: sddsplot.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.150  2011/03/22 23:47:10  borland
+ Added thickness qualifier for arrows.
+
+ Revision 1.149  2011/03/18 18:15:20  borland
+ Added gpng (gigantic PNG) type.
+
  Revision 1.148  2011/01/11 22:51:03  soliday
  Changed all the strcpy commands to strcpy_ss because of problems with
  RedHat Enterprise 6. If a strcpy copies the result to the same memory
@@ -642,7 +648,7 @@ char *USAGE2 = "  -tagRequest={<value>|@<parameter-name>}\n\
   -title=[@<parameter-name>|<string>|use={name|symbol|description}[,units]][,offset=<value>][,scale=<value>][,edit=<edit-command>][,thickness=<integer>][,linetype=<integer>] \n\
   -topline=[@<parameter-name>|<string>|use={name|symbol|description}[,units]][,offset=<value>][,scale=<value>][,edit=<edit-command>][,thickness=<integer>][,linetype=<integer>] \n\
   -labelSize=<fraction>\n\
-  -string={@<parameter-name>|<string>},{xCoordinate=<value>|pCoordinate=<value>},{yCoordinate=<value>|qCoordinate=<value>}[,scale=<value>][,angle=<degrees>][,edit=<edit-command>][,justify=<mode>][,slant=<degrees>][,linetype=<linetype>][,thickness=<integer>]\n\
+  -string={@<parameter-name>|<string>},{xCoordinate=<value|@<parameterName>>|pCoordinate=<value|@<parameterName>>},{yCoordinate=<value|@<parameterName>>|qCoordinate=<value|@<parameterName>>}[,scale=<value>][,angle=<degrees>][,edit=<edit-command>][,justify=<mode>][,slant=<degrees>][,linetype=<linetype>][,thickness=<integer>]\n\
   -drawLine={x0value=<value>|p0value=<value>|x0parameter=<name>|p0parameter=<name>},{x1value=<value>|p1value=<value>|x1parameter=<name>|p1parameter=<name>},{y0value=<value>|q0value=<value>|y0parameter=<name>|q0parameter=<name>},{y1value=<value>|q1value=<value>|y1parameter=<name>|q1parameter=<name>}[,linetype=<integer>][,thickness=<integer>][,clip]\n\
   [-filenamesOnTopline | -yTopline]\n";
 
@@ -655,9 +661,9 @@ char *USAGE3 = "  -topTitle\n\
   -subticksettings=[{xy}divisions=<integer>][,[{xy}]grid][,[{xy}]linetype=<integer>][,[{xy}]thickness=<integer>][,{xy}size=<fraction>][,xNoLogLabel][,yNoLogLabel]\n\
   -ticksettings=[{xy}spacing=<value>][,[{xy}]grid][,[{xy}]linetype=<integer>][,[{xy}]thickness=<integer>][,{xy}size=<fraction>][{xy}modulus=<value>][,[{xy}]logarithmic][,{xy}factor=<value>][,{xy}time][,{xy}nonExponentialLabels][,{xy}scaleChars=<factor>][,[{xy}]labelThickness=<integer>]\n\
   -enumeratedScales=[interval=<integer>][,limit=<integer>][,scale=<factor>][,allTicks][,rotate][,editCommand=<string>]\n\
-  -xScalesGroup={ID=<string>|fileIndex|fileString|nameIndex|nameString|page|request}\n";
+  -xScalesGroup={ID=<string>|fileIndex|fileString|nameIndex|nameString|page|request|units}\n";
 
-char *USAGE4 = "  -yScalesGroup={ID=<string>|fileIndex|fileString|nameIndex|nameString|page|request}\n\
+char *USAGE4 = "  -yScalesGroup={ID=<string>|fileIndex|fileString|nameIndex|nameString|page|request|units}\n\
   -legend={{xy}symbol|{xy}description|{xy}name|filename|specified=<string>|parameter=<name>}{,editCommand=<edit-string>}[,units][,firstFileOnly][,scale=<value>][,thickness=<integer>][,nosubtype]\n\
   -pointLabel=<name>[,edit=<editCommand>][,scale=<number>][,justifyMode={rcl}{bct}]\n\
   -newPanel  -endPanel  -nextPage\n\
@@ -2129,8 +2135,10 @@ void plot_sddsplot_data(PLOT_SPEC *plspec, short initializeDevice)
         min_level=limit[2];
       if (max_level==-DBL_MAX)
         max_level=limit[3];
-      if (plreq->color_settings.flags&COLORSET_SPECTRAL || plreq->color_settings.flags&COLORSET_RSPECTRAL) {
+      if (plreq->color_settings.flags&COLORSET_SPECTRAL) {
         alloc_spectrum(numcolors2,1,0,0,0,0,0,0);
+      } else if (plreq->color_settings.flags&COLORSET_RSPECTRAL) {
+        alloc_spectrum(numcolors2,2,0,0,0,0,0,0);
       } else if (plreq->color_settings.flags&COLORSET_START) {
         alloc_spectrum(numcolors2,0,plreq->color_settings.red[0],plreq->color_settings.green[0],plreq->color_settings.blue[0],plreq->color_settings.red[1],plreq->color_settings.green[1],plreq->color_settings.blue[1]);
       }
@@ -3435,7 +3443,7 @@ void make_legend(char **legend, GRAPHIC_SPEC **graphic, long n, double legendSca
       if (graphic[i]->arrow.barbLength<=0)
         plot_lines(x, y, 2, graphic[i]->arrow.linetype,0);
       else
-        plot_arrow(x[0], y[0], x[1]-x[0], 0.0, -1.0, 30./180.*PI, graphic[i]->arrow.linetype, graphic[i]->arrow.flags);
+        plot_arrow(x[0], y[0], x[1]-x[0], 0.0, -1.0, 30./180.*PI, graphic[i]->arrow.linetype, graphic[i]->arrow.flags, graphic[i]->arrow.thickness);
       break;
     default:
       bomb("unknown plot code in make_legend()", NULL);

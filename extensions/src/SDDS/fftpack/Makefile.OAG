@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
-# Revision 1.9  2010/02/04 23:43:28  soliday
-# Updated because dfilter.cc replaces dfilter.c
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.8  2009/12/02 22:22:13  soliday
 # Added the -D_ISOC99_SOURCE flag.
 #

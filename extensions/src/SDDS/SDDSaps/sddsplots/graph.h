@@ -12,7 +12,10 @@
  *          GNUPLOT-based graphics
  *
  * Michael Borland, 1991.
- $Log: graph.h,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.32  2011/03/22 23:47:10  borland
+ Added thickness qualifier for arrows.
+
  Revision 1.31  2010/01/05 20:06:45  soliday
  Added the -intensityBar option which can be used to move the intensity bar
  and to resize the label text to the left and the unit text above.
@@ -248,7 +251,7 @@ void time_date_stamp(void);
 typedef struct {
     unsigned long flags;
     double scale, barbLength, barbAngle;
-    int32_t linetype;
+    int32_t linetype, thickness;
     } ARROW_SETTINGS;
 #define ARROW_CENTERED         0x0001
 #define ARROW_SCALE_GIVEN      0x0002
@@ -261,11 +264,12 @@ typedef struct {
 #define ARROW_SINGLEBARB       0x0100
 #define ARROW_AUTOSCALE        0x0200
 #define ARROW_ENDPOINTS        0x0400
+#define ARROW_THICKNESS_GIVEN  0x0800
 
 void plot_arrows(double *x, double *y, double *x1, double *y1, long n, 
                  ARROW_SETTINGS *arrow);
 void plot_arrow(double x, double y, double length, double angle,
-    double barb_length, double barb_angle, long arrow_type, long arrow_flags);
+    double barb_length, double barb_angle, long arrow_type, long arrow_flags, long thickness);
 void plot_arrows_old(double *x, double *y, double *length, double *angle, long n,
     double arrow_type, double arrow_code);
 void plot_arrow_old(double x, double y, double length, double angle,
@@ -354,9 +358,11 @@ void make_intensity_bar(long n_shades, long shadeOffset, long reverse,
 
 void RGB_values(double *r, double *g, double *b, double hue);
 void Spectral_RGB_values(double *r, double *g, double *b, double hue);
+void Spectral_BGR_values(double *r, double *g, double *b, double hue);
 void Custom_RGB_values(double *red, double *green, double *blue, unsigned short red0, unsigned short green0, unsigned short blue0, unsigned short red1, unsigned short green1, unsigned short blue1, double hue);
 void RGB_short_values(unsigned short *r, unsigned short *g, unsigned short *b, double hue);
 void Spectral_RGB_short_values(unsigned short *r, unsigned short *g, unsigned short *b, double hue);
+void Spectral_BGR_short_values(unsigned short *r, unsigned short *g, unsigned short *b, double hue);
 void Custom_RGB_short_values(unsigned short *r, unsigned short *g, unsigned short *b, unsigned short r0, unsigned short g0, unsigned short b0, unsigned short r1, unsigned short g1, unsigned short b1, double hue);
 
 typedef struct {

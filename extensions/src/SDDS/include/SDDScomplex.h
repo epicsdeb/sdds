@@ -10,10 +10,7 @@
 /* file: complex.h
  *       structures and functions for complex number arithmetic
  * Michael Borland, 1992
- $Log: SDDScomplex.h,v $
- Revision 1.1  2010/10/08 18:09:13  soliday
- This file is needed for clinchor and perhaps other programs.
-
+ $Log: not supported by cvs2svn $
  Revision 1.12  2003/07/22 20:01:17  soliday
  Added support for Kylix.
 

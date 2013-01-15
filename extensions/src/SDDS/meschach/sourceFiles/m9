@@ -1237,7 +1237,7 @@ sed >spswap.c <<'//GO.SYSIN DD spswap.c' 's/^-//'
 -	to use Karen George's suggestion to use unordered rows
 -*/
 -
--static	char	rcsid[] = "$Id: m9,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	rcsid[] = "$Id: m9,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include        "sparse2.h"
@@ -1552,7 +1552,7 @@ sed >iter0.c <<'//GO.SYSIN DD iter0.c' 's/^-//'
 -#include        "iter.h"
 -
 -
--static char rcsid[] = "$Id: m9,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: m9,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -
 -/* standard functions */
@@ -1935,7 +1935,7 @@ sed >itersym.c <<'//GO.SYSIN DD itersym.c' 's/^-//'
 -#include	"sparse.h"
 -#include        "iter.h"
 -
--static char rcsid[] = "$Id: m9,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: m9,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -
 -#ifdef ANSI_C
@@ -2526,7 +2526,7 @@ sed >iternsym.c <<'//GO.SYSIN DD iternsym.c' 's/^-//'
 -#include	"sparse.h"
 -#include        "iter.h"
 -
--static char rcsid[] = "$Id: m9,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: m9,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -
 -#ifdef ANSI_C
@@ -3816,7 +3816,7 @@ sed >zmachine.c <<'//GO.SYSIN DD zmachine.c' 's/^-//'
 -  full advantage of specialised architectures (pipelining, vector
 -  processors etc).
 -  */
--static	char	*rcsid = "$Id: m9,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	*rcsid = "$Id: m9,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	"machine.h"
 -#include        "zmatrix.h"

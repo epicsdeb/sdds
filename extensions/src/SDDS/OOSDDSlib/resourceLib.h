@@ -1,5 +1,5 @@
 /*
- *      $Id: resourceLib.h,v 1.1 1997/03/06 19:25:00 saunders Exp $
+ *      $Id: resourceLib.h,v 1.1 1997-03-06 19:25:00 saunders Exp $
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov
@@ -28,10 +28,7 @@
  *
  *
  * History
- * $Log: resourceLib.h,v $
- * Revision 1.1  1997/03/06 19:25:00  saunders
- * New files necessary for build.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.7  1996/12/06 22:26:36  jhill
  * added auto cleanup of installed classes to destroy
  *

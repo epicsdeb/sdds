@@ -11,10 +11,7 @@
  * contents: definitions for internal use by SDDS routines
  * 
  * Michael Borland, November 1993.
- $Log: SDDS_internal.h,v $
- Revision 1.21  2008/04/14 18:28:05  shang
- moded some definition to SDDS.h
-
+ $Log: not supported by cvs2svn $
  Revision 1.20  2005/11/04 22:46:52  soliday
  Updated code to be compiled by a 64 bit processor.
 

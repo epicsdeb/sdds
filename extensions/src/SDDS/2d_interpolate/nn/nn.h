@@ -17,11 +17,8 @@
 
 #if !defined(_NN_H)
 #define _NN_H
-typedef enum { SIBSON, NON_SIBSONIAN } NN_RULE;
 
-#if defined(_WIN32)
-#define isnan(x) _isnan(x)
-#endif
+typedef enum { SIBSON, NON_SIBSONIAN } NN_RULE;
 
 /* "point" is a basic data structure in this package.
  */
@@ -343,6 +340,7 @@ extern NN_RULE nn_rule;
 
 /* Contains version string for the nn package.
  */
+extern char* nn_version;
 
 /* Limits verbose information to a particular vertex (used mainly for
  * debugging purposes).

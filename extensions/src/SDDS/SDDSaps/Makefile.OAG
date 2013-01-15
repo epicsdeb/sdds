@@ -9,7 +9,21 @@ gslcblas_DIR := /usr/lib
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
+# $Log: not supported by cvs2svn $
+# Revision 1.51  2012/03/22 19:41:39  soliday
+# Modified because gsl and xlslib have GPL licenses and cannot be distributed
+# with our software. We can still link against a system library version of gsl
+# if it is available.
+#
+# Revision 1.50  2012/03/01 21:24:39  soliday
+# Moved sddssyncflux to the elegant/sddsbrightness directory.
+#
+# Revision 1.49  2012/02/20 15:58:40  soliday
+# Fixed the directory name for the xlslib library.
+#
+# Revision 1.48  2012/01/27 21:32:38  soliday
+# Added Excel support to sdds2spreadsheet
+#
 # Revision 1.47  2011/01/28 16:43:50  shang
 # removed sddsmatrixop
 #
@@ -203,7 +217,9 @@ SDDSPROD =  citi2sdds csv2sdds elegant2genesis \
         
 
 ifndef WIN32
+ifneq ($(OS_CLASS),Darwin)
 SDDSPROD += agilentwaveform2sdds agilentcomm
+endif
 endif
 ifndef BGL
 SDDSPROD += sdds2tiff tiff2sdds
@@ -247,6 +263,57 @@ sddsprocess_LIBS = mdbcommon matlib fftpack rpnlib gsl gslcblas SDDS1c mdbmth md
 sddsgenericfit_LIBS = mdbcommon matlib fftpack rpnlib gsl gslcblas SDDS1c mdbmth mdblib
 sddsmatrixop_LIBS = rpnlib gsl gslcblas
 sddssyncflux_LIBS = rpnlib gsl gslcblas
+sdds2spreadsheet_CFLAGS = -I../../xlslib -DUSE_XLS
+sdds2spreadsheet_LIBS = mdbcommon matlib fftpack rpnlib SDDS1 mdbmth mdblib xls
+ifeq ($(OS_CLASS),Darwin)
+sdds2spreadsheet_LDFLAGS += -liconv 
+endif
+xls_DIR = $(INSTALL_LIB)
+endif
+
+#Look for private version of GSL used here at APS
+GSL = $(words $(wildcard ../../gsl))
+ifeq ($(GSL), 1)
+GSLLIB = gsl
+SYS_GSLLIB = 
+GSL_DIR = $(INSTALL_LIB)
+else
+
+#Look for system version of GSL
+SYSGSL = $(words $(notdir $(wildcard \
+/usr/lib/libgsl.a \
+/usr/lib/libgsl.so \
+/usr/lib64/libgsl.a \
+/usr/lib64/libgsl.so \
+/lib/libgsl.a \
+/lib/libgsl.so \
+/lib64/libgsl.a \
+/lib64/libgsl.so \
+/sw/lib/libgsl.a \
+/sw/lib/libgsl.dylib \
+/opt/local/lib/libgsl.a \
+/opt/local/lib/libgsl.dylib \
+/usr/sfw/lib/libgsl.a \
+/usr/sfw/lib/libgsl.so )))
+
+ifneq ($(SYSGSL), 0)
+GSLLIB = 
+SYS_GSLLIB = -lgsl -lgslcblas
+else
+
+#No GSL library found. Build without it.
+GSLLIB = 
+SYS_GSLLIB = 
+endif
+endif
+
+
+
+
+sddsprocess_LIBS = mdbcommon matlib fftpack rpnlib $(GSLLIB) SDDS1c mdbmth mdblib
+sddsgenericfit_LIBS = mdbcommon matlib fftpack rpnlib $(GSLLIB) SDDS1c mdbmth mdblib
+sddsprocess_LDFLAGS += $(SYS_GSLLIB)
+sddsgenericfit_LDFLAGS += $(SYS_GSLLIB)
 
 z_DIR = /usr/lib
 mdbmth_DIR = $(INSTALL_LIB)

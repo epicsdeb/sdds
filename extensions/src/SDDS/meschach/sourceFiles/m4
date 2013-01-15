@@ -1673,7 +1673,7 @@ sed >MACHINES/GCC/makefile <<'//GO.SYSIN DD MACHINES/GCC/makefile' 's/^-//'
 -#
 -# Copyright (C) David Stewart & Zbigniew Leyk 1993
 -#
--# $Id: m4,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $
+-# $Id: m4,v 1.1.1.1 1999-04-14 14:16:22 borland Exp $
 -#
 -
 -srcdir = .
@@ -2084,7 +2084,7 @@ sed >MACHINES/RS6000/machine.c <<'//GO.SYSIN DD MACHINES/RS6000/machine.c' 's/^-
 -  full advantage of specialised architectures (pipelining, vector
 -  processors etc).
 -  */
--static	char	*rcsid = "$Header: /net/phoebus/epicsmgr/cvsroot/epics/extensions/src/SDDS/meschach/sourceFiles/m4,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $";
+-static	char	*rcsid = "$Header: /net/phoebus/epicsmgr/cvsroot/epics/extensions/src/SDDS/meschach/sourceFiles/m4,v 1.1.1.1 1999-04-14 14:16:22 borland Exp $";
 -
 -#include	"machine.h"
 -
@@ -2488,7 +2488,7 @@ sed >MACHINES/RS6000/makefile <<'//GO.SYSIN DD MACHINES/RS6000/makefile' 's/^-//
 -#
 -# Copyright (C) David Stewart & Zbigniew Leyk 1993
 -#
--# $Id: m4,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $
+-# $Id: m4,v 1.1.1.1 1999-04-14 14:16:22 borland Exp $
 -#
 -
 -srcdir = .
@@ -2883,7 +2883,7 @@ sed >MACHINES/SPARC/makefile <<'//GO.SYSIN DD MACHINES/SPARC/makefile' 's/^-//'
 -#
 -# Copyright (C) David Stewart & Zbigniew Leyk 1993
 -#
--# $Id: m4,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $
+-# $Id: m4,v 1.1.1.1 1999-04-14 14:16:22 borland Exp $
 -#
 -
 -srcdir = .
@@ -3074,7 +3074,7 @@ sed >MACHINES/Linux/makefile <<'//GO.SYSIN DD MACHINES/Linux/makefile' 's/^-//'
 -#
 -# Copyright (C) David Stewart & Zbigniew Leyk 1993
 -#
--# $Id: m4,v 1.1.1.1 1999/04/14 14:16:22 borland Exp $
+-# $Id: m4,v 1.1.1.1 1999-04-14 14:16:22 borland Exp $
 -#
 -
 -srcdir = .

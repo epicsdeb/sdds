@@ -11,15 +11,7 @@
  * purpose: SDDS-format histogram command
  *  Based on the mpl program hist.
  * Michael Borland, 1995
- $Log: sddshist.c,v $
- Revision 1.24  2006/12/14 22:21:59  soliday
- Updated a bunch of programs because SDDS_SaveLayout is now called by
- SDDS_WriteLayout and it is no longer required to be called directly.
- Also the AutoCheckMode is turned off by default now so I removed calls to
- SDDS_SetAutoCheckMode that would attempt to turn it off. It is now up to
- the programmer to turn it on in new programs until debugging is completed
- and then remove the call to SDDS_SetAutoCheckMode.
-
+ $Log: not supported by cvs2svn $
  Revision 1.23  2005/11/14 17:58:49  soliday
  Fixed a bug where the lower and upper filter could be used when their
  values were uninitialized.

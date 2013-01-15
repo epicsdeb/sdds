@@ -10,7 +10,10 @@
 /* program: sddsgenericfit.c
  * purpose: perform fitting using a generic form supplied by the user
  * M. Borland, 2001
- $Log: sddsgenericfit.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.23  2012/01/11 22:39:21  shang
+ made -columns option obselete, added -ycolumn option to replace -columns option, and added -copycolumns option to copy provided list of columns to the output file.
+
  Revision 1.22  2009/07/30 15:34:50  shang
  made the lower, upper limit, step size and starting value of the variables to also be able to read from input file parameters.
 
@@ -108,24 +111,29 @@
 #define SET_VERBOSITY 7
 #define SET_STARTFROMPREVIOUS 8
 #define SET_EXPRESSION 9
-#define N_OPTIONS 10
+#define SET_COPYCOLUMNS 10
+#define SET_YCOLUMN 11
+#define SET_LOGFILE 12
+#define N_OPTIONS 13
 
 char *option[N_OPTIONS] = {
   "variable", "pipe", "equation", "columns", "target", "tolerance", "simplex",
-  "verbosity", "startfromprevious", "expression",
+  "verbosity", "startfromprevious", "expression", "copycolumns", "ycolumn", "logFile",
     };
 
 static char *USAGE1="sddsgenericfit [-pipe=[input][,output]] [<inputfile>] [<outputfile>] \n\
--columns=<x-name>,<y-name>[,ySigma=<sy-name>] \n\
 -equation=<rpnString>[,algebraic] [-expression=<string> [-expression=...]]\n\
 [-target=<value>] [-tolerance=<value>]\n\
 [-simplex=[restarts=<nRestarts>][,cycles=<nCycles>,][evaluations=<nEvals>][,no1DScans]\n\
 -variable=name=<name>,lowerLimit=<value|parameter-name>,upperLimit=<value|parametr-name>,stepsize=<value|parameter-name>,startingValue=<value|parametername>[,units=<string>][,heat=<value|parameter-name>]\n\
 [-variable=...] [-verbosity=<integer>] [-startFromPrevious]\n\
+[-copy=<list of column names>] -ycolumn=ycolumn_name[,ySigma=<sy-name>] \n\
 Uses Simplex method to finds a fit to <y-name> as a function of <x-name> by varying the given\n\
 variables, which are assumed to appear in the <rpnString>.\n\n\
--columns    Give the names of the independent and dependent data.  If given, the data in <sy-name>\n\
-            is used to weight the fit.\n\
+-ycolumn    give the name of dependant data and optional <sy-name> to weight the fit.\n\
+            This option replaces the old -columns option.\n\
+-copycolumns  provide list of columns to copy from the input file to the output file.\n\
+-logFile    if provide, the intermiate fitting result will be written to the logFile.\n\
 -equation   Give an rpn expression for the equation to use in fitting.\n\
             This equation can use the names of any of the columns or parameters in the file,\n\
             just as in sddsprocess.  It is expected to return a value that will be compared to\n\
@@ -151,13 +159,16 @@ static char *USAGE2="-tolerance Give the minimum change in the (weighted) rms re
             starting values supplied with the -variable option.  However, if this option is given,\n\
             then the final values from the previous page's fit are used as the starting values for\n\
             fitting.\n\
-Program by Michael Borland. (This is version 1, May 2001.)\n";
+Program by Michael Borland. ("__DATE__")\n";
 
 void report(double res, double *a, long pass, long n_eval, long n_dimen);
-void setupOutputFile(SDDS_DATASET *OutputTable, long *xIndex, long *yIndex, long *syIndex,
+void setupOutputFile(SDDS_DATASET *OutputTable, 
                      long *fitIndex, long *residualIndex,
                      char *output, SDDS_DATASET *InputTable, char *xName, char *yName,
-                     char *syName, char **variableName, char **variableUnits, long variables);
+                     char *syName, char **variableName, char **variableUnits, long variables, 
+		     char **colMatch, long colMatches,
+		     SDDS_DATASET *logData, char *logFile);
+
 double fitFunction(double *a, long *invalid);
 
 static SDDS_DATASET InputTable;
@@ -167,6 +178,11 @@ static char *equation;
 static long *variableMem, nVariables, verbosity;
 static char **expression = NULL;
 static long nExpressions = 0;
+static char **variableName=NULL;
+static int32_t step=0;
+static char *logFile=NULL;
+static SDDS_DATASET logData;
+static int32_t maxLogRows=500;
 
 #define VARNAME_GIVEN  0x0001U
 #define LOWER_GIVEN    0x0002U
@@ -181,14 +197,14 @@ int main(int argc, char **argv)
   SDDS_DATASET OutputTable;
   SCANNED_ARG *s_arg;
   long i_arg;
-  char *input, *output, *xName, *yName, *syName;
-  long xIndex, yIndex, fitIndex, residualIndex, syIndex, retval;
+  char *input, *output, *xName, *yName, *syName, **colMatch;
+  long  fitIndex, residualIndex, retval, colMatches;
   double rmsResidual, chiSqr, sigLevel;
   unsigned long pipeFlags, dummyFlags;
   int32_t nEvalMax=5000, nPassMax=10, nRestartMax=10;
   long nEval, iRestart;
   double tolerance, target;
-  char **variableName, **variableUnits;
+  char  **variableUnits;
   double *lowerLimit, *upperLimit, *stepSize, *startingValue, *paramValue, *paramDelta=NULL, *paramDelta0=NULL;
   char **startingPar=NULL, **lowerLimitPar=NULL, **upperLimitPar=NULL, **heatPar=NULL, **stepPar=NULL;
   double *heat, *bestParamValue, bestResult=0;
@@ -204,13 +220,14 @@ int main(int argc, char **argv)
 
   SDDS_RegisterProgramName(argv[0]);
   argc = scanargs(&s_arg, argc, argv);
-
+  colMatches = 0;
+  colMatch =  NULL;
   if (argc<=1) {
     fprintf(stderr, "%s%s", USAGE1, USAGE2);
     exit(1);
     /* bomb(USAGE, NULL);*/
   }
-
+  logFile = NULL;
   input = output = equation = NULL;
   variableName = variableUnits = NULL;
   lowerLimit = upperLimit = stepSize = startingValue = heat = bestParamValue = NULL; 
@@ -248,10 +265,32 @@ int main(int argc, char **argv)
                           NULL))
           SDDS_Bomb("invalid -columns syntax");
         break;
+      case SET_YCOLUMN:
+	if (s_arg[i_arg].n_items!=2 && s_arg[i_arg].n_items!=3)
+          SDDS_Bomb("invalid -ycolumn syntax");
+	yName = s_arg[i_arg].list[1];
+	s_arg[i_arg].n_items -= 2;
+	if (!scanItemList(&dummyFlags, s_arg[i_arg].list+2, &s_arg[i_arg].n_items, 0,
+                          "ysigma", SDDS_STRING, &syName, 1, 0,
+                          NULL))
+          SDDS_Bomb("invalid -ycolumn syntax");
+	break;
+      case SET_COPYCOLUMNS:
+	if (s_arg[i_arg].n_items<2)
+	  SDDS_Bomb("Invalid copycolumns syntax provided.");
+	colMatch = tmalloc(sizeof(*colMatch)*(colMatches=s_arg[i_arg].n_items-1));
+	for (i=0; i<colMatches; i++)
+	  colMatch[i] = s_arg[i_arg].list[i+1];
+	break;
       case SET_PIPE:
         if (!processPipeOption(s_arg[i_arg].list+1, s_arg[i_arg].n_items-1, &pipeFlags))
           SDDS_Bomb("invalid -pipe syntax");
         break;
+      case SET_LOGFILE:
+	if (s_arg[i_arg].n_items!=2)
+	  SDDS_Bomb("invalid -logFile syntax");
+	logFile = s_arg[i_arg].list[1];
+	break;
       case SET_VARIABLE:
         if (!(variableName=SDDS_Realloc(variableName, sizeof(*variableName)*(nVariables+1))) ||
             !(lowerLimit=SDDS_Realloc(lowerLimit, sizeof(*lowerLimit)*(nVariables+1))) ||
@@ -373,8 +412,8 @@ int main(int argc, char **argv)
 
   processFilenames("sddsgenericfit", &input, &output, pipeFlags, 0, NULL);
 
-  if (!xName || !yName)
-    SDDS_Bomb("-columns option must be given");
+  if (!yName)
+    SDDS_Bomb("-ycolumn option must be given");
   if (nVariables==0)
     SDDS_Bomb("you must give at least one -variables option");
   if (equation==NULL)
@@ -395,13 +434,14 @@ int main(int argc, char **argv)
 
   if (!SDDS_InitializeInput(&InputTable, input))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
-  if (!SDDS_FindColumn(&InputTable, FIND_NUMERIC_TYPE, xName, NULL) ||
+  if ((xName && !SDDS_FindColumn(&InputTable, FIND_NUMERIC_TYPE, xName, NULL)) ||
       !SDDS_FindColumn(&InputTable, FIND_NUMERIC_TYPE, yName, NULL) ||
       (syName && !SDDS_FindColumn(&InputTable, FIND_NUMERIC_TYPE, syName, NULL)))
     SDDS_Bomb("one or more of the given data columns is nonexistent or nonnumeric");
 
-  setupOutputFile(&OutputTable, &xIndex, &yIndex, &syIndex, &fitIndex, &residualIndex, output,
-                  &InputTable, xName, yName, syName, variableName, variableUnits, nVariables);
+  setupOutputFile(&OutputTable,  &fitIndex, &residualIndex, output,
+                  &InputTable, xName, yName, syName, variableName, variableUnits, nVariables, colMatch, colMatches,
+		  &logData, logFile);
 
   if (!(paramValue = SDDS_Malloc(sizeof(*paramValue)*nVariables)) ||
       !(paramDelta = SDDS_Malloc(sizeof(*paramDelta)*nVariables)) ||
@@ -412,7 +452,7 @@ int main(int argc, char **argv)
     variableMem[iVariable] = rpn_create_mem(variableName[iVariable], 0);
 
   while ((retval=SDDS_ReadPage(&InputTable))>0) {
-    if (!(xData = SDDS_GetColumnInDoubles(&InputTable, xName)) ||
+    if ((xName && !(xData = SDDS_GetColumnInDoubles(&InputTable, xName))) ||
         !(yData = SDDS_GetColumnInDoubles(&InputTable, yName)))
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
     if (syName && !(syData = SDDS_GetColumnInDoubles(&InputTable, syName)))
@@ -442,7 +482,6 @@ int main(int argc, char **argv)
       paramDelta[iVariable] = stepSize[iVariable];
       
     }
-    
     if (verbosity>2) {
       /* show starting values */
       fprintf(stderr, "Starting values and step sizes:\n");
@@ -520,12 +559,9 @@ int main(int argc, char **argv)
     }
 
     if (!SDDS_StartPage(&OutputTable, nData) ||
-        !SDDS_CopyParameters(&OutputTable, &InputTable) ||
-        !SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, xData, nData, xIndex) ||
+	!SDDS_CopyPage(&OutputTable, &InputTable) ||
         !SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, yFit, nData, fitIndex) ||
-        !SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, yData, nData, yIndex) ||
-        !SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, yResidual, nData, residualIndex) ||
-        (syName && !SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, syData, nData, syIndex)))
+        !SDDS_SetColumn(&OutputTable, SDDS_SET_BY_INDEX, yResidual, nData, residualIndex))
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
     for (iVariable=0; iVariable<nVariables; iVariable++)
       if (!SDDS_SetParameters(&OutputTable, SDDS_PASS_BY_VALUE|SDDS_SET_BY_NAME,
@@ -534,63 +570,100 @@ int main(int argc, char **argv)
         SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
     if (!SDDS_WritePage(&OutputTable))
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+    if (logFile && !SDDS_WritePage(&logData))
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+    step = 0;
     free(xData);
     free(yData);
     if (syData) 
       free(syData);
   }
+  if (!SDDS_Terminate(&InputTable) || !SDDS_Terminate(&OutputTable))
+    SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+  if (logFile && !SDDS_Terminate(&logData))
+    SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+  if (colMatches) free(colMatch);
+  if (syName) free(syName);
+  SDDS_FreeStringArray(variableName, nVariables);
+  free_scanargs(&s_arg, argc);
+  free(lowerLimit);
+  free(upperLimit);
+  free(stepSize);
+  free(heat);
+  free(bestParamValue);
+  free(startingValue);
+  free(startingPar);
+  free(lowerLimitPar);
+  free(upperLimitPar);
+  free(heatPar);
+  free(stepPar);
+  free(variableUnits);
+  
   return 0;
 }
 
-void setupOutputFile(SDDS_DATASET *OutputTable, long *xIndex, long *yIndex, long *syIndex, long *fitIndex, 
-                     long *residualIndex,
+void setupOutputFile(SDDS_DATASET *OutputTable, long *fitIndex,  long *residualIndex,
                      char *output, SDDS_DATASET *InputTable, 
                      char *xName, char *yName, char *syName, 
-                     char **variableName, char **variableUnits, long variables
+                     char **variableName, char **variableUnits, long variables,
+		     char **colMatch, long colMatches,
+		     SDDS_DATASET *logData, char *logFile
                      )
 {
-  char *name, *yUnits, *xUnits;
+  char *name, *yUnits=NULL, **col=NULL;
   int32_t typeValue = SDDS_DOUBLE;
   static char *residualNamePart = "Residual";
-  long i;
+  long i, cols=0;
   
   if (!SDDS_InitializeOutput(OutputTable, SDDS_BINARY, 0, NULL, "sddsgfit output", output) ||
-      !SDDS_TransferColumnDefinition(OutputTable, InputTable, xName, NULL) ||
-      !SDDS_ChangeColumnInformation(OutputTable, "type", &typeValue, SDDS_BY_NAME, xName) ||
-      (*xIndex=SDDS_GetColumnIndex(OutputTable, xName))<0 ||
-      !SDDS_GetColumnInformation(InputTable, "units", &xUnits, SDDS_BY_NAME, xName) ||
-      !SDDS_GetColumnInformation(InputTable, "units", &yUnits, SDDS_BY_NAME, yName))
+      !SDDS_TransferColumnDefinition(OutputTable, InputTable, yName, NULL) ||
+      !SDDS_ChangeColumnInformation(OutputTable, "type", &typeValue, SDDS_BY_NAME, yName))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
-
-  if (!SDDS_TransferColumnDefinition(OutputTable, InputTable, yName, NULL) ||
-      !SDDS_ChangeColumnInformation(OutputTable, "type", &typeValue, SDDS_BY_NAME, yName) ||
-      (*yIndex=SDDS_GetColumnIndex(OutputTable, yName))<0)
-    SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+  if (logFile && !!SDDS_InitializeOutput(logData, SDDS_BINARY, 0, NULL, "sddsgenericfit log", logFile))
+     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   if (syName && 
       (!SDDS_TransferColumnDefinition(OutputTable, InputTable, syName, NULL) ||
-       !SDDS_ChangeColumnInformation(OutputTable, "type", &typeValue, SDDS_BY_NAME, syName) ||
-       (*syIndex=SDDS_GetColumnIndex(OutputTable, syName))<0))
+       !SDDS_ChangeColumnInformation(OutputTable, "type", &typeValue, SDDS_BY_NAME, syName)))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+  
+  if (xName && !SDDS_TransferColumnDefinition(OutputTable, InputTable, xName, NULL))
+    SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+  if (colMatches) {
+    col = getMatchingSDDSNames(InputTable, colMatch, colMatches, &cols, SDDS_MATCH_COLUMN);
+    for (i=0; i<cols; i++) {
+      if (SDDS_GetColumnIndex(OutputTable, col[i])<0 && 
+	  !SDDS_TransferColumnDefinition(OutputTable, InputTable, col[i], NULL))
+	SDDS_PrintErrors(stdout, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+    }
+    SDDS_FreeStringArray(col, cols);
+  }
   name = tmalloc(sizeof(*name)*(strlen(yName)+strlen(residualNamePart)+1));
   sprintf(name, "%s%s", yName, residualNamePart);
   if ((*residualIndex=SDDS_DefineColumn(OutputTable, name, NULL, yUnits, NULL,
                                         NULL, SDDS_DOUBLE, 0))<0)
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
-  
   sprintf(name, "%sFit", yName);
   if ((*fitIndex=SDDS_DefineColumn(OutputTable, name, NULL, yUnits, NULL,
                                    NULL, SDDS_DOUBLE, 0))<0)
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   free(name);
-
+  
   for (i=0; i<variables; i++) {
     if (SDDS_DefineParameter(OutputTable, variableName[i], NULL, variableUnits[i], NULL,
                              NULL, SDDS_DOUBLE, 0)<0)
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+    if (logFile && SDDS_DefineColumn(logData, variableName[i], NULL, variableUnits[i], NULL,
+				     NULL, SDDS_DOUBLE, 0)<0)
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
   }
-
+  
   if (!SDDS_TransferAllParameterDefinitions(OutputTable, InputTable, SDDS_TRANSFER_KEEPOLD) ||
       !SDDS_WriteLayout(OutputTable))
+    SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+  if (logFile &&
+      (!SDDS_DefineSimpleColumn(logData,"Step", NULL, SDDS_LONG) ||
+       !SDDS_DefineSimpleColumn(logData, "Chi", NULL, SDDS_DOUBLE) ||
+       !SDDS_WriteLayout(logData)))
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
 }
 
@@ -626,7 +699,6 @@ double fitFunction(double *a, long *invalid)
       }
       sum += sqr(tmp);
     }
-    return(sum/nData);
   }
   else {
     for (i=sum=0; i<nData; i++) {
@@ -643,8 +715,26 @@ double fitFunction(double *a, long *invalid)
       yResidual[i] = tmp = (yFit[i]-yData[i]);      
       sum += sqr(tmp/syData[i]);
     }
-    return(sum/nData);
   }
+  if (logFile) {
+    if (!step && !SDDS_StartPage(&logData, maxLogRows))
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+    step++;
+    if (step>maxLogRows) {
+      if (!SDDS_LengthenTable(&logData, maxLogRows + 500))
+	SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+      maxLogRows += 500;
+    }
+    if (!SDDS_SetRowValues(&logData, SDDS_SET_BY_NAME|SDDS_PASS_BY_VALUE, step-1,
+			   "Step", step, "Chi", sum/nData, NULL))
+      SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+    for (i=0;i<nVariables;i++) {
+      if (!SDDS_SetRowValues(&logData, SDDS_SET_BY_NAME|SDDS_PASS_BY_VALUE, step-1,
+			     variableName[i], a[i], NULL))
+	SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors|SDDS_EXIT_PrintErrors);
+    }
+  }
+  return(sum/nData);
 }
 
 void report(double y, double *x, long pass, long nEval, long n_dimen)

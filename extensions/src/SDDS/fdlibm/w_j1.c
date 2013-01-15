@@ -1,10 +1,6 @@
 /*
  *
- $Log: w_j1.c,v $
- Revision 1.1  2000/04/21 20:14:25  soliday
- Borland C does not come with Bessel functions in its standard library.
- This file was added to give Borland C access to Bessel functions.
-
+ $Log: not supported by cvs2svn $
 
  *
  */

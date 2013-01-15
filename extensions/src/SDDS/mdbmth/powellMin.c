@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: powellMin.c,v $
- Revision 1.6  2003/09/02 17:54:24  soliday
- Cleaned up code for Linux.
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2003/08/28 19:56:28  soliday
  Cleaned up some of the code.
 

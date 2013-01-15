@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: complex.cc,v $
- Revision 1.1  2010/02/04 23:45:48  soliday
- Converted to c++ so that std::complex can be used.
-
+ $Log: not supported by cvs2svn $
  Revision 1.10  2009/12/02 22:20:41  soliday
  Added complex number support for non C99 compilers.
 

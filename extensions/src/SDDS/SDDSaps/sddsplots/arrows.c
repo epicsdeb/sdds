@@ -10,7 +10,7 @@
 /* file: arrows.c
  * purpose: support for arrows in mpl 
  * Michael Borland, 1992
- $Log: arrows.c,v $
+ $Log: not supported by cvs2svn $
  Revision 1.7  2002/08/14 17:24:50  soliday
  Added Open License
 
@@ -72,7 +72,7 @@ void set_arrow_barb_angle(double *asf)
 
 void plot_arrow(double x, double y, double length, double angle,
     double barb_length, double barb_angle,
-    long arrow_type, long arrow_flags
+    long arrow_type, long arrow_flags, long thickness
     )
 {
     static double xd[6], yd[6];
@@ -125,7 +125,7 @@ void plot_arrow(double x, double y, double length, double angle,
         yd[5] = yd[1];
         points = 6;
         }
-    plot_lines(xd, yd, points, abs(arrow_type), 0);
+    plot_lines(xd, yd, points, abs(arrow_type), arrow_flags&ARROW_THICKNESS_GIVEN?thickness:0);
     }
 
 void plot_arrows(double *x, double *y, double *x1, double *y1, long n,
@@ -137,7 +137,7 @@ void plot_arrows(double *x, double *y, double *x1, double *y1, long n,
     barbAngle = arrow->flags&ARROW_BARBANGLE_GIVEN?arrow->barbAngle:(30.0*PI/180);
     barbLength = arrow->flags&ARROW_BARBLENGTH_GIVEN?arrow->barbLength:0.35;
     arrowType = arrow->flags&ARROW_LINETYPE_GIVEN?arrow->linetype:get_linetype();
-        
+    
     for (i=0; i<n; i++) {
         if (arrow->flags&ARROW_POLAR_DATA) {
             length = x1[i];
@@ -156,7 +156,7 @@ void plot_arrows(double *x, double *y, double *x1, double *y1, long n,
             length *= arrow->scale;
         if (!(arrow->flags&ARROW_SCALAR_DATA))
             plot_arrow(x[i], y[i], length, angle, barbLength*length, barbAngle, 
-                       arrowType, arrow->flags);
+                       arrowType, arrow->flags, arrow->thickness);
         else
             plot_scalar(x[i], y[i], length, arrowType, arrow->flags);
         }
@@ -252,7 +252,7 @@ void plot_arrows_old(double *x, double *y, double *length, double *angle, long n
         bomb("length and/or angle arrays are NULL for arrow plotting", NULL);
 
     for (i=0; i<n; i++)
-        plot_arrow(x[i], y[i], length[i], angle[i], -1.0L, -1.0L, arrow_type, arrow_code);
+        plot_arrow(x[i], y[i], length[i], angle[i], -1.0L, -1.0L, arrow_type, arrow_code, 0);
     }
 
 

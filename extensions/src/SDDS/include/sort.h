@@ -11,10 +11,7 @@
  * purpose: proto-types for routies in sort.c
  *
  * Michael Borland, 1989
- $Log: sort.h,v $
- Revision 1.6  2008/03/24 21:30:57  soliday
- Moved strcmp_skip to mdb.h
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2008/03/24 21:09:51  soliday
  Fixed definition for strcmp_skip so that it will work with elegant and
  shared libraries.

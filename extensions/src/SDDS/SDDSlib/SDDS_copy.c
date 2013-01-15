@@ -11,10 +11,7 @@
  * contents: user's routines for copying data sets internally
  * 
  * Michael Borland, November 1993
- $Log: SDDS_copy.c,v $
- Revision 1.37  2006/05/02 16:53:22  soliday
- Fixed problems for WIN32
-
+ $Log: not supported by cvs2svn $
  Revision 1.36  2006/04/07 21:40:02  soliday
  Freed memory that I forgot to with the last change.
 

@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: table.c,v $
- Revision 1.4  2005/11/04 22:47:06  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2003/08/28 22:12:31  soliday
  Cleaned up the code.
 

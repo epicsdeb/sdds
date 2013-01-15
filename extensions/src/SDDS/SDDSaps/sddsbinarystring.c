@@ -12,10 +12,7 @@
  * future capabilities: convert to octal and hex
  *                      convert back to binary
  *                      create separate string columns for sections of the binary data.
- $Log: sddsbinarystring.c,v $
- Revision 1.4  2009/01/28 16:03:20  shang
- modified to give usage message when no arguments is given and replaced sddsmakebinarystring by sddsbinarystring
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2007/03/28 22:59:45  emery
  Allows SDDS_ULONG as integer type for conversion.
 

@@ -31,7 +31,7 @@
   full advantage of specialised architectures (pipelining, vector
   processors etc).
   */
-static	char	*rcsid = "$Id: zmachine.c,v 1.2 1999/07/23 15:34:14 soliday Exp $";
+static	char	*rcsid = "$Id: zmachine.c,v 1.2 1999-07-23 15:34:14 soliday Exp $";
 
 #include	<math.h>
 #include	"machine.h"

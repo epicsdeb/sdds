@@ -135,7 +135,7 @@ sed >extras.c <<'//GO.SYSIN DD extras.c' 's/^-//'
 -		A[m-1][j0], A[m-1][j0+1], ..., A[m-1][j0+n-1]
 -*/
 -
--static char	rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char	rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<math.h>
 -
@@ -648,7 +648,7 @@ sed >makefile.in <<'//GO.SYSIN DD makefile.in' 's/^-//'
 -#
 -# Copyright (C) David Stewart & Zbigniew Leyk 1993
 -#
--# $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $
+-# $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $
 -#
 -
 -srcdir = @srcdir@
@@ -2286,7 +2286,7 @@ echo configure.in 1>&2
 sed >configure.in <<'//GO.SYSIN DD configure.in' 's/^-//'
 -dnl Meschach autoconf script
 -dnl Copyright (C) Brook Milligan and David Stewart, 1993
--dnl $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $
+-dnl $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $
 -dnl
 -dnl Brook Milligan's prototype check
 -dnl Check if $(CC) supports prototypes
@@ -2395,7 +2395,7 @@ sed >machine.h.in <<'//GO.SYSIN DD machine.h.in' 's/^-//'
 -/* Any machine specific stuff goes here */
 -/* Add details necessary for your own installation here! */
 -
--/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $ */
+-/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $ */
 -
 -/* This is for use with "configure" -- if you are not using configure
 -	then use machine.van for the "vanilla" version of machine.h */
@@ -2675,7 +2675,7 @@ sed >tutorial.c <<'//GO.SYSIN DD tutorial.c' 's/^-//'
 -
 -/* routines from Chapter 1 of Meschach */
 -
--static char rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include <math.h>
 -#include "matrix.h"
@@ -3202,7 +3202,7 @@ sed >makefile <<'//GO.SYSIN DD makefile' 's/^-//'
 -#
 -# Copyright (C) David Stewart & Zbigniew Leyk 1993
 -#
--# $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $
+-# $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $
 -#
 -
 -srcdir = .
@@ -3591,7 +3591,7 @@ sed >torture.c <<'//GO.SYSIN DD torture.c' 's/^-//'
 -	library, parts 1 and 2
 -*/
 -
--static char rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include	"matrix2.h"
@@ -5135,7 +5135,7 @@ sed >ztorture.c <<'//GO.SYSIN DD ztorture.c' 's/^-//'
 -	library, complex routines
 -*/
 -
--static char rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	<stdio.h>
 -#include 	"zmatrix2.h"
@@ -5855,7 +5855,7 @@ sed >memtort.c <<'//GO.SYSIN DD memtort.c' 's/^-//'
 -  Tests for mem_info.c functions
 -  */
 -
--static char rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include        <stdio.h>
 -#include        <math.h>
@@ -7308,7 +7308,7 @@ sed >mfuntort.c <<'//GO.SYSIN DD mfuntort.c' 's/^-//'
 -
 -/* mfuntort.c,  10/11/93 */
 -
--static char rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include        <stdio.h>
 -#include        <math.h>
@@ -7493,7 +7493,7 @@ sed >iotort.c <<'//GO.SYSIN DD iotort.c' 's/^-//'
 -/* test of I/O functions */
 -
 -
--static char rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static char rcsid[] = "$Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include "sparse.h"
 -#include "zmatrix.h"
@@ -7636,7 +7636,7 @@ sed >err.h <<'//GO.SYSIN DD err.h' 's/^-//'
 -
 -/* err.h  28/09/1993 */
 -
--/*  RCS id: $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $  */
+-/*  RCS id: $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $  */
 -
 -
 -#ifndef ERRHEADER
@@ -7956,7 +7956,7 @@ sed >machine.h <<'//GO.SYSIN DD machine.h' 's/^-//'
 -/* Any machine specific stuff goes here */
 -/* Add details necessary for your own installation here! */
 -
--/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $ */
+-/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $ */
 -
 -/* This is for use with "configure" -- if you are not using configure
 -	then use machine.van for the "vanilla" version of machine.h */
@@ -8211,7 +8211,7 @@ sed >matrix.h <<'//GO.SYSIN DD matrix.h' 's/^-//'
 -
 -#ifndef	MATRIXH
 -
--/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $ */
+-/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $ */
 -
 -#define	MATRIXH	
 -
@@ -8885,7 +8885,7 @@ sed >iter.h <<'//GO.SYSIN DD iter.h' 's/^-//'
 -
 -#define ITERHH
 -
--/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $  */
+-/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $  */
 -
 -
 -#include	"sparse.h"
@@ -9630,7 +9630,7 @@ sed >sparse.h <<'//GO.SYSIN DD sparse.h' 's/^-//'
 -	Basic sparse routines to be held in sparse.c
 -*/
 -
--/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $ */
+-/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $ */
 -
 -#ifndef SPARSEH
 -
@@ -9848,7 +9848,7 @@ sed >sparse2.h <<'//GO.SYSIN DD sparse2.h' 's/^-//'
 -
 -
 -/* Sparse matrix factorise/solve header */
--/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $ */
+-/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $ */
 -
 -
 -
@@ -12065,7 +12065,7 @@ sed >MACHINES/GCC/makefile <<'//GO.SYSIN DD MACHINES/GCC/makefile' 's/^-//'
 -#
 -# Copyright (C) David Stewart & Zbigniew Leyk 1993
 -#
--# $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $
+-# $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $
 -#
 -
 -srcdir = .
@@ -12476,7 +12476,7 @@ sed >MACHINES/RS6000/machine.c <<'//GO.SYSIN DD MACHINES/RS6000/machine.c' 's/^-
 -  full advantage of specialised architectures (pipelining, vector
 -  processors etc).
 -  */
--static	char	*rcsid = "$Header: /net/phoebus/epicsmgr/cvsroot/epics/extensions/src/SDDS/meschach/sourceFiles/meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $";
+-static	char	*rcsid = "$Header: /net/phoebus/epicsmgr/cvsroot/epics/extensions/src/SDDS/meschach/sourceFiles/meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $";
 -
 -#include	"machine.h"
 -
@@ -12880,7 +12880,7 @@ sed >MACHINES/RS6000/makefile <<'//GO.SYSIN DD MACHINES/RS6000/makefile' 's/^-//
 -#
 -# Copyright (C) David Stewart & Zbigniew Leyk 1993
 -#
--# $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $
+-# $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $
 -#
 -
 -srcdir = .
@@ -13275,7 +13275,7 @@ sed >MACHINES/SPARC/makefile <<'//GO.SYSIN DD MACHINES/SPARC/makefile' 's/^-//'
 -#
 -# Copyright (C) David Stewart & Zbigniew Leyk 1993
 -#
--# $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $
+-# $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $
 -#
 -
 -srcdir = .
@@ -13466,7 +13466,7 @@ sed >MACHINES/Linux/makefile <<'//GO.SYSIN DD MACHINES/Linux/makefile' 's/^-//'
 -#
 -# Copyright (C) David Stewart & Zbigniew Leyk 1993
 -#
--# $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $
+-# $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $
 -#
 -
 -srcdir = .
@@ -13864,7 +13864,7 @@ sed >MACHINES/SGI/machine.h <<'//GO.SYSIN DD MACHINES/SGI/machine.h' 's/^-//'
 -/* Any machine specific stuff goes here */
 -/* Add details necessary for your own installation here! */
 -
--/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $ */
+-/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $ */
 -
 -/* This is for use with "configure" -- if you are not using configure
 -	then use machine.van for the "vanilla" version of machine.h */
@@ -14093,7 +14093,7 @@ sed >MACHINES/SGI/makefile <<'//GO.SYSIN DD MACHINES/SGI/makefile' 's/^-//'
 -#
 -# Copyright (C) David Stewart & Zbigniew Leyk 1993
 -#
--# $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $
+-# $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $
 -#
 -
 -srcdir = .
@@ -14310,7 +14310,7 @@ sed >MACHINES/Cray/machine.h <<'//GO.SYSIN DD MACHINES/Cray/machine.h' 's/^-//'
 -/* Any machine specific stuff goes here */
 -/* Add details necessary for your own installation here! */
 -
--/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $ */
+-/* RCS id: $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $ */
 -
 -/* This is for use with "configure" -- if you are not using configure
 -	then use machine.van for the "vanilla" version of machine.h */
@@ -14539,7 +14539,7 @@ sed >MACHINES/Cray/makefile <<'//GO.SYSIN DD MACHINES/Cray/makefile' 's/^-//'
 -#
 -# Copyright (C) David Stewart & Zbigniew Leyk 1993
 -#
--# $Id: meschach0.shar,v 1.1.1.1 1999/04/14 14:16:23 borland Exp $
+-# $Id: meschach0.shar,v 1.1.1.1 1999-04-14 14:16:23 borland Exp $
 -#
 -
 -srcdir = .

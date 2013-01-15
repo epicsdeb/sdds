@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: m_add.c,v $
- Revision 1.5  2008/01/05 03:35:16  borland
- Added m_subtract.
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2002/08/14 16:45:21  soliday
  Added Open License
 

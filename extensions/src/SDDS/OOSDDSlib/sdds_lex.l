@@ -1,7 +1,4 @@
-/* $Log: sdds_lex.l,v $
-/* Revision 1.2  1997/02/12 23:34:09  saunders
-/* Intermediate.
-/*
+/* $Log: not supported by cvs2svn $
  * Revision 1.1  1997/02/11 17:31:39  saunders
  * Initial work.
  * */

@@ -11,10 +11,7 @@
  * purpose: namelist preprocessor input file for SDDS library
  *
  * Michael Borland, November 1993
- $Log: SDDSnl.nl,v $
- Revision 1.4  2002/08/14 16:34:50  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1998/07/07 22:29:45  borland
  Completely new method of scanning the namelists in the headers.
  Twice as fast and eliminates need for namelist library in the

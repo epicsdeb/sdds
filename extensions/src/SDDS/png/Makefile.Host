@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Id: Makefile.Host,v 1.8 2003/07/23 18:14:51 soliday Exp $
+# $Id: Makefile.Host,v 1.8 2003-07-23 18:14:51 soliday Exp $
 
 TOP = ../../../..
 include $(TOP)/config/CONFIG_EXTENSIONS

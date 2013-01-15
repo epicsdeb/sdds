@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: lsfn.c,v $
- Revision 1.4  2008/08/05 19:08:23  borland
- Added checks for null pointers in lsfn().
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2002/08/14 16:48:28  soliday
  Added Open License
 

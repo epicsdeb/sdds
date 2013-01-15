@@ -3,12 +3,7 @@
  *           function prototypes and things I've added 
  * Equivalent to plot.h and setshow.h from GNUPLOT.
  * Michael Borland, 1991, 1995.
- $Log: graphics.h,v $
- Revision 1.14  2005/12/07 22:01:11  jiaox
- Made the line types ( thickness color dash style) consistent among motif,
- postscript and png devices. Added device arguments dashes and linetypetable
- for these devices to draw lines with user defined line styles.
-
+ $Log: not supported by cvs2svn $
  Revision 1.13  2005/11/04 22:46:45  soliday
  Updated code to be compiled by a 64 bit processor.
 

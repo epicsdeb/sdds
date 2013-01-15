@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # makefile for Java SDDS Editor
-# $Log: Makefile,v $
-# Revision 1.4  2002/08/14 19:33:04  soliday
-# Added Open License
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.3  2002/06/24 15:44:07  soliday
 # Changed the JARCMD option.
 #

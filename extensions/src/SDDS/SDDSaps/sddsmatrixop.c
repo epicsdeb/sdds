@@ -10,11 +10,7 @@
  * purpose: a general matrix operation sdds tool.
  *
  * Hairong Shang, 2003
- $Log: sddsmatrixop.c,v $
- Revision 1.13  2007/10/10 15:42:38  shang
- added -deteerminant option to compute the matrix's determinant and output it as parameter; removed the incorrect warning messages, and corrected
- definition of defintion-keeping.
-
+ $Log: not supported by cvs2svn $
  Revision 1.12  2006/12/14 22:21:59  soliday
  Updated a bunch of programs because SDDS_SaveLayout is now called by
  SDDS_WriteLayout and it is no longer required to be called directly.

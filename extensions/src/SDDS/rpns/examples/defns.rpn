@@ -145,16 +145,14 @@ min2
 /* maximum of top N items on statck
 udf
 maxn
-sto imaxn pop
-< ? swap pop : pop $
-imaxn 1 - 1 > ? pop maxn : pop pop $
+1 - 1 < pop ? pop : rup 
+< ? rup pop rdn rdn maxn : pop rdn maxn $ $
 
 /* minium of top N items on statck
 udf
 minn
-sto iminn pop
-> ? swap pop : pop $
-iminn 1 - 1 > ? pop minn : pop pop $
+1 - 1 < pop ? pop : rup 
+> ? rup pop rdn rdn minn : pop rdn minn $ $
 
 /* show the top of the stack
 udf

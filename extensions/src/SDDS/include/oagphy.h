@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: oagphy.h,v $
- Revision 1.2  2006/05/05 15:26:17  soliday
- Updated to fix a problem on WIN32
-
+ $Log: not supported by cvs2svn $
  Revision 1.1  2006/03/15 17:10:22  shang
  first version, contains functions for physics apllications
 

@@ -11,10 +11,7 @@
  * contents: wild_list()
  *
  * Michael Borland, 1991-3
- $Log: wild_list.c,v $
- Revision 1.5  2007/07/13 15:02:45  soliday
- Renamed strcpy_s to strcpy_ss because Microsoft is already using this name.
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  2007/02/02 18:45:28  borland
  Added str_copy.c, with strcpy_s() routine for safe string copies.
  Converted routines from strcpy() to strcpy_s().

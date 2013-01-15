@@ -40,7 +40,7 @@
 #include        "iter.h"
 
 
-static char rcsid[] = "$Id: iter0.c,v 1.1.1.1 1999/04/14 14:16:18 borland Exp $";
+static char rcsid[] = "$Id: iter0.c,v 1.1.1.1 1999-04-14 14:16:18 borland Exp $";
 
 
 /* standard functions */

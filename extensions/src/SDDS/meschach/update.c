@@ -29,7 +29,7 @@
 */
 
 /* update.c 1.3 11/25/87 */
-static	char	rcsid[] = "$Id: update.c,v 1.3 1999/12/15 15:59:29 soliday Exp $";
+static	char	rcsid[] = "$Id: update.c,v 1.3 1999-12-15 15:59:29 soliday Exp $";
 
 #include	<stdio.h>
 #include	<math.h>

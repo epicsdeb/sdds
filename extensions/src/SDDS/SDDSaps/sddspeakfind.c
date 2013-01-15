@@ -10,10 +10,7 @@
 /* program: sddspeakfind.c
  * purpose: find peaks in one SDDS column as a function of another.
  * M. Borland, 1995, based on mpl peakfind program.
- $Log: sddspeakfind.c,v $
- Revision 1.13  2005/11/04 22:46:16  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.12  2003/07/16 23:55:40  shang
  added feature to -threshold option, i,e., -threshold=<value>|@<parameterName>.
  The threshold can be obtained from the parameter if -threshold=@<parameterName>

@@ -11,10 +11,7 @@
  * purpose: simple example of reading an SDDS file
  *
  * Michael Borland, 1994
- $Log: readexample.c,v $
- Revision 1.4  2002/08/14 17:12:38  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1995/09/06 14:55:58  saunders
  First test release of SDDS1.5
 

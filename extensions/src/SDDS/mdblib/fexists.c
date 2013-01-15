@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: fexists.c,v $
- Revision 1.5  2002/08/14 16:06:08  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.4  1999/07/22 15:35:48  soliday
  Uses macro for fopen mode.
 

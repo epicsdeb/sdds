@@ -11,12 +11,7 @@
  * contents: user's SDDS routines for data set preparation
  *
  * M. Borland, November 1993
- $Log: SDDS_dataprep.c,v $
- Revision 1.26  2010/02/18 02:16:29  borland
- Added SDDS_SetError0() and modified SDDS_PrintErrors() to allow more easily composing
- multi-part error messages.  One side-effect is that stack traces come out in reverse
- order to previously.  Also modified SDDS_SetColumn() to use the new feature.
-
+ $Log: not supported by cvs2svn $
  Revision 1.25  2008/09/18 20:16:40  soliday
  Added SDDS_SetColumnFromDoubles
 

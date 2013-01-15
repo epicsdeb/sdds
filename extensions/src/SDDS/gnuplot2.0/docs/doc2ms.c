@@ -18,7 +18,7 @@
  *   doc2ms < gnuplot.doc | troff -ms
  */
 
-static char rcsid[] = "$Id: doc2ms.c,v 1.1.1.1 1995/08/25 16:18:06 saunders Exp $";
+static char rcsid[] = "$Id: doc2ms.c,v 1.1.1.1 1995-08-25 16:18:06 saunders Exp $";
 
 #include <stdio.h>
 #include <ctype.h>

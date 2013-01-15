@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /* 
- * $Log: replaceText.c,v $
- * Revision 1.4  2006/06/27 15:18:39  shang
- * added include/sinclude file feature
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.3  2003/09/02 18:08:32  soliday
  * Cleaned up code for Linux.
  *
@@ -40,23 +37,25 @@
 #define SET_STRINGS 3
 #define SET_STDIO 4
 #define SET_FILTER 5
-#define N_OPTIONS 6
+#define SET_CONFIRM 6
+#define N_OPTIONS 7
 
 char *option[N_OPTIONS] = {
-  "original", "replacement", "verbose", "strings", "stdio", "filter",
+  "original", "replacement", "verbose", "strings", "stdio", "filter", "confirm",
 } ;
 
 #define USAGE "replaceText {input [output] | -stdio | -strings=string[,string...]}\n\
--original=string[,string...] -replacement=string[,string...]\n\
+-original=string[,string...] -replacement=string[,string...] [-confirm]\n\
 [-verbose] [-filter=string[,string...]]\n\n\
 -stdio        Take input from standard input and deliver output to standard output.\n\
 -strings      Perform replacement on the listed strings.\n\
 -original     List of strings to replace.\n\
 -replacement  Parallel list of replacements for original strings.\n\
+-confirm      Interactive confirmation of individual replacements.\n\
 -verbose      Report the number of replacements made.\n\
 -filter       Perform replacement only on lines containing one or more of the\n\
               strings in the filter list.\n\n\
-Program by Michael Borland.  (This is version 1, April 2000)."
+Program by Michael Borland.  (This is version 2, August 2012)."
 
 int replace_string1(char *t, char *s, char *orig, char *repl);
 long passesFilters(char *s, char **filter, long filters);
@@ -71,12 +70,12 @@ int main(
   char **orig, **repl, *input, *output, *ptr, **filter;
   char **string_list;
   int n_pairs, i_pair, filters;
-  char s[1024], t[1024];
+  char s[1024], t[1024], s0[1024], response[10];
   FILE *fpi=NULL, *fpo=NULL;
   SCANNED_ARG *s_arg;
   int i_arg, *count, n_strings=0, use_stdio;
   char *input_fn, *output_fn;
-  int tmp_file, verbose;
+  int tmp_file, verbose, confirm;
 
   argc = scanargs(&s_arg, argc, argv);
   if (argc<2 || argc>(3+N_OPTIONS)) 
@@ -86,7 +85,7 @@ int main(
   orig = repl = filter =  NULL;
   n_pairs = verbose = filters = 0;
   string_list = NULL;
-  use_stdio = tmp_file = 0;
+  use_stdio = tmp_file = confirm = 0;
 
   for (i_arg=1; i_arg<argc; i_arg++) {
     if (s_arg[i_arg].arg_type==OPTION) {
@@ -122,6 +121,9 @@ int main(
           bomb("invalid -filter syntax", USAGE);
         filter = s_arg[i_arg].list+1;
         filters = s_arg[i_arg].n_items-1;
+        break;
+      case SET_CONFIRM:
+        confirm = 1;
         break;
       default:
         bomb("unknown option given", USAGE);
@@ -197,10 +199,30 @@ int main(
   }
   
   while (fgets(s, 1024, fpi)) {
+    strcpy(s0, s);
     if (!filters || passesFilters(s, filter, filters)) {
       for (i_pair=0; i_pair<n_pairs; i_pair++) {
-        count[i_pair] += replace_string1(t, s, orig[i_pair], repl[i_pair]);
-        strcpy(s, t);
+        int changed;
+        count[i_pair] += (changed=replace_string1(t, s, orig[i_pair], repl[i_pair]));
+        if (!changed) continue;
+        if (confirm) {
+          fprintf(stderr, "Old: >%s<\n", s0);
+          fprintf(stderr, "New: >%s<\n", t);
+          fprintf(stderr, "Keep change? (y=yes/e=edit/<enter>=no) ");
+          fgets(response, 10, stdin);
+          if (response[0]=='y' || response[0]=='Y') {
+            strcpy(s, t);
+          } else if (response[0]=='e' || response[0]=='E') {
+            fprintf(stderr, "Please enter new string:");
+            fgets(s0, 1024, stdin);
+            strcpy(s, s0);
+          } else {
+            strcpy(s, s0);
+          }
+        } else if (changed) {
+          strcpy(s0, t);
+          strcpy(s, t);
+        }
       }
       if (strncmp(s,"include(",strlen("include("))==0 || strncmp(s,"sinclude(",strlen("sinclude("))==0) {
 	process_include_file(s, fpo, orig, repl, n_pairs, filter, filters, count);

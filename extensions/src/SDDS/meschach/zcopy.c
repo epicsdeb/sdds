@@ -24,7 +24,7 @@
 ***************************************************************************/
 
 
-static	char	rcsid[] = "$Id: zcopy.c,v 1.2 1999/10/27 21:50:41 borland Exp $";
+static	char	rcsid[] = "$Id: zcopy.c,v 1.2 1999-10-27 21:50:41 borland Exp $";
 #include	<stdio.h>
 #include	"zmatrix.h"
 

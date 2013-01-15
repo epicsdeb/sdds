@@ -1,8 +1,5 @@
 #
-# $Log: Makefile,v $
-# Revision 1.2  1999/04/14 14:04:53  borland
-# Works with new build system.  Fixed some missing prototypes and function type mismatches.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.1  1997/02/10 19:37:43  saunders
 # Initial work on oosdds.
 #

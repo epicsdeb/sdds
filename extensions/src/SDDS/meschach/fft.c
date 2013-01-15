@@ -30,7 +30,7 @@
 	"Digital Signal Processing"
 */
 
-static char rcsid[] = "$Id: fft.c,v 1.2 1999/12/15 16:04:35 soliday Exp $";
+static char rcsid[] = "$Id: fft.c,v 1.2 1999-12-15 16:04:35 soliday Exp $";
 
 #include        <stdio.h>
 #include        <math.h>

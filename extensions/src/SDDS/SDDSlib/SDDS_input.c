@@ -12,10 +12,7 @@
  *           The header namelists are read and scanned, but not "processed".
  * 
  * Michael Borland, November 1993
- $Log: SDDS_input.c,v $
- Revision 1.58  2009/08/12 22:34:31  borland
- Fixed bug in last change.
-
+ $Log: not supported by cvs2svn $
  Revision 1.57  2009/08/12 22:21:50  borland
  Added better error message when file is not found in search path.
 

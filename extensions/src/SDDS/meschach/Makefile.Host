@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # makefile for mdbmth
-# $Log: Makefile.Host,v $
-# Revision 1.14  2003/07/23 15:06:24  soliday
-# Fixed to work with WIN32
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.13  2003/07/22 21:25:43  soliday
 # Updated Makefiles to work with both epics 3.13 and 3.14.
 #

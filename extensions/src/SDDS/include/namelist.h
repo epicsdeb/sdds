@@ -9,10 +9,7 @@
 
 /* definitions for use with namelist scanning routines */
 /* Michael Borland, 1988 
- $Log: namelist.h,v $
- Revision 1.7  2010/02/04 23:42:34  soliday
- Updated so that it can be used by c++
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2010/02/04 14:39:12  borland
  Added processNamelist(), which is a new interface to the namelist processor
  that returns NAMELIST_ERROR when their is an error, instead of exiting.

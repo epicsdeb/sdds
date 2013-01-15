@@ -11,10 +11,7 @@
  * contents: user's SDDS routines for data selection and extraction
  *
  * M. Borland, November 1993
- $Log: SDDS_extract.c,v $
- Revision 1.43  2008/09/18 20:15:51  soliday
- Added SDDS_GetColumnInFloats
-
+ $Log: not supported by cvs2svn $
  Revision 1.42  2008/07/01 14:37:16  shang
  modified SDDS_GetParameterAsLong to return integer for any numeric parameter
 

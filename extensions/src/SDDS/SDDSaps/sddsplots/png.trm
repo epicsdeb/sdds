@@ -22,6 +22,9 @@
 #define HPNG_XMAX ((long)(LPNG_XMAX*2))
 #define HPNG_YMAX ((long)(LPNG_YMAX*2))
 
+#define GPNG_XMAX ((long)(HPNG_XMAX*2))
+#define GPNG_YMAX ((long)(HPNG_YMAX*2))
+
 #define SPNG_XMAX ((long)(PNG_XMAX*0.80))
 #define SPNG_YMAX ((long)(PNG_YMAX*0.80))
 
@@ -190,6 +193,14 @@ int HPNG_init(void)
 {
   png_xlast = (png_xmax = HPNG_XMAX) - 1;
   png_ylast = (png_ymax = HPNG_YMAX) - 1;
+  PNG_initCommon();
+  return 0;
+}
+
+int GPNG_init(void)
+{
+  png_xlast = (png_xmax = GPNG_XMAX) - 1;
+  png_ylast = (png_ymax = GPNG_YMAX) - 1;
   PNG_initCommon();
   return 0;
 }
@@ -428,8 +439,10 @@ int PNG_fill_box(int shade, int xl, int xh, int yl, int yh)
   unsigned short red, green, blue;
 
   shade = shade%(ncolors_png);
-  if (spectralpng)
+  if (spectralpng == 1)
     Spectral_RGB_values(&r,  &g,  &b, ncolors_png > 1 ? shade/(ncolors_png - 1.0) : 0);
+  else if (spectralpng == 2)
+    Spectral_BGR_values(&r,  &g,  &b, ncolors_png > 1 ? shade/(ncolors_png - 1.0) : 0);
   else if (customspectralpng)
     Custom_RGB_values(&r, &g, &b, r0_png, g0_png, b0_png, r1_png, g1_png, b1_png, ncolors_png > 1 ? shade/(ncolors_png - 1.0) : 0);
   else
@@ -510,6 +523,9 @@ int PNG_spectral(long num, int spec, unsigned short red0, unsigned short green0,
     b1_png = blue1;
   } else if (spec == 1){
     spectralpng = 1;
+    customspectralpng = 0;
+  } else if (spec == 2){
+    spectralpng = 2;
     customspectralpng = 0;
   } else {
     spectralpng = 0;

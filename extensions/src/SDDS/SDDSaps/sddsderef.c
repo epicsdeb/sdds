@@ -10,15 +10,7 @@
 /* program: sddsderef.c
  * purpose: do array dereferencing into column or parameter data.
  * M. Borland, 1995
- $Log: sddsderef.c,v $
- Revision 1.15  2006/12/14 22:21:58  soliday
- Updated a bunch of programs because SDDS_SaveLayout is now called by
- SDDS_WriteLayout and it is no longer required to be called directly.
- Also the AutoCheckMode is turned off by default now so I removed calls to
- SDDS_SetAutoCheckMode that would attempt to turn it off. It is now up to
- the programmer to turn it on in new programs until debugging is completed
- and then remove the call to SDDS_SetAutoCheckMode.
-
+ $Log: not supported by cvs2svn $
  Revision 1.14  2006/10/19 17:55:39  soliday
  Updated to work with linux-x86_64.
 

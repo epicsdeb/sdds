@@ -12,10 +12,7 @@
  *          columns
  *
  * Michael Borland, 1994
- $Log: sddssort.c,v $
- Revision 1.32  2007/07/13 15:25:09  soliday
- Fixed a problem with the Rank column on 64 bit machines.
-
+ $Log: not supported by cvs2svn $
  Revision 1.31  2007/04/10 16:50:56  shang
  added reading and writing constraints violation value for non-dominated sort
 

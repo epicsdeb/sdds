@@ -11,10 +11,7 @@
  * contents: user's SDDS routines for data set setup and output, SDDS version 1
  *
  * M. Borland, November 1993
- $Log: SDDS_output.c,v $
- Revision 1.59  2009/06/01 20:56:26  soliday
- Updated so that it can handle SDDS_MPI_IO=0
-
+ $Log: not supported by cvs2svn $
  Revision 1.58  2009/03/12 15:30:45  shang
  included SDDS_MPI_DisconnectFile into SDDS_DisconnectFile and SDDS_MPI_ReconnectFile into SDDS_ReconnectFile.
 

@@ -31,7 +31,7 @@
   Radical revision completed Mon 07th Dec 1992, 10:59:57 AM
 */
 
-static	char	rcsid[] = "$Id: spbkp.c,v 1.4 2003/09/02 17:52:25 soliday Exp $";
+static	char	rcsid[] = "$Id: spbkp.c,v 1.4 2003-09-02 17:52:25 soliday Exp $";
 
 #include	<stdio.h>
 #include	<math.h>

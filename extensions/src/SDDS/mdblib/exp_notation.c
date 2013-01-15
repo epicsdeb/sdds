@@ -11,10 +11,7 @@
  * purpose: convert a number into a string in exponential notation,
  *          suitable for use with MPL plotting program.
  * Michael Borland, 1989
- $Log: exp_notation.c,v $
- Revision 1.6  2007/07/13 15:02:44  soliday
- Renamed strcpy_s to strcpy_ss because Microsoft is already using this name.
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2007/02/02 18:45:28  borland
  Added str_copy.c, with strcpy_s() routine for safe string copies.
  Converted routines from strcpy() to strcpy_s().

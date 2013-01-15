@@ -12,10 +12,7 @@
  * part of sddsplot (plotting program for SDDS files)
  *
  * Michael Borland, 1994.
- $Log: sddsplotRecord.c,v $
- Revision 1.4  2002/08/14 17:24:56  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1998/08/25 15:05:39  borland
  New version with major changes to allow multiple scales on x and y axes.
 

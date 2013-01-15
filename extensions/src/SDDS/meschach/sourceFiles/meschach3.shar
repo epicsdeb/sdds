@@ -37,7 +37,7 @@ sed >sparse.c <<'//GO.SYSIN DD sparse.c' 's/^-//'
 -#include	"sparse.h"
 -
 -
--static char	rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999/04/14 14:16:24 borland Exp $";
+-static char	rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999-04-14 14:16:24 borland Exp $";
 -
 -#define	MINROWLEN	10
 -
@@ -1074,7 +1074,7 @@ sed >sprow.c <<'//GO.SYSIN DD sprow.c' 's/^-//'
 -#include	"sparse.h"
 -
 -
--static char	rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999/04/14 14:16:24 borland Exp $";
+-static char	rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999-04-14 14:16:24 borland Exp $";
 -
 -#define	MINROWLEN	10
 -
@@ -1789,7 +1789,7 @@ sed >sparseio.c <<'//GO.SYSIN DD sparseio.c' 's/^-//'
 -#include        <stdio.h>
 -#include        "sparse.h"
 -
--static char rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999/04/14 14:16:24 borland Exp $";
+-static char rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999-04-14 14:16:24 borland Exp $";
 -
 -
 -
@@ -2105,7 +2105,7 @@ sed >spchfctr.c <<'//GO.SYSIN DD spchfctr.c' 's/^-//'
 -
 -*/
 -
--static char	rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999/04/14 14:16:24 borland Exp $";
+-static char	rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999-04-14 14:16:24 borland Exp $";
 -
 -#include	<stdio.h>
 -#include        "sparse2.h"
@@ -3149,7 +3149,7 @@ sed >spbkp.c <<'//GO.SYSIN DD spbkp.c' 's/^-//'
 -  Radical revision completed Mon 07th Dec 1992, 10:59:57 AM
 -*/
 -
--static	char	rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999/04/14 14:16:24 borland Exp $";
+-static	char	rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999-04-14 14:16:24 borland Exp $";
 -
 -#include	<stdio.h>
 -#include        "sparse2.h"
@@ -4535,7 +4535,7 @@ sed >spswap.c <<'//GO.SYSIN DD spswap.c' 's/^-//'
 -	to use Karen George's suggestion to use unordered rows
 -*/
 -
--static	char	rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999/04/14 14:16:24 borland Exp $";
+-static	char	rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999-04-14 14:16:24 borland Exp $";
 -
 -#include	<stdio.h>
 -#include        "sparse2.h"
@@ -4850,7 +4850,7 @@ sed >iter0.c <<'//GO.SYSIN DD iter0.c' 's/^-//'
 -#include        "iter.h"
 -
 -
--static char rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999/04/14 14:16:24 borland Exp $";
+-static char rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999-04-14 14:16:24 borland Exp $";
 -
 -
 -/* standard functions */
@@ -5233,7 +5233,7 @@ sed >itersym.c <<'//GO.SYSIN DD itersym.c' 's/^-//'
 -#include	"sparse.h"
 -#include        "iter.h"
 -
--static char rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999/04/14 14:16:24 borland Exp $";
+-static char rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999-04-14 14:16:24 borland Exp $";
 -
 -
 -#ifdef ANSI_C
@@ -5824,7 +5824,7 @@ sed >iternsym.c <<'//GO.SYSIN DD iternsym.c' 's/^-//'
 -#include	"sparse.h"
 -#include        "iter.h"
 -
--static char rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999/04/14 14:16:24 borland Exp $";
+-static char rcsid[] = "$Id: meschach3.shar,v 1.1.1.1 1999-04-14 14:16:24 borland Exp $";
 -
 -
 -#ifdef ANSI_C

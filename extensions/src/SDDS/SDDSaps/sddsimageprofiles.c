@@ -11,10 +11,7 @@
  * purpose: analyze images stored as horizontal lines (one per column),
  *          based on ideas of B-X Yang.
  * M. Borland, 2000
- $Log: sddsimageprofiles.c,v $
- Revision 1.10  2009/10/23 16:25:18  soliday
- It was leaving the last row off when doing -profileType=y
-
+ $Log: not supported by cvs2svn $
  Revision 1.9  2005/11/07 21:48:10  soliday
  Updated to remove Linux compiler warnings.
 
@@ -51,15 +48,13 @@
 #define SET_PROFILETYPE 1
 #define SET_COLPREFIX 2
 #define SET_METHOD 3
-#define SET_AVECTOR 4
-#define SET_BVECTOR 5
-#define SET_OFFSET 6
-#define SET_BACKGROUND 7
-#define N_OPTIONS 8
+#define SET_AREAOFINTEREST 4
+#define SET_BACKGROUND 5
+#define N_OPTIONS 6
 
 char *option[N_OPTIONS] = {
    "pipe", "profileType", "columnPrefix",
-   "method", "aVector", "bVector", "offset", "background"
+   "method", "areaOfInterest", "background"
 };
 
 char *USAGE = "sddsimageprofiles [<inputfile>] [<outputfile>]\n\
@@ -68,9 +63,7 @@ char *USAGE = "sddsimageprofiles [<inputfile>] [<outputfile>]\n\
 [-profileType={x|y}]\n\
 [-method={centerLine|integrated|averaged|peak}]\n\
 [-background=<filename>]\n\
-[-aVector=<ax>,<ay>]\n\
-[-bVector=<bx>,<by>]\n\
-[-offset=<x>,<y>]\n\n\
+[-areaOfInterest=<rowStart>,<rowEnd>,<columnStart>,<columnEnd>]\n\n\
 Program by Robert Soliday. ("__DATE__")\n\n\
 \
 -method      If this option is not specified it is a real profile.\n\
@@ -93,13 +86,13 @@ int xImageProfile(IMAGE_DATA *data, int32_t *type, long rows,
 		  SDDS_DATASET *SDDS_dataset, long method,
 		  long x1, long x2,
 		  long y1, long y2,
-		  long *colIndex, long *colIndex2);
+		  long *colIndex, double *colIndex2);
 
 int yImageProfile(IMAGE_DATA *data, int32_t *type, long rows, 
 		  SDDS_DATASET *SDDS_dataset, long method,
 		  long x1, long x2,
 		  long y1, long y2,
-		  long *colIndex, long *colIndex2);
+		  long *colIndex, double *colIndex2);
 
 long xPeakLine(IMAGE_DATA *data, int32_t *type, 
 		 long *colIndex,
@@ -122,7 +115,7 @@ long yCenterLine(IMAGE_DATA *data, int32_t *type,
 
 long GetData(SDDS_DATASET *SDDS_orig, char *input,
 	     IMAGE_DATA **data, int32_t **type,
-	     long **colIndex, long **colIndex2,
+	     long **colIndex, double **colIndex2,
 	     char *colPrefix, long *validColumns);
 
 int main(int argc, char **argv)
@@ -137,15 +130,10 @@ int main(int argc, char **argv)
   long rows, bg_rows, i, j, validColumns=0, bg_validColumns=0;
   int32_t *type, *bg_type;
 
-  long axstart=0;
-  long bystart=0;
+  long rowStart=1, rowEnd=0, columnStart=1, columnEnd=0;
 
-  long *colIndex, *colIndex2, *bg_colIndex, *bg_colIndex2;
-
-  long ax=0, ay=0, bx=0, by=0;
-  long ax2=0, ay2=0, bx2=0, by2=0;
-  long x1, x2, y1, y2;
-  long offset_used=0;
+  long *colIndex, *bg_colIndex;
+  double *colIndex2, *bg_colIndex2;
 
   SDDS_RegisterProgramName(argv[0]);
   argc = scanargs(&s_arg, argc, argv);
@@ -182,42 +170,17 @@ int main(int argc, char **argv)
 	if (strncasecmp("peak", s_arg[i_arg].list[1], strlen(s_arg[i_arg].list[1])) == 0)
 	  method = 4;
 	break;
-      case SET_AVECTOR:
-	/*
-	if (s_arg[i_arg].n_items<2)
-	  SDDS_Bomb("invalid -aVector syntax");
-	if (sscanf(s_arg[i_arg].list[1], "%ld", &axlength)!=1 || axlength<=0)
-	  SDDS_Bomb("invalid -aVector syntax or value");
-	*/
-	if (s_arg[i_arg].n_items!=3)
-	  SDDS_Bomb("invalid -aVector syntax");
-	if (sscanf(s_arg[i_arg].list[1], "%ld", &ax)!=1 || ax<=0)
-	  SDDS_Bomb("invalid -aVector syntax or value");
-	if (sscanf(s_arg[i_arg].list[2], "%ld", &ay)!=1)
-	  SDDS_Bomb("invalid -aVector syntax or value");
-	break;
-      case SET_BVECTOR:
-	/*
-	if (s_arg[i_arg].n_items<2)
-	  SDDS_Bomb("invalid -bVector syntax");
-	if (sscanf(s_arg[i_arg].list[1], "%ld", &bylength)!=1 || bylength<=0)
-	  SDDS_Bomb("invalid -bVector syntax or value");
-	*/
-	if (s_arg[i_arg].n_items!=3)
-	  SDDS_Bomb("invalid -bVector syntax");
-	if (sscanf(s_arg[i_arg].list[1], "%ld", &bx)!=1)
-	  SDDS_Bomb("invalid -bVector syntax or value");
-	if (sscanf(s_arg[i_arg].list[2], "%ld", &by)!=1 || by<=0)
-	  SDDS_Bomb("invalid -bVector syntax or value");
-	break;
-      case SET_OFFSET:
-	if (s_arg[i_arg].n_items!=3)
-	  SDDS_Bomb("invalid -offset syntax");
-	if (sscanf(s_arg[i_arg].list[1], "%ld", &axstart)!=1 || axstart<0)
-	  SDDS_Bomb("invalid -offset syntax or value");
-	if (sscanf(s_arg[i_arg].list[2], "%ld", &bystart)!=1 || bystart<0)
-	  SDDS_Bomb("invalid -offset syntax or value");
-	offset_used=1;
+      case SET_AREAOFINTEREST:
+	if (s_arg[i_arg].n_items!=5)
+	  SDDS_Bomb("invalid -areaOfInterest syntax");
+	if (sscanf(s_arg[i_arg].list[1], "%ld", &rowStart)!=1 || rowStart<=0)
+	  SDDS_Bomb("invalid -areaOfInterest syntax or value");
+	if (sscanf(s_arg[i_arg].list[2], "%ld", &rowEnd)!=1 || rowEnd<=0)
+	  SDDS_Bomb("invalid -areaOfInterest syntax or value");
+	if (sscanf(s_arg[i_arg].list[3], "%ld", &columnStart)!=1 || columnStart<=0)
+	  SDDS_Bomb("invalid -areaOfInterest syntax or value");
+	if (sscanf(s_arg[i_arg].list[4], "%ld", &columnEnd)!=1 || columnEnd<=0)
+	  SDDS_Bomb("invalid -areaOfInterest syntax or value");
 	break;
       case SET_BACKGROUND:
 	if (s_arg[i_arg].n_items!=2)
@@ -307,20 +270,7 @@ int main(int argc, char **argv)
     }
   }
 
-  if (ax == 0)
-    ax = rows;
-  if (by == 0)
-    by = colIndex2[validColumns-1];
-  if (offset_used) {
-    axstart++;
-    bystart += colIndex2[0];
-  } else {
-    axstart = 1;
-    bystart = colIndex2[0];
-  }
-  
-
-  /* Initialize the output file and define the columns */
+    /* Initialize the output file and define the columns */
   if (!SDDS_InitializeOutput(&SDDS_dataset, SDDS_ASCII, 
 			     1, NULL, NULL, output)) {
     SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
@@ -355,7 +305,7 @@ int main(int argc, char **argv)
       exit(1);
     }
     if (SDDS_DefineColumn(&SDDS_dataset, "y", NULL, NULL, NULL, 
-			  NULL, SDDS_LONG, 0) == -1) {
+			  NULL, SDDS_DOUBLE, 0) == -1) {
       SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
       exit(1);
     }
@@ -365,61 +315,18 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  ax2=axstart;
-  ay2=0;
-  bx2=0;
-  by2=bystart;
-  /*
-  fprintf(stdout, "SDDS1\n");
-  fprintf(stdout, "&column name=x, type=long,  &end\n");
-  fprintf(stdout, "&column name=y, type=long,  &end\n");
-  fprintf(stdout, "&data mode=ascii, no_row_counts=1, &end\n");
-  */
+  if ((rowEnd > rows) || (rowEnd < rowStart))
+    rowEnd = rows;
+  
+  if ((columnEnd > validColumns) || (columnEnd < columnStart))
+    columnEnd = validColumns;
 
-  while (ax2+bx2 <= rows) {
-    while (ay2+by2 + 1 - colIndex2[0] <= colIndex2[validColumns-1]) {
-      x1 = ax2+bx2+(bx)/2;
-      y1 = ay2+by2+(ay)/2;
-      x2 = ax2+bx2+(bx)/2+ax;
-      y2 = ay2+by2+(ay)/2+by;
-      if (x1 < 1)
-	x1 = 1;
-      if (x2 < 1)
-	x2 = 1;
-      if (x1 > rows)
-	x1 = rows+1;
-      if (x2 > rows)
-	x2 = rows+1;
-      if (y1 < colIndex2[0])
-	y1 = colIndex2[0];
-      if (y2 < colIndex2[0])
-	y2 = colIndex2[0];
-      if (y1 > colIndex2[validColumns-1])
-	y1 = colIndex2[validColumns-1]+1;
-      if (y2 > colIndex2[validColumns-1])
-	y2 = colIndex2[validColumns-1]+1;
-      y1 += 1 - colIndex2[0]; 
-      y2 += 1 - colIndex2[0]; 
-
-      /*
-      fprintf(stdout, "%ld %ld\n%ld %ld\n%ld %ld\n%ld %ld\n", 
-	      x1, y1, x2, y1, x2, y2, x1, y2);
-      */
-      if (profileType == 1) {
-	xImageProfile(data, type, rows, &SDDS_dataset, method,
-		      x1-1, x2-1, y1-1, y2-1, colIndex, colIndex2);
-      } else {
-	yImageProfile(data, type, rows, &SDDS_dataset, method,
-		      x1-1, x2-1, y1-1, y2-1, colIndex, colIndex2);
-      }
-
-      bx2 += bx;
-      by2 += by;
-    }
-    ax2 += ax;
-    ay2 += ay;
-    bx2=0;
-    by2=bystart;
+  if (profileType == 1) {
+    xImageProfile(data, type, rows, &SDDS_dataset, method,
+                  rowStart-1, rowEnd, columnStart-1, columnEnd, colIndex, colIndex2);
+  } else {
+    yImageProfile(data, type, rows, &SDDS_dataset, method,
+                  rowStart-1, rowEnd, columnStart-1, columnEnd, colIndex, colIndex2);
   }
 
   /* Close the output file */
@@ -435,7 +342,7 @@ int xImageProfile(IMAGE_DATA *data, int32_t *type, long rows,
 		  SDDS_DATASET *SDDS_dataset, long method,
 		  long x1, long x2,
 		  long y1, long y2,
-		  long *colIndex, long *colIndex2) {
+		  long *colIndex, double *colIndex2) {
   int i, j, k=0;
   double val=0;
   long center;
@@ -571,20 +478,20 @@ int yImageProfile(IMAGE_DATA *data, int32_t *type, long rows,
 		  SDDS_DATASET *SDDS_dataset, long method,
 		  long x1, long x2,
 		  long y1, long y2,
-		  long *colIndex, long *colIndex2) {
+		  long *colIndex, double *colIndex2) {
   int i, j, k=0;
   double val;
   long center;
   
-  int32_t *index;
+  double *index;
   double *values;
   char value[30];
 
-  index = malloc(sizeof(long)*(y2-y1));
+  index = malloc(sizeof(double)*(y2-y1));
   values = malloc(sizeof(double)*(y2-y1));
 
   if (method == 0) { /* Highest point */
-    for (i=y1; i<=y2; i++) {
+    for (i=y1; i<y2; i++) {
       switch (type[colIndex[i]]) {
       case SDDS_SHORT:
 	val = data[colIndex[i]].shortData[0];
@@ -627,7 +534,7 @@ int yImageProfile(IMAGE_DATA *data, int32_t *type, long rows,
     } else {
       center = xCenterLine(data, type, colIndex, x1, x2, y1, y2);
     }
-    for (i=y1; i<=y2; i++) {
+    for (i=y1; i<y2; i++) {
       switch (type[colIndex[i]]) {
       case SDDS_SHORT:
 	val = data[colIndex[i]].shortData[center];
@@ -649,7 +556,7 @@ int yImageProfile(IMAGE_DATA *data, int32_t *type, long rows,
       k++;
     }
   } else if ((method == 2) || (method == 3)) { /* Integrated or Averaged profile */
-    for (i=y1; i<=y2; i++) {
+    for (i=y1; i<y2; i++) {
       val = 0;
       switch (type[colIndex[i]]) {
       case SDDS_SHORT:
@@ -902,9 +809,10 @@ long yCenterLine(IMAGE_DATA *data, int32_t *type,
 
 long GetData(SDDS_DATASET *SDDS_orig, char *input,
 	     IMAGE_DATA **data, int32_t **type,
-	     long **colIndex, long **colIndex2,
+	     long **colIndex, double **colIndex2,
 	     char *colPrefix, long *validColumns) {
-  long rows, i, j, temp, temp2;
+  long rows, i, j, temp;
+  double temp2;
   int32_t orig_column_names;
   char **orig_column_name;
 
@@ -934,7 +842,7 @@ long GetData(SDDS_DATASET *SDDS_orig, char *input,
   /* Get number of rows */
   rows = SDDS_RowCount(SDDS_orig);
   *colIndex = malloc(sizeof(long)*orig_column_names);
-  *colIndex2 = malloc(sizeof(long)*orig_column_names);
+  *colIndex2 = malloc(sizeof(double)*orig_column_names);
 
   /* Read all numerical data from file */
   for (i=0; i<orig_column_names; i++) {
@@ -978,7 +886,7 @@ long GetData(SDDS_DATASET *SDDS_orig, char *input,
   }
   /* For each valid column read the row from the column name */
   for (i=0;i<*validColumns;i++) {
-    (*colIndex2)[i] = atol(orig_column_name[(*colIndex)[i]]+strlen(colPrefix));
+    (*colIndex2)[i] = atof(orig_column_name[(*colIndex)[i]]+strlen(colPrefix));
   }
   /* Sort columns by their row value ('row' is not related to the SDDS rows)*/
   for (i=0;i<*validColumns;i++) {

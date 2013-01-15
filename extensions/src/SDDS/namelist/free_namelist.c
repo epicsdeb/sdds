@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: free_namelist.c,v $
- Revision 1.4  2002/08/14 16:23:48  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1999/12/15 16:43:34  soliday
  Added vxWorks support.
 

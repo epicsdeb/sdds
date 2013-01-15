@@ -16,10 +16,7 @@
  * Similar to sddsxref, but doesn't transfer any data.
  *
  * Michael Borland, 1995
- $Log: sddsmselect.c,v $
- Revision 1.10  2002/08/14 17:12:49  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.9  2001/05/03 20:55:33  soliday
  Standardized usage messages.
 

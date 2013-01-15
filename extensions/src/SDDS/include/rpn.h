@@ -9,10 +9,7 @@
 
 /* file: rpn.h
  * Michael Borland, 1988
- $Log: rpn.h,v $
- Revision 1.34  2010/12/03 02:48:57  borland
- Added prototypes for isort and dsort functions.
-
+ $Log: not supported by cvs2svn $
  Revision 1.33  2010/02/24 23:59:38  borland
  Added InvFq function to RPN.
 
@@ -242,6 +239,7 @@ void rpn_JN(void);
 void rpn_YN(void);
 void rpn_IN(void);
 void rpn_KN(void);
+void rpn_G1y(void);
 void rpn_int(void);
 void rpn_cei1(void);
 void rpn_cei2(void);

@@ -11,10 +11,7 @@
  * purpose: transpose a matrix 
  * usage  : m_trans(B, A) ==> B=TRANS(A)
  * Michael Borland, 1986.
- $Log: m_trans.c,v $
- Revision 1.4  2002/08/14 16:45:23  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1998/04/21 21:26:42  borland
  New names to allow concurrent use with the Meschach library.
 

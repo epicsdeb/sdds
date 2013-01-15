@@ -10,10 +10,7 @@
 /* program: sddssinefit.c
  * purpose: do  sinusoidal fit:  y(n) = a0 + a1*sin(2*PI*a2*x(n)+a3)
  * M. Borland, 1995
- $Log: sddssinefit.c,v $
- Revision 1.22  2005/11/04 22:46:18  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.21  2003/07/22 21:05:38  soliday
  IEEE functions are always used.
 

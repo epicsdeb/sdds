@@ -8,11 +8,7 @@
 \*************************************************************************/
 
 /*
- * $Log: sddsendian.c,v $
- * Revision 1.10  2004/11/15 17:15:40  soliday
- * Moved and renamed the procedures to write non native binary data from
- * sddsendian to SDDSlib.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.9  2003/09/02 19:16:03  soliday
  * Cleaned up code for Linux.
  *

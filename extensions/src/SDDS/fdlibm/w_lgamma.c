@@ -1,9 +1,6 @@
 /*
  *
- $Log: w_lgamma.c,v $
- Revision 1.3  2003/07/18 19:57:02  soliday
- Added support for Kylix.
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2000/04/05 22:14:22  soliday
  Added Borland C support.
 

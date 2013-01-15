@@ -22,7 +22,10 @@
  * from this book isn't free, the original version of sddspseudoinverse 
  * can't be distributed outside the lab.
  * L.Emery, ANL, 1994
- $Log: sddspseudoinverse.c,v $
+ $Log: not supported by cvs2svn $
+ Revision 1.57  2012/01/06 22:36:10  shang
+ fixed a bug in removeDCVectors when using LAPACK routines because the Vt matrix in LAPACK is in column order however it was treated as row order, so the inverse matrix would be wrong if -removeDCVectors option was given in previous command.
+
  Revision 1.56  2008/04/22 19:38:44  shang
  removed the unnecessary print statement.
 
@@ -438,7 +441,7 @@ int main(int argc, char **argv)
   char **outputColumnName=NULL, **orthoColumnName=NULL, **actuatorName=NULL, **numericalColumnName=NULL, **multiplyColumnName=NULL;
   char *weightsNamesColumn, *weightsValuesColumn, *stringColumnName=NULL, *multiStringCol=NULL;
   char **weightsColumnName, **weightsName=NULL;
-  double *weights;
+  double *weights, largestS;
   int32_t rows, multiplyRows=0, outpageRows=0, actuators=0, outputColumns=0;
   int32_t rowsFirstPage=0, numericalColumns, weightsRows, weightsColumns, multiplyColumns, freeMultiCol=0;
   long sFileAsMatrix; 
@@ -970,11 +973,20 @@ int main(int argc, char **argv)
       fprintf(stderr, "Input ");
       m_foutput( stderr, R);
     }
-    if (includeWeights) 
-      for (i=0;i<R->n;i++)
-        for (j=0;j<R->m;j++)
+    /*here there was an important bug by in multiplying weight, R->m=rows (corresponse to bpms), weight numbers = rows (bpm weights); so that the correct 
+      way should be i<R->m (instead of i<R->n, which was before), and j<R->n (instead of R->m, which was before) */
+    if (includeWeights) {
+#if defined(SUNPERF) || defined(CLAPACK) || defined(LAPACK)
+      /*for lapack, the R matrix is transposed (in column major order */
+      for (j=0;j<R->n;j++) 
+        for (i=0;i<R->m;i++)
+          R->me[j][i] *= w->ve[i];
+#else
+      for (i=0;i<R->m;i++)
+        for (j=0;j<R->n;j++) 
           R->me[i][j] *= w->ve[i];
-    
+#endif
+    }
     /* On first passs, allocate the memory. On subsequent passes,
        the memory may have been free, and the pointer made NULL */
     if (!SValue)
@@ -1184,32 +1196,43 @@ LAPACK is plain lapack now installed in linux systems.
       for (i=0; i<numericalColumns; i++) {
         sum = 0.0;
         for (j=0; j<numericalColumns; j++) {
+/* note here for CLAPACK, Vt is transposed*/
+#if defined(CLAPACK) || defined(LAPACK)
+	  sum += Vt->me[j][i];
+#else
           sum += Vt->me[i][j];
+#endif
         }
         if ( fabs(sum) > 0.1 * sqrt(numericalColumns) ) {
           SValue->ve[i] = 0.0;
         }
       }
     }
-
     max = 0;
     min = HUGE;
-    InvSValue->ve[0] = 1/SValue->ve[0];
-    SValueUsed->ve[0] = SValue->ve[0];
-    max = MAX(SValueUsed->ve[0],max);
-    min = MIN(SValueUsed->ve[0],min);
-    NSVUsed=1;
+    /*find the largest S value, and use it as reference for ratio instead of the first Svalue because the first Svalue could be removed 
+     (set to zero) with -removeDCVectors option*/
+    largestS = 0;
+    for (i=0; i<numericalColumns; i++) {
+      if (SValue->ve[i]) {
+	largestS = SValue->ve[i];
+	break;
+      }
+    }
+    if (!largestS)
+      SDDS_Bomb("Error: no non-zero singular values found, unable to find the inverse response matrix.");
     /*
       1) first remove SVs that are exactly zero
       2) remove SV according to ratio option
       3) remove SV according to largests option
       4) remove SV of user-selected vectors
       */
-    for(i=1;i<numericalColumns;i++) {
+    NSVUsed = 0;
+    for(i=0;i<numericalColumns;i++) {
       if (!SValue->ve[i]) {
         InvSValue->ve[i] = 0;
       }
-      else if ((SValue->ve[i]/SValue->ve[0])<ratio ) {
+      else if ((SValue->ve[i]/largestS)<ratio ) {
         InvSValue->ve[i] = 0;
         SValueUsed->ve[i] = 0;
       }
@@ -1245,7 +1268,6 @@ LAPACK is plain lapack now installed in linux systems.
         NSVUsed--;
       }
     }
-    
     conditionNumber = max/min;
     if (verbose&FL_VERYVERBOSE) {
       setformat("%9.6le ");
@@ -1286,10 +1308,10 @@ LAPACK is plain lapack now installed in linux systems.
     /* Only U (with original R memory) and Vt are available.  Make
        multiplication as sum of singular triplets RInv_ij = (V_ik InvS_k
        Ut_kj) becomes (Vt_ki InvS_k U_jk) */
-    for ( i=0 ; i<Vt->n ; i++) 
+    for ( i=0 ; i<Vt->n ; i++)
       for ( j=0 ; j<U->m ; j++) {
         x = 0.0;
-        for ( k=0 ; k<numericalColumns ; k++)
+        for ( k=0 ; k<numericalColumns ; k++) 
           x += Vt->me[k][i] * InvSValue->ve[k] * U->me[j][k];
         RInvt->me[j][i] = x;
       }

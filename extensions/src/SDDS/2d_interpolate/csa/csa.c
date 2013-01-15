@@ -1412,7 +1412,7 @@ void csa_setnppc(csa* a, int nppc)
 static void points_generate(double xmin, double xmax, double ymin, double ymax, int nx, int ny, int *nout, point **pout)
 {
     double stepx, stepy;
-    double x0, xx, yy;
+    double y0, xx, yy;
     int i, j, ii;
 
     if (nx < 1 || ny < 1) {
@@ -1425,20 +1425,20 @@ static void points_generate(double xmin, double xmax, double ymin, double ymax, 
 
     stepx = (nx > 1) ? (xmax - xmin) / (nx - 1) : 0.0;
     stepy = (ny > 1) ? (ymax - ymin) / (ny - 1) : 0.0;
-    x0 = (nx > 1) ? xmin : (xmin + xmax) / 2.0;
-    yy = (ny > 1) ? ymin : (ymin + ymax) / 2.0; 
+    xx = (nx > 1) ? xmin : (xmin + xmax) / 2.0;
+    y0 = (ny > 1) ? ymin : (ymin + ymax) / 2.0; 
     ii = 0;
-    for (j = 0; j < ny; ++j) {
-        xx = x0;
-        for (i = 0; i < nx; ++i) {
+    for (i = 0; i < nx; ++i) {
+        yy = y0;
+        for (j = 0; j < ny; ++j) {
             point* p = &(*pout)[ii];
 
             p->x = xx;
             p->y = yy;
-            xx += stepx;
+            yy += stepy;
             ii++;
         }
-        yy += stepy;
+        xx += stepx;
     }
 }
 

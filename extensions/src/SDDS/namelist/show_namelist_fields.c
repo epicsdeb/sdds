@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: show_namelist_fields.c,v $
- Revision 1.3  2005/11/09 22:03:36  soliday
- Added support for int32_t
-
+ $Log: not supported by cvs2svn $
  Revision 1.2  2002/08/14 16:23:50  soliday
  Added Open License
 

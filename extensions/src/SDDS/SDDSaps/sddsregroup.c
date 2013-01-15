@@ -16,10 +16,7 @@
  * These extra columns will be duplicated in all pages.
  * On the command line, one may specify which columns of the input file
  * becomes parameters in the output file.
- $Log: sddsregroup.c,v $
- Revision 1.15  2005/11/04 22:46:17  soliday
- Updated code to be compiled by a 64 bit processor.
-
+ $Log: not supported by cvs2svn $
  Revision 1.14  2002/08/14 17:12:52  soliday
  Added Open License
 

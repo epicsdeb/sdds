@@ -3,10 +3,7 @@
  *          format
  *
  * Michael Borland, 1993
- $Log: SDDStypes.h,v $
- Revision 1.1  1997/03/06 19:24:58  saunders
- New files necessary for build.
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  1995/09/06 14:12:01  saunders
  First test release of SDDS1.5
 

@@ -12,11 +12,7 @@
  * part of sddsplot (plotting program for SDDS files)
  *
  * Michael Borland, 1994.
- $Log: sddsplotGroup.c,v $
- Revision 1.21  2010/07/08 21:26:47  borland
- Added "first" qualifier to -omnipresent option.  When given, omnipresent datasets
- are plotted first.  The default is to plot them last.
-
+ $Log: not supported by cvs2svn $
  Revision 1.20  2009/07/28 14:01:16  borland
  Added scroll feature to -replicate option.  Greatly improved memory management for
  split and replicated datasets.  Added -nocolorbar option.

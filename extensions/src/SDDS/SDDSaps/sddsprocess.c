@@ -11,7 +11,7 @@
    * purpose: process columns of an SDDS file to create a new SDDS file 
    *          with new parameters and columns
    * Michael Borland, 1994
-   $Log: sddsprocess.c,v $
+   $Log: not supported by cvs2svn $
    Revision 1.61  2010/12/10 18:18:49  soliday
    Added support for algebraic mode when getting an equation from a parameter.
 
@@ -1663,12 +1663,12 @@ int main(int argc, char **argv)
             filter_term = filter_ptr->filter_term;
             for (j=0; j<filter_ptr->filter_terms; j++) {
               if (filter_term[j].lowerPar && !SDDS_GetParameterAsDouble(&SDDS_input, filter_term[j].lowerPar, &(filter_term[j].lower))) {
-                fprintf(stderr, "Error: unable to get parameter %s value for the lower filter from input file.\n", filter_term[i].lowerPar);
+                fprintf(stderr, "Error: unable to get parameter %s value for the lower filter from input file.\n", filter_term[j].lowerPar);
                 SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
                 exit(1);
               }
               if (filter_term[j].upperPar && !SDDS_GetParameterAsDouble(&SDDS_input, filter_term[j].upperPar, &(filter_term[j].upper))) {
-                fprintf(stderr, "Error: unable to get parameter %s value for the upper filter from input file.\n", filter_term[i].upperPar);
+                fprintf(stderr, "Error: unable to get parameter %s value for the upper filter from input file.\n", filter_term[j].upperPar);
                 SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
                 exit(1);
               }

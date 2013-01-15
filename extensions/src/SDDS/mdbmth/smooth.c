@@ -8,11 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: smooth.c,v $
- Revision 1.6  2005/08/16 20:01:25  soliday
- Fixed bug in despikeData when using odd numbered neighbors. The wrong
- number of elements were being allocated.
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  2004/07/16 16:28:10  shang
  added countLimit argument to despikeData function to avoid despiking if
  the number of readings that exceeds the threshold is greater than the

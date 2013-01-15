@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
+# $Log: not supported by cvs2svn $
 # Revision 1.15  2009/04/27 17:18:22  soliday
 # Updated to link to gsl when building the rpnlib library.
 #

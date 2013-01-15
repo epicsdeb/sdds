@@ -8,10 +8,7 @@
 #*************************************************************************
 #
 # Top Makefile for Java SDDS software
-# $Log: Makefile,v $
-# Revision 1.5  2008/06/10 18:51:35  soliday
-# Updated to work with new build rules.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.4  2002/08/14 19:32:39  soliday
 # Added Open License
 #

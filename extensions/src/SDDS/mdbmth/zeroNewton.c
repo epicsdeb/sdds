@@ -12,10 +12,7 @@
  *          of derivatives.
  *
  * Michael Borland, 1994, 1995
- $Log: zeroNewton.c,v $
- Revision 1.4  2002/08/14 16:19:01  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.3  2000/11/02 21:25:27  borland
  Added "value" option that allows solving for fn=value instead of just
  fn=0.

@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG,v $
-# Revision 1.9  2005/11/17 19:48:31  soliday
-# Removed wofz.c from makefile.
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.8  2005/11/16 18:55:07  shang
 # moved wofz.c to madmth
 #

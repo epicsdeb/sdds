@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: execute.c,v $
- Revision 1.18  2009/10/29 19:53:19  soliday
- Renamed a few global variables that conflicted with MADX.
-
+ $Log: not supported by cvs2svn $
  Revision 1.17  2005/01/12 21:49:31  shang
  added is_string argument to is_memeory function to tell the memory data type
 

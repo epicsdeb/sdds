@@ -10,15 +10,7 @@
  * purpose: make an SDDS file from inputing data in the commandline.
  *
  * Hairong Shang, 2003
- $Log: sddsmakedataset.c,v $
- Revision 1.8  2006/12/14 22:21:59  soliday
- Updated a bunch of programs because SDDS_SaveLayout is now called by
- SDDS_WriteLayout and it is no longer required to be called directly.
- Also the AutoCheckMode is turned off by default now so I removed calls to
- SDDS_SetAutoCheckMode that would attempt to turn it off. It is now up to
- the programmer to turn it on in new programs until debugging is completed
- and then remove the call to SDDS_SetAutoCheckMode.
-
+ $Log: not supported by cvs2svn $
  Revision 1.7  2006/09/06 15:18:06  soliday
  Updated so that it uses the SDDS_IdentifyType command to determine the data
  type because it does not require a local list of data type names which

@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /* 
- * $Log: editstring.c,v $
- * Revision 1.7  2004/12/16 01:45:13  borland
- * Added fflush() after puts() in stream mode, so data gets output promptly.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.6  2003/07/02 16:51:26  borland
  * Better version of last fix.  Remove the newline from string before
  * editing, then emit a new newline during printout.

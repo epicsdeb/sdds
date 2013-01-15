@@ -12,10 +12,7 @@
  *          format
  *
  * Michael Borland, 1993
- $Log: SDDStypes.h,v $
- Revision 1.7  2006/08/31 15:06:55  soliday
- Updated to work with SDDS2
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2002/08/14 15:40:13  soliday
  Added Open License
 

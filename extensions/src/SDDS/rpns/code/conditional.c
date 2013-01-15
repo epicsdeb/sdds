@@ -8,10 +8,7 @@
 \*************************************************************************/
 
 /*
- $Log: conditional.c,v $
- Revision 1.6  2002/08/14 16:28:57  soliday
- Added Open License
-
+ $Log: not supported by cvs2svn $
  Revision 1.5  1999/06/01 14:37:33  soliday
  Removed warnings when compiled under Linux.
 

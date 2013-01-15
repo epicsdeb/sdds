@@ -7,10 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Log: Makefile.OAG2,v $
-# Revision 1.7  2005/01/21 20:30:43  soliday
-# Updated to support purify on Linux
-#
+# $Log: not supported by cvs2svn $
 # Revision 1.6  2003/08/28 21:24:57  soliday
 # Cleaned up the code.
 #

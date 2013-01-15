@@ -10,10 +10,7 @@
 /* file: fftpackC.c
  * contents: C languange interface to fftpack routines
  * author: M. Borland, 1995.
- $Log: fftpackC.c,v $
- Revision 1.7  2003/07/22 20:50:39  soliday
- atexit is always used.
-
+ $Log: not supported by cvs2svn $
  Revision 1.6  2002/08/14 16:41:20  soliday
  Added Open License
 

@@ -5,12 +5,9 @@
  * Author: Jim Kowalkowski
  * Date: 2/96
  *
- * $Id: gddUtils.h,v 1.1 1997/03/06 19:24:59 saunders Exp $
+ * $Id: gddUtils.h,v 1.1 1997-03-06 19:24:59 saunders Exp $
  *
- * $Log: gddUtils.h,v $
- * Revision 1.1  1997/03/06 19:24:59  saunders
- * New files necessary for build.
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.1  1996/06/25 19:11:50  jbk
  * new in EPICS base
  *
