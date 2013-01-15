@@ -1,0 +1,413 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/3570/trunk/SDDSaps/sddsplots
+END
+Simple.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/Simple.h
+END
+Converters.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/Converters.h
+END
+hp26.trm
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/hp26.trm
+END
+setshow.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/setshow.h
+END
+sddsplot.h
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/3564/trunk/SDDSaps/sddsplots/sddsplot.h
+END
+mif_limits.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/mif_limits.h
+END
+sddsplotFilter.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/AOP/SDDS/!svn/ver/3431/trunk/SDDSaps/sddsplots/sddsplotFilter.c
+END
+gnumacros.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/gnumacros.h
+END
+png.trm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/3464/trunk/SDDSaps/sddsplots/png.trm
+END
+plot_data_sets.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/AOP/SDDS/!svn/ver/3431/trunk/SDDSaps/sddsplots/plot_data_sets.c
+END
+eepic.trm
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/817/trunk/SDDSaps/sddsplots/eepic.trm
+END
+term.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/3464/trunk/SDDSaps/sddsplots/term.c
+END
+sddsplotMapping.c
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/AOP/SDDS/!svn/ver/3564/trunk/SDDSaps/sddsplots/sddsplotMapping.c
+END
+sddsplotGroup.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/AOP/SDDS/!svn/ver/3374/trunk/SDDSaps/sddsplots/sddsplotGroup.c
+END
+aed.trm
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/817/trunk/SDDSaps/sddsplots/aed.trm
+END
+hpgl.trm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/817/trunk/SDDSaps/sddsplots/hpgl.trm
+END
+term.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/2749/trunk/SDDSaps/sddsplots/term.h
+END
+iris4d.trm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/iris4d.trm
+END
+v384.trm
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/v384.trm
+END
+unixpc.trm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/unixpc.trm
+END
+sddsplotRead.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/AOP/SDDS/!svn/ver/3431/trunk/SDDSaps/sddsplots/sddsplotRead.c
+END
+gnuplot_x11g.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/AOP/SDDS/!svn/ver/3497/trunk/SDDSaps/sddsplots/gnuplot_x11g.c
+END
+mif.trm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/1230/trunk/SDDSaps/sddsplots/mif.trm
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/2201/trunk/SDDSaps/sddsplots/Makefile
+END
+latex.trm
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/1263/trunk/SDDSaps/sddsplots/latex.trm
+END
+hpljii.trm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/hpljii.trm
+END
+gnuplot_x11c1.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/AOP/SDDS/!svn/ver/3497/trunk/SDDSaps/sddsplots/gnuplot_x11c1.c
+END
+make_scales.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/AOP/SDDS/!svn/ver/3460/trunk/SDDSaps/sddsplots/make_scales.c
+END
+x11test.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/1922/trunk/SDDSaps/sddsplots/x11test.c
+END
+sddsplotAP.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/3564/trunk/SDDSaps/sddsplots/sddsplotAP.c
+END
+qms.trm
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/qms.trm
+END
+gnuplot_x11.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/AOP/SDDS/!svn/ver/3497/trunk/SDDSaps/sddsplots/gnuplot_x11.c
+END
+put_link_date.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/AOP/SDDS/!svn/ver/1922/trunk/SDDSaps/sddsplots/put_link_date.c
+END
+kyo.trm
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/kyo.trm
+END
+Label.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/817/trunk/SDDSaps/sddsplots/Label.h
+END
+sun.trm
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/sun.trm
+END
+sddsplotRecord.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/AOP/SDDS/!svn/ver/1922/trunk/SDDSaps/sddsplots/sddsplotRecord.c
+END
+t410x.trm
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/817/trunk/SDDSaps/sddsplots/t410x.trm
+END
+graphics.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/3431/trunk/SDDSaps/sddsplots/graphics.c
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/3569/trunk/SDDSaps/sddsplots/Makefile.OAG
+END
+epson.trm
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/epson.trm
+END
+graphics.h
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/2724/trunk/SDDSaps/sddsplots/graphics.h
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/AOP/SDDS/!svn/ver/2186/trunk/SDDSaps/sddsplots/Makefile.Host
+END
+object.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/object.h
+END
+sddsplotLabels.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/AOP/SDDS/!svn/ver/3431/trunk/SDDSaps/sddsplots/sddsplotLabels.c
+END
+imagen.trm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/imagen.trm
+END
+pc.trm
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/3431/trunk/SDDSaps/sddsplots/pc.trm
+END
+cgi.trm
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/cgi.trm
+END
+dxy.trm
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/dxy.trm
+END
+fig.trm
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/fig.trm
+END
+regis.trm
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/911/trunk/SDDSaps/sddsplots/regis.trm
+END
+sddsplotConvert.c
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/AOP/SDDS/!svn/ver/3539/trunk/SDDSaps/sddsplots/sddsplotConvert.c
+END
+SDDSaps.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/3431/trunk/SDDSaps/sddsplots/SDDSaps.c
+END
+unixplot.trm
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/unixplot.trm
+END
+tek.trm
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/911/trunk/SDDSaps/sddsplots/tek.trm
+END
+post.trm
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/3464/trunk/SDDSaps/sddsplots/post.trm
+END
+SDDSaps.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSaps/sddsplots/SDDSaps.h
+END
+graph.h
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/3464/trunk/SDDSaps/sddsplots/graph.h
+END
+imPcodes.h
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/imPcodes.h
+END
+gnugraph.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/1226/trunk/SDDSaps/sddsplots/gnugraph.c
+END
+hp2648.trm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/hp2648.trm
+END
+arrows.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/3463/trunk/SDDSaps/sddsplots/arrows.c
+END
+sddsplotXfer.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/AOP/SDDS/!svn/ver/3431/trunk/SDDSaps/sddsplots/sddsplotXfer.c
+END
+psymbol.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/1508/trunk/SDDSaps/sddsplots/psymbol.c
+END
+multi_plot.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/1922/trunk/SDDSaps/sddsplots/multi_plot.c
+END
+x11.trm
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/3464/trunk/SDDSaps/sddsplots/x11.trm
+END
+psymbol.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/1922/trunk/SDDSaps/sddsplots/psymbol.h
+END
+sddsplot.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/3564/trunk/SDDSaps/sddsplots/sddsplot.c
+END

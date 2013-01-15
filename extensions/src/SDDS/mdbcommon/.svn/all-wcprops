@@ -1,0 +1,83 @@
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/AOP/SDDS/!svn/ver/3470/trunk/mdbcommon
+END
+savitzkyGolay.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/3297/trunk/mdbcommon/savitzkyGolay.c
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2915/trunk/mdbcommon/Makefile.OAG
+END
+scanargs.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/3470/trunk/mdbcommon/scanargs.c
+END
+find_files.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/3088/trunk/mdbcommon/find_files.c
+END
+fixcounts.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2729/trunk/mdbcommon/fixcounts.c
+END
+lsfn.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/3087/trunk/mdbcommon/lsfn.c
+END
+lsfp.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/mdbcommon/lsfp.c
+END
+table.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/2689/trunk/mdbcommon/table.c
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2158/trunk/mdbcommon/Makefile.Host
+END
+Makefile.Vx
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2537/trunk/mdbcommon/Makefile.Vx
+END
+lsfg.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/2689/trunk/mdbcommon/lsfg.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2158/trunk/mdbcommon/Makefile
+END
+interpMinimum.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/1916/trunk/mdbcommon/interpMinimum.c
+END

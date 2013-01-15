@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/AOP/SDDS/!svn/ver/754/trunk/meschach/configFiles/MACHINES/RS6000
+END
+machine.c
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/AOP/SDDS/!svn/ver/754/trunk/meschach/configFiles/MACHINES/RS6000/machine.c
+END
+machine.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/AOP/SDDS/!svn/ver/754/trunk/meschach/configFiles/MACHINES/RS6000/machine.h
+END
+makefile
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/AOP/SDDS/!svn/ver/754/trunk/meschach/configFiles/MACHINES/RS6000/makefile
+END

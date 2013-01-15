@@ -1,0 +1,12 @@
+#!/bin/sh  
+# \
+exec tclsh "$0" "$@"
+
+set dir [file dir [exec which SDDS.jar]]
+
+set classpath [file join $dir SDDS.jar]:[file join $dir SDDS3Dplot.jar]:[file join $dir visad.jar]
+
+if {[catch {eval exec /usr/local/oag/jre1.5.0_03/bin/java -cp $classpath  SDDS.java/SDDS3Dplot.Application1 $argv} results]} {
+    puts stderr $results
+}
+

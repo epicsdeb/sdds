@@ -1,0 +1,197 @@
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/AOP/SDDS/!svn/ver/756/trunk/OOSDDSlib
+END
+gddNewDel.cc
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/496/trunk/OOSDDSlib/gddNewDel.cc
+END
+sddsString.hh
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/497/trunk/OOSDDSlib/sddsString.hh
+END
+gddNewDel.h
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/496/trunk/OOSDDSlib/gddNewDel.h
+END
+sddsFileBuffer.hh
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/496/trunk/OOSDDSlib/sddsFileBuffer.hh
+END
+sddsLayout.hh
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/503/trunk/OOSDDSlib/sddsLayout.hh
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/756/trunk/OOSDDSlib/Makefile.Host
+END
+sddsArray.hh
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/496/trunk/OOSDDSlib/sddsArray.hh
+END
+sddsError.cc
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/496/trunk/OOSDDSlib/sddsError.cc
+END
+sdds_lex.l
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/498/trunk/OOSDDSlib/sdds_lex.l
+END
+sddsTable.hh
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/496/trunk/OOSDDSlib/sddsTable.hh
+END
+sddsSortedIndex.hh
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/496/trunk/OOSDDSlib/sddsSortedIndex.hh
+END
+resourceLib.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/503/trunk/OOSDDSlib/resourceLib.h
+END
+sddsDefinition.hh
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/499/trunk/OOSDDSlib/sddsDefinition.hh
+END
+SDDS_data.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/504/trunk/OOSDDSlib/SDDS_data.c
+END
+sddsString.cc
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/496/trunk/OOSDDSlib/sddsString.cc
+END
+SDDStypes.h
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/503/trunk/OOSDDSlib/SDDStypes.h
+END
+sddsFileBuffer.cc
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/496/trunk/OOSDDSlib/sddsFileBuffer.cc
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/751/trunk/OOSDDSlib/Makefile
+END
+sddsLayout.cc
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/751/trunk/OOSDDSlib/sddsLayout.cc
+END
+SDDS_internal.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/503/trunk/OOSDDSlib/SDDS_internal.h
+END
+SDDS.h
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/503/trunk/OOSDDSlib/SDDS.h
+END
+sddsTable.cc
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/500/trunk/OOSDDSlib/sddsTable.cc
+END
+sddsSortedIndex.cc
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/496/trunk/OOSDDSlib/sddsSortedIndex.cc
+END
+sddsDefinition.cc
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/499/trunk/OOSDDSlib/sddsDefinition.cc
+END
+Makefile.Unix
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/503/trunk/OOSDDSlib/Makefile.Unix
+END
+resourceLib.cc
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/503/trunk/OOSDDSlib/resourceLib.cc
+END
+sdds_yacc.y
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/500/trunk/OOSDDSlib/sdds_yacc.y
+END
+sddsHeader.hh
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/496/trunk/OOSDDSlib/sddsHeader.hh
+END
+sddsError.hh
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/496/trunk/OOSDDSlib/sddsError.hh
+END
+gddUtils.h
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/503/trunk/OOSDDSlib/gddUtils.h
+END
+tsSLList.h
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/503/trunk/OOSDDSlib/tsSLList.h
+END
+Main.cc
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/503/trunk/OOSDDSlib/Main.cc
+END

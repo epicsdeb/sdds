@@ -1,0 +1,353 @@
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/AOP/SDDS/!svn/ver/3326/trunk/fftpack
+END
+passf2.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/passf2.c
+END
+radf2.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/radf2.c
+END
+ezfft1.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/ezfft1.c
+END
+passf3.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/passf3.c
+END
+radf3.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/radf3.c
+END
+passf4.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/passf4.c
+END
+radf4.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/radf4.c
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/3324/trunk/fftpack/Makefile.OAG
+END
+passf5.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/passf5.c
+END
+radf5.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/radf5.c
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2157/trunk/fftpack/Makefile.Host
+END
+cost.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/cost.c
+END
+cffti1.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/cffti1.c
+END
+costi.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/costi.c
+END
+fftpack.h
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/1986/trunk/fftpack/fftpack.h
+END
+doc
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/AOP/SDDS/!svn/ver/2/trunk/fftpack/doc
+END
+cfftb.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/cfftb.c
+END
+rfftb1.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/rfftb1.c
+END
+sinti.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/sinti.c
+END
+Makefile.Vx
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2252/trunk/fftpack/Makefile.Vx
+END
+cfftf.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/cfftf.c
+END
+cosqb1.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/cosqb1.c
+END
+rfftf1.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/rfftf1.c
+END
+cffti.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/cffti.c
+END
+dfilter.cc
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/3326/trunk/fftpack/dfilter.cc
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/2157/trunk/fftpack/Makefile
+END
+cosqf1.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/cosqf1.c
+END
+sint1.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/sint1.c
+END
+rfftb.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/rfftb.c
+END
+cfftb1.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/cfftb1.c
+END
+cosqb.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/cosqb.c
+END
+rfftf.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/rfftf.c
+END
+passb.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/passb.c
+END
+cfftf1.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/cfftf1.c
+END
+naff.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/2918/trunk/fftpack/naff.c
+END
+rffti.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/rffti.c
+END
+cosqf.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/cosqf.c
+END
+passf.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/passf.c
+END
+sinqb.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/sinqb.c
+END
+sint.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/sint.c
+END
+cosqi.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/cosqi.c
+END
+radbg.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/radbg.c
+END
+ezfftb.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/ezfftb.c
+END
+sinqf.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/sinqf.c
+END
+fftpackC.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2142/trunk/fftpack/fftpackC.c
+END
+radfg.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/radfg.c
+END
+sinqi.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/sinqi.c
+END
+ezfftf.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/ezfftf.c
+END
+ezffti.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/ezffti.c
+END
+passb2.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/passb2.c
+END
+radb2.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/radb2.c
+END
+passb3.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/passb3.c
+END
+radb3.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/radb3.c
+END
+rffti1.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/rffti1.c
+END
+passb4.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/passb4.c
+END
+radb4.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/radb4.c
+END
+passb5.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/passb5.c
+END
+radb5.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/fftpack/radb5.c
+END

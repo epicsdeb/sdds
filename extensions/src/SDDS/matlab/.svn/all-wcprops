@@ -1,0 +1,101 @@
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/AOP/SDDS/!svn/ver/3579/trunk/matlab
+END
+sdds3d.m
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/2078/trunk/matlab/sdds3d.m
+END
+LICENSE
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/1934/trunk/matlab/LICENSE
+END
+sddscontour3.m
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/1997/trunk/matlab/sddscontour3.m
+END
+sddssurf.m
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/1997/trunk/matlab/sddssurf.m
+END
+sddsload.m
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/3578/trunk/matlab/sddsload.m
+END
+convertSDDSname.m
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/1997/trunk/matlab/convertSDDSname.m
+END
+sddssurfc.m
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1997/trunk/matlab/sddssurfc.m
+END
+sddsmeshz.m
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1997/trunk/matlab/sddsmeshz.m
+END
+sddscontour.m
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/1997/trunk/matlab/sddscontour.m
+END
+sddssurfl.m
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1997/trunk/matlab/sddssurfl.m
+END
+sddsmesh.m
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/1997/trunk/matlab/sddsmesh.m
+END
+sddssave.m
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/3579/trunk/matlab/sddssave.m
+END
+sddspcolor.m
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1997/trunk/matlab/sddspcolor.m
+END
+sddsmeshc.m
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1997/trunk/matlab/sddsmeshc.m
+END
+sddsplot3.m
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1997/trunk/matlab/sddsplot3.m
+END
+mat2sdds.m
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/2748/trunk/matlab/mat2sdds.m
+END

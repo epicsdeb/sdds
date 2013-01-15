@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/AOP/SDDS/!svn/ver/3062/trunk/java/SDDS
+END
+LERandomAccessFile.java
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/AOP/SDDS/!svn/ver/1558/trunk/java/SDDS/LERandomAccessFile.java
+END
+LEDataInputStream.java
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/AOP/SDDS/!svn/ver/1558/trunk/java/SDDS/LEDataInputStream.java
+END
+LEDataOutputStream.java
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/AOP/SDDS/!svn/ver/1558/trunk/java/SDDS/LEDataOutputStream.java
+END
+SDDSColumn.java
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/3062/trunk/java/SDDS/SDDSColumn.java
+END
+SDDSUtil.java
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/1923/trunk/java/SDDS/SDDSUtil.java
+END
+SDDSArray.java
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/3062/trunk/java/SDDS/SDDSArray.java
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/3061/trunk/java/SDDS/Makefile
+END
+SDDSFile.java
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/3062/trunk/java/SDDS/SDDSFile.java
+END
+SDDSParameter.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/1923/trunk/java/SDDS/SDDSParameter.java
+END

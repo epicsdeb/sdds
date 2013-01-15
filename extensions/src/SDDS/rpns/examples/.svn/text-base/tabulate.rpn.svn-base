@@ -1,0 +1,55 @@
+/* rpn module: tabulate
+/* purpose   : makes a table of a function in a file--dpl format
+/* user's function is "fn"
+/* lower limit is in "a", upper limit is in "b"
+/* number of steps is in "n"
+/* file must be open on unit 2
+/* uses variables i, x, dx
+/* calls: "tabulate" to make a table with null labels
+/*        "tabulate_nl" to make a table with no labels (make them before-
+/*                hand if you want to use dpl on the file).
+/* Michael Borland, 1988
+/*
+udf
+tabulate
+"\n\n\n\n" 2 puts
+tabulate_nl
+
+udf
+tabulate_nl
+"%.0lf\n" n 2 fprf pop
+b a - n 1 - / sto dx pop 
+a sto x pop 
+0 sto i pop  
+do_tab_loop
+
+udf
+do_tab_loop
+i n == pop pop 
+    ? 
+      1 "done\n" puts stop
+    : 
+      x 2 "%13.16le\t" fprf 
+      fn 2 "%13.16le\n" fprf pop
+      x dx + sto x pop 
+      i 1 + sto i pop 
+      do_tab_loop 
+    $ 
+
+udf
+fn
+1.5 - sqr 2 -
+
+"tabulate.sdds,w" 2 open
+"SDDS1\n" 2 puts 
+"&column name=x type=double &end\n" 2 puts
+"&column name=F type=double &end\n" 2 puts
+"&data mode=ascii &end\n" 2 puts
+-10 sto a
+10 sto b
+100 sto n
+
+tabulate_nl
+2 clos
+
+"sddsplot -column=x,F tabulate.sdds" cshs

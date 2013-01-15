@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/AOP/SDDS/!svn/ver/3360/trunk/oagLib
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3360/trunk/oagLib/Makefile.OAG
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/1506/trunk/oagLib/Makefile.Host
+END
+Makefile.Vx
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2538/trunk/oagLib/Makefile.Vx
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/2453/trunk/oagLib/Makefile
+END

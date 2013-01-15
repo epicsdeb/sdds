@@ -1,0 +1,25 @@
+#!/bin/sh  
+# \
+exec tclsh "$0" "$@"
+if [catch {set device $env(SDDS_DEVICE)}] {
+    set device motif
+}
+
+
+puts stderr "** Define a sequence of 5 pages with 21 points each."
+puts stderr "** Create y = 1 + 2*exp(-3*x) with random values added in."
+puts stderr "** Fit a decaying exponential to each page."
+puts stderr "** Create a label using the fit parameters."
+exec sddssequence -define=x,type=double -sequence=begin=0,end=2,number=21 -repeat=5 -pipe=out \
+| sddsbreak -pipe -rowlimit=21 \
+| sddsprocess -pipe "-define=col,y,x -3 * exp 2 * 1 + grnd 25 / +" \
+| sddsexpfit -pipe -full -col=x,y -tol=1e-12 -clue=decay \
+| sddsprocess -pipe=in expfit.sdds \
+   "-print=param,label,y = %.3g + %.3g*e\$a%.3g*x\$b,expfitConstant,expfitFactor,expfitRate"
+
+puts stderr "**"
+puts stderr "** plot the results"
+exec sddsplot -groupby=page -sep=page -split=page -col=x,y expfit.sdds -graph=sym -uns=y \
+   -col=x,yFit expfit.sdds -graph=line,type=1 -string=@label,scale=2,p=0.1,q=0.1
+
+file delete expfit.sdds

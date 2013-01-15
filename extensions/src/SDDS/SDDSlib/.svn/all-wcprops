@@ -1,0 +1,209 @@
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/AOP/SDDS/!svn/ver/3559/trunk/SDDSlib
+END
+SDDS_transfer.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSlib/SDDS_transfer.c
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/3559/trunk/SDDSlib/Makefile.OAG
+END
+SDDS_binary.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/3119/trunk/SDDSlib/SDDS_binary.c
+END
+SDDS_MPI_binary.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/3246/trunk/SDDSlib/SDDS_MPI_binary.c
+END
+SDDS_write.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSlib/SDDS_write.c
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2154/trunk/SDDSlib/Makefile.Host
+END
+SDDS_info.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSlib/SDDS_info.c
+END
+Makefile.SDDS1
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2155/trunk/SDDSlib/Makefile.SDDS1
+END
+SDDS_utils.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/3514/trunk/SDDSlib/SDDS_utils.c
+END
+atest.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1913/trunk/SDDSlib/atest.c
+END
+Makefile.OAG2
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2530/trunk/SDDSlib/Makefile.OAG2
+END
+SDDS_data.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2821/trunk/SDDSlib/SDDS_data.c
+END
+SDDS_copy.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2787/trunk/SDDSlib/SDDS_copy.c
+END
+Makefile.Vx
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2284/trunk/SDDSlib/Makefile.Vx
+END
+testout1.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1913/trunk/SDDSlib/testout1.c
+END
+SDDS_process.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/3032/trunk/SDDSlib/SDDS_process.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/3036/trunk/SDDSlib/Makefile
+END
+SDDS_internal.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/3037/trunk/SDDSlib/SDDS_internal.h
+END
+aptest.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1913/trunk/SDDSlib/aptest.c
+END
+SDDS_mplsupport.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSlib/SDDS_mplsupport.c
+END
+SDDS_ascii.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2868/trunk/SDDSlib/SDDS_ascii.c
+END
+testout.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/1913/trunk/SDDSlib/testout.c
+END
+SDDS_rpn.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/3074/trunk/SDDSlib/SDDS_rpn.c
+END
+SDDS_input.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/3259/trunk/SDDSlib/SDDS_input.c
+END
+SDDS_output.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/3227/trunk/SDDSlib/SDDS_output.c
+END
+SDDS_dataprep.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/3330/trunk/SDDSlib/SDDS_dataprep.c
+END
+SDDSnl.nl
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/1913/trunk/SDDSlib/SDDSnl.nl
+END
+SDDSmpi_input.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/3426/trunk/SDDSlib/SDDSmpi_input.c
+END
+SDDSmpi_output.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/3224/trunk/SDDSlib/SDDSmpi_output.c
+END
+setrow.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1913/trunk/SDDSlib/setrow.c
+END
+Makefile.Host.SDDS1
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/2154/trunk/SDDSlib/Makefile.Host.SDDS1
+END
+SDDS_extract.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/3129/trunk/SDDSlib/SDDS_extract.c
+END
+notes.SDDSlib
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/389/trunk/SDDSlib/notes.SDDSlib
+END
+SDDSnl.h
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1913/trunk/SDDSlib/SDDSnl.h
+END

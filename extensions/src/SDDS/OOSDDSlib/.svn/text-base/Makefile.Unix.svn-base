@@ -1,0 +1,70 @@
+# Makefile for SDDS library
+
+EPICS = ../../../../..
+include Target.include
+include $(EPICS)/config/CONFIG_EXTENSIONS
+
+UNIX_OPT = NO
+LEX = flex
+YACC = bison
+
+LIBNAME = libOOSDDS1.a
+PROD = main 
+DEPLIBS = libOOSDDS1.a
+
+USR_CCFLAGS = -g -I. -I../../../SDDS/include -DATEXIT_AVAIL -Dsparc -DUNIX -DIEEE_MATH
+USR_LDFLAGS = -L../../../../lib/$(T_A) -L.
+USR_LDLIBS = -lOOSDDS1 -lmdblib
+
+SRCS.cc = ../Main.cc 
+SRCS.cc += ../sdds_yacc.cc
+SRCS.cc += ../sddsTable.cc
+SRCS.cc += ../sddsLayout.cc
+SRCS.cc += ../sddsError.cc
+SRCS.cc += ../gddNewDel.cc
+SRCS.cc += ../sddsFileBuffer.cc
+SRCS.cc += ../sddsSortedIndex.cc
+SRCS.cc += ../sddsString.cc
+SRCS.cc += ../sddsDefinition.cc
+
+SRCS.cc += ../resourceLibTest.cc
+ 
+SRCS.c += ../SDDS_data.c
+
+OBJS = Main.o
+
+LIBOBJS = sddsTable.o sddsLayout.o sddsError.o gddNewDel.o sddsFileBuffer.o
+LIBOBJS += sddsSortedIndex.o	
+LIBOBJS += sddsString.o	
+LIBOBJS += sdds_yacc.o	
+LIBOBJS += sddsDefinition.o	
+LIBOBJS += SDDS_data.o	
+
+include $(EPICS)/config/RULES.Unix
+
+# pre_build: SDDSnl.h
+
+#SDDSnl.h:  ../SDDSnl.nl
+#	$(INSTALL_BIN)/nlpp ../SDDSnl.nl SDDSnl.h
+
+
+libOOSDDS1.a: $(LIBOBJS) ../sddsDefinition.hh
+	$(AR) c$(ARFLAGS) $@ $(LIBOBJS)
+	@if [ ! -z "$(RANLIB)" ] ; then\
+		$(RANLIB) $@; \
+	fi
+
+
+main: $(OBJS) $(DEPLIBS)
+	$(LINK.cc) -o $@ $(OBJS) $(LDLIBS)
+
+sdds_lex.cc: ../sdds_lex.l
+	$(LEX) -o$@ ../sdds_lex.l
+
+sdds_yacc.cc: sdds_lex.cc ../sdds_yacc.y
+	$(YACC) -o $@ ../sdds_yacc.y
+
+clean::
+	/bin/rm -f SDDSnl.h
+
+

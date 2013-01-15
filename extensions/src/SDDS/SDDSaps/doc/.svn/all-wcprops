@@ -1,0 +1,551 @@
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/AOP/SDDS/!svn/ver/3563/trunk/SDDSaps/doc
+END
+sddspfit.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/3257/trunk/SDDSaps/doc/sddspfit.tex
+END
+sddsmatrixop.tex
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/2281/trunk/SDDSaps/doc/sddsmatrixop.tex
+END
+sddsxref.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/2370/trunk/SDDSaps/doc/sddsxref.tex
+END
+sddsquery.tex
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddsquery.tex
+END
+sddshist.tex
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/sddshist.tex
+END
+hpif2sdds.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/hpif2sdds.tex
+END
+sddsderiv.tex
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddsderiv.tex
+END
+sddssmooth.tex
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddssmooth.tex
+END
+sddsnaff.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/2629/trunk/SDDSaps/doc/sddsnaff.tex
+END
+mpl2sdds.tex
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/316/trunk/SDDSaps/doc/mpl2sdds.tex
+END
+raw2sdds.tex
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/raw2sdds.tex
+END
+sddscheck.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/sddscheck.tex
+END
+sddszerofind.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/656/trunk/SDDSaps/doc/sddszerofind.tex
+END
+sddspeakfind.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/sddspeakfind.tex
+END
+sddsmakedataset.tex
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/AOP/SDDS/!svn/ver/2113/trunk/SDDSaps/doc/sddsmakedataset.tex
+END
+sddsbreak.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/sddsbreak.tex
+END
+sddscliptails.tex
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/AOP/SDDS/!svn/ver/1545/trunk/SDDSaps/doc/sddscliptails.tex
+END
+sddscollect.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddscollect.tex
+END
+sddssort.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/3353/trunk/SDDSaps/doc/sddssort.tex
+END
+sddsgfit.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/1298/trunk/SDDSaps/doc/sddsgfit.tex
+END
+sddsspotanalysis.tex
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/AOP/SDDS/!svn/ver/2317/trunk/SDDSaps/doc/sddsspotanalysis.tex
+END
+sddscast.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/1795/trunk/SDDSaps/doc/sddscast.tex
+END
+sddsconvolve.tex
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddsconvolve.tex
+END
+sddsvslopes.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddsvslopes.tex
+END
+sddsendian.tex
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/712/trunk/SDDSaps/doc/sddsendian.tex
+END
+sddsfdfilter.tex
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/3165/trunk/SDDSaps/doc/sddsfdfilter.tex
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/1952/trunk/SDDSaps/doc/Makefile
+END
+elegant2genesis.tex
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/AOP/SDDS/!svn/ver/3104/trunk/SDDSaps/doc/elegant2genesis.tex
+END
+charSet.eps
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/348/trunk/SDDSaps/doc/charSet.eps
+END
+sddscollapse.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/713/trunk/SDDSaps/doc/sddscollapse.tex
+END
+sddschanges.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/1057/trunk/SDDSaps/doc/sddschanges.tex
+END
+sddseventhist.tex
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddseventhist.tex
+END
+sddsdigfilter.tex
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/416/trunk/SDDSaps/doc/sddsdigfilter.tex
+END
+sddscongen.tex
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/sddscongen.tex
+END
+sdds2mpl.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sdds2mpl.tex
+END
+sddssyncflux.tex
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/2375/trunk/SDDSaps/doc/sddssyncflux.tex
+END
+sddscombine.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddscombine.tex
+END
+sdds2stream.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sdds2stream.tex
+END
+sddstranspose.tex
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/374/trunk/SDDSaps/doc/sddstranspose.tex
+END
+sddsmpfit.tex
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddsmpfit.tex
+END
+sddsgenericfit.tex
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/2745/trunk/SDDSaps/doc/sddsgenericfit.tex
+END
+sddsdistest.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddsdistest.tex
+END
+sddsselect.tex
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/2417/trunk/SDDSaps/doc/sddsselect.tex
+END
+lba2sdds.tex
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/lba2sdds.tex
+END
+rpn.tex
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3347/trunk/SDDSaps/doc/rpn.tex
+END
+sddsoutlier.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddsoutlier.tex
+END
+sddsimageconvert.tex
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/AOP/SDDS/!svn/ver/2317/trunk/SDDSaps/doc/sddsimageconvert.tex
+END
+sddsregroup.tex
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/314/trunk/SDDSaps/doc/sddsregroup.tex
+END
+sddsrunstats.tex
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddsrunstats.tex
+END
+sddsprintout.tex
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddsprintout.tex
+END
+SDDStoolkit.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/3366/trunk/SDDSaps/doc/SDDStoolkit.tex
+END
+sddsimageprofiles.tex
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/AOP/SDDS/!svn/ver/2317/trunk/SDDSaps/doc/sddsimageprofiles.tex
+END
+sddssplit.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/sddssplit.tex
+END
+sddssinefit.tex
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/sddssinefit.tex
+END
+sddssampledist.tex
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/1823/trunk/SDDSaps/doc/sddssampledist.tex
+END
+sddsdiff.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/2568/trunk/SDDSaps/doc/sddsdiff.tex
+END
+sddssequence.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/363/trunk/SDDSaps/doc/sddssequence.tex
+END
+csv2sdds.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/1146/trunk/SDDSaps/doc/csv2sdds.tex
+END
+sddsplot.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/3367/trunk/SDDSaps/doc/sddsplot.tex
+END
+sddsexpand.tex
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/712/trunk/SDDSaps/doc/sddsexpand.tex
+END
+sddscorrelate.tex
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/AOP/SDDS/!svn/ver/1371/trunk/SDDSaps/doc/sddscorrelate.tex
+END
+sddsconvert.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/1412/trunk/SDDSaps/doc/sddsconvert.tex
+END
+sddsmultihist.tex
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/AOP/SDDS/!svn/ver/3162/trunk/SDDSaps/doc/sddsmultihist.tex
+END
+sddsbaseline.tex
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/3099/trunk/SDDSaps/doc/sddsbaseline.tex
+END
+hdf2sdds.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/1360/trunk/SDDSaps/doc/hdf2sdds.tex
+END
+sddsrowstats.tex
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/1633/trunk/SDDSaps/doc/sddsrowstats.tex
+END
+sddspseudoinverse.tex
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/AOP/SDDS/!svn/ver/3168/trunk/SDDSaps/doc/sddspseudoinverse.tex
+END
+sddshist2d.tex
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/sddshist2d.tex
+END
+awe2sdds.tex
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/awe2sdds.tex
+END
+sddsinterp.tex
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/2369/trunk/SDDSaps/doc/sddsinterp.tex
+END
+sddsslopes.tex
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/314/trunk/SDDSaps/doc/sddsslopes.tex
+END
+sddssortcolumn.tex
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/2374/trunk/SDDSaps/doc/sddssortcolumn.tex
+END
+sddsmatrixmult.tex
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/1362/trunk/SDDSaps/doc/sddsmatrixmult.tex
+END
+sddsinteg.tex
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/3485/trunk/SDDSaps/doc/sddsinteg.tex
+END
+sdds2math.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/sdds2math.tex
+END
+sddswildcards.tex
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/sddswildcards.tex
+END
+sddsenvelope.tex
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/1146/trunk/SDDSaps/doc/sddsenvelope.tex
+END
+sddsprocess.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/3563/trunk/SDDSaps/doc/sddsprocess.tex
+END
+sddsfft.tex
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/3124/trunk/SDDSaps/doc/sddsfft.tex
+END
+plaindata2sdds.tex
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/1091/trunk/SDDSaps/doc/plaindata2sdds.tex
+END
+sdds2plaindata.tex
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/1091/trunk/SDDSaps/doc/sdds2plaindata.tex
+END
+sddsshiftcor.tex
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddsshiftcor.tex
+END
+sddsEditing.tex
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/sddsEditing.tex
+END
+sddsderef.tex
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/sddsderef.tex
+END
+sdds2spreadsheet.tex
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sdds2spreadsheet.tex
+END
+sddscontour.tex
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/3166/trunk/SDDSaps/doc/sddscontour.tex
+END
+epsf.sty
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/598/trunk/SDDSaps/doc/epsf.sty
+END
+sddsexpfit.tex
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/298/trunk/SDDSaps/doc/sddsexpfit.tex
+END
+col2sdds.tex
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/655/trunk/SDDSaps/doc/col2sdds.tex
+END
+sddstimeconvert.tex
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddstimeconvert.tex
+END
+sddsnormalize.tex
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/AOP/SDDS/!svn/ver/1022/trunk/SDDSaps/doc/sddsnormalize.tex
+END

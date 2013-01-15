@@ -1,0 +1,80 @@
+#!/bin/sh  
+# \
+exec tclsh "$0" "$@"
+if [catch {set device $env(SDDS_DEVICE)}] {
+    set device motif
+}
+
+puts stderr ""
+puts stderr " Make a series of pages with 21 x points on \[-5, 5\], then create"
+puts stderr " the y column from y = 1 + 2*x + 3*x^2 + randomValue"
+exec sddssequence -pipe=out -define=x,type=double \
+ -sequence=beg=-5,end=5,number=21 -repeat=200 \
+| sddsbreak -pipe -rowlimit=21 \
+| sddsprocess -rpndef=defns.rpn -pipe=in pfitTest.sdds "-define=column,y,3 x * 2 + x * 1 + grnd +" \
+ "-rpnexpression=0 sto i" "-define=param,Page,i 1 + sto i,type=short"
+
+puts stderr ""
+puts stderr " Make fits and xref back the page number"
+puts stderr " Also make an evaluation file"
+exec sddspfit pfitTest.sdds -pipe=out -col=x,y -terms=3 -eval=pfitTest.evals,number=101 \
+| sddsxref -pipe=in pfitTest.sdds pfitTest.fits -leave=* -transfer=param,Page
+exec sddsxref -nowarn pfitTest.evals pfitTest.sdds -leave=* -transfer=param,Page
+
+puts stderr ""
+puts stderr " Make interpolations to high order (to show what happens)"
+puts stderr " and xref back the page number"
+exec sddsinterp pfitTest.sdds -pipe=out -fileValues=pfitTest.evals,col=x,parallel -col=x,y -order=7 \
+| sddsxref -pipe=in pfitTest.sdds pfitTest.interp -leave=* -transfer=param,Page
+
+puts stderr ""
+puts stderr " Find the envelope of the y values and xref back the Page number"
+exec sddsenvelope pfitTest.interp -pipe=out -copy=x -min=y -max=y \
+| sddsxref -pipe=in pfitTest.sdds pfitTest.env -leave=* -transfer=param,Page
+
+puts stderr ""
+puts stderr " Collapse the fit output and process fit parameters, then"
+puts stderr " print the fit parameter statistics"
+exec sddscollapse pfitTest.fits -pipe=out \
+| sddsprocess -rpndef=defns.rpn -pipe=in pfitTest.fitc \
+   -process=Intercept,ave,AverageIntercept -process=Intercept,stand,StDevIntercept \
+   -process=Slope,ave,AverageSlope -process=Slope,stand,StDevSlope \
+   -process=Curvature,ave,AverageCurvature -process=Curvature,stand,StDevCurvature 
+
+puts stderr [exec sddsprintout pfitTest.fitc -param=*Intercept,end \
+        -param=*Slope,end -param=*Curvature,end]
+
+puts stderr ""
+puts stderr " Histogram the fit parameters, then make plots"
+file delete [glob -nocomplain pfitTest.his*]
+exec sddshist pfitTest.fitc -pipe=out -data=Intercept -bins=20 -sides -stat \
+| sddsprocess -rpndef=defns.rpn -pipe=in pfitTest.hisIntercept "-print=param,histLabel,Mean: %.3e  StDev %.3e,InterceptMean,InterceptStDev"
+exec sddshist pfitTest.fitc -pipe=out -data=Slope -bins=20 -sides -stat \
+| sddsprocess -rpndef=defns.rpn -pipe=in pfitTest.hisSlope "-print=param,histLabel,Mean: %.3e  StDev %.3e,SlopeMean,SlopeStDev"
+exec sddshist pfitTest.fitc -pipe=out -data=Curvature -bins=20 -sides -stat \
+| sddsprocess -rpndef=defns.rpn -pipe=in pfitTest.hisCurvature "-print=param,histLabel,Mean: %.3e  StDev %.3e,CurvatureMean,CurvatureStDev"
+catch { eval exec sddsplot -column=frequency,(Intercept,Slope,Curvature) -groupby=nameIndex \
+[glob -nocomplain pfitTest.his*] -sep -swap -topline=@histLabel}
+
+puts stderr ""
+puts stderr " Do a single fit with error propagation.  The result should"
+puts stderr " agree reasonably well with the statistics for many fits with"
+puts stderr " perturbed data points."
+catch {exec sddssequence -pipe=out -define=x,type=double \
+ -sequence=beg=-5,end=5,number=21 \
+| sddsprocess -rpndef=defns.rpn -pipe "-define=column,y,3 x * 2 + x * 1 + " \
+ -define=col,sy,1 \
+| sddspfit -pipe=in /dev/null -col=x,y,ysigma=sy -terms=5 -verbose -revise=thres=0.1} result
+puts stderr "$result"
+
+puts stderr ""
+puts stderr " Make a movie of data, fit evaluation, interpolation, and envelope"
+exec sddsplot -split=page -sep=page -groupby=page -same=y \
+  -filter=param,Page,1,20 \
+  -col=x,y pfitTest.fits -graph=sym -legend=spec=data "-topline=@sddspfitLabel,edit=i/Fit: /" \
+  -col=x,y pfitTest.evals -graph=line,type=1 -legend=spec=fit \
+  -col=x,y pfitTest.interp -graph=line,type=2 -legend=spec=interp \
+  -col=x,(yMin,yMax) pfitTest.env -graph=line,type=3 -legend=spec=envelope  -omnipresent
+
+eval file delete [glob -nocomplain pfitTest*]
+

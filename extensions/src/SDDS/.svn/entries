@@ -1,0 +1,263 @@
+10
+
+dir
+3580
+https://svn.aps.anl.gov/AOP/SDDS/trunk
+https://svn.aps.anl.gov/AOP/SDDS
+
+
+
+2012-10-01T21:07:33.421411Z
+3580
+soliday
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+d9d7c72f-1acf-6d44-b4ec-d286040990fa
+
+python
+dir
+
+rpns
+dir
+
+png
+dir
+
+COPYRIGHT.TXT
+file
+
+
+
+
+2012-10-04T14:39:48.144541Z
+12bfc88f7f8b87bb008f909902aba08f
+1995-08-25T16:19:24.000000Z
+2
+saunders
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2291
+
+xlslib
+dir
+
+zlib
+dir
+
+SDDSaps
+dir
+
+MPLDriver
+file
+
+
+
+
+2012-10-04T14:39:48.144942Z
+933fb4fc7a2f507c4836ec89ea0b6faa
+2006-10-20T14:10:36.000000Z
+2850
+jiaox
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3507
+
+daq
+dir
+
+pgapack
+dir
+
+gnuplot2.0
+dir
+
+meschach
+dir
+
+mdbmth
+dir
+
+mdbcommon
+dir
+
+2d_interpolate
+dir
+
+cmatlib
+dir
+
+namelist
+dir
+
+Makefile
+file
+
+
+
+
+2012-10-04T14:39:48.145381Z
+ac0dce78ec50bc5e4e3f1b79c9d811ba
+2012-08-13T22:55:09.515885Z
+3569
+soliday
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8019
+
+java
+dir
+
+OOSDDSlib
+dir
+
+LICENSE
+file
+
+
+
+
+2012-10-04T14:39:48.145748Z
+59612efb06f69e4e2eaeadbca4ac4551
+2012-05-29T19:27:52.239854Z
+3561
+soliday
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3528
+
+include
+dir
+
+SDDSlib
+dir
+
+gsl
+dir
+
+levmar
+dir
+
+tiff
+dir
+
+mdblib
+dir
+
+gd
+dir
+
+oagLib
+dir
+
+fdlibm
+dir
+
+matlab
+dir
+
+utils
+dir
+
+SDDS3lib
+dir
+
+matlib
+dir
+
+fortran
+dir
+
+examples
+dir
+
+fftpack
+dir
+

@@ -1,0 +1,125 @@
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/AOP/SDDS/!svn/ver/2175/trunk/fdlibm
+END
+s_rint.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1141/trunk/fdlibm/s_rint.c
+END
+s_erf.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/1141/trunk/fdlibm/s_erf.c
+END
+k_cos.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/1141/trunk/fdlibm/k_cos.c
+END
+w_j0.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/1221/trunk/fdlibm/w_j0.c
+END
+e_exp.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/1141/trunk/fdlibm/e_exp.c
+END
+w_j1.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/1221/trunk/fdlibm/w_j1.c
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2175/trunk/fdlibm/Makefile.OAG
+END
+e_lgamma.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/1141/trunk/fdlibm/e_lgamma.c
+END
+k_sin.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/1141/trunk/fdlibm/k_sin.c
+END
+s_signgam.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/891/trunk/fdlibm/s_signgam.c
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2173/trunk/fdlibm/Makefile.Host
+END
+k_standard.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2135/trunk/fdlibm/k_standard.c
+END
+e_jn.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/1221/trunk/fdlibm/e_jn.c
+END
+e_j0.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/1221/trunk/fdlibm/e_j0.c
+END
+e_j1.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/1221/trunk/fdlibm/e_j1.c
+END
+e_lgamma_r.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1141/trunk/fdlibm/e_lgamma_r.c
+END
+w_lgamma.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/2135/trunk/fdlibm/w_lgamma.c
+END
+e_log.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/1141/trunk/fdlibm/e_log.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/2175/trunk/fdlibm/Makefile
+END
+w_jn.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/1221/trunk/fdlibm/w_jn.c
+END

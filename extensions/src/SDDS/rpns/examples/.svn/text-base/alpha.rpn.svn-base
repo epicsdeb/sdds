@@ -1,0 +1,28 @@
+0.7505018154047944 sto ka
+"physconst.rpn/s" @
+1 sto beta0 0 sto alpha0
+1 sto beta  0 sto alpha
+0 sto phi
+cle
+
+udf
+xmax
+sto gamma pop sto gradB pop gamma _gamma
+p gradB / sqrt ka *
+
+udf
+r11
+beta beta0 / sqrt phi cos phi sin alpha0 * + *
+
+udf
+r12
+beta beta0 * sqrt phi sin *
+
+udf
+r21
+alpha alpha0 - phi cos * 1 alpha alpha0 * + phi sin * + beta beta0 * sqrt / chs
+
+udf
+r22
+phi cos phi sin alpha * - beta0 beta / sqrt *
+

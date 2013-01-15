@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/AOP/SDDS/!svn/ver/3570/trunk/SDDSaps/sddsplots/motifDriver
+END
+xwdfunc.c
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/AOP/SDDS/!svn/ver/1922/trunk/SDDSaps/sddsplots/motifDriver/xwdfunc.c
+END
+resources.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/AOP/SDDS/!svn/ver/3054/trunk/SDDSaps/sddsplots/motifDriver/resources.h
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/AOP/SDDS/!svn/ver/3569/trunk/SDDSaps/sddsplots/motifDriver/Makefile.OAG
+END
+mpl_motif.c
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/AOP/SDDS/!svn/ver/3570/trunk/SDDSaps/sddsplots/motifDriver/mpl_motif.c
+END
+mpl_motif.hlp
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/AOP/SDDS/!svn/ver/3054/trunk/SDDSaps/sddsplots/motifDriver/mpl_motif.hlp
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/AOP/SDDS/!svn/ver/2190/trunk/SDDSaps/sddsplots/motifDriver/Makefile.Host
+END
+aps.icon
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/AOP/SDDS/!svn/ver/2/trunk/SDDSaps/sddsplots/motifDriver/aps.icon
+END
+mpl_motif.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/AOP/SDDS/!svn/ver/2725/trunk/SDDSaps/sddsplots/motifDriver/mpl_motif.h
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/AOP/SDDS/!svn/ver/2220/trunk/SDDSaps/sddsplots/motifDriver/Makefile
+END

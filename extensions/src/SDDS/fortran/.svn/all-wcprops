@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/AOP/SDDS/!svn/ver/3540/trunk/fortran
+END
+SDDSFortran.h
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/3487/trunk/fortran/SDDSFortran.h
+END
+fortranReadExample.sdds
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/981/trunk/fortran/fortranReadExample.sdds
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/3540/trunk/fortran/Makefile.OAG
+END
+fortranWriteExample.f
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/996/trunk/fortran/fortranWriteExample.f
+END
+fortranReadExample.f
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/1318/trunk/fortran/fortranReadExample.f
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2441/trunk/fortran/Makefile.Host
+END
+fortran_wrapper.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/3487/trunk/fortran/fortran_wrapper.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/3406/trunk/fortran/Makefile
+END

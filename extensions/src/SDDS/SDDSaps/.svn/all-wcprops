@@ -1,0 +1,671 @@
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/AOP/SDDS/!svn/ver/3580/trunk/SDDSaps
+END
+sddscorrelate.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSaps/sddscorrelate.c
+END
+sddsconvert.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2940/trunk/SDDSaps/sddsconvert.c
+END
+sddspeakfind.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSaps/sddspeakfind.c
+END
+sddsbaseline.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2901/trunk/SDDSaps/sddsbaseline.c
+END
+sddsmultihist.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/3554/trunk/SDDSaps/sddsmultihist.c
+END
+sddsmakedataset.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddsmakedataset.c
+END
+sddsconvertlogonchange.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/AOP/SDDS/!svn/ver/3440/trunk/SDDSaps/sddsconvertlogonchange.c
+END
+sddscollect.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddscollect.c
+END
+sddsrowstats.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/3496/trunk/SDDSaps/sddsrowstats.c
+END
+sddssort.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2950/trunk/SDDSaps/sddssort.c
+END
+sddsgfit.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddsgfit.c
+END
+sddsspotanalysis.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/2880/trunk/SDDSaps/sddsspotanalysis.c
+END
+sddsconvolve.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/3122/trunk/SDDSaps/sddsconvolve.c
+END
+sddsvslopes.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/3009/trunk/SDDSaps/sddsvslopes.c
+END
+sddsfdfilter.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/3346/trunk/SDDSaps/sddsfdfilter.c
+END
+SDDSutils.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3515/trunk/SDDSaps/SDDSutils.c
+END
+sddscombinelogfiles.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/AOP/SDDS/!svn/ver/3478/trunk/SDDSaps/sddscombinelogfiles.c
+END
+elegant2genesis.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/3103/trunk/SDDSaps/elegant2genesis.c
+END
+sddsseparate.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2945/trunk/SDDSaps/sddsseparate.c
+END
+SDDSutils.h
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3515/trunk/SDDSaps/SDDSutils.h
+END
+sddsinteg.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3490/trunk/SDDSaps/sddsinteg.c
+END
+sddsmatrixmult.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddsmatrixmult.c
+END
+sddseventhist.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddseventhist.c
+END
+sddsdigfilter.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2813/trunk/SDDSaps/sddsdigfilter.c
+END
+readexample.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/1918/trunk/SDDSaps/readexample.c
+END
+sddsduplicate.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/3398/trunk/SDDSaps/sddsduplicate.c
+END
+sddsbinarystring.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/3155/trunk/SDDSaps/sddsbinarystring.c
+END
+agilentwaveform2sdds.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/AOP/SDDS/!svn/ver/3444/trunk/SDDSaps/agilentwaveform2sdds.cpp
+END
+sdds2stream.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2691/trunk/SDDSaps/sdds2stream.c
+END
+sddsprocess.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/3457/trunk/SDDSaps/sddsprocess.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/2162/trunk/SDDSaps/Makefile
+END
+sddsdistest.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSaps/sddsdistest.c
+END
+sddsgenericfit.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/3527/trunk/SDDSaps/sddsgenericfit.c
+END
+sddsmpfit.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2845/trunk/SDDSaps/sddsmpfit.c
+END
+sddsselect.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2644/trunk/SDDSaps/sddsselect.c
+END
+agilentcomm.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/3308/trunk/SDDSaps/agilentcomm.cpp
+END
+sddsmxref.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3421/trunk/SDDSaps/sddsmxref.c
+END
+sddsoutlier.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/3400/trunk/SDDSaps/sddsoutlier.c
+END
+sddspoly.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddspoly.c
+END
+sddsregroup.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSaps/sddsregroup.c
+END
+sddsrunstats.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/3007/trunk/SDDSaps/sddsrunstats.c
+END
+SDDS.m
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/2346/trunk/SDDSaps/SDDS.m
+END
+sddssplit.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3176/trunk/SDDSaps/sddssplit.c
+END
+sddsnormalize.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddsnormalize.c
+END
+sdds3daverage.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2922/trunk/SDDSaps/sdds3daverage.c
+END
+sddssinefit.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSaps/sddssinefit.c
+END
+sddspfit.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/3480/trunk/SDDSaps/sddspfit.c
+END
+sddsxref.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/3421/trunk/SDDSaps/sddsxref.c
+END
+sddssampledist.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/3318/trunk/SDDSaps/sddssampledist.c
+END
+tek2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1918/trunk/SDDSaps/tek2sdds.c
+END
+hpif2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1918/trunk/SDDSaps/hpif2sdds.c
+END
+citi2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1918/trunk/SDDSaps/citi2sdds.c
+END
+mpl2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/3225/trunk/SDDSaps/mpl2sdds.c
+END
+sddsnaff.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddsnaff.c
+END
+csv2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/3378/trunk/SDDSaps/csv2sdds.c
+END
+sddsexpand.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddsexpand.c
+END
+sddszerofind.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddszerofind.c
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/3580/trunk/SDDSaps/Makefile.OAG
+END
+sddscliptails.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddscliptails.c
+END
+sddsbreak.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3574/trunk/SDDSaps/sddsbreak.c
+END
+hpwf2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1918/trunk/SDDSaps/hpwf2sdds.c
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2162/trunk/SDDSaps/Makefile.Host
+END
+sddscast.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddscast.c
+END
+sddsmselect.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/1918/trunk/SDDSaps/sddsmselect.c
+END
+sddsendian.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2477/trunk/SDDSaps/sddsendian.c
+END
+sddsinterp.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/3491/trunk/SDDSaps/sddsinterp.c
+END
+sddscollapse.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSaps/sddscollapse.c
+END
+mcs2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1918/trunk/SDDSaps/mcs2sdds.c
+END
+sddsslopes.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSaps/sddsslopes.c
+END
+sddssortcolumn.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/3350/trunk/SDDSaps/sddssortcolumn.c
+END
+sdds3dconvert.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2921/trunk/SDDSaps/sdds3dconvert.c
+END
+sddschanges.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddschanges.c
+END
+sdds2mpl.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2691/trunk/SDDSaps/sdds2mpl.c
+END
+tiff2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3111/trunk/SDDSaps/tiff2sdds.c
+END
+sdds2math.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2691/trunk/SDDSaps/sdds2math.c
+END
+wfm2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/3153/trunk/SDDSaps/wfm2sdds.c
+END
+sddscombine.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/3002/trunk/SDDSaps/sddscombine.c
+END
+sddsenvelope.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/3452/trunk/SDDSaps/sddsenvelope.c
+END
+TFS2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1918/trunk/SDDSaps/TFS2sdds.c
+END
+sddstranspose.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/3113/trunk/SDDSaps/sddstranspose.c
+END
+plaindata2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/3472/trunk/SDDSaps/plaindata2sdds.c
+END
+sdds2plaindata.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/3256/trunk/SDDSaps/sdds2plaindata.c
+END
+sddsfft.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/3556/trunk/SDDSaps/sddsfft.c
+END
+lba2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1918/trunk/SDDSaps/lba2sdds.c
+END
+sddsshiftcor.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSaps/sddsshiftcor.c
+END
+atest1.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1918/trunk/SDDSaps/atest1.c
+END
+SDDSaps.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/3562/trunk/SDDSaps/SDDSaps.c
+END
+sddsprintout.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/3481/trunk/SDDSaps/sddsprintout.c
+END
+sddsderef.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddsderef.c
+END
+sddsimageprofiles.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/3566/trunk/SDDSaps/sddsimageprofiles.c
+END
+SDDSaps.h
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/3562/trunk/SDDSaps/SDDSaps.h
+END
+sdds2spreadsheet.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/3555/trunk/SDDSaps/sdds2spreadsheet.c
+END
+sddsexpfit.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/3475/trunk/SDDSaps/sddsexpfit.c
+END
+sddstimeconvert.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddstimeconvert.c
+END
+sddsmatrixop.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2977/trunk/SDDSaps/sddsmatrixop.c
+END
+image2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2691/trunk/SDDSaps/image2sdds.c
+END
+sdds2headlessdata.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/3565/trunk/SDDSaps/sdds2headlessdata.c
+END
+sddsquery.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3245/trunk/SDDSaps/sddsquery.c
+END
+sddshist.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddshist.c
+END
+sddsdiff.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/3268/trunk/SDDSaps/sddsdiff.c
+END
+sddssequence.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2689/trunk/SDDSaps/sddssequence.c
+END
+sddsderiv.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddsderiv.c
+END
+sddssmooth.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddssmooth.c
+END
+sdds2tiff.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3261/trunk/SDDSaps/sdds2tiff.c
+END
+raw2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1918/trunk/SDDSaps/raw2sdds.c
+END
+sdds2dinterpolate.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/3577/trunk/SDDSaps/sdds2dinterpolate.c
+END
+sddscheck.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2943/trunk/SDDSaps/sddscheck.c
+END
+sddsinterpset.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddsinterpset.c
+END
+sddsshift.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2753/trunk/SDDSaps/sddsshift.c
+END
+sddsarray2column.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/AOP/SDDS/!svn/ver/2871/trunk/SDDSaps/sddsarray2column.c
+END
+sddsminterp.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2845/trunk/SDDSaps/sddsminterp.c
+END

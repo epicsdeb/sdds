@@ -1,0 +1,51 @@
+#!/bin/sh  
+# \
+exec tclsh "$0" "$@"
+if [catch {set device $env(SDDS_DEVICE)}] {
+    set device motif
+}
+
+set interval 5e-2
+puts stderr "**Zeroes of J0:"
+puts stderr [exec sddssequence -define=z,type=double -sequence=begin=0,end=50,delta=$interval -pipe=out \
+| sddsprocess -pipe -rpndef=defns.rpn \
+    "-define=column,J0,z 0 Jn" "-define=column,J1,z 1 Jn" \
+| sddszerofind -pipe -zero=J0 -column=z,J1 \
+| sddsprocess -pipe -rpndef=defns.rpn \
+    "-define=col,J0check,z 0 Jn" "-define=col,J1check,z 1 Jn" \
+| sddsprintout -column=(z,J0,J0check,J1,J1check) -pipe=in -format=double=%16.9e]
+
+puts stderr "**Iterative solution for better accuracy:"
+set offset 1e-4
+exec sddssequence -define=z,type=double -sequence=begin=0,end=50,number=5000 -pipe=out \
+| sddsprocess -rpndef=defns.rpn -pipe "-define=column,J0,z 0 Jn" \
+| sddszerofind -pipe=in -zero=J0 -column=z J0zeros.sdds
+exec sddsprocess -rpndef=defns.rpn J0zeros.sdds J0zeros1.sdds "-redefine=column,z,z $offset -" "-redefine=col,J0,z 0 Jn"
+exec sddsprocess -rpndef=defns.rpn J0zeros.sdds J0zeros2.sdds "-redefine=column,z,z $offset +" "-redefine=col,J0,z 0 Jn"
+exec sddscombine J0zeros1.sdds J0zeros2.sdds -merge -pipe=out \
+| sddssort -pipe -col=z \
+| sddszerofind -pipe -zero=J0 -column=z \
+| sddsprocess -rpndef=defns.rpn -pipe=in J0zeros.sdds "-define=col,J0check,z 0 Jn" "-defi=col,zOverPi,z pi /" 
+puts stderr "first iteration done"
+
+set offset 1e-6
+exec sddsprocess -rpndef=defns.rpn J0zeros.sdds J0zeros1.sdds "-redefine=column,z,z $offset -" "-redefine=col,J0,z 0 Jn"
+exec sddsprocess -rpndef=defns.rpn J0zeros.sdds J0zeros2.sdds "-redefine=column,z,z $offset +" \
+    "-redefine=col,J0,z 0 Jn"
+exec sddscombine J0zeros1.sdds J0zeros2.sdds -merge -pipe=out \
+| sddssort -pipe -col=z \
+| sddszerofind -pipe -zero=J0 -column=z \
+| sddsprocess -rpndef=defns.rpn -pipe=in J0zeros.sdds "-define=col,J0check,z 0 Jn" "-defi=col,zOverPi,z pi /" 
+puts stderr "second iteration done"
+
+set offset 1e-8
+exec sddsprocess -rpndef=defns.rpn J0zeros.sdds J0zeros1.sdds "-redefine=column,z,z $offset -" "-redefine=col,J0,z 0 Jn"
+exec sddsprocess -rpndef=defns.rpn J0zeros.sdds J0zeros2.sdds "-redefine=column,z,z $offset +" "-redefine=col,J0,z 0 Jn"
+puts stderr [exec sddscombine J0zeros1.sdds J0zeros2.sdds -merge -pipe=out \
+| sddssort -pipe -col=z \
+| sddszerofind -pipe -zero=J0 -column=z \
+| sddsprocess -rpndef=defns.rpn -pipe "-define=col,J0check,z 0 Jn" "-defi=col,zOverPi,z pi /" \
+| tee J0zeros.sdds \
+| sddsprintout -column=(z,zOverPi),format=%16.12f -column=J0check -pipe=in -format=double=%16.9e]
+
+file delete J0*

@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Main-Class: SDDS.java.SDDSedit.sddsEdit
+Class-Path: SDDS.jar
+Created-By: 1.6.0 (Sun Microsystems Inc.)
+

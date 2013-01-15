@@ -1,0 +1,45 @@
+#!/bin/sh
+# \
+exec oagtclsh "$0" "$@"
+
+# Log:$ 
+
+# This compiles all methods of svd for sddspseudoinverse,
+# and gives each executable a different name for
+# benchmarking.
+
+set hostname [exec hostname]
+set possibleArchitectures "linux-x86 solaris-sparc"
+set developmentDir [glob O.*]
+set architecture ""
+foreach dir $developmentDir {
+    foreach arch $possibleArchitectures {
+        if [regexp $arch $dir] {
+            set architecture $arch
+            break
+        }
+    }
+    if [string length $architecture] break
+}
+
+# By setting SUNPERF=0 we should get the fall-back "default" meschach
+exec touch sddspseudoinverse.c
+catch {exec gnumake SUNPERF=0 > make.log.Meschach}
+exec mv O.${architecture}/sddspseudoinverse O.${architecture}/sddspseudoinverse.${hostname}.Meschach
+
+exec touch sddspseudoinverse.c
+catch {exec gnumake NUMERICAL_RECIPES=yes > make.log.NR}
+exec mv O.${architecture}/sddspseudoinverse O.${architecture}/sddspseudoinverse.${hostname}.NR
+
+exec touch sddspseudoinverse.c
+catch {exec gnumake CLAPACK=yes > make.log.CLAPACK}
+exec mv O.${architecture}/sddspseudoinverse O.${architecture}/sddspseudoinverse.${hostname}.CLAPACK
+
+exec touch sddspseudoinverse.c
+catch {exec gnumake SUNPERF=yes > make.log.SunPerf}
+exec mv O.${architecture}/sddspseudoinverse O.${architecture}/sddspseudoinverse.${hostname}.SunPerf
+
+exit
+
+
+

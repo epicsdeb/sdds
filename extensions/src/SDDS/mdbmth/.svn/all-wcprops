@@ -1,0 +1,371 @@
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/AOP/SDDS/!svn/ver/3562/trunk/mdbmth
+END
+k13.c
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/3223/trunk/mdbmth/k13.c
+END
+GillMillerIntegration.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/3489/trunk/mdbmth/GillMillerIntegration.c
+END
+zeroIH.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/zeroIH.c
+END
+interp.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/3453/trunk/mdbmth/interp.c
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3484/trunk/mdbmth/Makefile.OAG
+END
+dlaran.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/2736/trunk/mdbmth/dlaran.c
+END
+fn_zero.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/fn_zero.c
+END
+factorial.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/factorial.c
+END
+dlaran.f
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/dlaran.f
+END
+mcTable.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/mcTable.c
+END
+gridopt.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/2802/trunk/mdbmth/gridopt.c
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2149/trunk/mdbmth/Makefile.Host
+END
+lincorr.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/3562/trunk/mdbmth/lincorr.c
+END
+complex.cc
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/3326/trunk/mdbmth/complex.cc
+END
+sigLevel.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/2247/trunk/mdbmth/sigLevel.c
+END
+zeroNewton.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/zeroNewton.c
+END
+lsfBasisFns.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2689/trunk/mdbmth/lsfBasisFns.c
+END
+ipow.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/2247/trunk/mdbmth/ipow.c
+END
+comtest.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/3280/trunk/mdbmth/comtest.c
+END
+gy.c
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/AOP/SDDS/!svn/ver/3306/trunk/mdbmth/gy.c
+END
+counter.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/counter.c
+END
+qromb.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/3235/trunk/mdbmth/qromb.c
+END
+simplex.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/2422/trunk/mdbmth/simplex.c
+END
+diffeqResDescrip.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/diffeqResDescrip.c
+END
+moments.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/moments.c
+END
+poly.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/2332/trunk/mdbmth/poly.c
+END
+zero_main.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2101/trunk/mdbmth/zero_main.c
+END
+betai.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/2247/trunk/mdbmth/betai.c
+END
+gaussFit.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/2026/trunk/mdbmth/gaussFit.c
+END
+minc.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/minc.c
+END
+Makefile.Vx
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2247/trunk/mdbmth/Makefile.Vx
+END
+drand.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/2738/trunk/mdbmth/drand.c
+END
+ming.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/ming.c
+END
+gammai.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/2247/trunk/mdbmth/gammai.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/2149/trunk/mdbmth/Makefile
+END
+trapInteg.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2398/trunk/mdbmth/trapInteg.c
+END
+k23.c
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/3223/trunk/mdbmth/k23.c
+END
+kstests.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/kstests.c
+END
+logfile_gener.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/3264/trunk/mdbmth/logfile_gener.c
+END
+zeroInterp.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/zeroInterp.c
+END
+rkODE.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/3238/trunk/mdbmth/rkODE.c
+END
+elliptic.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/elliptic.c
+END
+onedoptimize.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/3219/trunk/mdbmth/onedoptimize.c
+END
+powellMin.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2260/trunk/mdbmth/powellMin.c
+END
+smooth.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/2659/trunk/mdbmth/smooth.c
+END
+hypert.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/hypert.c
+END
+bsODEp.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/2247/trunk/mdbmth/bsODEp.c
+END
+dbessel.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/3191/trunk/mdbmth/dbessel.c
+END
+min.c
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/min.c
+END
+halton.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/3434/trunk/mdbmth/halton.c
+END
+linfit.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/3101/trunk/mdbmth/linfit.c
+END
+rowmedian.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/rowmedian.c
+END
+wofz.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/3325/trunk/mdbmth/wofz.c
+END
+factorize.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/factorize.c
+END
+mmid.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/2247/trunk/mdbmth/mmid.c
+END
+hyper.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/hyper.c
+END
+findMinMax.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3359/trunk/mdbmth/findMinMax.c
+END
+makeHistogram.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/makeHistogram.c
+END
+gaussQuad.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/gaussQuad.c
+END
+median.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/3012/trunk/mdbmth/median.c
+END
+topbase.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1909/trunk/mdbmth/topbase.c
+END

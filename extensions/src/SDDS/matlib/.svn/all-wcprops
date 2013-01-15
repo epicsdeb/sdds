@@ -1,0 +1,131 @@
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/AOP/SDDS/!svn/ver/2999/trunk/matlib
+END
+m_scmul.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_scmul.c
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2714/trunk/matlib/Makefile.OAG
+END
+m_trans.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_trans.c
+END
+m_add.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/2999/trunk/matlib/m_add.c
+END
+m_identity.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_identity.c
+END
+m_error.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_error.c
+END
+m_alloc.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_alloc.c
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2157/trunk/matlib/Makefile.Host
+END
+m_diag.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_diag.c
+END
+m_invert.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_invert.c
+END
+m_copy.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_copy.c
+END
+fmat.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/fmat.c
+END
+m_det.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_det.c
+END
+Makefile.Vx
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2254/trunk/matlib/Makefile.Vx
+END
+m_check.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_check.c
+END
+m_bench.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_bench.c
+END
+m_zero.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_zero.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/2157/trunk/matlib/Makefile
+END
+m_show.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_show.c
+END
+m_free.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_free.c
+END
+m_mult.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1916/trunk/matlib/m_mult.c
+END

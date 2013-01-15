@@ -1,0 +1,83 @@
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/3174/trunk/SDDSlib/mpi_examples
+END
+example3.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/AOP/SDDS/!svn/ver/3041/trunk/SDDSlib/mpi_examples/example3.c
+END
+example5.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/AOP/SDDS/!svn/ver/3042/trunk/SDDSlib/mpi_examples/example5.c
+END
+reconnect.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/AOP/SDDS/!svn/ver/3174/trunk/SDDSlib/mpi_examples/reconnect.c
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/AOP/SDDS/!svn/ver/3096/trunk/SDDSlib/mpi_examples/Makefile.OAG
+END
+example6.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/AOP/SDDS/!svn/ver/3043/trunk/SDDSlib/mpi_examples/example6.c
+END
+row2column.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/AOP/SDDS/!svn/ver/3091/trunk/SDDSlib/mpi_examples/row2column.c
+END
+convert2row.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/AOP/SDDS/!svn/ver/3091/trunk/SDDSlib/mpi_examples/convert2row.c
+END
+copy.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/3097/trunk/SDDSlib/mpi_examples/copy.c
+END
+write.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/3097/trunk/SDDSlib/mpi_examples/write.c
+END
+read.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/3097/trunk/SDDSlib/mpi_examples/read.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/AOP/SDDS/!svn/ver/3044/trunk/SDDSlib/mpi_examples/Makefile
+END
+example1.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/AOP/SDDS/!svn/ver/3039/trunk/SDDSlib/mpi_examples/example1.c
+END
+example2.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/AOP/SDDS/!svn/ver/3040/trunk/SDDSlib/mpi_examples/example2.c
+END

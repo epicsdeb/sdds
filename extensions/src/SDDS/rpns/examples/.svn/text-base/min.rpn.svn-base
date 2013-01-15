@@ -1,0 +1,59 @@
+/* rpn udf:  min
+/* purpose:  find minimum of a function
+/* user's function is "fn"
+/* lower limit stored in "a"
+/* upper limit stored in "b"
+/* step size stored in "dx"
+/* desired accuracy is in "dxlim"
+/* call to find minimum is "min"
+/* upon exit, stack contains value of x at which minimum occurs
+/*
+/* Michael Borland, 1988
+0 sto dx sto dxlim sto a sto b sto dx sto f0 sto f1 
+  sto x0 sto x1
+cle
+
+udf
+min
+a sto x0 fn sto f0 pop  a dx + sto x1 fn sto f1 pop  loop1
+
+udf
+viewState
+dx "dx = %e " 1 fprf pop
+x0 "x0 = %e " 1 fprf pop
+f0 "f0 = %e " 1 fprf pop
+x1 "x1 = %e " 1 fprf pop
+f1 "f1 = %e\n" 1 fprf pop
+
+udf
+loop1
+viewState
+stopNow 1 == pop pop ? :
+f0 f1 < pop pop ? reset_steps : test_end advance loop1 $ $
+
+udf
+test_end
+0 sto stopNow pop 
+x1 b > pop pop ? 1 sto stopNow pop : test_end1 $
+
+udf
+test_end1
+dx dxlim < pop pop ? x0 1 sto stopNow pop :  $
+
+udf
+advance
+x1 sto x0 dx + sto x1 pop   f1 sto f0 pop   x1 fn sto f1 pop
+
+udf
+reset_steps
+x0 dx - sto x0 fn sto f0 pop dx 2 / sto dx  x0 + sto x1 fn sto f1 pop
+"subdivided\n" 1 puts
+viewState
+loop1
+
+udf
+fn
+1.5 - sqr 2 -
+
+-10 sto a 10 sto b 1 sto dx 1e-8 sto dxlim cle
+

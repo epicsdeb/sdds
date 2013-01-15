@@ -1,0 +1,101 @@
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/AOP/SDDS/!svn/ver/3473/trunk/namelist
+END
+escape_quotes.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/2955/trunk/namelist/escape_quotes.c
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2984/trunk/namelist/Makefile.OAG
+END
+show_namelist_fields.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/AOP/SDDS/!svn/ver/2693/trunk/namelist/show_namelist_fields.c
+END
+namelist_etc.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2955/trunk/namelist/namelist_etc.c
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2179/trunk/namelist/Makefile.Host
+END
+process_namelist.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/3473/trunk/namelist/process_namelist.c
+END
+zero_namelist.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/1909/trunk/namelist/zero_namelist.c
+END
+namelist_pp.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/3329/trunk/namelist/namelist_pp.c
+END
+get_namelist.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/2955/trunk/namelist/get_namelist.c
+END
+show_namelist.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/1909/trunk/namelist/show_namelist.c
+END
+free_namelist.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/1909/trunk/namelist/free_namelist.c
+END
+scan_namelist.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/AOP/SDDS/!svn/ver/2955/trunk/namelist/scan_namelist.c
+END
+free_namelist_text.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/AOP/SDDS/!svn/ver/1909/trunk/namelist/free_namelist_text.c
+END
+print_namelist.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/AOP/SDDS/!svn/ver/2955/trunk/namelist/print_namelist.c
+END
+Makefile.Vx
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2249/trunk/namelist/Makefile.Vx
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/2153/trunk/namelist/Makefile
+END

@@ -1,0 +1,53 @@
+#!/bin/sh  
+# \
+exec tclsh "$0" "$@"
+if [catch {set device $env(SDDS_DEVICE)}] {
+    set device motif
+}
+
+puts stderr "** Process data: "
+puts stderr "**  eliminate 0 readbacks (which indicate no data)"
+puts stderr "**  find min, max, mean, median pressure"
+puts stderr "**  print a label with statistics"
+exec sddsprocess data/SR.vac SR.vac1 \
+ -filter=column,Pressure,0,0,! -rpndefinitionsfiles=defns.rpn \
+ -process=Pressure,minimum,PressureMin \
+ -process=Pressure,maximum,PressureMax \
+ -process=Pressure,average,PressureMean \
+ -process=Pressure,median,PressureMedian \
+ "-define=column,LogPressure,Pressure log" \
+ "-print=parameter,PressureLabel,Pressure (%s):  Maximum=%.1e  Mean=%.1e  Median=%.1e,PressureMax.units,PressureMax,PressureMean,PressureMedian"
+
+puts stderr "**"
+puts stderr "** Plot the statistics vs. time"
+exec sddsplot -parameter=TimeOfDay,PressureM* -graph=line,vary -mode=y=log,y=special \
+    -legend=edit=%/Pressure// \
+     SR.vac1 -title=
+
+puts stderr "** Fit a decaying exponential to pumpdown starting at T=10h"
+exec sddscollapse SR.vac1 -pipe=out \
+| sddsprocess  -pipe -filter=column,TimeOfDay,0,10,! \
+| sddsexpfit -pipe -columns=TimeOfDay,PressureMax \
+ -tolerance=1e-16 -clue=decays  -fullOutput \
+| sddsprocess -pipe=in SR.vac1.fit \
+ "-print=parameter,RateLabel,Exponential rate: %e %s,expfitRate,expfitRate.units"
+
+puts stderr "** Plot fit and data "
+exec sddsplot -mode=y=log,y=special \
+ -labelsize=0.03 \
+ -topline=@RateLabel \
+ -column=TimeOfDay,PressureMaxFit SR.vac1.fit -graph=line,type=1 \
+        -legend=specified=FIT \
+ -column=TimeOfDay,PressureMax SR.vac1.fit -graph=sym,subtype=2 \
+        -legend=specified=DATA
+
+puts stderr "**"
+puts stderr "** Plot a movie of pressure vs sector number"
+puts stderr "** It is not recommended to send this output to a printer, as there"
+puts stderr "** are 99 pages worth."
+exec sddsplot -split=page,columnbin=LogPressure,start=-12,width=1 \
+  -sep=page -same=y  \
+  -col=SectorNumber,Pressure -mode=y=log -ticks=ylog SR.vac1 \
+  -graph=bar,vary -title=@TimeStamp -topline=@PressureLabel 
+
+file delete -force SR.vac1 SR.vac1.fit

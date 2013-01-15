@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/AOP/SDDS/!svn/ver/3568/trunk/utils
+END
+replaceText.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3568/trunk/utils/replaceText.c
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/3545/trunk/utils/Makefile.OAG
+END
+hdf2sdds.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/3283/trunk/utils/hdf2sdds.c
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2159/trunk/utils/Makefile.Host
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/2159/trunk/utils/Makefile
+END
+editstring.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2487/trunk/utils/editstring.c
+END

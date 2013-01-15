@@ -1,0 +1,275 @@
+K 25
+svn:wc:ra_dav:version-url
+V 32
+/AOP/SDDS/!svn/ver/3221/trunk/gd
+END
+gd_png.c
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/AOP/SDDS/!svn/ver/2579/trunk/gd/gd_png.c
+END
+gd_ss.c
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gd_ss.c
+END
+gd_jpeg.c
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gd_jpeg.c
+END
+gd.h
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/AOP/SDDS/!svn/ver/2860/trunk/gd/gd.h
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/3221/trunk/gd/Makefile.OAG
+END
+wbmp.c
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/AOP/SDDS/!svn/ver/2574/trunk/gd/wbmp.c
+END
+gd_gif_out.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gd_gif_out.c
+END
+gdkanji.c
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdkanji.c
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/2161/trunk/gd/Makefile.Host
+END
+config.h
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/AOP/SDDS/!svn/ver/2648/trunk/gd/config.h
+END
+wbmp.h
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/AOP/SDDS/!svn/ver/2574/trunk/gd/wbmp.h
+END
+gdft.c
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/AOP/SDDS/!svn/ver/2579/trunk/gd/gdft.c
+END
+gdtables.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdtables.c
+END
+gd_io_ss.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gd_io_ss.c
+END
+gdfx.c
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdfx.c
+END
+gdfontg.c
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdfontg.c
+END
+gd_topal.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gd_topal.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/AOP/SDDS/!svn/ver/2161/trunk/gd/Makefile
+END
+gdfontl.c
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdfontl.c
+END
+gdfontg.h
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdfontg.h
+END
+gdfx.h
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdfx.h
+END
+gdfontmb.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdfontmb.c
+END
+gdfontl.h
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdfontl.h
+END
+gdfonts.c
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdfonts.c
+END
+gd_gd.c
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/AOP/SDDS/!svn/ver/2579/trunk/gd/gd_gd.c
+END
+gd_io_dp.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gd_io_dp.c
+END
+gdfontmb.h
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdfontmb.h
+END
+gd_gif_in.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gd_gif_in.c
+END
+gdfontt.c
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdfontt.c
+END
+gdfonts.h
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdfonts.h
+END
+gdfontt.h
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdfontt.h
+END
+gdhelpers.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdhelpers.c
+END
+gdcache.c
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdcache.c
+END
+gd_wbmp.c
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gd_wbmp.c
+END
+gdxpm.c
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdxpm.c
+END
+gd_io_file.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gd_io_file.c
+END
+gd_security.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gd_security.c
+END
+gd_io.c
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gd_io.c
+END
+gdhelpers.h
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/2579/trunk/gd/gdhelpers.h
+END
+gdcache.h
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gdcache.h
+END
+gd_gd2.c
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gd_gd2.c
+END
+gd_io.h
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/AOP/SDDS/!svn/ver/2574/trunk/gd/gd_io.h
+END
+entities.h
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/2574/trunk/gd/entities.h
+END
+gd.c
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/AOP/SDDS/!svn/ver/2579/trunk/gd/gd.c
+END
+jisx0208.h
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/2574/trunk/gd/jisx0208.h
+END

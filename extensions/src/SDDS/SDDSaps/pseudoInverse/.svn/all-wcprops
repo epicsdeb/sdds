@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/3573/trunk/SDDSaps/pseudoInverse
+END
+meminfo.h
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/4/trunk/SDDSaps/pseudoInverse/meminfo.h
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/AOP/SDDS/!svn/ver/3569/trunk/SDDSaps/pseudoInverse/Makefile.OAG
+END
+sddsmatrixop.c
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/AOP/SDDS/!svn/ver/3383/trunk/SDDSaps/pseudoInverse/sddsmatrixop.c
+END
+matrix.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/3382/trunk/SDDSaps/pseudoInverse/matrix.c
+END
+makeAll
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/AOP/SDDS/!svn/ver/2655/trunk/SDDSaps/pseudoInverse/makeAll
+END
+benchmarkSVD
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/AOP/SDDS/!svn/ver/2653/trunk/SDDSaps/pseudoInverse/benchmarkSVD
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/AOP/SDDS/!svn/ver/2192/trunk/SDDSaps/pseudoInverse/Makefile.Host
+END
+matrixop.h
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/AOP/SDDS/!svn/ver/3109/trunk/SDDSaps/pseudoInverse/matrixop.h
+END
+machine.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/AOP/SDDS/!svn/ver/1895/trunk/SDDSaps/pseudoInverse/machine.h
+END
+matrix.h
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/2264/trunk/SDDSaps/pseudoInverse/matrix.h
+END
+sddspseudoinverse.c
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/AOP/SDDS/!svn/ver/3573/trunk/SDDSaps/pseudoInverse/sddspseudoinverse.c
+END
+matrix2.h
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/AOP/SDDS/!svn/ver/4/trunk/SDDSaps/pseudoInverse/matrix2.h
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/AOP/SDDS/!svn/ver/2192/trunk/SDDSaps/pseudoInverse/Makefile
+END
+err.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/AOP/SDDS/!svn/ver/1490/trunk/SDDSaps/pseudoInverse/err.h
+END

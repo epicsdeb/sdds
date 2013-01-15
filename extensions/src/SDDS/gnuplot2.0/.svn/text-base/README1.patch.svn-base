@@ -1,0 +1,156 @@
+Patch 1 to gnuplot 2.0.
+-----------------------
+
+The files in this patch are
+
+gnuplot_patch1.sh1:
+    README.patch1 (this file)
+    version.c
+    setshow.c
+    docs/doc2tex.c
+    docs/titlepage.ms
+    docs/titlepage.tex
+
+gnuplot_patch1.sh2
+    patch1a
+
+gnuplot_patch1.sh3
+    patch1b
+
+gnuplot_patch1.sh4
+    patch1c
+
+
+To apply this patch copy the files patch1a, patch1b and patch1c to the 
+gnuplot directory.  
+Overwrite the original gnuplot files version.c, setshow.c, docs/doc2tex.c, 
+docs/titlepage.ms and docs/titlepage.tex with the replacements in this patch.
+
+Change directory to the gnuplot directory, and then apply the patches
+with the following commands:
+
+    patch -p < patch1a
+    patch -p < patch1b
+    patch -p < patch1c
+
+Then recompile gnuplot!
+
+
+Building Gnuplot on Ultrix.
+---------------------------
+
+Changes have been made to several term/*.trm files so that the Ultrix
+standard cc compiler can now be used.  Use makefile.unx instead of 
+makefile.ult.   makefile.ult may be deleted.
+
+
+Building Gnuplot on RS/6000 AIX 3.1
+-----------------------------------
+
+One small source changes is needed to successfully compile gnuplot on AIX 3.1:
+
+   o Comment out the "extern char *malloc();" declaration in misc.c
+
+Proper CFLAGS setting is -O -Dunix -DBCOPY -DBZERO -DGAMMA.
+
+
+Building Gnuplot for X11
+------------------------
+
+Read README.x11.
+
+
+Significant changes in this patch
+---------------------------------
+
+command.c:
+	Fixed bug in replot command that arose under Turbo C.
+        Added cd (change directory) and pwd (print working directory) 
+        commands.
+graphics.c:
+	Fixed bugs in the ticmark-series code, by adding new functions 
+	specifically for ticmark series.
+	Corrected problems using user-defined ticmark sets with logscale.
+parse.c: 
+	Catch a situation where no floating point exception occured and 
+	yet the value computed was Inf (IEEE infinite).  
+	This happens on the 3b1 when plotting x**-4 + x.
+pcgraph.asm:
+	Changed the 'jmp _inter' to a far jump.
+standard.c:
+	Bessel functions fixed.  However, they only accept real arguments.
+term.h:
+	Moved most terminal defines from makefiles to new file term.h.
+
+docs/gnuplot.doc:
+        Fixed a troff problem.
+        Added note about bessel function limitations.
+        Added cd and pwd commands.
+docs/titlepage.ms:
+docs/titlepage.tex:
+        Updated version number to 2.0.
+
+docs/latextut/tutorial.tex:
+	Mentioned a new package of useful auxiliary programs for latex users.
+
+term/eepic.trm:
+        Ultrix cc initialiser problem fixed.
+term/eps60.trm:
+	New epson driver for 60dpi printers.
+term/epson.trm:
+	New Star color printer driver.
+term/hpljet.trm:
+	Fixed text placement.
+term/hpgl.trm:
+        Ultrix cc initialiser problem fixed.
+term/imagen.trm:
+        Ultrix cc initialiser problem fixed.
+term/latex.trm: 
+	Many bugs fixed: some to help out different compilers, some bugs
+	  in LATEX_linetype that had caused coredumps, and several
+	  details in the line-drawing routines. This last one had
+	  sometimes left gaps in lines that were near-vertical.
+	New emTeX driver.
+        Ultrix cc initialiser problem fixed.
+term/pc.trm:
+	Added Turbo C ATT6300 driver.
+term/post.trm:
+	Added "0 setgray" to epsf output.
+        Ultrix cc initialiser problem fixed.
+        Added stroke before show.
+term/t410x.trm:
+	New Tektronix 410x driver.
+term/x11.trm:
+gnuplot_x11.c:
+	New X11 driver.
+term/unixpc.trm: 
+	Use stdout and not stdin as the window device.
+
+
+Mail Addresses
+--------------
+
+The mailing list info-gnuplot exists as a forum for discussions about 
+gnuplot.  About the only gnuplot topic not supported by this list is 
+bug reports.  They are handled by a different mail alias, bug-gnuplot.  
+
+To be removed or add someone to the mailing list send mail to:
+
+pixar!info-gnuplot-request@sun.com
+
+
+To report bugs send mail to:
+
+pixar!bug-gnuplot@sun.com
+
+
+To ask a question or discuss gnuplot send mail to:
+
+pixar!info-gnuplot@sun.com
+
+
+pixar is a UUCP site.  sun.com is a UUCP and Internet site.  
+In the above addresses, sun.com can be replaced by ucbvax.berkeley.edu.
+
+
+End of README.patch1

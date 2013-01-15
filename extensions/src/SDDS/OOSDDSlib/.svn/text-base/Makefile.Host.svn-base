@@ -1,0 +1,50 @@
+# Makefile for SDDS library
+
+TOP = ../../../..
+include $(TOP)/config/CONFIG_EXTENSIONS
+
+HOST_OPT = NO
+LEX = flex
+YACC = bison
+
+LIBRARY = OOSDDS1
+PROD = main 
+
+USR_CXXFLAGS += -I. -I../../../SDDS/include -DATEXIT_AVAIL -Dsparc -DUNIX -DIEEE_MATH
+USR_LIBS = OOSDDS1 mdblib
+OOSDDS1_DIR = .
+mdblib_DIR = $(INSTALL_LIB)
+
+main_SRCS += Main.cc
+ 
+LIBSRCS = sddsTable.cc sddsLayout.cc sddsError.cc gddNewDel.cc sddsFileBuffer.cc
+LIBSRCS += sddsSortedIndex.cc
+LIBSRCS += sddsString.cc
+LIBSRCS += sdds_yacc.cc
+LIBSRCS += sddsDefinition.cc
+LIBSRCS += SDDS_data.c	
+
+include $(TOP)/config/RULES.Host
+
+pre_build: SDDSnl.h
+
+SDDSnl.h:  ../SDDSnl.nl
+	$(INSTALL_BIN)/nlpp ../SDDSnl.nl SDDSnl.h
+
+
+#libOOSDDS1.a: $(LIBOBJS) ../sddsDefinition.hh
+	#$(AR) c$(ARFLAGS) $@ $(LIBOBJS)
+	#@if [ ! -z "$(RANLIB)" ] ; then\
+		#$(RANLIB) $@; \
+	#fi
+
+
+sdds_lex.cc: ../sdds_lex.l
+	$(LEX) -o$@ ../sdds_lex.l
+
+sdds_yacc.cc: sdds_lex.cc ../sdds_yacc.y
+	$(YACC) -o $@ ../sdds_yacc.y
+
+clean::
+	$(RM) SDDSnl.h
+

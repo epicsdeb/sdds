@@ -1,0 +1,12 @@
+udf
+loop
+i 1 + sto i pop
+i 0 Jn 5 mod i 1 Jn 6 mod / abs chs pop
+i n == pop pop ? : loop $
+
+udf
+go
+1000 sto n loop
+
+go
+quit

@@ -1,0 +1,575 @@
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/AOP/SDDS/!svn/ver/3296/trunk/meschach
+END
+zmachine.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/914/trunk/meschach/zmachine.c
+END
+meminfo.h
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/754/trunk/meschach/meminfo.h
+END
+sparse.h
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/754/trunk/meschach/sparse.h
+END
+init.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/990/trunk/meschach/init.c
+END
+torture.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/2259/trunk/meschach/torture.c
+END
+iotort.dat
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/754/trunk/meschach/iotort.dat
+END
+iter.h
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/754/trunk/meschach/iter.h
+END
+otherio.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/754/trunk/meschach/otherio.c
+END
+itertort.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1030/trunk/meschach/itertort.c
+END
+mfuntort.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/754/trunk/meschach/mfuntort.c
+END
+machine.h.in
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/754/trunk/meschach/machine.h.in
+END
+solve.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1030/trunk/meschach/solve.c
+END
+Makefile.Vx
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2246/trunk/meschach/Makefile.Vx
+END
+hsehldr.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1030/trunk/meschach/hsehldr.c
+END
+matrixio.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1134/trunk/meschach/matrixio.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/2445/trunk/meschach/Makefile
+END
+makefile.in
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/754/trunk/meschach/makefile.in
+END
+splufctr.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1030/trunk/meschach/splufctr.c
+END
+zmemory.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/990/trunk/meschach/zmemory.c
+END
+tutorial.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/754/trunk/meschach/tutorial.c
+END
+zmatio.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/1134/trunk/meschach/zmatio.c
+END
+ls.dat
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/754/trunk/meschach/ls.dat
+END
+zcopy.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/990/trunk/meschach/zcopy.c
+END
+tutadv.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/754/trunk/meschach/tutadv.c
+END
+memory.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/2879/trunk/meschach/memory.c
+END
+memstat.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1134/trunk/meschach/memstat.c
+END
+copy.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/990/trunk/meschach/copy.c
+END
+iternsym.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/990/trunk/meschach/iternsym.c
+END
+sprow.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/754/trunk/meschach/sprow.c
+END
+symmeig.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1030/trunk/meschach/symmeig.c
+END
+zmatop.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/990/trunk/meschach/zmatop.c
+END
+vecop.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/990/trunk/meschach/vecop.c
+END
+zschur.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/914/trunk/meschach/zschur.c
+END
+lufactor.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/2259/trunk/meschach/lufactor.c
+END
+meschach.h
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/754/trunk/meschach/meschach.h
+END
+iter0.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/754/trunk/meschach/iter0.c
+END
+version.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/826/trunk/meschach/version.c
+END
+zfunc.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/914/trunk/meschach/zfunc.c
+END
+rk4.dat
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/754/trunk/meschach/rk4.dat
+END
+pxop.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1134/trunk/meschach/pxop.c
+END
+fmacheps.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/754/trunk/meschach/fmacheps.c
+END
+memtort.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/754/trunk/meschach/memtort.c
+END
+copyright
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/754/trunk/meschach/copyright
+END
+bkpfacto.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1131/trunk/meschach/bkpfacto.c
+END
+zmatlab.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/754/trunk/meschach/zmatlab.c
+END
+matrix2.h
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/990/trunk/meschach/matrix2.h
+END
+ztorture.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1030/trunk/meschach/ztorture.c
+END
+maxint.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/754/trunk/meschach/maxint.c
+END
+matlab.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/754/trunk/meschach/matlab.c
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/AOP/SDDS/!svn/ver/2680/trunk/meschach/Makefile.OAG
+END
+machine.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/754/trunk/meschach/machine.c
+END
+matlab.h
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/754/trunk/meschach/matlab.h
+END
+znorm.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/2246/trunk/meschach/znorm.c
+END
+oldnames.h
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/754/trunk/meschach/oldnames.h
+END
+makefile-old
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/754/trunk/meschach/makefile-old
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/AOP/SDDS/!svn/ver/2172/trunk/meschach/Makefile.Host
+END
+machine.h
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/3296/trunk/meschach/machine.h
+END
+norm.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/2246/trunk/meschach/norm.c
+END
+spswap.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/2259/trunk/meschach/spswap.c
+END
+spbkp.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/2259/trunk/meschach/spbkp.c
+END
+fft.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/1030/trunk/meschach/fft.c
+END
+zhessen.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/754/trunk/meschach/zhessen.c
+END
+iotort.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/754/trunk/meschach/iotort.c
+END
+qrfactor.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1134/trunk/meschach/qrfactor.c
+END
+zsolve.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/990/trunk/meschach/zsolve.c
+END
+zhsehldr.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/990/trunk/meschach/zhsehldr.c
+END
+bdfactor.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1030/trunk/meschach/bdfactor.c
+END
+hessen.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/990/trunk/meschach/hessen.c
+END
+err.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/754/trunk/meschach/err.c
+END
+zlufctr.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/990/trunk/meschach/zlufctr.c
+END
+sptort.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/754/trunk/meschach/sptort.c
+END
+submat.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/990/trunk/meschach/submat.c
+END
+svd.c
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/2758/trunk/meschach/svd.c
+END
+err.h
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/AOP/SDDS/!svn/ver/754/trunk/meschach/err.h
+END
+zmatrix.h
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/990/trunk/meschach/zmatrix.h
+END
+extras.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/754/trunk/meschach/extras.c
+END
+zvecop.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/1135/trunk/meschach/zvecop.c
+END
+mfunc.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1030/trunk/meschach/mfunc.c
+END
+matrix.h
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/2878/trunk/meschach/matrix.h
+END
+spchfctr.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1134/trunk/meschach/spchfctr.c
+END
+matop.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/990/trunk/meschach/matop.c
+END
+update.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/1030/trunk/meschach/update.c
+END
+sparse2.h
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/754/trunk/meschach/sparse2.h
+END
+schur.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/1030/trunk/meschach/schur.c
+END
+dmacheps.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/754/trunk/meschach/dmacheps.c
+END
+sparseio.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/754/trunk/meschach/sparseio.c
+END
+ivecop.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/1133/trunk/meschach/ivecop.c
+END
+zgivens.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/990/trunk/meschach/zgivens.c
+END
+zmatrix2.h
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/754/trunk/meschach/zmatrix2.h
+END
+chfactor.c
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/1030/trunk/meschach/chfactor.c
+END
+meminfo.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/754/trunk/meschach/meminfo.c
+END
+givens.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/1030/trunk/meschach/givens.c
+END
+zqrfctr.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/AOP/SDDS/!svn/ver/990/trunk/meschach/zqrfctr.c
+END
+itersym.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/AOP/SDDS/!svn/ver/1132/trunk/meschach/itersym.c
+END
+sparse.c
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/826/trunk/meschach/sparse.c
+END

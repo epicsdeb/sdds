@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/AOP/SDDS/!svn/ver/3495/trunk/python
+END
+sdds.py
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/AOP/SDDS/!svn/ver/3495/trunk/python/sdds.py
+END
+Makefile.Host
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/2624/trunk/python/Makefile.Host
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/AOP/SDDS/!svn/ver/1482/trunk/python/Makefile
+END
+sddsdatamodule.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/AOP/SDDS/!svn/ver/3495/trunk/python/sddsdatamodule.c
+END

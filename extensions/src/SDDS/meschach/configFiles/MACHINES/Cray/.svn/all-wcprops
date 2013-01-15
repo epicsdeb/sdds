@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/AOP/SDDS/!svn/ver/754/trunk/meschach/configFiles/MACHINES/Cray
+END
+patch.2
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/AOP/SDDS/!svn/ver/754/trunk/meschach/configFiles/MACHINES/Cray/patch.2
+END
+patch.3
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/AOP/SDDS/!svn/ver/754/trunk/meschach/configFiles/MACHINES/Cray/patch.3
+END
+machine.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/AOP/SDDS/!svn/ver/754/trunk/meschach/configFiles/MACHINES/Cray/machine.h
+END
+makefile
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/AOP/SDDS/!svn/ver/754/trunk/meschach/configFiles/MACHINES/Cray/makefile
+END
+patch.1
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/AOP/SDDS/!svn/ver/754/trunk/meschach/configFiles/MACHINES/Cray/patch.1
+END

@@ -1,0 +1,28 @@
+/* rpn benchmark program
+udf
+bench
+sto n
+0 sto i
+1 sto a
+2 sto b
+3 sto c
+4 sto d
+cle
+0 1 "start\n" fprf pop
+grind
+
+udf
+grind
+i n == pop pop 
+? 0 1 "stop\n" fprf pop 
+: domath increment grind
+$
+
+udf
+domath
+a sin b + c / sto d pop
+
+udf
+increment
+i 1 + sto i pop
+

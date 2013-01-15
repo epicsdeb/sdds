@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/AOP/SDDS/!svn/ver/3338/trunk/daq
+END
+user_test.cc
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/3337/trunk/daq/user_test.cc
+END
+Makefile.OAG
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/AOP/SDDS/!svn/ver/3338/trunk/daq/Makefile.OAG
+END
+ttf2_daq_user.cc
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/AOP/SDDS/!svn/ver/3337/trunk/daq/ttf2_daq_user.cc
+END
+ttf2_daq_user.h
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/AOP/SDDS/!svn/ver/3337/trunk/daq/ttf2_daq_user.h
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/AOP/SDDS/!svn/ver/3337/trunk/daq/Makefile
+END

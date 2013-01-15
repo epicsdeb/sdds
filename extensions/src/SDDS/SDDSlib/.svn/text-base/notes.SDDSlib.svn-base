@@ -1,0 +1,15 @@
+Modified SDDS_SetParametersFromDoubles to give more useful error
+messages for out-of-range indices.
+
+Modified SDDS_SprintTypedValue and SDDS_PrintTypedValue to 
+include mode argument; now support omission of quotes around
+string data.  SDDS_PrintTypedValue now calls SDDS_SprintTypedValue
+to format string data.
+
+Added tests for NULL pointers to set of four free() calls at the end
+of SDDS_Terminate.  Shouldn't been needed for ANSI-compliant free(),
+but needed under Solaris.
+
+Added fflush call to SDDS_FlushBuffer, plus SDDS_FlushBuffer calls in
+SDDS_UpdateBinaryPage.  Fixed bug that resulted in corrupted data
+from programs that used SDDS_UpdateBinarPage.
