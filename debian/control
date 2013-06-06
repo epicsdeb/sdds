@@ -11,6 +11,7 @@ Build-Depends: debhelper (>= 7), cdbs,
                liblapack-dev, gfortran, libgfortran3, libtiff-dev,
                libxmu-headers, libxmu-dev, libxtst-dev, libgd2-xpm-dev,
                x11proto-print-dev, tk (>=8.4),
+               libncurses5-dev, libreadline6-dev,
 Standards-Version: 3.8.0
 Homepage: http://www.aps.anl.gov/Accelerator_Systems_Division/Operations_Analysis/software.shtml
 
