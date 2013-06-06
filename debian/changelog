@@ -1,3 +1,9 @@
+sdds (2.11-1+wheezy1) wheezy; urgency=low
+
+  * build for debian 7 (Wheezy).
+
+ -- Guobao Shen <shengb@bnl.gov>  Thu, 06 Jun 2013 11:29:24 -0400
+
 sdds (2.11-1) unstable; urgency=low
 
   * import 2.11 upstream
