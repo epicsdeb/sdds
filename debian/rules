@@ -1,90 +1,26 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
 
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/makefile.mk
-include /usr/share/cdbs/1/rules/utils.mk
+export DH_VERBOSE=1
 
-EPICS_HOST_ARCH:=$(shell /usr/lib/epics/startup/EpicsHostArch)
+EPICS_HOST_ARCH=$(shell /usr/lib/epics/startup/EpicsHostArch.pl)
 
-# chop out the source version from Changelog (ie 1.12.20)
-SOV=$(shell echo "$(DEB_NOEPOCH_VERSION)"| cut -f 1 -d '-')
+%:
+	dh $@ --with epics -Sepicsmake -D./extensions/src/SDDS
 
-ENV=EPICS_HOST_ARCH=$(EPICS_HOST_ARCH)
-
-DEB_MAKE_ENVVARS = PATH="$(CURDIR)/extensions/bin/$(EPICS_HOST_ARCH):$$PATH" \
-LD_LIBRARY_PATH="$(CURDIR)/extensions/lib/$(EPICS_HOST_ARCH):$$LD_LIBRARY_PATH"
-
-DEB_MAKE_MAKEVARS = EPICS_HOST_ARCH=$(EPICS_HOST_ARCH) USE_RPATH=NO \
-SHRLIB_VERSION=$(SOV) ABS_INSTALL_DIR=/usr/lib/epics
-
-# Prevent CFLAGS and similar from being passed to EPICS since
-# this will break cross-builds of things.
-DEB_MAKE_INVOKE  = $(DEB_MAKE_ENVVARS) $(MAKE) -C $(DEB_BUILDDIR) $(DEB_MAKE_MAKEVARS)
-
-DEB_BUILDDIR=extensions/src/SDDS
-
-post-patches:: ./extensions/configure
-
-./extensions/configure:
+override_dh_auto_configure:
 	ln -s /usr/lib/epics/extensions/configure ./extensions/
 
-move-src: move-src-stamp
+override_dh_install:
+	dh_install --fail-missing
 
-clean::
-	rm -f move-src-stamp
+	for ff in debian/tmp/usr/lib/epics/bin/${EPICS_HOST_ARCH}/sdds*; do \
+  rm -f debian/sdds-util/usr/bin/`basename $$ff`; \
+  ln -sf ../lib/epics/bin/${EPICS_HOST_ARCH}/`basename $$ff` debian/sdds-util/usr/bin/`basename $$ff`; \
+  done
+	#cp -r extensions/bin debian/tmp/usr/
 
-DEB_MAKE_CLEAN_TARGET =
-DEB_MAKE_BUILD_TARGET = all
-DEB_MAKE_INSTALL_TARGET = all INSTALL_LOCATION=$(CURDIR)/debian/tmp/usr/lib/epics
-DEB_MAKE_CHECK_TARGET =
-
-# Build Rules
-
-binbuild=$(CURDIR)/extensions/bin/$(EPICS_HOST_ARCH)
-libbuild=$(CURDIR)/extensions/lib/$(EPICS_HOST_ARCH)
-
-clean::
-	rm -f ./extensions/configure
-	rm -rf ./extensions/bin ./extensions/include ./extensions/lib/$(EPICS_HOST_ARCH)
+override_dh_auto_clean:
+	rm -f extensions/configure
+	rm -rf ./extensions/bin ./extensions/include ./extensions/lib
 	find . -name 'O.*' -type d|xargs rm -rf
-
-# Install Rules
-
-instroot=$(CURDIR)/debian/tmp
-bindir=$(instroot)/usr/bin
-libdir=$(instroot)/usr/lib
-confdir=$(instroot)/etc
-datadir=$(instroot)/usr/share/sdds
-docdir=$(instroot)/usr/share/doc/sdds
-
-epicsroot=$(instroot)/usr/lib/epics
-epicslibs=$(epicsroot)/lib/$(EPICS_HOST_ARCH)
-epicsbins=$(epicsroot)/bin/$(EPICS_HOST_ARCH)
-epicsincl=$(epicsroot)/include
-
-install/sdds-dev::
-	install -d $(bindir)
-	install -d $(libdir)/sdds
-	install -d $(datadir)
-	install -d $(confdir)/sdds
-
-	# Basic libraries go in /usr/lib/epics/lib
-	for ff in $(epicslibs)/*.so;do \
-		mv $$ff.$(SOV) $(libdir)/; \
-		rm -f $$ff; \
-		ln -s ../../../../lib/`basename $$ff`.$(SOV) $$ff; \
-	done
-
-install/sdds-util::
-	install -d $(bindir)
-	install -d $(libdir)/sdds
-	install -d $(datadir)
-	install -d $(confdir)/sdds
-	install -d $(epicsbins)
-	install -m 644 defns.rpn $(confdir)/sdds/defns.rpn
-
-	# Basic libraries go in /usr/bin
-	for ff in $(epicsbins)/*;do \
-		ln -s ../lib/epics/bin/$(EPICS_HOST_ARCH)/`basename $$ff` $(bindir)/`basename $$ff`; \
-	done

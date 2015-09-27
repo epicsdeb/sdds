@@ -2,9 +2,9 @@ Source: sdds
 Section: contrib/x11
 Priority: extra
 Maintainer: Guobao Shen <shengb@bnl.gov>
-Build-Depends: debhelper (>= 7), cdbs,
+Build-Depends: debhelper (>= 9), epics-debhelper (>= 8.10~),
                epics-dev (>= 3.14.11-2),
-               epics-extensions-dev (>= 20091204.1),
+               epics-extensions-dev (>= 20130514),
                libgsl0-dev,
                libpng-dev, zlib1g, zlib1g-dev, libmotif-dev,
                libxaw7-dev, libx11-dev, libxp-dev,  libxt-dev,

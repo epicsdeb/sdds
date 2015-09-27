@@ -240,3 +240,5 @@ include $(TOP)/config/RULES_DIRS
 else
 include $(TOP)/configure/RULES_DIRS
 endif
+
+distclean: clean
