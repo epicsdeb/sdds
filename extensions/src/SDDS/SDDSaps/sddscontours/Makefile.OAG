@@ -85,50 +85,6 @@ endif
 USR_CFLAGS = 	-I../../sddsplots -I../../../include \
 		-DzLib
 
-ifdef KYLIX
-LDFLAGS += -w-dup
-endif
-
-ifeq ($(OS_CLASS),solaris)
-ACC_DEP_CFLAGS += -KPIC -v
-CCC_DEP_CFLAGS += -KPIC -v
-GCC_DEP_CFLAGS += -D__EXTENSIONS__
-endif
-
-GDFOUND = 1
-GD = $(words $(notdir $(wildcard \
-/usr/lib/libgd.a \
-/usr/lib/libgd.so \
-/usr/lib64/libgd.a \
-/usr/lib64/libgd.so \
-/usr/lib/i386-linux-gnu/libgd.a \
-/usr/lib/i386-linux-gnu/libgd.so \
-/usr/lib/x86_64-linux-gnu/libgd.a \
-/usr/lib/x86_64-linux-gnu/libgd.so \
-/lib/libgd.a \
-/lib/libgd.so \
-/lib64/libgd.a \
-/lib64/libgd.so \
-/sw/lib/libgd.a \
-/sw/lib/libgd.dylib \
-/opt/sfw/lib/libgd.a \
-/opt/sfw/lib/libgd.so \
-/opt/local/lib/libgd.so )))
-GDINC = $(words $(notdir $(wildcard \
-/usr/include/gd.h \
-/include/gd.h \
-/sw/include/gd.h \
-/opt/sfw/include/gd.h \
-/opt/local/include/gd.h )))
-
-ifeq ($(GD), 0)
-GDFOUND = 0
-else
-ifeq ($(GDINC), 0)
-GDFOUND = 0
-endif
-endif
-
 sddscontour_SYS_LIBS += gd png
 sddscongen_SYS_LIBS += gd png
 sddshist2d_SYS_LIBS += gd png

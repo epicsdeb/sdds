@@ -190,33 +190,7 @@ PROD_LIBS_Darwin = mdbplt mdbcommon SDDS1 mdbmth mdblib Xaw Xmu Xt Xext X11
 PROD_LIBS_solaris = mdbplt mdbcommon SDDS1 mdbmth mdblib Xaw Xmu Xext
 PROD_LIBS_Linux = mdbplt mdbcommon matlib fftpack SDDS1 rpnlib mdbmth mdblib
 
-#
-ifeq ($(OS_CLASS),Linux)
-ifeq ($(STATIC_BUILD),YES)
-STATIC_LDFLAGS_YES += -L$(X11_LIB)
-#OP_SYS_LDLIBS = -Wl,-Bdynamic -lXaw -lXmu -lXt -lXext -lX11 -Wl,-Bstatic
-ifeq ($(RHEL4_STATIC_BUILD),YES)
-OP_SYS_LDLIBS = -Wl,-Bdynamic -lXaw -Wl,-Bstatic -lXpm -lXmu -lXt -lSM -lICE -lXext -lX11 -lXdmcp -lXau -ldl
-else
-OP_SYS_LDLIBS = -lXaw -lXpm -lXmu -lXt -lSM -lICE -lXext -lX11 -lXdmcp -lXau -ldl
-endif
-else
-OP_SYS_LDLIBS += -L$(X11_LIB) -lXaw -lXmu -lXt -lXext -lX11
-endif #($(STATIC_BUILD),YES)
-ifndef BGL
-ifneq ($(words $(notdir $(wildcard /usr/include/fontconfig/fontconfig.h))), 0)
-ifeq ($(STATIC_BUILD),YES)
-ifneq ($(words $(notdir $(wildcard /usr/lib/libfontconfig.a /usr/lib64/libfontconfig.a))), 0)
-SYS_PROD_LIBS_Linux += fontconfig
-else
-OP_SYS_LDLIBS += -Wl,-Bdynamic -lfontconfig -Wl,-Bstatic 
-endif #($(words $(notdir $(wildcard /usr/lib/libfontconfig.a))), 0)
-else
-SYS_PROD_LIBS_Linux += fontconfig
-endif #($(STATIC_BUILD),YES)
-endif #($(words $(notdir $(wildcard /usr/include/fontconfig/fontconfig.h))), 0)
-endif #BGL
-endif #($(OS_CLASS),Linux)
+OP_SYS_LDLIBS += -lXaw -lXmu -lXt -lXext -lX11
 
 PROD_LIBS_WIN32 = mdbplt mdbcommon SDDS1 mdbmth mdblib fdlibm z
 PROD_LIBS_BORLANDC = mdbplt mdbcommon SDDS1 mdbmth mdblib fdlibm z
