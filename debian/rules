@@ -3,13 +3,22 @@
 
 export DH_VERBOSE=1
 
-EPICS_HOST_ARCH=$(shell /usr/lib/epics/startup/EpicsHostArch.pl)
+export EPICS_HOST_ARCH=$(shell /usr/lib/epics/startup/EpicsHostArch.pl)
 
 %:
-	dh $@ --with epics -Sepicsmake -D./extensions/src/SDDS
+	dh $@ --with epics --with python2 -Sepicsmake -D./extensions/src/SDDS
 
 override_dh_auto_configure:
-	ln -s /usr/lib/epics/extensions/configure ./extensions/
+	[ -e extensions/configure ] || ln -s /usr/lib/epics/extensions/configure ./extensions/
+
+override_dh_auto_build:
+	dh_auto_build
+	cd extensions/src/SDDS/python && python2.7 setup-mod.py build --force
+
+override_dh_auto_install:
+	dh_auto_install
+	cd extensions/src/SDDS/python && \
+  python2.7 setup-mod.py install --force --no-compile --install-layout=deb --root=$(CURDIR)/debian/tmp
 
 override_dh_install:
 	dh_install --fail-missing
@@ -21,6 +30,7 @@ override_dh_install:
 	#cp -r extensions/bin debian/tmp/usr/
 
 override_dh_auto_clean:
+	cd extensions/src/SDDS/python && python2.7 setup-mod.py clean -a
 	rm -f extensions/configure
 	rm -rf ./extensions/bin ./extensions/include ./extensions/lib
 	find . -name 'O.*' -type d|xargs rm -rf

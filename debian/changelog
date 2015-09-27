@@ -1,3 +1,9 @@
+sdds (2.11-3) jessie; urgency=medium
+
+  * Build python bindings (add python-sdds)
+
+ -- Michael Davidsaver <mdavidsaver@gmail.com>  Sun, 27 Sep 2015 19:14:05 -0400
+
 sdds (2.11-2) jessie; urgency=medium
 
   * Fix build for debian 8

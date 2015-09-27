@@ -12,6 +12,8 @@ Build-Depends: debhelper (>= 9), epics-debhelper (>= 8.10~),
                libxmu-headers, libxmu-dev, libxtst-dev, libgd2-xpm-dev,
                x11proto-print-dev, tk (>=8.4),
                libncurses5-dev, libreadline6-dev,
+               python-all-dev,
+XS-Python-Version: >= 2.7
 Standards-Version: 3.8.0
 Homepage: http://www.aps.anl.gov/Accelerator_Systems_Division/Operations_Analysis/software.shtml
 
@@ -20,12 +22,12 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
          libsdds2.11 (= ${binary:Version}),
 Description: The Self Describing Data Sets
- The Self Describing Data Sets (SDDS) is for an accelerator 
- simulation, beam commissioning, physics study, and operation. 
- A file protocol is the basis for a powerful and expanding 
- toolkit of generic programs. These programs are used for 
- simulation postprocessing, graphics, data preparation, program 
- interfacing, and experimental data analysis. 
+ The Self Describing Data Sets (SDDS) is for an accelerator
+ simulation, beam commissioning, physics study, and operation.
+ A file protocol is the basis for a powerful and expanding
+ toolkit of generic programs. These programs are used for
+ simulation postprocessing, graphics, data preparation, program
+ interfacing, and experimental data analysis.
 
 Package: sdds-dev
 Section: contrib/devel
@@ -39,13 +41,13 @@ Depends: ${shlibs:Depends}, ${misc:Depends},
          liblapack-dev, gfortran, libgfortran3, libtiff-dev,
          libxmu-headers, libxmu-dev, libxtst-dev, libgd2-xpm-dev,
          x11proto-print-dev, tk (>=8.4),
-Description: The Self Describing Data Sets
- The Self Describing Data Sets (SDDS) is for an accelerator 
- simulation, beam commissioning, physics study, and operation. 
- A file protocol is the basis for a powerful and expanding 
- toolkit of generic programs. These programs are used for 
- simulation postprocessing, graphics, data preparation, program 
- interfacing, and experimental data analysis. 
+Description: The Self Describing Data Sets. Development headers
+ The Self Describing Data Sets (SDDS) is for an accelerator
+ simulation, beam commissioning, physics study, and operation.
+ A file protocol is the basis for a powerful and expanding
+ toolkit of generic programs. These programs are used for
+ simulation postprocessing, graphics, data preparation, program
+ interfacing, and experimental data analysis.
  .
  Development headers
 
@@ -53,13 +55,27 @@ Package: libsdds2.11
 Section: contrib/devel
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
-Description: The Self Describing Data Sets
- The Self Describing Data Sets (SDDS) is for an accelerator 
- simulation, beam commissioning, physics study, and operation. 
- A file protocol is the basis for a powerful and expanding 
- toolkit of generic programs. These programs are used for 
- simulation postprocessing, graphics, data preparation, program 
- interfacing, and experimental data analysis. 
+Description: The Self Describing Data Sets. Runtime libraries
+ The Self Describing Data Sets (SDDS) is for an accelerator
+ simulation, beam commissioning, physics study, and operation.
+ A file protocol is the basis for a powerful and expanding
+ toolkit of generic programs. These programs are used for
+ simulation postprocessing, graphics, data preparation, program
+ interfacing, and experimental data analysis.
  .
  Runtime libraries
 
+Package: python-sdds
+Section: contrib/python
+Architecture: any
+Depends: ${python:Depends}, ${misc:Depends},
+         libsdds2.11 (= ${binary:Version}),
+Description: The Self Describing Data Sets. Python bindings
+ The Self Describing Data Sets (SDDS) is for an accelerator
+ simulation, beam commissioning, physics study, and operation.
+ A file protocol is the basis for a powerful and expanding
+ toolkit of generic programs. These programs are used for
+ simulation postprocessing, graphics, data preparation, program
+ interfacing, and experimental data analysis.
+ .
+ Python bindings
