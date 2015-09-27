@@ -129,37 +129,10 @@ GDFOUND = 0
 endif
 endif
 
-ifneq ($(GDFOUND), 0)
-ifeq ($(STATIC_BUILD),YES)
-ifneq ($(words $(notdir $(wildcard /usr/lib/libgd.a \
-                                   /usr/lib64/libgd.a \
-                                   /lib/libgd.a \
-                                   /lib64/libgd.a \
-                                   /sw/lib/libgd.a \
-                                   /opt/sfw/lib/libgd.a \
-                                   /opt/local/lib/libgd.a))), 0)
-SYS_PROD_LIBS += gd png
-else
-OP_SYS_LDLIBS += -lgd -lpng
-endif
-else
-SYS_PROD_LIBS += gd png
-endif
-ifeq ($(OS_CLASS),solaris)
-OP_SYS_INCLUDES += -I/opt/sfw/include -I/opt/local/include
-OP_SYS_LDFLAGS += -L/opt/sfw/lib -L/opt/local/lib -R/opt/sfw/lib -R/opt/local/lib
-endif
-endif
-
-ifeq ($(GDFOUND), 0)
-sddscontour_LIBS += gd png
-sddscongen_LIBS += gd png
-sddshist2d_LIBS += gd png
-sddsimageconvert_LIBS += gd png
-PROD_LIBS_WIN32 += gd png
-gd_DIR = /usr/lib
-png_DIR = /usr/lib
-endif
+sddscontour_SYS_LIBS += gd png
+sddscongen_SYS_LIBS += gd png
+sddshist2d_SYS_LIBS += gd png
+sddsimageconvert_SYS_LIBS += gd png
 
 PROD_SYS_LIBS += gsl gslcblas
 

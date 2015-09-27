@@ -161,42 +161,6 @@ GCC_DEP_CFLAGS += -D__EXTENSIONS__
 SHRLIB_LDFLAGS = -G -h libmdbplt.so -z nodefs
 endif
 
-GDFOUND = 1
-GD = $(words $(notdir $(wildcard \
-/usr/lib/libgd.a \
-/usr/lib/libgd.so \
-/usr/lib64/libgd.a \
-/usr/lib64/libgd.so \
-/usr/lib/i386-linux-gnu/libgd.a \
-/usr/lib/i386-linux-gnu/libgd.so \
-/usr/lib/x86_64-linux-gnu/libgd.a \
-/usr/lib/x86_64-linux-gnu/libgd.so \
-/lib/libgd.a \
-/lib/libgd.so \
-/lib64/libgd.a \
-/lib64/libgd.so \
-/sw/lib/libgd.a \
-/sw/lib/libgd.dylib \
-/opt/local/lib/libgd.a \
-/opt/local/lib/libgd.dylib \
-/opt/sfw/lib/libgd.a \
-/opt/sfw/lib/libgd.so \
-/opt/local/lib/libgd.so )))
-GDINC = $(words $(notdir $(wildcard \
-/usr/include/gd.h \
-/include/gd.h \
-/sw/include/gd.h \
-/opt/sfw/include/gd.h \
-/opt/local/include/gd.h )))
-
-ifeq ($(GD), 0)
-GDFOUND = 0
-else
-ifeq ($(GDINC), 0)
-GDFOUND = 0
-endif
-endif
-
 ifeq ($(OS_CLASS),Linux)
 ifeq ($(STATIC_BUILD),YES)
 #These static libraries usually are only available if you rebuild the
@@ -219,34 +183,7 @@ endif
 
 SYS_PROD_LIBS += gsl gslcblas
 
-ifneq ($(GDFOUND), 0)
-ifeq ($(STATIC_BUILD),YES)
-ifneq ($(words $(notdir $(wildcard /usr/lib/libgd.a \
-                                   /usr/lib64/libgd.a \
-                                   /lib/libgd.a \
-                                   /lib64/libgd.a \
-                                   /sw/lib/libgd.a \
-                                   /opt/sfw/lib/libgd.a \
-                                   /opt/local/lib/libgd.a))), 0)
-SYS_PROD_LIBS += gd png
-else
-sddsplot_LDFLAGS_Linux += -Wl,-Bdynamic -lgd -lpng -Wl,-Bstatic
-sddsplot_LDFLAGS_Default += -lgd -lpng
-endif
-else
-SYS_PROD_LIBS += gd png
-endif
-ifeq ($(OS_CLASS),solaris)
-OP_SYS_INCLUDES += -I/opt/sfw/include -I/opt/local/include
-OP_SYS_LDFLAGS += -L/opt/sfw/lib -L/opt/local/lib -R/opt/sfw/lib -R/opt/local/lib
-endif
-endif
-
-ifeq ($(GDFOUND), 0)
-sddsplot_LIBS += gd png
-gd_DIR = $(INSTALL_LIB)
-png_DIR = $(INSTALL_LIB)
-endif
+sddsplot_SYS_LIBS += gd png
 
 PROD_LIBS_DEFAULT = mdbplt mdbcommon SDDS1 mdbmth mdblib Xaw Xmu Xt Xext X11
 PROD_LIBS_Darwin = mdbplt mdbcommon SDDS1 mdbmth mdblib Xaw Xmu Xt Xext X11
@@ -311,9 +248,6 @@ Xext_DIR = $(X11_LIB)
 X11_DIR = $(X11_LIB)
 
 term_CFLAGS += -DUSE_GD_LIBRARY -I$(EPICS_BASE)/include
-ifeq ($(GDFOUND), 0)
-term_CFLAGS += -I../../../gd
-endif
 
 LIBSRCS = arrows.c plot_data_sets.c make_scales.c graphics.c psymbol.c \
           term.c multi_plot.c

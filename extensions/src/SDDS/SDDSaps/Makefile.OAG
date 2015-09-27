@@ -363,74 +363,9 @@ sddsdigfilter_SRCS = SDDSutils.c sddsdigfilter.c
 sddstranspose_SRCS = SDDSutils.c sddstranspose.c
 
 ifndef BGL
-TIFFLOCATION = $(wildcard /usr/lib/libtiff.a \
-                          /usr/lib/libtiff.so \
-                          /usr/lib/i386-linux-gnu/libtiff.a \
-                          /usr/lib/i386-linux-gnu/libtiff.so \
-                          /usr/lib/x86_64-linux-gnu/libtiff.a \
-                          /usr/lib/x86_64-linux-gnu/libtiff.so \
-                          /usr/lib64/libtiff.a \
-                          /usr/lib64/libtiff.so \
-                          /lib/libtiff.a \
-                          /lib/libtiff.so \
-                          /lib64/libtiff.a \
-                          /lib64/libtiff.so \
-                          /sw/lib/libtiff.a \
-                          /sw/lib/libtiff.dylib \
-                          /usr/sfw/lib/libtiff.a \
-                          /usr/sfw/lib/libtiff.so )
-TIFFINCLOCATION = $(wildcard /usr/include/tiffio.h \
-                             /include/tiffio.h \
-                             /sw/include/tiffio.h \
-                             /usr/sfw/include/tiffio.h )
-TIFF = $(words $(notdir $(TIFFLOCATION)))
-TIFFINC = $(words $(notdir $(TIFFINCLOCATION)))
-
 TIFFFOUND = 0
-ifneq ($(TIFF), 0)
-ifneq ($(TIFFINC), 0)
-ifeq ($(STATIC_BUILD),YES)
-ifneq ($(words $(notdir $(wildcard /usr/lib/libtiff.a \
-                                   /usr/lib64/libtiff.a \
-                                   /lib/libtiff.a \
-                                   /lib64/libtiff.a \
-                                   /sw/lib/libtiff.a \
-                                   /usr/sfw/lib/libtiff.a))), 0)
-SYS_PROD_LIBS += tiff
-else
-sdds2tiff_LDFLAGS_Linux += -Wl,-Bdynamic -ltiff -Wl,-Bstatic
-sdds2tiff_LDFLAGS_Default += -ltiff
-tiff2sdds_LDFLAGS_Linux += -Wl,-Bdynamic -ltiff -Wl,-Bstatic
-tiff2sdds_LDFLAGS_Default += -ltiff
-endif
-ifneq ($(words $(notdir $(wildcard /usr/lib/libjpeg.a \
-                                   /usr/lib64/libjpeg.a \
-                                   /lib/libjpeg.a \
-                                   /lib64/libjpeg.a \
-                                   /sw/lib/libjpeg.a \
-                                   /usr/sfw/lib/libjpeg.a))), 0)
-SYS_PROD_LIBS += jpeg
-else
-sdds2tiff_LDFLAGS_Linux += -Wl,-Bdynamic -ljpeg -Wl,-Bstatic
-sdds2tiff_LDFLAGS_Default += -ljpeg
-tiff2sdds_LDFLAGS_Linux += -Wl,-Bdynamic -ljpeg -Wl,-Bstatic
-tiff2sdds_LDFLAGS_Default += -ljpeg
-endif
-else
-SYS_PROD_LIBS += tiff jpeg
-endif
-TIFFFOUND = 1
-ifeq ($(OS_CLASS),solaris)
-OP_SYS_INCLUDES += -I/usr/sfw/include
-OP_SYS_LDFLAGS += -L/usr/sfw/lib -R/usr/sfw/lib
-endif
-endif #ifneq ($(TIFFINC), 0)
-endif #ifneq ($(TIFF), 0)
 
-ifeq ($(TIFFFOUND), 0)
-tiff2sdds_LIBS = tiff
-sdds2tiff_LIBS = tiff
-tiff_DIR = /usr/lib
-endif #ifeq ($(TIFFFOUND), 0)
+sdds2tiff_SYS_LIBS += tiff jpeg
+tiff2sdds_SYS_LIBS += tiff jpeg
 
 endif

@@ -107,71 +107,9 @@ CCC_DEP_CFLAGS += -KPIC -v
 GCC_DEP_CFLAGS += -D__EXTENSIONS__
 endif
 
-GDFOUND = 1
-GD = $(words $(notdir $(wildcard \
-/usr/lib/libgd.a \
-/usr/lib/libgd.so \
-/usr/lib64/libgd.a \
-/usr/lib64/libgd.so \
-/usr/lib/i386-linux-gnu/libgd.a \
-/usr/lib/i386-linux-gnu/libgd.so \
-/usr/lib/x86_64-linux-gnu/libgd.a \
-/usr/lib/x86_64-linux-gnu/libgd.so \
-/lib/libgd.a \
-/lib/libgd.so \
-/lib64/libgd.a \
-/lib64/libgd.so \
-/sw/lib/libgd.a \
-/sw/lib/libgd.dylib \
-/opt/local/lib/libgd.a \
-/opt/local/lib/libgd.dylib \
-/opt/sfw/lib/libgd.a \
-/opt/sfw/lib/libgd.so \
-/opt/local/lib/libgd.so )))
-GDINC = $(words $(notdir $(wildcard \
-/usr/include/gd.h \
-/include/gd.h \
-/sw/include/gd.h \
-/opt/sfw/include/gd.h \
-/opt/local/include/gd.h )))
-
-ifeq ($(GD), 0)
-GDFOUND = 0
-else
-ifeq ($(GDINC), 0)
-GDFOUND = 0
-endif
-endif
-
 PROD_SYS_LIBS += gsl gslcblas
 
-ifneq ($(GDFOUND), 0)
-ifeq ($(STATIC_BUILD),YES)
-ifneq ($(words $(notdir $(wildcard /usr/lib/libgd.a \
-                                   /usr/lib64/libgd.a \
-                                   /lib/libgd.a \
-                                   /lib64/libgd.a \
-                                   /sw/lib/libgd.a \
-                                   /opt/sfw/lib/libgd.a \
-                                   /opt/local/lib/libgd.a))), 0)
-SYS_PROD_LIBS += gd png
-else
-OP_SYS_LDLIBS += -lgd -lpng
-endif
-else
-SYS_PROD_LIBS += gd png
-endif
-ifeq ($(OS_CLASS),solaris)
-OP_SYS_INCLUDES += -I/opt/sfw/include -I/opt/local/include
-OP_SYS_LDFLAGS += -L/opt/sfw/lib -L/opt/local/lib -R/opt/sfw/lib -R/opt/local/lib
-endif
-endif
-
-ifeq ($(GDFOUND), 0)
-mpl_motif_LIBS += gd png
-gd_DIR = $(INSTALL_LIB)
-png_DIR = $(INSTALL_LIB)
-endif
+mpl_motif_SYS_LIBS += gd png
 
 
 PROD_LIBS_DEFAULT = mdbplt SDDS1 mdbmth mdblib Xm Xmu Xt X11
